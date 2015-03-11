@@ -2,23 +2,27 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKeyConstraint
-import datetime
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 db = SQLAlchemy(app)
 
+# Students could login
 class Student(db.Model):
     sno = db.Column(db.String(20), unique=True, primary_key=True)
     name = db.Column(db.String(80))
     dept = db.Column(db.String(80))
 
     email = db.Column(db.String(80))
+    password = db.Column(db.String(80))
+    is_admin = db.Column(db.Boolean(), default=False)
+
     description = db.Column(db.Text())
-    register_time = db.Column(db.DateTime())
+    register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     last_login_time = db.Column(db.DateTime())
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
-    avatar = db.Column(db.Integer, db.ForeignKey('image_store', name='avatar_storage', use_alter=True))
+    avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
 
     classes_joined = db.relationship('JoinClass', backref='student')
     courses_following = db.relationship('FollowCourse', backref='student')
@@ -33,7 +37,7 @@ class Student(db.Model):
         self.dept = dept
 
     def __repr__(self):
-        return '<User {} ({})>'.format(self.name, self.sno)
+        return '<Student {} ({})>'.format(self.name, self.sno)
 
     # course_type: 计划必修，自由选修……
     def joinClass(self, sno, term, course_type):
@@ -46,12 +50,31 @@ class Student(db.Model):
         db.session.add(c)
         db.session.commit()
 
+class Teacher(db.Model):
+    tno = db.Column(db.String(20), unique=True, primary_key=True)
+    name = db.Column(db.String(80))
+    dept = db.Column(db.String(80))
+
+    email = db.Column(db.String(80))
+    description = db.Column(db.Text())
+
+    classes = db.relationship('Class')
+
+    def __init__(self, tno, name, dept):
+        self.tno = tno
+        self.name = name
+        self.dept = dept
+    
+    def __repr__(self):
+        return '<Teacher {} ({})'.format(self.name, self.tno)
+
 # 每个有唯一课程号的课程是一个 Course 对象
 class Course(db.Model):
     cid = db.Column(db.Integer, unique=True)
     cno = db.Column(db.String(20), unique=True, primary_key=True)
     name = db.Column(db.String(80))
     dept = db.Column(db.String(80))
+    description = db.Column(db.Text())
 
     classes = db.relationship('Class')
     followers = db.relationship('FollowCourse')
@@ -69,10 +92,16 @@ class Course(db.Model):
 class Class(db.Model):
     cno = db.Column(db.String(20), db.ForeignKey('course.cno'), primary_key=True)
     term = db.Column(db.String(10), primary_key=True)
+    start_week = db.Column(db.Integer)
+    end_week = db.Column(db.Integer)
+    tno = db.Column(db.String(20), db.ForeignKey('teacher.tno'))
+    credit = db.Column(db.Integer) # 学分
+    hours = db.Column(db.Integer)  # 学时
     time = db.Column(db.String(100))
     room = db.Column(db.String(80))
 
     course = db.relationship('Course')
+    teacher = db.relationship('Teacher')
     students = db.relationship('JoinClass', backref='class')
 
     def __init__(self, cno, term, time, room):
@@ -113,10 +142,10 @@ class CourseReview(db.Model):
     sno = db.Column(db.String(20), db.ForeignKey('student.sno'))
     cno = db.Column(db.String(80), db.ForeignKey('course.cno'))
     rate = db.Column(db.Integer())   # 课程评分
-    upvote = db.Column(db.Integer()) # 点赞数量
+    upvote = db.Column(db.Integer(), default=0) # 点赞数量
     title = db.Column(db.String(200))
     content = db.Column(db.Text())
-    publish_time = db.Column(db.DateTime())
+    publish_time = db.Column(db.DateTime(), default=datetime.utcnow)
 
     course = db.relationship('Course')
     student = db.relationship('Student')
@@ -129,14 +158,13 @@ class CourseReview(db.Model):
         self.upvote = 0
         self.title = title
         self.content = content
-        self.publish_time = datetime.now()
 
 class CourseReviewComment(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     review_id = db.Column(db.Integer, db.ForeignKey('course_review.id'))
     sno = db.Column(db.String(20), db.ForeignKey('student.sno'))
     content = db.Column(db.Text())
-    publish_time = db.Column(db.DateTime())
+    publish_time = db.Column(db.DateTime(), default=datetime.utcnow)
 
     author = db.relationship('Student')
 
@@ -144,7 +172,6 @@ class CourseReviewComment(db.Model):
         self.review_id = review_id
         self.sno = author
         self.content = content
-        self.publish_time = db.Column(db.DateTime())
 
 class CourseNote(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
@@ -172,7 +199,7 @@ class CourseNoteComment(db.Model):
     note_id = db.Column(db.Integer, db.ForeignKey('course_note.id'))
     sno = db.Column(db.String(20), db.ForeignKey('student.sno'))
     content = db.Column(db.Text())
-    publish_time = db.Column(db.DateTime())
+    publish_time = db.Column(db.DateTime(), default=datetime.utcnow)
 
     author = db.relationship('Student')
 
@@ -180,13 +207,12 @@ class CourseNoteComment(db.Model):
         self.note_id = note_id
         self.sno = author
         self.content = content
-        self.publish_time = db.Column(db.DateTime())
 
 class CourseForumThread(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     sno = db.Column(db.String(20), db.ForeignKey('student.sno'))
     cno = db.Column(db.String(80), db.ForeignKey('course.cno'))
-    upvote = db.Column(db.Integer())
+    upvote = db.Column(db.Integer(), default=0)
     title = db.Column(db.String(200))
     content = db.Column(db.Text())
 
@@ -206,9 +232,9 @@ class CourseForumPost(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     thread_id = db.Column(db.Integer, db.ForeignKey('course_forum_thread.id'))
     sno = db.Column(db.Integer, db.ForeignKey('student.sno'))
-    upvote = db.Column(db.Integer())
+    upvote = db.Column(db.Integer(), default=0)
     content = db.Column(db.Text())
-    publish_time = db.Column(db.DateTime())
+    publish_time = db.Column(db.DateTime(), default=datetime.utcnow)
 
     author = db.relationship('Student')
 
@@ -217,16 +243,16 @@ class CourseForumPost(db.Model):
         self.sno = author
         self.upvote = 0
         self.content = content
-        self.publish_time = db.Column(db.DateTime())
 
 class CourseShare(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     sno = db.Column(db.String(20), db.ForeignKey('student.sno'))
     cno = db.Column(db.String(80), db.ForeignKey('course.cno'))
-    upvote = db.Column(db.Integer())
+    upvote = db.Column(db.Integer(), default=0)
     filename = db.Column(db.String(256))
     description = db.Column(db.Text())
     stored_filename = db.Column(db.String(80), unique=True)
+    publish_time = db.Column(db.DateTime(), default=datetime.utcnow)
 
     course = db.relationship('Course')
     author = db.relationship('Student')
@@ -238,14 +264,13 @@ class CourseShare(db.Model):
         self.upvote = 0
         self.title = title
         self.content = content
-        self.publish_time = datetime.now()
 
 class CourseShareComment(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     share_id = db.Column(db.Integer, db.ForeignKey('course_share.id'))
     sno = db.Column(db.String(20), db.ForeignKey('student.sno'))
     content = db.Column(db.Text())
-    publish_time = db.Column(db.DateTime())
+    publish_time = db.Column(db.DateTime(), default=datetime.utcnow)
 
     author = db.relationship('Student')
 
@@ -253,16 +278,16 @@ class CourseShareComment(db.Model):
         self.share_id = share_id
         self.sno = author
         self.content = content
-        self.publish_time = datetime.now()
 
 class ImageStore(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     sno = db.Column(db.String(20), db.ForeignKey('student.sno'))
     filename = db.Column(db.String(256))
-    upload_time = db.Column(db.DateTime())
+    upload_time = db.Column(db.DateTime(), default=datetime.utcnow)
     stored_filename = db.Column(db.String(80), unique=True)
 
-    #author = db.relationship('Student')
+    # we need to specify foreign_keys because Student.avatar => ImageStore.id is another foreign key
+    author = db.relationship('Student', foreign_keys=[sno])
 
     def __init__(self, author, filename, stored_filename):
         self.sno = author
