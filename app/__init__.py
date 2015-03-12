@@ -9,8 +9,8 @@ import os
 from flask import Flask,request
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
-from app.course import course
-from app.home import home
+from app.views import course
+from app.views import home
 
 app = Flask(__name__)
 
