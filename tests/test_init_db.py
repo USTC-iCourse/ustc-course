@@ -7,14 +7,22 @@
 import sys
 sys.path.append('..')  # fix import directory
 
-from model import db, Student
+from app import app,db
+from app.models import Student,Course
 from random import randint
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+
 
 db.create_all()
 for i in range(1, 10):
     stu = Student('PB10' + str(randint(100000, 999999)), '李博杰', '11')
+    course = Course('test'+str(randint(100000,999999)),'线性代数','test')
+    db.session.add(course)
     db.session.add(stu)
 db.session.commit()
 
 print(Student.query.all())
+print()
 print(Student.query.filter_by(dept='11').first())
+print(Course.query.all())

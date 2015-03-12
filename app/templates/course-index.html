@@ -1,0 +1,13 @@
+<html>
+<body>
+{% for item in pagination.items %}
+<table>
+<tr>{{ item.cno }}</tr>
+<tr>{{ item.name }}</tr>
+<tr>{{ item.dept }}</tr>
+<tr>{{ item.description }}</tr>
+</table>
+{% endfor %}
+</body>
+</html>
+
