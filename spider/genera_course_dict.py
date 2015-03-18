@@ -6,13 +6,20 @@
 
 
 import pickle
+import os
 
 term = input('2014秋季学期: 20141\n2015春季学期: 20142\n2015夏季学期: 20143\n请输入开课学期: ')
+
+if term not in ['20141','20142','20143']:
+    term = '20142'
 
 #开始处理
 ############################
 try:
-    data = open('../course_lists/'+term+'.html')
+    path = "../course_lists/"
+    if not os.path.exists(path):
+        os.mkdir(path)
+    data = open(path+term+'.html','r')
     course_dict = {}  #一学期所有的课程是一个大字典, 每个课程的value是一个列表
 
     for i in range(818):
@@ -36,6 +43,8 @@ try:
 
     data.close()
 
+    if not os.path.exists("../data/"):
+        os.mkdir("../data/")
     with open('../data/'+term+'_course_dict.pickle', 'wb') as course_dict_file:
         pickle.dump(course_dict, course_dict_file)
 

@@ -12,6 +12,9 @@ my_cookies = {"pgv_pvi":"7886302208", "__utma": "63887786.357939715.1420618208.1
 term = input('2014秋季学期: 20141\n2015春季学期: 20142\n2015夏季学期: 20143\n请输入开课学期: ')
 
 try:
+    path = "../data/"
+    if not os.path.exists(path):
+        os.mkdir(path)
     with open('../data/'+term+'_course_dict.pickle', 'rb') as myrestoredata:
         course_dict = pickle.load(myrestoredata)
 
