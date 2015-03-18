@@ -12,15 +12,11 @@ folowcourse = db.Table('followcourse',db.metadata,
 
 
 joinclass = db.Table('joinclass', db.metadata,
-    db.Column('sutdent_id', db.String(20), db.ForeignKey('students.sno')),
-    db.Column('class_id', db.Integer, db.ForeignKey('classes.id')),
-    #db.Column('term',db.String(10) ,db.ForeignKey('classes.term'))
-    #course_type = db.Column(db.String(80), primary_key=True)
-    #__table_args__ = (ForeignKeyConstraint([cno, term], [Class.cno, Class.term]), {})
-
-    #course = db.relationship('Course')
-    #classes = db.relationship('Class')
-    )
+    db.Column('student_id', db.String(20), db.ForeignKey('students.sno')),
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id')),
+    db.Column('term',db.String(10) ,db.ForeignKey('courses.term'))
+    ForeignKeyConstraint(['student_id', 'term'], ['courses.cno', 'courses.term']))
+)
 
 
 # Students could login
@@ -42,12 +38,12 @@ class Student(db.Model):
 
     avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
 
-    classes = db.relationship('Class', secondary=joinclass, backref='students')
-    courses = db.relationship('Course',secondary=folowcourse, backref = 'folowers')
+    courses_joined = db.relationship('Course', secondary=joincourse, backref='students')
+    courses_following = db.relationship('Course',secondary=folowcourse, backref = 'folowers')
     #courses_following = db.relationship('FollowCourse', backref='student')
 
+    reviews = db.relationship('CourseReview',backref='author')
     '''
-    reviews = db.relationship('CourseReview')
     notes = db.relationship('CourseNote')
     discussions = db.relationship('CourseForumThread')
     shares = db.relationship('CourseShare')
@@ -62,15 +58,21 @@ class Student(db.Model):
         return '<Student {} ({})>'.format(self.name, self.sno)
 
     # course_type: 计划必修，自由选修……
-    def joinClass(self, _class):
-        self.classes.append(_class)
+    def join_course(self, course):
+        if not course:
+            return None
+        self.courses_joined.append(course)
         db.session.add(self)
         db.session.commit()
+        return self
 
-    def followCourse(self, course):
-        self.courses.append(course)
+    def follow_course(self, course):
+        if not course:
+            return None
+        self.courses_following.append(course)
         db.session.add(self)
         db.session.commit()
+        return self
 
 class Teacher(db.Model):
     __tablename__ = 'teachers'
@@ -82,7 +84,7 @@ class Teacher(db.Model):
     email = db.Column(db.String(80))
     description = db.Column(db.Text())
 
-    classes = db.relationship('Class',backref='teacher')
+    courses = db.relationship('Course',backref='teacher')
 
     def __init__(self, tno, name, dept):
         self.tno = tno
