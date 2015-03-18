@@ -1,0 +1,67 @@
+body {
+  padding-top: 60px;
+  padding-bottom: 30px;
+  background-color: #f3f3f3;
+}
+
+.grey {
+    color: #999;
+    font-size: 13px;
+}
+
+.blue {
+    color: #337ab7;
+}
+
+.float-element {
+    background-color: #ffffff;
+    padding: 30px;
+    margin: 20px 0;
+}
+
+#course-name {
+    font-size: 20px;
+}
+
+.container {
+    width: 75%;
+}
+
+.text-container {
+    padding: 15px;
+}
+
+.comment-container {
+    border-bottom: 1px #ddd dashed;
+    margin: 10px 0 10px 0;
+}
+.user-info {
+    padding: 15px 0 10px 0;
+}
+.glyphicon-star, .glyphicon-star-empty {
+    font-size: 12px;
+}
+.comment-text {
+    padding: 5px 0;
+}
+.comment-detail {
+    padding: 10px 0 20px 0;
+}
+.glyphicon-comment, .glyphicon-thumbs-up {
+    margin-left: 10px;
+}
+.post-time {
+    margin-right: 30px;
+}
+.learn-status {
+    margin-left: 5px;
+}
+.post-user {
+    margin-right: 5px;
+}
+.btn-add-evaluation {
+    float: right;
+}
+.last-evaluation {
+    font-size: 18px;
+}
