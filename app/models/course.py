@@ -10,9 +10,9 @@ from app import db
 class Course(db.Model):
     __tablename__ = 'courses'
 
-    cid = db.Column(db.Integer,unique=True)
-    cno = db.Column(db.String(20), unique=True, primary_key=True)
-    term = db.Colmun(db.Integer, primary_key=True)
+    id = db.Column(db.Integer,unique=True,primary_key=True)
+    cno = db.Column(db.String(20), unique=True)
+    term = db.Column(db.String(10))
     name = db.Column(db.String(80))
     dept = db.Column(db.String(80))
     description = db.Column(db.Text())
@@ -28,7 +28,7 @@ class Course(db.Model):
     #followers : Students that follow the class
     #students : Students that attend the class
     reviews = db.relationship('CourseReview',backref='course')
-
+    #notes
 
     def __init__(self,  cno, name, dept):
         #self.cid = cid
@@ -43,9 +43,7 @@ class CourseReview(db.Model):
     __tablename__ = 'course_reviews'
     id = db.Column(db.Integer,primary_key=True, unique=True)
     author_id = db.Column(db.String(20),db.ForeignKey('students.sno'))
-    course_id = db.Column(db.String(20))
-    course_term = db.Column(db.String(10))
-    __table_args__ = (ForeignKeyConstraint([course_id,course_term],[Course.cno,Course.term]))
+    course_id = db.Column(db.String(20),db.ForeignKey('courses.id'))
 
     rate = db.Column(db.Integer)  #课程评分
     upvote = db.Column(db.Integer,default=0) #点赞数量
@@ -55,8 +53,8 @@ class CourseReview(db.Model):
     publish_time = db.Column(db.DateTime(),default=datetime.utcnow)
     update_time = db.Column(db.DateTime(),default=datetime.utcnow)
 
-    #author : backref to Student
-    #course : backref to Course
+    author = db.relationship('Student',backref='reviews')
+    #course
 
     comments = db.relationship('CourseReviewComment',backref='review')
 

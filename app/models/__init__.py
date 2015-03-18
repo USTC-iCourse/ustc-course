@@ -1,3 +1,3 @@
 from .course import *
 from .user import *
-from utils import *
+from .utils import *

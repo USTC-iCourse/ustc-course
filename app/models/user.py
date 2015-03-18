@@ -7,16 +7,19 @@ from app import db
 
 folowcourse = db.Table('followcourse',db.metadata,
     db.Column('student_id',db.String(20), db.ForeignKey('students.sno')),
-    db.Column('course_id',db.String(80), db.ForeignKey('courses.cno'))
+    db.Column('course_id',db.String(80), db.ForeignKey('courses.id'))
     )
 
 
-joinclass = db.Table('joinclass', db.metadata,
+joincourse= db.Table('joinclass', db.metadata,
     db.Column('student_id', db.String(20), db.ForeignKey('students.sno')),
     db.Column('course_id', db.Integer, db.ForeignKey('courses.id')),
-    db.Column('term',db.String(10) ,db.ForeignKey('courses.term'))
-    ForeignKeyConstraint(['student_id', 'term'], ['courses.cno', 'courses.term']))
 )
+
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer,primary_key=True)
+    email = db.Column(db.String(255), unique=True)
 
 
 # Students could login
@@ -42,7 +45,8 @@ class Student(db.Model):
     courses_following = db.relationship('Course',secondary=folowcourse, backref = 'folowers')
     #courses_following = db.relationship('FollowCourse', backref='student')
 
-    reviews = db.relationship('CourseReview',backref='author')
+    #needn't anymore
+    #reviews = db.relationship('CourseReview',backref='author')
     '''
     notes = db.relationship('CourseNote')
     discussions = db.relationship('CourseForumThread')

@@ -64,7 +64,7 @@ class Teacher(db.Model):
         self.tno = tno
         self.name = name
         self.dept = dept
-    
+
     def __repr__(self):
         return '<Teacher {} ({})'.format(self.name, self.tno)
 

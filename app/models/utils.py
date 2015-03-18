@@ -1,3 +1,7 @@
+from flask import url_for
+from app import db
+from datetime import datetime
+
 class ImageStore(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     sno = db.Column(db.String(20), db.ForeignKey('student.sno'))
