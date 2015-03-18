@@ -7,9 +7,10 @@
 
 import requests
 import pickle
+import os
 
 # You should change cookies["JESSIONID"] everytime you signed in
-my_cookies = {"pgv_pvi":"7886302208", "__utma": "63887786.357939715.1420618208.1421380394.1422108680.4", " __utmz": "63887786.1425197280.5.2.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided)", "_gscu_1103646635": "20618766mew2xs15", "_ga": "GA1.3.2036932779.1422282491", "JSESSIONID": "9863C5650F4678B3A84DC1E9DEF4B914"}
+my_cookies = {"JSESSIONID": "D1904F071AB249CB534B9CCBA5FF7450"}
 term = input('2014秋季学期: 20141\n2015春季学期: 20142\n2015夏季学期: 20143\n请输入开课学期: ')
 
 try:
@@ -22,8 +23,11 @@ try:
         url = "http://mis.teach.ustc.edu.cn/querystubykcbjh.do?tag=gc&xnxq=" + term + "&kcbjh=" + key + "&kczw=" + course_dict[key][1]
 
         page = requests.get(url, cookies=my_cookies)
+        if not '学号' in page.text:
+            raise IOError('请登录综合教务系统，获取 cookie 填入代码中的 JSESSIONID 一栏')
 
-        with open("../"+term+"/"+ key +".html", "w") as newfile:
+        os.makedirs('../data/' + term, 0o755, exist_ok=True)
+        with open("../data/"+term+"/"+ key +".html", "w") as newfile:
             print(page.text, file = newfile)
 
 except IOError as err:

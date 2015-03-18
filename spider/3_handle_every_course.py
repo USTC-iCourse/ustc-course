@@ -21,7 +21,7 @@ try:
 # 开始读取文件，处理信息
 ######################
     for key in course_dict:
-        data = open('../'+term+'/'+key+'.html')
+        data = open('../data/'+term+'/'+key+'.html')
         student_list = []  #这是每门课的学生名单列表
         new_student = []  #每个学生的信息是一个列表
 
@@ -59,7 +59,8 @@ try:
     for key in course_student_dict:
         print('课程号：', key)
         print('学生人数：', len(course_student_dict[key]))
-        print('第一个学生：', course_student_dict[key][0])
+        if 0 in course_student_dict[key]:
+            print('第一个学生：', course_student_dict[key][0])
         break
 
 
