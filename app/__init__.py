@@ -8,7 +8,7 @@
 import os
 from flask import Flask,request
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.login import LoginManager
+from flask.ext.security import Security,  SQLAlchemyUserDatastore
 
 
 app = Flask(__name__)
@@ -18,16 +18,18 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////'+os.path.join(app.root_path, 'test.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-
+#app.config['SECURITY_PASSWORD_HASH'] = bcrypt
 db = SQLAlchemy(app)
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-#login_manager.login_view = 'signin'
+
+
 
 from app.views import course
 from app.views import home
+from app.models import User,Role
 app.register_blueprint(home,url_prefix='')
 app.register_blueprint(course,url_prefix='/course')
 
-
+# Setup Flask-Security
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(app, user_datastore)

@@ -7,7 +7,7 @@
 import sys
 sys.path.append('..')  # fix import directory
 
-from app import app,db
+from app import app,db,user_datastore
 from app.models import Student,Course
 from random import randint
 
@@ -20,6 +20,9 @@ for i in range(1, 10):
     course = Course('test'+str(randint(100000,999999)),'线性代数','test')
     db.session.add(course)
     db.session.add(stu)
+db.session.commit()
+
+user_datastore.create_user(email='test@163.com',password='password')
 db.session.commit()
 
 print(Student.query.all())
