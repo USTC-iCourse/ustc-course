@@ -7,7 +7,7 @@ from app import db
 from flask.ext.security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin
 
 folowcourse = db.Table('followcourse',db.metadata,
-    db.Column('student_id',db.String(20), db.ForeignKey('students.sno')),
+    db.Column('user_id',db.String(20), db.ForeignKey('users.id')),
     db.Column('course_id',db.String(80), db.ForeignKey('courses.id'))
     )
 
@@ -35,8 +35,23 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
-    confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role',secondary=roles_users, backref=db.backref('users',lazy='dynamic'))
+    register_time = db.Column(db.DateTime(), default=datetime.utcnow)
+    confirmed_at = db.Column(db.DateTime())
+    last_login_time = db.Column(db.DateTime())
+    # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
+
+    avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
+
+    courses_following = db.relationship('Course',secondary=folowcourse, backref = 'folowers')
+    #needn't anymore
+    #reviews = db.relationship('CourseReview',backref='author')
+    '''
+    notes = db.relationship('CourseNote')
+    discussions = db.relationship('CourseForumThread')
+    shares = db.relationship('CourseShare')
+    '''
+
 
     def __repr__(self):
         return '<User {} ({})>'.format(self.email, self.password)
@@ -52,36 +67,38 @@ class Student(db.Model):
     name = db.Column(db.String(80))
     dept = db.Column(db.String(80))
 
-    email = db.Column(db.String(80))
-    password = db.Column(db.String(80))
-    is_admin = db.Column(db.Boolean(), default=False)
-
     description = db.Column(db.Text())
-    register_time = db.Column(db.DateTime(), default=datetime.utcnow)
-    last_login_time = db.Column(db.DateTime())
-    # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
-
-    avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
 
     courses_joined = db.relationship('Course', secondary=joincourse, backref='students')
-    courses_following = db.relationship('Course',secondary=folowcourse, backref = 'folowers')
-    #courses_following = db.relationship('FollowCourse', backref='student')
 
-    #needn't anymore
-    #reviews = db.relationship('CourseReview',backref='author')
-    '''
-    notes = db.relationship('CourseNote')
-    discussions = db.relationship('CourseForumThread')
-    shares = db.relationship('CourseShare')
-    '''
-
-    def __init__(self, sno, name, dept):
+    def __init__(self, sno, name, dept=None, description=None):
         self.sno = sno
         self.name = name
         self.dept = dept
+        self.description=description
 
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
+
+    @classmethod
+    def create(cls, sno, name, dept=None, description=None):
+        '''
+        creat a Student object and add it to database
+        if the student object already exists in the db, it will
+            return None.
+        :param sno: the student id number
+        :param name: the student's name
+        :param dept: the department the sutdent belongs to
+        :param description:
+        '''
+        if cls.query.get(sno):
+            return None
+        else:
+            student = cls(sno, name, dept, description)
+            db.session.add(student)
+            db.commit()
+            return student
+
 
     # course_type: 计划必修，自由选修……
     def join_course(self, course):
@@ -92,6 +109,7 @@ class Student(db.Model):
         db.session.commit()
         return self
 
+    #deprecated
     def follow_course(self, course):
         if not course:
             return None
