@@ -27,21 +27,21 @@ class Course(db.Model):
     #teacher : Teacher
     #followers : Students that follow the class
     #students : Students that attend the class
-    reviews = db.relationship('CourseReview',backref='course')
+    reviews = db.relationship('CourseReview',backref='course',lazy='dynamic')
     #notes
-
-    def __init__(self,  cno, name, dept):
-        #self.cid = cid
-        self.cno = cno
-        self.name = name
-        self.dept = dept
 
     def __repr__(self):
         return '<Course {} ({})>'.format(self.name, self.cno)
 
+    @classmethod
+    def create(cls,**kwargs):
+        course = Course(**kwargs)
+        db.session.add(course)
+        db.session.commit()
+
     @property
     def url(self):
-        return url_for('course.detail',course_id=self.id,course_name=self.name)
+        return url_for('course.course_detail',course_id=self.id,course_name=self.name)
 
 class CourseReview(db.Model):
     __tablename__ = 'course_reviews'
@@ -50,7 +50,6 @@ class CourseReview(db.Model):
     rate = db.Column(db.Integer)  #课程评分
     upvote = db.Column(db.Integer,default=0) #点赞数量
 #TODO: upvote lists
-    title = db.Column(db.String(200))
     content = db.Column(db.Text())
     publish_time = db.Column(db.DateTime(),default=datetime.utcnow)
     update_time = db.Column(db.DateTime(),default=datetime.utcnow)
@@ -62,12 +61,9 @@ class CourseReview(db.Model):
 
     comments = db.relationship('CourseReviewComment',backref='review')
 
-    def __init__(self,author,course,rate,title,content):
-        self.author = author
-        self.course = course
-        self.rate = rate
-        self.title = title
-        self.content = content
+    def __repr__(self):
+        return 'Review %s (%d)'%(self.content,self.rate)
+
 
     def save(self, course=None, author=None):
         if self.id:     # the review already exits
@@ -92,10 +88,12 @@ class CourseReviewComment(db.Model):
     content = db.Column(db.Text)
     publish_time = db.Column(db.DateTime,default=datetime.utcnow)
 
-    def __init__(self,review, author, content):
-        self.review = review
-        self.author = author
-        self.content = content
+    def save(self, review, author):
+        if review and author:
+            self.review = review
+            self.author = author
+            db.session.add(self)
+            db.session.commit()
 
 
 

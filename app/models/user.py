@@ -71,12 +71,6 @@ class Student(db.Model):
 
     courses_joined = db.relationship('Course', secondary=joincourse, backref='students')
 
-    def __init__(self, sno, name, dept=None, description=None):
-        self.sno = sno
-        self.name = name
-        self.dept = dept
-        self.description=description
-
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
 
@@ -94,9 +88,9 @@ class Student(db.Model):
         if cls.query.get(sno):
             return None
         else:
-            student = cls(sno, name, dept, description)
+            student = cls(sno=sno, name=name, dept=dept, description=description)
             db.session.add(student)
-            db.commit()
+            db.session.commit()
             return student
 
 

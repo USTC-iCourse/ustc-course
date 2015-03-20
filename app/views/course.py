@@ -23,10 +23,10 @@ def course_detail(course_id,course_name=None):
         return redirect(url_for('.course_detail',course_id=course_id,course_name=course.name))
 
     reviews = course.reviews
-    return course_name + str(reviews)
+    return course_name + '<a href='+url_for('.review',course_id=course.id,course_name=course.name)+'>reviews</a>'
     return str(course_id)
 
-@course.route('/<int:course_id>/<course_name>/review/')
+@course.route('/<int:course_id>/<course_name>/reviews/')
 def review(course_id,course_name=None):
     course = Course.query.get(course_id)
     if not course:
@@ -34,9 +34,24 @@ def review(course_id,course_name=None):
     if course_name != course.name:
         return redirect(url_for('.review',course_id=course_id,course_name=course.name))
 
-    reviews = course.reviews.pagination(page=1,perpage=10)
-    return course_name + str(reviews)
-    return str(course_id)
+    reviews = course.reviews.paginate(page=1,per_page=10)
+    if reviews.total:
+        for item in review.item:
+            str += item.content + '<a href=' + url_for('review.edit', review_id=review.id) +'>Edit</a><br>'
+        return str
+    else:
+        return 'No reviews'
+
+
+'''deprecated. See review.py.
+@course.route('/<int:course_id>/<course_name>/review/edit',methods=['GET','POST'])
+def edit_review(course_d,course_name=None):
+    course = Course.query.get(course_id)
+    if not course:
+        return 404
+    if course_name != course.name:
+        return redirect(url_for('.edit_review',course_id=course_id,course_name=course.name))
+    '''
 
 
 

@@ -6,6 +6,7 @@
     <tr><a href={{ item.url }}>{{ item.name }}</a></tr>
     <tr>{{ item.dept }}</tr>
     <tr>{{ item.description }}</tr>
+    <tr><a href={{ url_for('review.new_review',course_id=item.id, course_name=item.name) }}>New Rreview</a>
 </table>
 {% endfor %}
 </body>

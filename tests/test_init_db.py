@@ -16,14 +16,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 
 db.create_all()
 for i in range(1, 10):
-    stu = Student('PB10' + str(randint(100000, 999999)), '李博杰', '11')
-    course = Course('test'+str(randint(100000,999999)),'线性代数','test')
-    db.session.add(course)
-    db.session.add(stu)
-db.session.commit()
+    Student.create(sno='PB10' + str(randint(100000, 999999)), name='李博杰', dept= '11')
+    Course.create(tno='test'+str(randint(100000,999999)),name='线性代数',dept='test')
 
-user_datastore.create_user(email='test@163.com',password='password')
-db.session.commit()
+try:
+    uuser_datastore.create_user(email='test@163.com',password='password')
+except:
+    pass
 
 print(Student.query.all())
 print()
