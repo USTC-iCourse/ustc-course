@@ -19,7 +19,7 @@ class Course(db.Model):
 
     credit = db.Column(db.Integer) # 学分
     hours = db.Column(db.Integer)  # 学时
-    default_classes = db.Column(db.String(200))
+    class_numbers = db.Column(db.String(200))
     start_end_week = db.Column(db.String(100))
     time_location = db.Column(db.String(100))
 
@@ -34,8 +34,10 @@ class Course(db.Model):
         return '<Course {} ({})>'.format(self.name, self.cno)
 
     @classmethod
-    def create(cls,**kwargs):
-        course = Course(**kwargs)
+    def create(cls,cno,term,**kwargs):
+        if cls.query.filter_by(cno=cno,term=term):
+            return None
+        course = Course(cno,term,**kwargs)
         db.session.add(course)
         db.session.commit()
         return course

@@ -124,12 +124,19 @@ class Teacher(db.Model):
 
     courses = db.relationship('Course',backref='teacher')
 
-    def __init__(self, tno, name, dept):
-        self.tno = tno
-        self.name = name
-        self.dept = dept
 
     def __repr__(self):
         return '<Teacher {} ({})'.format(self.name, self.tno)
+
+    @classmethod
+    def create(cls, tno, name, dept=None,email=None,description=None):
+        if cls.query.get(tno):
+            return None
+        else:
+            teacher=cls(tno=tno, name=name, dept=dept, email=email, description=description)
+            db.session.add(teacher)
+            db.session.commit()
+            return teacher
+
 
 

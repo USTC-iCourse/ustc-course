@@ -10,7 +10,7 @@ import pickle
 import os
 
 # You should change cookies["JESSIONID"] everytime you signed in
-my_cookies = {"JSESSIONID": "945B287A49E7F5317563A101FF8C2B89"}
+my_cookies = {"JSESSIONID": "4189FC3E84FE5C0D5816CB33E4DF2F34"}
 term = input('2014秋季学期: 20141\n2015春季学期: 20142\n2015夏季学期: 20143\n请输入开课学期: ')
 
 try:
