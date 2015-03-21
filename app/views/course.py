@@ -15,14 +15,15 @@ def index():
 
 @course.route('/<int:course_id>/')
 @course.route('/<int:course_id>/<course_name>/')
-def course_detail(course_id,course_name=None):
+def view_course(course_id,course_name=None):
     course = Course.query.get(course_id)
     if not course:
         return 404
     if course_name != course.name:
-        return redirect(url_for('.course_detail',course_id=course_id,course_name=course.name))
+        return redirect(url_for('.view_course',course_id=course_id,course_name=course.name))
 
     reviews = course.reviews
+    related_courses = Course.query.filter_by(name=course_name).all()
     return course_name + '<a href='+url_for('.review',course_id=course.id,course_name=course.name)+'>reviews</a>'
     return str(course_id)
 
@@ -57,5 +58,17 @@ def edit_review(course_d,course_name=None):
 
 @course.route('/new/',methods=['GET','POST'])
 @course.route('/<int:course_id>/edit/',methods=['GET','POSt'])
-def edit(course_id=None):
-    pass
+def edit_course(course_id=None):
+    if course_id:
+        course = Course.query.get(course_id)
+    else:
+        course = Course()
+    if not course:
+        return 404
+    course_form = CourseForm(request.form, course)
+    if course_form.validate_on_submit():
+        course_form.populate_obj(course)
+        course = course.save()
+        flash('course saved')
+        return redirect('.view_course', course_id=course.id, course_name=course.name)
+    return render_tempalte('edit-course.html', form=course_form)

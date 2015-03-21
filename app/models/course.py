@@ -17,7 +17,6 @@ class Course(db.Model):
     dept = db.Column(db.String(80))
     description = db.Column(db.Text())
 
-    tno = db.Column(db.String(20), db.ForeignKey('teachers.tno'))
     credit = db.Column(db.Integer) # 学分
     hours = db.Column(db.Integer)  # 学时
     default_classes = db.Column(db.String(200))
@@ -25,6 +24,7 @@ class Course(db.Model):
     time_location = db.Column(db.String(100))
 
     #teacher : Teacher
+    tno = db.Column(db.String(20), db.ForeignKey('teachers.tno'))
     #followers : Students that follow the class
     #students : Students that attend the class
     reviews = db.relationship('CourseReview',backref='course',lazy='dynamic')
@@ -38,10 +38,16 @@ class Course(db.Model):
         course = Course(**kwargs)
         db.session.add(course)
         db.session.commit()
+        return course
 
     @property
     def url(self):
         return url_for('course.course_detail',course_id=self.id,course_name=self.name)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
 
 class CourseReview(db.Model):
     __tablename__ = 'course_reviews'

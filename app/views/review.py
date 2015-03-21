@@ -6,7 +6,7 @@ from app.forms import ReviewForm
 review = Blueprint('review',__name__)
 
 @review.route('/new/',methods=['GET','POST'])
-@login_required
+#@login_required
 def new_review():
     form = ReviewForm(request.form)
     course_id = request.args.get('course_id')

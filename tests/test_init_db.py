@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 db.create_all()
 for i in range(1, 10):
     Student.create(sno='PB10' + str(randint(100000, 999999)), name='李博杰', dept= '11')
-    Course.create(tno='test'+str(randint(100000,999999)),name='线性代数',dept='test')
+    Course.create(cno='test'+str(randint(100000,999999)),name='线性代数',dept='test')
 
 try:
     uuser_datastore.create_user(email='test@163.com',password='password')
