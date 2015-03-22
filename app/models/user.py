@@ -6,6 +6,9 @@ from datetime import datetime
 from app import db
 #from flask.ext.security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin
 
+Roles = ['Admin',
+        'User']
+
 folowcourse = db.Table('followcourse',db.metadata,
     db.Column('user_id',db.String(20), db.ForeignKey('users.id')),
     db.Column('course_id',db.String(80), db.ForeignKey('courses.id'))
@@ -22,6 +25,7 @@ roles_users = db.Table('roles_users',
         db.Column('role_id', db.Integer(), db.ForeignKey('roles.id')))
 
 #class Role(db.Model, RoleMixin):
+#not used for now
 class Role(db.Model):
     __tablename__ = 'roles'
 
@@ -35,14 +39,14 @@ class User(db.Model):
 
     id = db.Column(db.Integer,primary_key=True)
     email = db.Column(db.String(255), unique=True)
-    _password = db.Column(db.String(255))
+    _password = db.Column(db.String(255),nullable=False)
     active = db.Column(db.Boolean())
-    roles = db.relationship('Role',secondary=roles_users, backref=db.backref('users',lazy='dynamic'))
+    #roles = db.relationship('Role',secondary=roles_users, backref=db.backref('users',lazy='dynamic'))
+    role = db.Column(db.String(20),default='User')
     register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
     last_login_time = db.Column(db.DateTime())
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
-
     avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
 
     courses_following = db.relationship('Course',secondary=folowcourse, backref = 'folowers')
