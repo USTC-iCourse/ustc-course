@@ -1,8 +1,12 @@
+'''
+将数据导入到数据库
+如果为课程指定教师，则课程应该在创建教师后再创建。
+'''
 from app.models import Course, Student, Teacher
 
 def create_course(cno, term ,name, dept=None, description=None, credit=0, hours=0,
         class_numbers=None, time_location=None, teacher=None):
-    ''' creat a course in the database
+    ''' creat a course in the database,
     :param con: 课程号(必须)
     :param term: 学期号(必须)
     :param name: 课程名(必须)
@@ -12,7 +16,7 @@ def create_course(cno, term ,name, dept=None, description=None, credit=0, hours=
     :param hours: 学时
     :param class_numbers: 班级号
     :param time_location: pass
-    :param teacher: 教师对象 Teacher.
+    :param teacher: 教师对象 Teacher.如果存在，则为该课程添加教师。
     '''
     course=Course.create(cno=cno, term=term,name=name, dept=dept,
             description=description, credit=credit, hours=hours,
