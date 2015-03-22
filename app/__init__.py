@@ -26,11 +26,13 @@ db = SQLAlchemy(app)
 
 from app.views import course
 from app.views import home,review
-from app.models import User,Role
+#from app.models import User,Role
+from app.views import api
 app.register_blueprint(home,url_prefix='')
 app.register_blueprint(course,url_prefix='/course')
 app.register_blueprint(review, url_prefix='/review')
+app.register_blueprint(api, url_prefix='/api')
 
 # Setup Flask-Security
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore)
+#user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+#security = Security(app, user_datastore)

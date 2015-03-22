@@ -2,6 +2,10 @@ from datetime import datetime
 
 from flask import url_for,abort
 from app import db
+try:
+    from flask.ext.login import current_user
+except:
+    current_user=None
 
 
 
@@ -85,6 +89,11 @@ class CourseReview(db.Model):
             db.session.add(self)
             db.session.commit()
 
+    def add_comment(self, comment, author=current_user):
+        self.comments.append(comment)
+        self.save()
+
+
 
 class CourseReviewComment(db.Model):
     __tablename__ = 'reviewcomments'
@@ -96,7 +105,7 @@ class CourseReviewComment(db.Model):
     content = db.Column(db.Text)
     publish_time = db.Column(db.DateTime,default=datetime.utcnow)
 
-    def save(self, review, author):
+    def save(self, review, author=current_user):
         if review and author:
             self.review = review
             self.author = author

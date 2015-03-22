@@ -1,1 +1,1 @@
-from .review import ReviewForm
+from .review import ReviewForm, ReviewCommentForm
