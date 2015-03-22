@@ -37,8 +37,9 @@ def review(course_id,course_name=None):
 
     reviews = course.reviews.paginate(page=1,per_page=10)
     if reviews.total:
-        for item in review.item:
-            str += item.content + '<a href=' + url_for('review.edit', review_id=review.id) +'>Edit</a><br>'
+        str = ''
+        for item in reviews.items:
+            str += item.content + '<a href=' + url_for('review.edit_review', review_id=item.id) +'>Edit</a><br>'
         return str
     else:
         return 'No reviews'

@@ -9,6 +9,7 @@ import os
 from flask import Flask,request
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import Security,  SQLAlchemyUserDatastore
+from flask.ext.login import LoginManager
 
 
 app = Flask(__name__)
@@ -21,7 +22,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 #app.config['SECURITY_PASSWORD_HASH'] = bcrypt
 db = SQLAlchemy(app)
 
-
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'home.login'
 
 
 from app.views import course
@@ -33,6 +36,6 @@ app.register_blueprint(course,url_prefix='/course')
 app.register_blueprint(review, url_prefix='/review')
 app.register_blueprint(api, url_prefix='/api')
 
-# Setup Flask-Security
+
 #user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 #security = Security(app, user_datastore)

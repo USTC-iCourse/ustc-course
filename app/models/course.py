@@ -39,16 +39,16 @@ class Course(db.Model):
 
     @classmethod
     def create(cls,cno,term,**kwargs):
-        if cls.query.filter_by(cno=cno,term=term):
+        if cls.query.filter_by(cno=cno,term=term).first():
             return None
-        course = Course(cno,term,**kwargs)
+        course = Course(cno=cno,term=term,**kwargs)
         db.session.add(course)
         db.session.commit()
         return course
 
     @property
     def url(self):
-        return url_for('course.course_detail',course_id=self.id,course_name=self.name)
+        return url_for('course.view_course',course_id=self.id,course_name=self.name)
 
     def save(self):
         db.session.add(self)

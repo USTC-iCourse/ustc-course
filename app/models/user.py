@@ -3,11 +3,17 @@ from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKeyConstraint
 from datetime import datetime
-from app import db
+from app import db, login_manager as lm
+from random import randint
+from flask.ext.login import UserMixin
 #from flask.ext.security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin
 
 Roles = ['Admin',
         'User']
+
+Identidies =['Teacher',
+        'Student']
+
 
 folowcourse = db.Table('followcourse',db.metadata,
     db.Column('user_id',db.String(20), db.ForeignKey('users.id')),
@@ -34,15 +40,17 @@ class Role(db.Model):
     description = db.Column(db.String(255))
 
 #class User(db.Model, UserMixin):
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer,primary_key=True)
     email = db.Column(db.String(255), unique=True)
-    _password = db.Column(db.String(255),nullable=False)
-    active = db.Column(db.Boolean())
+    password = db.Column(db.String(255),nullable=False)
+    nick = db.Column(db.String(120),nullable=False,default=randint(100000,999999))
+    active = db.Column(db.Boolean(), default=True)
     #roles = db.relationship('Role',secondary=roles_users, backref=db.backref('users',lazy='dynamic'))
     role = db.Column(db.String(20),default='User')
+    identity = db.Column(db.String(20))
     register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
     last_login_time = db.Column(db.DateTime())
@@ -50,6 +58,8 @@ class User(db.Model):
     avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
 
     courses_following = db.relationship('Course',secondary=folowcourse, backref = 'folowers')
+    student_info = db.relationship('Student', backref='user',uselist=False)
+    teacher_info = db.relationship('Teacher', backref='user',uselist=False)
     #needn't anymore
     #reviews = db.relationship('CourseReview',backref='author')
     '''
@@ -59,8 +69,35 @@ class User(db.Model):
     '''
 
 
+
     def __repr__(self):
         return '<User {} ({})>'.format(self.email, self.password)
+
+    @property
+    def info(self):
+        if self.identity == 'Student':
+            return self.student_info
+        elif self.identity == 'Teacher':
+            return self.teacher_info
+        else:
+            return None
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        if self.active:
+            return True
+        return False
+
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+@lm.user_loader
+def load_user(userid):
+    return User.query.get(userid)
 
 
 
@@ -72,8 +109,9 @@ class Student(db.Model):
     sno = db.Column(db.String(20), unique=True, primary_key=True)
     name = db.Column(db.String(80))
     dept = db.Column(db.String(80))
-
     description = db.Column(db.Text())
+
+    use_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     courses_joined = db.relationship('Course', secondary=joincourse, backref='students')
 
@@ -127,6 +165,8 @@ class Teacher(db.Model):
 
     email = db.Column(db.String(80))
     description = db.Column(db.Text())
+
+    user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     courses = db.relationship('Course',backref='teacher')
 

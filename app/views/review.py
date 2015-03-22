@@ -47,10 +47,12 @@ def edit_review():
     if review.author != current_user:
         return 'You have no right to do this'
 
-    form = ReviewForm(request.POST,review)
-    if request.POST and form.validate():
+    form = ReviewForm(request.form,review)
+    if form.validate_on_submit():
         form.populate_obj(review)
         review.save()
+        course = review.course
+        return redirect(url_for('course.review', course_id=course.id, course_name=course.name))
 
     return render_template('new-review.html', form=form)
 
