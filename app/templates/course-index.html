@@ -16,130 +16,62 @@
 
   <!-- Projects Row -->
   <div class="row">
+      {% for course in pagination.items %}
     <div class="col-md-4 portfolio-item">
       <a href="#">
         <img class="img-responsive" src="http://placehold.it/700x400" alt="">
       </a>
       <h3>
-        <a href="#">Project Name</a>
+          <a href={{ course.url }}>{{ course.name }}</a>
       </h3>
+      {{ course.description }}
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
     </div>
-    <div class="col-md-4 portfolio-item">
-      <a href="#">
-        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-      </a>
-      <h3>
-        <a href="#">Project Name</a>
-      </h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-    </div>
-    <div class="col-md-4 portfolio-item">
-      <a href="#">
-        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-      </a>
-      <h3>
-        <a href="#">Project Name</a>
-      </h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-    </div>
-  </div>
-  <!-- /.row -->
-
-  <!-- Projects Row -->
-  <div class="row">
-    <div class="col-md-4 portfolio-item">
-      <a href="#">
-        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-      </a>
-      <h3>
-        <a href="#">Project Name</a>
-      </h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-    </div>
-    <div class="col-md-4 portfolio-item">
-      <a href="#">
-        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-      </a>
-      <h3>
-        <a href="#">Project Name</a>
-      </h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-    </div>
-    <div class="col-md-4 portfolio-item">
-      <a href="#">
-        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-      </a>
-      <h3>
-        <a href="#">Project Name</a>
-      </h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-    </div>
-  </div>
-
-  <!-- Projects Row -->
-  <div class="row">
-    <div class="col-md-4 portfolio-item">
-      <a href="#">
-        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-      </a>
-      <h3>
-        <a href="#">Project Name</a>
-      </h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-    </div>
-    <div class="col-md-4 portfolio-item">
-      <a href="#">
-        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-      </a>
-      <h3>
-        <a href="#">Project Name</a>
-      </h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-    </div>
-    <div class="col-md-4 portfolio-item">
-      <a href="#">
-        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
-      </a>
-      <h3>
-        <a href="#">Project Name</a>
-      </h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
-    </div>
+    {% endfor %}
   </div>
   <!-- /.row -->
 
   <hr>
 
   <!-- Pagination -->
-  <div class="row text-center">
-    <div class="col-lg-12">
-      <ul class="pagination">
+<nav>
+  <ul class=pagination>
+        {%- if pagination.has_prev %} 
         <li>
-          <a href="#">&laquo;</a>
+        <a href={{ url_for(endpoint,page=pagination.prev_num,**kwargs) }} aria-label="previous">
+           <span aria-hidden="true">&laquo;</span>
+       </a>
+       </li>
+       {% else %}
+       <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+       {% endif %}
+  {%- for page in pagination.iter_pages(left_edge=1,right_edge=1) %}
+    {% if page %}
+      {% if page != pagination.page %}
+      <li>
+        <a href="{{ url_for(endpoint, page=page,**kwargs) }}">{{ page }}</a>
         </li>
-        <li class="active">
-          <a href="#">1</a>
+      {% else %}
+      <li class="active">
+      <a href="#"><strong>{{ page }}</strong></a>
         </li>
+      {% endif %}
+    {% else %}
+        <li><span class=ellipsis>…</span></li>
+    {% endif %}
+    {%- endfor %}
+    {%- if pagination.has_next %} 
         <li>
-          <a href="#">2</a>
-        </li>
-        <li>
-          <a href="#">3</a>
-        </li>
-        <li>
-          <a href="#">4</a>
-        </li>
-        <li>
-          <a href="#">5</a>
-        </li>
-        <li>
-          <a href="#">&raquo;</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <!-- /.row -->
+        <a href={{ url_for(endpoint,page=pagination.next_num,**kwargs) }} aria-label="Next">
+           <span aria-hidden="true">&raquo;</span>
+       </a>
+       </li>
+        {% else %}
+       <li class="disabled"><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+       {% endif %}
+  </ul>
+<nav>
+   <!-- /.row -->
 
   <hr>
 
