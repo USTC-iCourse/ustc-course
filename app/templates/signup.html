@@ -1,90 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="favicon.ico">
-    <title>USTC评课社区</title>
+{% extends "layout-simple.html" %}
+{% block content %}
 
-    <!-- Bootstrap core CSS -->
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+<div class="container">
+  <div class="float-element">
 
-    <!-- Custom styles for this template -->
-    <link href="/static/css/style.css" rel="stylesheet">
-    <link href="/static/css/signin.css" rel="stylesheet">
-  </head>
+    {{ error }}
 
+    <h3 class="blue">Sign Up</h3>
+    <hr>
 
-
-  <body>
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <a class="navbar-brand" href={{ url_for('course.index') }}>USTC评课社区</a>
+    <form class="form-horizontal">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <div class="form-group">
+        <label for="inputName" class="col-sm-2 control-label">Username</label>
+        <div class="col-sm-4">
+          <input type="text" name="username" class="form-control" id="inputName" placeholder="Username">
         </div>
       </div>
-    </nav>
-
-
-
-    <div class="container">
-      <div class="float-element">
-
-          {{ error }}
-
-        <h3 class="blue">Sign Up</h3>
-        <hr>
-
-        <form class="form-horizontal">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="form-group">
-            <label for="inputName" class="col-sm-2 control-label">Username</label>
-            <div class="col-sm-4">
-              <input type="text" name="username" class="form-control" id="inputName" placeholder="Username">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="inputEmail" class="col-sm-2 control-label">USTC Email</label>
-            <div class="col-sm-4">
-              <input name="email" class="form-control" id="inputEmail" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="inputPassword" class="col-sm-2 control-label">Password</label>
-            <div class="col-sm-4">
-              <input name="password" class="form-control" id="inputPassword" placeholder="Password">
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-              <button type="submit" class="btn btn-default">Submit</button>
-            </div>
-          </div>
-        </form>
-
-
+      <div class="form-group">
+        <label for="inputEmail" class="col-sm-2 control-label">USTC Email</label>
+        <div class="col-sm-4">
+          <input name="email" class="form-control" id="inputEmail" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn">
+        </div>
       </div>
-    </div>
-
-
-    <footer class="footer">
-      <div class="container">
-        <p class="text-muted">Copyright &copy; USTC评课社区 2015</p>
+      <div class="form-group">
+        <label for="inputPassword" class="col-sm-2 control-label">Password</label>
+        <div class="col-sm-4">
+          <input name="password" class="form-control" id="inputPassword" placeholder="Password">
+        </div>
       </div>
-    </footer>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-default">Submit</button>
+        </div>
+      </div>
+    </form>
 
 
+  </div>
+</div>
+
+{% endblock %}
 
 
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/static/js/jquery.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-  </body>
-</html>
