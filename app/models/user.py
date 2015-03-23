@@ -14,37 +14,19 @@ Identidies =['Teacher',
         'Student']
 
 related_courses = db.Table('related_course',
-    course1 = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True),
-    course2 = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True)
+    db.Column('src', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
+    db.Column('dst', db.Integer, db.ForeignKey('courses.id'), primary_key=True)
 )
 
 follow_course = db.Table('follow_course',
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True),
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
 )
 
 join_course = db.Table('join_course',
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.sno'), primary_key=True)
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
+    db.Column('student_id', db.Integer, db.ForeignKey('students.sno'), primary_key=True)
 )
-
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer,primary_key=True)
-    email = db.Column(db.String(255), unique=True)
-
-    password = db.Column(db.String(80))
-    is_admin = db.Column(db.Boolean(), default=False)
-
-    description = db.Column(db.Text())
-    register_time = db.Column(db.DateTime(), default=datetime.utcnow)
-    last_login_time = db.Column(db.DateTime())
-
-class Student(db.Model):
-    __tablename__ = 'students'
-
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -64,7 +46,7 @@ class User(db.Model, UserMixin):
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
     avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
 
-    courses_following = db.relationship('Course',secondary=folowcourse, backref = 'folowers')
+    courses_following = db.relationship('FollowCourse')
     student_info = db.relationship('Student', backref='user',uselist=False)
     teacher_info = db.relationship('Teacher', backref='user',uselist=False)
 
@@ -111,7 +93,7 @@ class Student(db.Model):
 
     use_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
-    courses_joined = db.relationship('Course', secondary=joincourse, backref='students')
+    courses_joined = db.relationship('Course', backref='students')
 
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
@@ -157,7 +139,7 @@ class Student(db.Model):
 class Teacher(db.Model):
     __tablename__ = 'teachers'
 
-    tno = db.Column(db.String(20), unique=True, primary_key=True)
+    id = db.Column(db.Integer, unique=True, primary_key=True)
     name = db.Column(db.String(80))
     dept = db.Column(db.String(80))
 
