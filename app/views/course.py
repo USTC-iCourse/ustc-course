@@ -11,7 +11,7 @@ def index():
     per_page = request.args.get('per_page', 20, type=int)
     print(page)
     courses_page = Course.query.paginate(page,per_page=20)
-    return render_template('course.html',pagination=courses_page)
+    return render_template('course-index.html',pagination=courses_page)
 
 @course.route('/<int:course_id>/')
 @course.route('/<int:course_id>/<course_name>/')
