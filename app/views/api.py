@@ -1,5 +1,5 @@
 from flask import Blueprint,jsonify,request
-from app.models import CourseReview as Review, CourseReviewComment as Comment
+from app.models import CourseReview as Review, CourseReviewComment as Comment, User
 
 api = Blueprint('api',__name__)
 
@@ -38,3 +38,18 @@ def get_review_comment():
     else:
         return jsonify(status='Id not found',data=None)
     return jsonify(status='OK',data=comments)
+
+@api.route('/reg_verify', methods=['GET'])
+def reg_verify():
+    name = request.args.get('name')
+    value = request.args.get('value')
+
+    if name == 'username':
+        if User.query.filter_by(username=value).first():
+            return 'Username Exists'
+        return 'OK'
+    elif name == 'email':
+        if User.query.filter_by(email=value).first():
+            return 'Email Exists'
+        return 'OK'
+    return 'Invalid Request', 400
