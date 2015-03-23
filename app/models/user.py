@@ -6,7 +6,6 @@ from datetime import datetime
 from app import db, login_manager as lm
 from random import randint
 from flask.ext.login import UserMixin
-#from flask.ext.security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin
 
 Roles = ['Admin',
         'User']
@@ -14,62 +13,60 @@ Roles = ['Admin',
 Identidies =['Teacher',
         'Student']
 
-
-folowcourse = db.Table('followcourse',db.metadata,
-    db.Column('user_id',db.String(20), db.ForeignKey('users.id')),
-    db.Column('course_id',db.String(80), db.ForeignKey('courses.id'))
-    )
-
-
-joincourse= db.Table('joinclass', db.metadata,
-    db.Column('student_id', db.String(20), db.ForeignKey('students.sno')),
-    db.Column('course_id', db.Integer, db.ForeignKey('courses.id')),
+related_courses = db.Table('related_course',
+    course1 = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    course2 = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True)
 )
 
-roles_users = db.Table('roles_users',
-        db.Column('user_id',db.Integer(), db.ForeignKey('users.id')),
-        db.Column('role_id', db.Integer(), db.ForeignKey('roles.id')))
+follow_course = db.Table('follow_course',
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
 
-#class Role(db.Model, RoleMixin):
-#not used for now
-class Role(db.Model):
-    __tablename__ = 'roles'
+join_course = db.Table('join_course',
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.sno'), primary_key=True)
+)
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer,primary_key=True)
+    email = db.Column(db.String(255), unique=True)
+
+    password = db.Column(db.String(80))
+    is_admin = db.Column(db.Boolean(), default=False)
+
+    description = db.Column(db.Text())
+    register_time = db.Column(db.DateTime(), default=datetime.utcnow)
+    last_login_time = db.Column(db.DateTime())
+
+class Student(db.Model):
+    __tablename__ = 'students'
 
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
-#class User(db.Model, UserMixin):
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer,primary_key=True)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255),nullable=False)
-    nick = db.Column(db.String(120),nullable=False,default=randint(100000,999999))
-    active = db.Column(db.Boolean(), default=True)
-    #roles = db.relationship('Role',secondary=roles_users, backref=db.backref('users',lazy='dynamic'))
-    role = db.Column(db.String(20),default='User')
-    identity = db.Column(db.String(20))
+    nick = db.Column(db.String(120),nullable=False) # 昵称
+    active = db.Column(db.Boolean(), default=True) # 是否已经激活
+    role = db.Column(db.String(20),default='User') # 用户或者管理员
+    identity = db.Column(db.String(20)) # 学生或者教师
     register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
     last_login_time = db.Column(db.DateTime())
-    register_token = db.Column(db.String(40))
+    register_token = db.Column(db.String(40)) # 注册验证 token
+
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
     avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
 
     courses_following = db.relationship('Course',secondary=folowcourse, backref = 'folowers')
     student_info = db.relationship('Student', backref='user',uselist=False)
     teacher_info = db.relationship('Teacher', backref='user',uselist=False)
-    #needn't anymore
-    #reviews = db.relationship('CourseReview',backref='author')
-    '''
-    notes = db.relationship('CourseNote')
-    discussions = db.relationship('CourseForumThread')
-    shares = db.relationship('CourseShare')
-    '''
-
-
 
     def __repr__(self):
         return '<User {} ({})>'.format(self.email, self.password)
