@@ -19,3 +19,7 @@ class RegisterForm(Form):
     def validate_email(form, field):
         if User.query.filter_by(email=field.data).first():
             raise ValidationError('The email address has been registered.')
+
+    def validate_username(form, field):
+        if User.query.filter_by(username=field.data).first():
+            raise ValidationError('The username has been taken!')
