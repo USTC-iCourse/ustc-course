@@ -26,7 +26,7 @@ def login():
             return redirect(request.args.get('next') or url_for('home.index'))
         error = '用户名或密码错误'
     print(form.errors)
-    return render_template('login.html',form=form, error = error)
+    return render_template('signin.html',form=form, error = error)
 
 
 @home.route('/signup/',methods=['GET','POST'])
