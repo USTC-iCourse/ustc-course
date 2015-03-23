@@ -136,7 +136,7 @@ class CourseReviewComment(db.Model):
     publish_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     author = db.relationship('User')
-    #review = db.relationship('CourseReview')
+    #:review: backref to CourseReview
 
 note_upvotes = db.Table('note_upvotes',
     db.Column('note_id', db.Integer, db.ForeignKey('course_notes.id'), primary_key=True),
@@ -167,7 +167,6 @@ class CourseNoteComment(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     content = db.Column(db.Text)
     publish_time = db.Column(db.DateTime, default=datetime.utcnow)
-    update_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     author = db.relationship('User')
     #:note: backref to CourseNote
@@ -193,15 +192,9 @@ class CourseForumThread(db.Model):
 
     author = db.relationship('User')
     course = db.relationship('Course')
-    posts = db.relationship('CourseForumPost',backref='course_forum_thread',lazy='dynamic')
+    posts = db.relationship('CourseForumPost',backref='thread',lazy='dynamic')
 
     upvotes = db.relationship('User', secondary=forum_thread_upvotes)
-    def save(self, review, author=current_user):
-        if review and author:
-            self.review = review
-            self.author = author
-            db.session.add(self)
-            db.session.commit()
 
 
 class CourseForumPost(db.Model):
