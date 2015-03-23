@@ -9,10 +9,7 @@ home = Blueprint('home',__name__)
 @home.route('/')
 @login_required
 def index():
-    return render_template('index.html')
     return redirect(url_for('course.index'))
-
-
 
 @home.route('/login/',methods=['POST','GET'])
 def login():
