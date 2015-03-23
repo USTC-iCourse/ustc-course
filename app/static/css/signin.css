@@ -1,17 +1,14 @@
-body {
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #eee;
-}
-
 .form-signin {
   max-width: 330px;
-  padding: 15px;
+  padding: 20px 15px;
   margin: 0 auto;
 }
-.form-signin .form-signin-heading,
+.form-signin .form-signin-heading {
+  margin-bottom: 20px;
+}
 .form-signin .checkbox {
   margin-bottom: 10px;
+  padding: 5px 0;
 }
 .form-signin .checkbox {
   font-weight: normal;
@@ -38,6 +35,9 @@ body {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-.modal-login {
+.modal-signin {
     width: 360px;
+}
+.float-right {
+    float: right;
 }
