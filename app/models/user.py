@@ -6,6 +6,8 @@ from datetime import datetime
 from app import db, login_manager as lm
 from random import randint
 from flask.ext.login import UserMixin
+from werkzeug.security import generate_password_hash, \
+     check_password_hash
 
 Roles = ['Admin',
         'User']
@@ -32,9 +34,9 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer,primary_key=True)
+    username = db.Column(db.String(255), unique=True) #用户名
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255),nullable=False)
-    nick = db.Column(db.String(120),nullable=False) # 昵称
     active = db.Column(db.Boolean(), default=True) # 是否已经激活
     role = db.Column(db.String(20),default='User') # 用户或者管理员
     identity = db.Column(db.String(20)) # 学生或者教师
@@ -49,6 +51,11 @@ class User(db.Model, UserMixin):
     courses_following = db.relationship('Course',secondary=follow_course, backref='followers')
     student_info = db.relationship('Student', backref='user',uselist=False)
     teacher_info = db.relationship('Teacher', backref='user',uselist=False)
+
+    def __init__(self, username, email, password):
+        self.username = username
+        self.email = email
+        self.set_password(password)
 
     def __repr__(self):
         return '<User {} ({})>'.format(self.email, self.password)
@@ -69,6 +76,33 @@ class User(db.Model, UserMixin):
         if self.active:
             return True
         return False
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self,password):
+        """Check passwords.Returns ture if matchs"""
+        if self.password is None:
+            return False
+        return check_password_hash(self.password,password)
+
+    @classmethod
+    def authenticate(cls,login,password):
+        """A classmethod for authenticating users
+        It returns true if the user exists and has entered a correct password
+        :param login: This can be either a username or a email address.
+        :param password: The password that is connected to username and email.
+        """
+
+        user = cls.query.filter(db.or_(User.username == login,
+                                       User.email == login)).first()
+
+        if user:
+            authenticated = user.check_password(password)
+        else:
+            authenticated = False
+        return user, authenticated
+
 
 
     def save(self):
