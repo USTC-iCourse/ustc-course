@@ -125,7 +125,7 @@ class CourseReviewComment(db.Model):
     __tablename__ = 'course_review_comments'
     id = db.Column(db.Integer, primary_key=True, unique=True)
     review_id = db.Column(db.Integer, db.ForeignKey('course_reviews.id'))
-    author_id = db.Column(db.String(20), db.ForeignKey('users.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     content = db.Column(db.Text)
     publish_time = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -158,7 +158,7 @@ class CourseNoteComment(db.Model):
     __tablename__ = 'course_note_comments'
     id = db.Column(db.Integer, primary_key=True, unique=True)
     note_id = db.Column(db.Integer, db.ForeignKey('course_notes.id'))
-    author_id = db.Column(db.String(20), db.ForeignKey('users.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     content = db.Column(db.Text)
     publish_time = db.Column(db.DateTime, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, default=datetime.utcnow)
