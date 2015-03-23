@@ -15,17 +15,17 @@ class Course(db.Model):
     __tablename__ = 'courses'
 
     id = db.Column(db.Integer,unique=True,primary_key=True)
-    cno = db.Column(db.String(20))
-    term = db.Column(db.String(10))
-    name = db.Column(db.String(80))
-    dept = db.Column(db.String(80))
-    description = db.Column(db.Text())
+    cno = db.Column(db.String(20))  # 课程号
+    term = db.Column(db.String(10)) # 学年学期，例如 20142 表示 2015 年春季学期
+    name = db.Column(db.String(80)) # 课程名称
+    dept = db.Column(db.String(80)) # 开课院系
+    description = db.Column(db.Text()) # 课程描述
 
     credit = db.Column(db.Integer) # 学分
     hours = db.Column(db.Integer)  # 学时
-    class_numbers = db.Column(db.String(200))
-    start_end_week = db.Column(db.String(100))
-    time_location = db.Column(db.String(100))
+    class_numbers = db.Column(db.String(200))   # 上课班级
+    start_end_week = db.Column(db.String(100))  # 起止周
+    time_location = db.Column(db.String(100))   # 上课时间和教室
 
     #teacher : Teacher
     tno = db.Column(db.String(20), db.ForeignKey('teachers.tno'))
