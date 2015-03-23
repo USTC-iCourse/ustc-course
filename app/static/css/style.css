@@ -12,7 +12,6 @@ body {
 .blue {
     color: #337ab7;
 }
-
 .float-element {
     background-color: #ffffff;
     padding: 30px;
@@ -61,7 +60,4 @@ body {
 }
 .btn-add-evaluation {
     float: right;
-}
-.last-evaluation {
-    font-size: 18px;
 }
