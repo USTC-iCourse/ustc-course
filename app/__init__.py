@@ -8,7 +8,6 @@
 import os
 from flask import Flask,request
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.security import Security,  SQLAlchemyUserDatastore
 from flask.ext.login import LoginManager
 
 
