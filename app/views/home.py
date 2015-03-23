@@ -24,9 +24,8 @@ def login():
         return redirect(request.args.get('next') or url_for('home.index'))
     return render_template('login.html',form=form)
 
-
-@home.route('/register/',methods=['GET','POST'])
-def register():
+@home.route('/signup/',methods=['GET','POST'])
+def signup():
     form = RegisterForm()
     if form.validate_on_submit():
         email = request.form.get('email')
@@ -37,6 +36,6 @@ def register():
         return redirect(request.args.get('next') or url_for('.index'))
     if form.errors:
         print(form.errors)
-    return render_template('register.html',form=form)
+    return render_template('signup.html',form=form)
 
 
