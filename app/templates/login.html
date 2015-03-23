@@ -11,8 +11,8 @@
 <div class="modal fade" id="signin" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-signin">
     <div class="modal-content">
-      <form class="form-signin">
-        {{ form.csrf_token }}
+        <form class="form-signin" target={{ url_for('home.login') }} method='post'>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="form-signin-heading">
           <span class="h2">Please sign in</span>
           <a class="btn btn-default float-right" href="/sign_up">Sign Up</a>

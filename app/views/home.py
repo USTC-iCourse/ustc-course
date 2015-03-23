@@ -7,11 +7,10 @@ from app.forms import LoginForm, RegisterForm
 home = Blueprint('home',__name__)
 
 @home.route('/')
-@login_required
 def index():
     return redirect(url_for('course.index'))
 
-@home.route('/login/',methods=['POST','GET'])
+@home.route('/singin/',methods=['POST','GET'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -25,7 +24,7 @@ def login():
     return render_template('login.html',form=form)
 
 
-@home.route('/register/',methods=['GET','POST'])
+@home.route('/singup/',methods=['GET','POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
@@ -39,4 +38,10 @@ def register():
         print(form.errors)
     return render_template('register.html',form=form)
 
+
+@home.route('/logout/')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home.index'))
 
