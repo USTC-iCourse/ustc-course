@@ -22,10 +22,8 @@ def view_course(course_id,course_name=None):
     if course_name != course.name:
         return redirect(url_for('.view_course',course_id=course_id,course_name=course.name))
 
-    reviews = course.reviews
     related_courses = Course.query.filter_by(name=course_name).all()
-    return course_name + '<a href='+url_for('.review',course_id=course.id,course_name=course.name)+'>reviews</a>'
-    return str(course_id)
+    return render_template('course.html', course=course, related_courses=related_courses)
 
 @course.route('/<int:course_id>/<course_name>/reviews/')
 def review(course_id,course_name=None):

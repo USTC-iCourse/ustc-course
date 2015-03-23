@@ -43,29 +43,28 @@
 
 
         <!-- 载入用户的评论 -->
-        {% for item in pagination.items %}
+        {% for item in course.reviews %}
         <div class="comment-container">
           <div class="user-info">
-            <span><a><span class="post-user">jenny42</span></a>
+            <span><a><span class="post-user">{{ item.author.nick }}</span></a>
               <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
               <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
               <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
               <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
               <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
             </span>
-            <span class="grey learn-status">还在学习</span>
           </div>
           <div class="comment-text">
-            <p>李娟老师好赞！超有气质，表达能力特别好。</p>
+            <p>{{ item.content }}</p>
           </div>
           <div class="comment-detail grey">
-            <span class="post-time">2015-03-17 19:45</span>
-            <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true" ></span> 4
-            <span class="glyphicon glyphicon-comment blue" aria-hidden="true"></span> 2
+            <span class="post-time">{{ item.publish_time }}</span>
+            <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true" ></span> {{ item.upvote }}
+            <span class="glyphicon glyphicon-comment blue" aria-hidden="true"></span> {{ len(item.conments) }}
           </div>
         </div>
+        {% endfor %}
 
-<!-- 
         <!-- 第二个 -->
         <div class="comment-container">
           <div class="user-info">
@@ -111,8 +110,7 @@
             <span class="glyphicon glyphicon-comment blue" aria-hidden="true"></span> 0
           </div>
         </div>
-
-        -->
+        
       </div>
     </div>
   </div>
