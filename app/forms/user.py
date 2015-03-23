@@ -5,11 +5,12 @@ from wtforms.validators import (InputRequired,NumberRange, Email, EqualTo)
 from app.models import User
 
 class LoginForm(Form):
-    email = StringField('Email',validators=[InputRequired(), Email()])
+    username = StringField('Username',validators=[InputRequired()])
     password = PasswordField('Password',validators=[InputRequired()])
 
 
 class RegisterForm(Form):
+    username = StringField('Username', validators=[InputRequired()])
     email = StringField('Email', validators=[InputRequired(), Email()])
     password = PasswordField('Password', validators=[InputRequired(),
         EqualTo('confirm_password', message='Passwords must match')])

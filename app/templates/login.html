@@ -8,6 +8,10 @@
 {% block content %}
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#signin">写点评</button>
 
+{% if error %}
+{{ error }}
+{% endif %}
+
 <div class="modal fade" id="signin" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-signin">
     <div class="modal-content">
@@ -18,9 +22,9 @@
           <a class="btn btn-default float-right" href="/sign_up">Sign Up</a>
         </div>
         <label for="inputEmail" class="sr-only">Email address</label>
-        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+        <input name="username" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
         <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <input name="password" id="inputPassword" class="form-control" placeholder="Password" required>
         <div class="checkbox">
           <label>
             <input type="checkbox" value="remember-me"> Remember me
