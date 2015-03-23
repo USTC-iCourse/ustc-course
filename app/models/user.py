@@ -46,7 +46,7 @@ class User(db.Model, UserMixin):
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
     avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
 
-    courses_following = db.relationship('FollowCourse')
+    courses_following = db.relationship('Course',secondary=follow_course, backref='followers')
     student_info = db.relationship('Student', backref='user',uselist=False)
     teacher_info = db.relationship('Teacher', backref='user',uselist=False)
 
@@ -93,7 +93,7 @@ class Student(db.Model):
 
     use_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
-    courses_joined = db.relationship('Course', backref='students')
+    courses_joined = db.relationship('Course',secondary=join_course, backref='students')
 
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
@@ -140,6 +140,7 @@ class Teacher(db.Model):
     __tablename__ = 'teachers'
 
     id = db.Column(db.Integer, unique=True, primary_key=True)
+
     name = db.Column(db.String(80))
     dept = db.Column(db.String(80))
 
@@ -148,8 +149,7 @@ class Teacher(db.Model):
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
-    courses = db.relationship('Course',backref='teacher')
-
+    #course
 
     def __repr__(self):
         return '<Teacher {} ({})'.format(self.name, self.tno)

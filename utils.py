@@ -4,23 +4,26 @@
 '''
 from app.models import Course, Student, Teacher
 
-def create_course(cno, term ,name, dept=None, description=None, credit=0, hours=0,
-        class_numbers=None, time_location=None, teacher=None):
+def create_course(cno, term ,name,kcid=0, dept=None, description=None, credit=0, hours=0,
+        class_numbers=None, time_location=None, start_end_week=None, teacher=None):
     ''' creat a course in the database,
-    :param con: 课程号(必须)
+    :param con: 课堂号(必须)
     :param term: 学期号(必须)
     :param name: 课程名(必须)
+    :param kcid: 课程id
     :param dept: 学院
     :param description: 课程描述
     :param credit:  学分
     :param hours: 学时
     :param class_numbers: 班级号
-    :param time_location: pass
+    :param time_location: 地点:时间
+    :param start_end_week: 起止周
     :param teacher: 教师对象 Teacher.如果存在，则为该课程添加教师。
     '''
     course=Course.create(cno=cno, term=term,name=name, dept=dept,
             description=description, credit=credit, hours=hours,
-            class_numbers=class_numbers, time_location=time_location)
+            class_numbers=class_numbers, time_location=time_location,
+            start_end_week=start_end_week)
     if teacher:
         course.teacher=teacher
         course = course.save()

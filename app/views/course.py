@@ -6,7 +6,6 @@ course = Blueprint('course',__name__)
 
 @course.route('/')
 def index():
-    #return render_template('course.html')
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
     print(page)
