@@ -7,6 +7,12 @@ try:
 except:
     current_user=None
 
+course_time_locations = db.Table('course_time_locations',
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id')),
+    db.Column('time', db.String(20)),
+    db.Column('location', db.String(20))
+)
+
 class Course(db.Model):
     __tablename__ = 'courses'
 
@@ -22,7 +28,7 @@ class Course(db.Model):
     hours = db.Column(db.Integer)  # 学时
     class_numbers = db.Column(db.String(200))   # 上课班级
     start_end_week = db.Column(db.String(100))  # 起止周
-    time_location = db.Column(db.String(100))   # 上课时间和教室
+    time_locations = db.relationship('Course', secondary=course_time_locations)
 
     __table_args__ = (db.UniqueConstraint('cno', 'term'), )
 
