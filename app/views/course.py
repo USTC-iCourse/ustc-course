@@ -11,7 +11,7 @@ def index():
     per_page = request.args.get('per_page', 20, type=int)
     print(page)
     courses_page = Course.query.paginate(page,per_page=20)
-    return render_template('course.html',pagination=courses_page)
+    return render_template('course-index.html',pagination=courses_page)
 
 @course.route('/<int:course_id>/')
 @course.route('/<int:course_id>/<course_name>/')
@@ -22,10 +22,8 @@ def view_course(course_id,course_name=None):
     if course_name != course.name:
         return redirect(url_for('.view_course',course_id=course_id,course_name=course.name))
 
-    reviews = course.reviews
     related_courses = Course.query.filter_by(name=course_name).all()
-    return course_name + '<a href='+url_for('.review',course_id=course.id,course_name=course.name)+'>reviews</a>'
-    return str(course_id)
+    return render_template('course.html', course=course, related_courses=related_courses)
 
 @course.route('/<int:course_id>/<course_name>/reviews/')
 def review(course_id,course_name=None):
