@@ -196,6 +196,10 @@ class CourseForumThread(db.Model):
 
     upvotes = db.relationship('User', secondary=forum_thread_upvotes)
 
+forum_post_upvotes = db.Table('forum_post_upvotes',
+    db.Column('post_id', db.Integer, db.ForeignKey('course_forum_posts.id'), primary_key=True),
+    db.Column('author_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+)
 
 class CourseForumPost(db.Model):
     __tablename__ = 'course_forum_posts'
@@ -208,5 +212,13 @@ class CourseForumPost(db.Model):
     publish_time = db.Column(db.DateTime, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, default=datetime.utcnow)
 
-    thread = db.relationship('CourseForumThread')
     author = db.relationship('User')
+    upvotes = db.relationship('User', secondary=forum_post_upvotes)
+
+    def save(self, thread, author=current_user):
+        if thread and author:
+            self.thread = thread
+            self.author = author
+            db.session.add(self)
+            db.session.commit()
+
