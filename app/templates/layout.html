@@ -63,6 +63,8 @@
 
           
           <ul class="nav navbar-nav navbar-right">
+              {% if current_user.is_authenticated() %}
+                Hi {{ current_user.name }}!
             <li><a href="#">Notice</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Jenny42<span class="caret"></span></a>
@@ -70,9 +72,12 @@
                 <li><a href="#">Profile</a></li>
                 <li><a href="#">Settings</a></li>
                 <li class="divider"></li>
-                <li><a href="#">Log out</a></li>
+                <li><a href={{ url_for('home.logout') }}>Log out</a></li>
               </ul>
             </li>
+            {% else %}
+            <h1> 将登录框放在此处 </h1>
+            {% endif %}
           </ul>
           
         </div><!--/.nav-collapse -->
