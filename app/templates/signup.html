@@ -6,61 +6,69 @@
 
     {{ error }}
 
-   <h3 class="blue">Sign Up</h3>
+    <h3 class="blue">Sign Up</h3>
     <hr>
-        <form class="form-horizontal" method="post" action="{{ url_for('home.signup') }}">
-          <div id='csrf-token' class="form-group" type="hiddent">
-              {{ form.csrf_token }}
-          </div>
-          <div id="regverify-username" class="form-group">
-            <label for="reginput-username" class="col-sm-2 control-label">Username</label>
-            <div class="col-sm-4">
-              <input type="text" id="reginput-username" name="username" class="form-control" placeholder="Username" onchange="regverify('username')">
-              <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
-              <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
-              {% if form.errors.get('username') %}
-              {% for info in form.errors.get('username') %}
+    <form class="form-horizontal" method="post" target="{{ url_for('home.signup') }}">
+      <div id='csrf-token' class="form-group" type="hiddent">
+        {{ form.csrf_token }}
+      </div>
+      <div id="regverify-username" class="form-group">
+        <label for="reginput-username" class="col-sm-2 control-label">Username</label>
+        <div class="col-sm-4">
+          <input type="text" id="reginput-username" name="Username" class="form-control" placeholder="Username" onchange="regverify('username')">
+          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
+          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+          {% if form.errors.get('username') %}
+            {% for info in form.errors.get('username') %}
               {{ info }}
-              {% endfor %}
-              {% endif %}
-            </div>
-          </div>
-          <div id="regverify-email" class="form-group">
-            <label for="reginput-email" class="col-sm-2 control-label">USTC Email</label>
-            <div class="col-sm-4">
-             <input type="email" id="reginput-email" name="email" class="form-control" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn" onchange="regverify('email')">
-             <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
-              <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
-            </div>
-          </div>
-          <div id="regverify-password" class="form-group">
-            <label for="reginput-password" class="col-sm-2 control-label">Password</label>
-            <div class="col-sm-4">
-              <input type="password" name="password" class="form-control" id="reginput-password" placeholder="Password" onchange="checkPassword()">
-              <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
-              <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
-              {% if form.errors.get('password') %}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div id="regverify-email" class="form-group">
+        <label for="reginput-email" class="col-sm-2 control-label">USTC Email</label>
+        <div class="col-sm-4">
+          <input type="email" id="reginput-email" name="Email" class="form-control" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn" onchange="regverify('email')">
+          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
+          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+          {% if form.errors.get('email') %}
+            {% for info in form.errors.get('email') %}
+              {{ info }}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div id="regverify-password" class="form-group">
+        <label for="reginput-password" class="col-sm-2 control-label">Password</label>
+        <div class="col-sm-4">
+          <input type="password" name="password" class="form-control" id="reginput-password" placeholder="Password" onchange="checkPassword()">
+          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
+          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+          {% if form.errors.get('password') %}
             {% for info in form.errors.get('password') %}
               {{ info }}
-              {% endfor %}
-              {% endif %}
-            </div>
-          </div>
-          <div id="regverify-confirm-password" class="form-group">
-            <label for="reginput-confirm-password" class="col-sm-2 control-label">Password</label>
-            <div class="col-sm-4">
-              <input type="password" class="form-control" name="confirm_password" id="reginput-confirm-password" placeholder="Confirm Password" onchange="checkConfirmPassword()">
-              <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
-              <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-          </div>
-        </form>
- </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div id="regverify-confirm-password" class="form-group">
+        <label for="reginput-confirm-password" class="col-sm-2 control-label"></label>
+        <div class="col-sm-4">
+          <input type="password" class="form-control" name="confirm_password" id="reginput-confirm-password" placeholder="Confirm Password" onchange="checkConfirmPassword()">
+          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
+          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-default">Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
 
