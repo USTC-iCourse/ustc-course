@@ -12,9 +12,10 @@
   </div>
   <!-- /.row -->
 
+  {% for row in pagination.items|batch(3) %}
   <!-- Projects Row -->
   <div class="row">
-      {% for course in pagination.items %}
+      {% for course in row %}
     <div class="col-md-4 portfolio-item">
       <a href="#">
         <img class="img-responsive" src="http://placehold.it/700x400" alt="">
@@ -28,6 +29,7 @@
     {% endfor %}
   </div>
   <!-- /.row -->
+  {% endfor %}
 
   <hr>
 
@@ -36,7 +38,7 @@
   <ul class=pagination>
         {%- if pagination.has_prev %} 
         <li>
-        <a href={{ url_for(endpoint,page=pagination.prev_num,**kwargs) }} aria-label="previous">
+        <a href={{ url_for('course.index',page=pagination.prev_num) }} aria-label="previous">
            <span aria-hidden="true">&laquo;</span>
        </a>
        </li>
@@ -47,7 +49,7 @@
     {% if page %}
       {% if page != pagination.page %}
       <li>
-        <a href="{{ url_for(endpoint, page=page,**kwargs) }}">{{ page }}</a>
+        <a href="{{ url_for('course.index', page=page) }}">{{ page }}</a>
         </li>
       {% else %}
       <li class="active">
@@ -60,7 +62,7 @@
     {%- endfor %}
     {%- if pagination.has_next %} 
         <li>
-        <a href={{ url_for(endpoint,page=pagination.next_num,**kwargs) }} aria-label="Next">
+        <a href={{ url_for('course.index',page=pagination.next_num) }} aria-label="Next">
            <span aria-hidden="true">&raquo;</span>
        </a>
        </li>

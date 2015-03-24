@@ -80,7 +80,7 @@ def confirm_email():
         user = User.query.filter_by(email=email).first_or_404()
         if not user.confirmed:
             send_confirm_mail(email)
-        return 'Confirm url sent'
+        return 'Confirm url sent'   #需要一个反馈页面
     else:
         return 404
 
@@ -101,10 +101,10 @@ def forgot_password():
     if form.validate_on_submit():
         email = form['email'].data
         user = User.query.filter_by(email=email).first()
-        if not user:
-            return 'Email %s has not been registered'%email
-        send_reset_password_mail(email)
-        return 'Reset password mail sent.'
+        if user:
+            send_reset_password_mail(email)
+            return 'Reset password mail sent.'  #一个反馈信息
+        flash('The email has not been registered')
     return render_template('forgot-password.html')
 
 @home.route('/reset-password/<string:token>/', methods=['GET','POST'])

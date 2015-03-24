@@ -20,6 +20,8 @@ def view_course(course_id,course_name=None):
     if course_name != course.name:
         return redirect(url_for('.view_course',course_id=course_id,course_name=course.name))
 
+    for item in course.reviews:
+        print(type(item.comments))
     related_courses = Course.query.filter_by(name=course_name).all()
     return render_template('course.html', course=course, related_courses=related_courses)
 
