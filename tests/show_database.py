@@ -1,4 +1,4 @@
-import sys
+immport sys
 sys.path.append('..')  # fix import directory
 
 from app import app,db
