@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import (StringField, PasswordField)
+from wtforms import (StringField, PasswordField, ValidationError)
 from wtforms.validators import (InputRequired,NumberRange, Email, EqualTo)
 
 from app.models import User
@@ -23,3 +23,11 @@ class RegisterForm(Form):
     def validate_username(form, field):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('The username has been taken!')
+
+class FogotPasswordForm(Form):
+    email = StringField('Email', validators=[InputRequired('必须输入邮箱地址'),
+        Email()])
+
+class ResetPasswordForm(Form):
+    pass
+
