@@ -12,14 +12,10 @@ from flask.ext.login import LoginManager
 from flask_wtf.csrf import CsrfProtect
 
 app = Flask(__name__)
-app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-    #TODO: config file
-    #app.config.from_object('config')
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////'+os.path.join(app.root_path, 'test.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-#app.config['SECURITY_PASSWORD_HASH'] = bcrypt
-db = SQLAlchemy(app)
+app.config.from_object('config.default')
 
+
+db = SQLAlchemy(app)
 CsrfProtect(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -29,7 +25,6 @@ login_manager.login_view = 'home.login'
 
 from app.views import course
 from app.views import home,review
-#from app.models import User,Role
 from app.views import api
 app.register_blueprint(home,url_prefix='')
 app.register_blueprint(course,url_prefix='/course')
@@ -37,5 +32,3 @@ app.register_blueprint(review, url_prefix='/review')
 app.register_blueprint(api, url_prefix='/api')
 
 
-#user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-#security = Security(app, user_datastore)

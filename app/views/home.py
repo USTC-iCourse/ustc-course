@@ -25,15 +25,14 @@ def signin():
             login_user(user, remember=remember)
             flash('Logged in')
             return redirect(request.args.get('next') or url_for('home.index'))
-        elif not user.confirmed:
+        elif user and not user.confirmed:
             '''没有确认邮箱的用户'''
             return  render_template('feedback.html', status=False, message='Please activate your account by clicking link in your email! <a href=%s>Resend Email</a>'%url_for('.confirm_email',
                     email=user.email,
                     action='send'))
             '''需要一个发送确认邮件的页面'''
-            return render_template('require-confirm.html')
         error = '用户名或密码错误'
-    print(form.errors)
+    #TODO: log the form errors
     return render_template('signin.html',form=form, error=error)
 
 
@@ -80,7 +79,7 @@ def confirm_email():
         user = User.query.filter_by(email=email).first_or_404()
         if not user.confirmed:
             send_confirm_mail(email)
-        return render_template('feedback.html', status=True, message='Email has been sent!') 
+        return render_template('feedback.html', status=True, message='Email has been sent!')
     else:
         return 404
 
