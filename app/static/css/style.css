@@ -66,11 +66,11 @@ body {
 /* signin modal part */
 .form-signin {
     max-width: 330px;
-    padding: 20px 15px;
+    padding: 30px 15px;
     margin: 0 auto;
 }
 .form-signin .form-signin-heading {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 .form-signin .checkbox {
     margin-bottom: 10px;
@@ -102,7 +102,7 @@ body {
     border-top-right-radius: 0;
 }
 .modal-signin {
-    width: 360px;
+    width: 380px;
 }
 .float-right {
     float: right;

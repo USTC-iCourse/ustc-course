@@ -7,6 +7,12 @@ try:
 except:
     current_user=None
 
+course_time_locations = db.Table('course_time_locations',
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id')),
+    db.Column('time', db.String(20)),
+    db.Column('location', db.String(20))
+)
+
 class Course(db.Model):
     __tablename__ = 'courses'
 
@@ -22,7 +28,7 @@ class Course(db.Model):
     hours = db.Column(db.Integer)  # 学时
     class_numbers = db.Column(db.String(200))   # 上课班级
     start_end_week = db.Column(db.String(100))  # 起止周
-    time_location = db.Column(db.String(100))   # 上课时间和教室
+    time_locations = db.relationship('Course', secondary=course_time_locations)
 
     __table_args__ = (db.UniqueConstraint('cno', 'term'), )
 
@@ -130,7 +136,7 @@ class CourseReviewComment(db.Model):
     publish_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     author = db.relationship('User')
-    #review = db.relationship('CourseReview')
+    #:review: backref to CourseReview
 
 note_upvotes = db.Table('note_upvotes',
     db.Column('note_id', db.Integer, db.ForeignKey('course_notes.id'), primary_key=True),
@@ -161,7 +167,6 @@ class CourseNoteComment(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     content = db.Column(db.Text)
     publish_time = db.Column(db.DateTime, default=datetime.utcnow)
-    update_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     author = db.relationship('User')
     #:note: backref to CourseNote
@@ -187,16 +192,14 @@ class CourseForumThread(db.Model):
 
     author = db.relationship('User')
     course = db.relationship('Course')
-    posts = db.relationship('CourseForumPost',backref='course_forum_thread',lazy='dynamic')
+    posts = db.relationship('CourseForumPost',backref='thread',lazy='dynamic')
 
     upvotes = db.relationship('User', secondary=forum_thread_upvotes)
-    def save(self, review, author=current_user):
-        if review and author:
-            self.review = review
-            self.author = author
-            db.session.add(self)
-            db.session.commit()
 
+forum_post_upvotes = db.Table('forum_post_upvotes',
+    db.Column('post_id', db.Integer, db.ForeignKey('course_forum_posts.id'), primary_key=True),
+    db.Column('author_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+)
 
 class CourseForumPost(db.Model):
     __tablename__ = 'course_forum_posts'
@@ -209,5 +212,13 @@ class CourseForumPost(db.Model):
     publish_time = db.Column(db.DateTime, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, default=datetime.utcnow)
 
-    thread = db.relationship('CourseForumThread')
     author = db.relationship('User')
+    upvotes = db.relationship('User', secondary=forum_post_upvotes)
+
+    def save(self, thread, author=current_user):
+        if thread and author:
+            self.thread = thread
+            self.author = author
+            db.session.add(self)
+            db.session.commit()
+

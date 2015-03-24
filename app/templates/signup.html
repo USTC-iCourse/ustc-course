@@ -1,96 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="favicon.ico">
-    <title>USTC评课社区</title>
+{% extends "layout-simple.html" %}
+{% block content %}
 
-    <!-- Bootstrap core CSS -->
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+<div class="container">
+  <div class="float-element">
 
-    <!-- Custom styles for this template -->
-    <link href="/static/css/style.css" rel="stylesheet">
-    <link href="/static/css/signin.css" rel="stylesheet">
-  </head>
+    {{ error }}
 
-
-
-  <body>
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <a class="navbar-brand" href={{ url_for('course.index') }}>USTC评课社区</a>
-        </div>
-      </div>
-    </nav>
-
-
-
-    <div class="container">
-      <div class="float-element">
-
-          {{ error }}
-
-        <h3 class="blue">Sign Up</h3>
-        <hr>
-
-        <form class="form-horizontal" method='post'>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <div class="form-group">
-            <label for="inputName" class="col-sm-2 control-label">Username</label>
+   <h3 class="blue">Sign Up</h3>
+    <hr>
+        <form class="form-horizontal" method="post" target="{{ url_for('home.signup') }}">
+          <div id="regverify-username" class="form-group">
+            <label for="reginput-username" class="col-sm-2 control-label">Username</label>
             <div class="col-sm-4">
-              <input type="text" name="username" class="form-control" id="inputName" placeholder="Username">
+              <input type="text" id="reginput-username" name="Username" class="form-control" placeholder="Username" onchange="regverify('username')">
+              <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
+              <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
               {% for info in form.errors.get('username') %}
               {{ info }}
               {% endfor %}
             </div>
           </div>
-          <div class="form-group">
-            <label for="inputEmail" class="col-sm-2 control-label">USTC Email</label>
+          <div id="regverify-email" class="form-group">
+            <label for="reginput-email" class="col-sm-2 control-label">USTC Email</label>
             <div class="col-sm-4">
-              <input name="email" class="form-control" id="inputEmail" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn">
-              {% for info in form.errors.get('password') %}
+             <input type="email" id="reginput-email" name="Email" class="form-control" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn" onchange="regverify('email')">
+            {% for info in form.errors.get('password') %}
               {{ info }}
               {% endfor %}
+              <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
+              <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
             </div>
           </div>
-          <div class="form-group">
-            <label for="inputPassword" class="col-sm-2 control-label">Password</label>
+          <div id="regverify-password" class="form-group">
+            <label for="reginput-password" class="col-sm-2 control-label">Password</label>
             <div class="col-sm-4">
-              <input name="password" class="form-control" id="inputPassword" placeholder="Password">
+              <input type="password" class="form-control" id="reginput-password" placeholder="Password" onchange="checkPassword()">
+              <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
+              <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+            </div>
+          </div>
+          <div id="regverify-confirm-password" class="form-group">
+            <label for="reginput-confirm-password" class="col-sm-2 control-label">Password</label>
+            <div class="col-sm-4">
+              <input type="password" class="form-control" name="confirm_password" id="reginput-confirm-password" placeholder="Confirm Password" onchange="checkConfirmPassword()">
+              <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
+              <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-              <button type="submit" class="btn btn-default">Submit</button>
+              <button type="submit" class="btn btn-primary">Submit</button>
             </div>
           </div>
         </form>
-
-
-      </div>
-    </div>
-
-
-    <footer class="footer">
-      <div class="container">
-        <p class="text-muted">Copyright &copy; USTC评课社区 2015</p>
-      </div>
-    </footer>
-
-
-
-
+  </div>
+</div>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
-  </body>
+    <script>
+    function inputFeedback(elem, ok) {
+        elem.find('.form-control-feedback').hide();
+        if (ok) {
+            elem.attr('class', 'form-group has-success has-feedback');
+            elem.find('.glyphicon-ok').show();
+        } else {
+            elem.attr('class', 'form-group has-error has-feedback');
+            elem.find('.glyphicon-remove').show();
+        }
+    }
+    function regverify(name) {
+        $.ajax({
+            type: "get",
+            url: "{{ url_for('api.reg_verify') }}",
+            async: true,
+            data: {
+                name: name,
+                value: $('#reginput-' + name).val(),
+            },
+            success: function(data) {
+                elem = $('#regverify-' + name);
+                inputFeedback(elem, (data == 'OK'));
+            },
+            error: function(err) {
+                alert('数据通信错误: ' + err.toString());
+            }
+        });
+    }
+    function checkPassword() {
+        pwd = $('#reginput-password').val();
+        elem = $('#regverify-password');
+        inputFeedback(elem, (pwd.length >= 6));
+    }
+    function checkConfirmPassword() {
+        elem = $('#regverify-confirm-password');
+        inputFeedback(elem, ($('#reginput-password').val() === $('#reginput-confirm-password').val()));
+    }
+    </script>
 </html>
+
+{% endblock %}

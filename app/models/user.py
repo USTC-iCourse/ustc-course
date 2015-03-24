@@ -125,7 +125,7 @@ class Student(db.Model):
     dept = db.Column(db.String(80))
     description = db.Column(db.Text())
 
-    use_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     courses_joined = db.relationship('Course',secondary=join_course, backref='students')
 
