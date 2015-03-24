@@ -6,7 +6,7 @@
 
     {{ error }}
 
-    <h3 class="blue">Sign In</h3>
+    <h3 class="blue">Sign in</h3>
     <hr>
 
     <form class="form-horizontal" method='post'>
@@ -46,4 +46,8 @@
 
 {% endblock %}
 
-
+{% block script %}
+<script>
+  $('#inputEmail').focus();
+</script>
+{% endblock %}

@@ -60,53 +60,50 @@
             </div>
           </div>
         </form>
-  </div>
+ </div>
 </div>
+{% endblock %}
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/static/js/jquery.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script>
-    function inputFeedback(elem, ok) {
-        elem.find('.form-control-feedback').hide();
-        if (ok) {
-            elem.attr('class', 'form-group has-success has-feedback');
-            elem.find('.glyphicon-ok').show();
-        } else {
-            elem.attr('class', 'form-group has-error has-feedback');
-            elem.find('.glyphicon-remove').show();
-        }
-    }
-    function regverify(name) {
-        $.ajax({
-            type: "get",
-            url: "{{ url_for('api.reg_verify') }}",
-            async: true,
-            data: {
-                name: name,
-                value: $('#reginput-' + name).val(),
-            },
-            success: function(data) {
-                elem = $('#regverify-' + name);
-                inputFeedback(elem, (data == 'OK'));
-            },
-            error: function(err) {
-                alert('数据通信错误: ' + err.toString());
-            }
-        });
-    }
-    function checkPassword() {
-        pwd = $('#reginput-password').val();
-        elem = $('#regverify-password');
-        inputFeedback(elem, (pwd.length >= 6));
-    }
-    function checkConfirmPassword() {
-        elem = $('#regverify-confirm-password');
-        inputFeedback(elem, ($('#reginput-password').val() === $('#reginput-confirm-password').val()));
-    }
-    </script>
-</html>
 
+{% block script %}
+<script>
+ $('#reginput-username').focus();
+ function inputFeedback(elem, ok) {
+   elem.find('.form-control-feedback').hide();
+   if (ok) {
+     elem.attr('class', 'form-group has-success has-feedback');
+     elem.find('.glyphicon-ok').show();
+   } else {
+     elem.attr('class', 'form-group has-error has-feedback');
+     elem.find('.glyphicon-remove').show();
+   }
+ }
+ function regverify(name) {
+   $.ajax({
+     type: "get",
+     url: "{{ url_for('api.reg_verify') }}",
+     async: true,
+     data: {
+       name: name,
+       value: $('#reginput-' + name).val(),
+     },
+     success: function(data) {
+       elem = $('#regverify-' + name);
+       inputFeedback(elem, (data == 'OK'));
+     },
+     error: function(err) {
+       alert('数据通信错误: ' + err.toString());
+     }
+   });
+ }
+ function checkPassword() {
+   pwd = $('#reginput-password').val();
+   elem = $('#regverify-password');
+   inputFeedback(elem, (pwd.length >= 6));
+ }
+ function checkConfirmPassword() {
+   elem = $('#regverify-confirm-password');
+   inputFeedback(elem, ($('#reginput-password').val() === $('#reginput-confirm-password').val()));
+ }
+</script>
 {% endblock %}
