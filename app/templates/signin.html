@@ -9,18 +9,18 @@
     <h3 class="blue">Sign in</h3>
     <hr>
 
-    <form class="form-horizontal" method='post'>
+    <form class="form-horizontal" method='post' action='/signin/'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <div class="form-group">
-        <label for="inputEmail" class="col-sm-2 control-label">Username</label>
+        <label for="inputEmail" class="col-sm-2 control-label">Email</label>
         <div class="col-sm-4">
-          <input name="username" class="form-control" id="inputEmail" placeholder="Username or Email">
+          <input type="text" name="username" class="form-control" id="inputEmail" placeholder="Email or username">
         </div>
       </div>
       <div class="form-group">
         <label for="inputPassword" class="col-sm-2 control-label">Password</label>
         <div class="col-sm-4">
-          <input name="password" class="form-control" id="inputPassword" placeholder="Password">
+          <input type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
         </div>
       </div>
 
