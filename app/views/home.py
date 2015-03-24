@@ -27,9 +27,9 @@ def signin():
             return redirect(request.args.get('next') or url_for('home.index'))
         elif not user.confirmed:
             '''没有确认邮箱的用户'''
-            return 'Please confirm your email!<a href=%s>resend email</a>'%url_for('.confirm_email',
+            return  render_template('feedback.html', status=False, message='Please activate your account by clicking link in your email! <a href=%s>Resend Email</a>'%url_for('.confirm_email',
                     email=user.email,
-                    action='send')
+                    action='send'))
             '''需要一个发送确认邮件的页面'''
             return render_template('require-confirm.html')
         error = '用户名或密码错误'
@@ -52,7 +52,7 @@ def signup():
         flash('registered')
         #login_user(user)
         '''注册完毕后显示一个需要激活的页面'''
-        return 'Please confirm your email address in your email.'
+        return render_template('feedback.html', status=True, message='Please activate your account by clicking link in your email.')
     if form.errors:
         print(form.errors)
     return render_template('signup.html',form=form)
@@ -80,7 +80,7 @@ def confirm_email():
         user = User.query.filter_by(email=email).first_or_404()
         if not user.confirmed:
             send_confirm_mail(email)
-        return 'Confirm url sent'   #需要一个反馈页面
+        return render_template('feedback.html', status=True, message='Email has been sent!') 
     else:
         return 404
 
@@ -113,14 +113,14 @@ def reset_password(token):
     if current_user.is_authenticated():
         return redirect(request.args.get('next') or url_for('home.index'))
     if RT.query.get(token):
-        return 'Token has been used'
+        return render_template('feedback.html', status=False, message='Token has been used')
     form = ResetPasswordForm()
     if form.validate_on_submit():
         RT.add(token)
         try:
             email = ts.loads(token, salt="password-reset-key", max_age=86400)
         except:
-            return 'Your token has expired.'
+            return render_template('feedback.html', status=False, message='Your token has expired.')
         user = User.query.filter_by(email=email).first_or_404()
         password = form['password'].data
         user.set_password(password)
@@ -135,3 +135,9 @@ def report_bug():
     ''' 报bug表单 '''
 
     return render_template('report-bug.html')
+
+@home.route('/test/')
+def test():
+    '''前端html页面效果测试专用'''
+
+    return render_template('feedback.html')
