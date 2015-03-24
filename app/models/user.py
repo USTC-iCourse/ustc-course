@@ -43,7 +43,6 @@ class User(db.Model, UserMixin):
     register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
     last_login_time = db.Column(db.DateTime())
-    register_token = db.Column(db.String(40)) # 注册验证 token
 
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
     avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
@@ -59,6 +58,12 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return '<User {} ({})>'.format(self.email, self.password)
+
+    @property
+    def confirmed(self):
+        if self.confirmed_at:
+            return True
+        return False
 
     @property
     def info(self):
@@ -77,8 +82,13 @@ class User(db.Model, UserMixin):
             return True
         return False
 
+    def confirm(self):
+        self.confirmed_at = datetime.utcnow()
+        self.save()
+
     def set_password(self, password):
         self.password = generate_password_hash(password)
+        self.save()
 
     def check_password(self,password):
         """Check passwords.Returns ture if matchs"""
@@ -97,7 +107,7 @@ class User(db.Model, UserMixin):
         user = cls.query.filter(db.or_(User.username == login,
                                        User.email == login)).first()
 
-        if user:
+        if user and user.confirmed:
             authenticated = user.check_password(password)
         else:
             authenticated = False
