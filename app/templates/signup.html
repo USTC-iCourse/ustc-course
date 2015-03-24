@@ -39,18 +39,24 @@
         <h3 class="blue">Sign Up</h3>
         <hr>
 
-        <form class="form-horizontal">
+        <form class="form-horizontal" method='post'>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="form-group">
             <label for="inputName" class="col-sm-2 control-label">Username</label>
             <div class="col-sm-4">
               <input type="text" name="username" class="form-control" id="inputName" placeholder="Username">
+              {% for info in form.errors.get('username') %}
+              {{ info }}
+              {% endfor %}
             </div>
           </div>
           <div class="form-group">
             <label for="inputEmail" class="col-sm-2 control-label">USTC Email</label>
             <div class="col-sm-4">
               <input name="email" class="form-control" id="inputEmail" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn">
+              {% for info in form.errors.get('password') %}
+              {{ info }}
+              {% endfor %}
             </div>
           </div>
           <div class="form-group">
