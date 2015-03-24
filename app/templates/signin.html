@@ -9,12 +9,12 @@
     <h3 class="blue">Sign in</h3>
     <hr>
 
-    <form class="form-horizontal" method='post'>
+    <form class="form-horizontal">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <div class="form-group">
-        <label for="inputEmail" class="col-sm-2 control-label">Username</label>
+        <label for="inputEmail" class="col-sm-2 control-label">USTC Email</label>
         <div class="col-sm-4">
-          <input name="username" class="form-control" id="inputEmail" placeholder="Username or Email">
+          <input name="email" class="form-control" id="inputEmail" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn">
         </div>
       </div>
       <div class="form-group">
