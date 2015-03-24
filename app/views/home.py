@@ -57,3 +57,10 @@ def reset_password():
     ''' 重置密码'''
 
     return render_template('reset-password.html')
+
+
+@home.route('/report-bug/')
+def report_bug():
+    ''' 报bug表单 '''
+
+    return render_template('report-bug.html')
