@@ -11,7 +11,7 @@ def index():
     return redirect(url_for('course.index'))
 
 @home.route('/signin/',methods=['POST','GET'])
-def login():
+def signin():
     if current_user.is_authenticated():
         return redirect(url_for('.index',username=current_user.username))
     form = LoginForm()
@@ -39,6 +39,7 @@ def signup():
         user = User(username=username, email=email,password=password)
         user.save()
         flash('registered')
+        login_user(user)
         return redirect(request.args.get('next') or url_for('.index'))
     if form.errors:
         print(form.errors)

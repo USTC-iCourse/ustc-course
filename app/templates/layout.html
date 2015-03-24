@@ -80,14 +80,14 @@
             <div class="modal fade" id="signin" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-signin">
                 <div class="modal-content">
-                  <form class="form-signin" target={{ url_for('home.login') }} method='post'>
+                  <form class="form-signin" action={{ url_for('home.signin', next=request.path) }} method='post'>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="form-signin-heading">
                       <span class="h2">Please sign in</span>
                       <a class="btn btn-default float-right" href="/signup">Sign Up</a>
                     </div>
-                    <label for="inputEmail" class="sr-only">Email address</label>
-                    <input name="username" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                    <label for="inputEmail" class="sr-only">Username</label>
+                    <input name="username" id="inputEmail" class="form-control" placeholder="Username or Email" required autofocus>
                     <label for="inputPassword" class="sr-only">Password</label>
                     <input name="password" id="inputPassword" class="form-control" placeholder="Password" required>
                     <div class="checkbox">
