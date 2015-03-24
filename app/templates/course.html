@@ -46,7 +46,7 @@
         {% for item in course.reviews %}
         <div class="comment-container">
           <div class="user-info">
-            <span><a><span class="post-user">{{ item.author.nick }}</span></a>
+            <span><a><span class="post-user">{{ item.author.username}}</span></a>
               <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
               <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
               <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
@@ -60,7 +60,7 @@
           <div class="comment-detail grey">
             <span class="post-time">{{ item.publish_time }}</span>
             <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true" ></span> {{ item.upvote }}
-            <span class="glyphicon glyphicon-comment blue" aria-hidden="true"></span> {{ len(item.conments) }}
+            <span class="glyphicon glyphicon-comment blue" aria-hidden="true"></span> {{ item.conments|length }}
           </div>
         </div>
         {% endfor %}
