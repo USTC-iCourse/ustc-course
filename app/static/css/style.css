@@ -119,3 +119,11 @@ body {
     font-size: 17px;
     margin-bottom: 50px;
 }
+.footer-link {
+    margin: 10px 0;
+    border-bottom: 1px #ddd solid;
+}
+.footer-btn {
+    display: inline-block;
+    padding: 10px 20px 10px 0;
+}
