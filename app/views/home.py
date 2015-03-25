@@ -135,8 +135,16 @@ def report_bug():
 
     return render_template('report-bug.html')
 
+
+@home.route('/about/')
+def about():
+    '''关于我们,用来放一些联系方式'''
+
+    return render_template('about.html')
+
+
 @home.route('/test/')
 def test():
     '''前端html页面效果测试专用'''
 
-    return render_template('feedback.html')
+    return render_template('review.html')
