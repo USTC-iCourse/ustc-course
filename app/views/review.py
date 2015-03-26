@@ -13,7 +13,7 @@ def new_review():
     form = ReviewForm(request.form)
     course_id = request.args.get('course_id')
     if not course_id:
-        return 'need to specify a course'
+        return 404
     course = Course.query.get(course_id)
     form = ReviewForm()
     review = CourseReview()
@@ -22,7 +22,9 @@ def new_review():
     form.course_id = course_id
     if form.validate_on_submit():
         form.populate_obj(review)
-        review.save(course,current_user)
+        review.author = current_user
+        review.course = course
+        review.save()
         return '<p>'+course_name + str(review) +'</p>'
     return render_template('new-review.html', form=form)
 
@@ -47,5 +49,5 @@ def edit_review():
         course = review.course
         return redirect(url_for('course.review', course_id=course.id, course_name=course.name))
 
-    return render_template('new-review.html', form=form)
+    return render_template('review.html', form=form)
 

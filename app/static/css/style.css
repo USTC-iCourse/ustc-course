@@ -1,68 +1,109 @@
+/* 颜色使用说明：
+主色调： #337ab7;
+辅色：
+*/
+
 body {
   padding-top: 60px;
   padding-bottom: 30px;
   background-color: #f3f3f3;
 }
-
-.grey {
-    color: #999;
-    font-size: 13px;
-}
-.blue {
-    color: #337ab7;
-}
-.dashed {
-    padding-top: 15px;
-    margin-bottom: 15px;
-    border-bottom: 1px #ddd dashed;
-}
+.container { width: 77%; }
 .float-element {
     background-color: #ffffff;
     padding: 30px;
     margin: 20px 0;
 }
-.container {
-    width: 75%;
+.dashed { border-bottom: 1px #ddd dashed; }
+.solid { border-bottom: 1px #ddd solid; }
+
+p { line-height: 25px; }
+.ud-gap-sm { padding: 8px 0; }
+.ud-gap-md { padding: 15px 0; }
+.ud-gap-lg { padding: 30px 0; }
+
+.rl-gap-sm { padding: 0 8px; }
+.rl-gap-md { padding: 0 15px; }
+.rl-gap-lg { padding: 0 30px; }
+
+.right-gap-sm { margin-right: 8px; }
+.right-gap-md { margin-right: 15px; }
+.right-gap-lg { margin-right: 30px; }
+
+.left-gap-sm { margin-left: 8px; }
+.left-gap-md { margin-left: 15px; }
+.left-gap-lg { margin-left: 30px; }
+
+.float-right { float: right; }
+.float-left { float: left; }
+
+.align-bottom { vertical-align: text-bottom; }
+.inline-h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
 }
 
-.text-container {
+.glyphicon-lg { font-size: 15px; }
+.glyphicon-sm { font-size: 12px; }
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+}
+.avatar-md {
+    width: 48px;
+    height: 48px;
+}
+.avatar-lg {
+    width: 96px;
+    height: 96px;
+}
+.cicle { border-radius: 100%; }
+.rect-lg {
+    width: 300px;
+    height: 225px;
+}
+.rect-md {
+
+}
+
+.grey { color: #999; }
+.blue { color: #337ab7; }
+
+.btn-blue {
+    color: #fff;
+    font-weight: 600;
+    background-color: #1caaea;
+    border-radius: 0;
+}
+.btn-blue:hover {
+    color: #fff;
+    background-color: #128bc1;
+}
+.btn-grey {
+    color: #666;
+    background-color: #f3f3f3;
+    border-radius: 0;
+}
+
+/* special elements */
+.tips {
+    margin: 20px 0;
     padding: 15px;
+    border: 1px #ddd dashed;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #999;
 }
-
-.comment-container {
-    border-bottom: 1px #ddd dashed;
-    margin: 10px 0 10px 0;
-}
-.user-info {
-    padding: 15px 0 10px 0;
-}
-.glyphicon-star, .glyphicon-star-empty {
-    font-size: 12px;
-}
-.comment-text {
-    padding: 5px 0;
-}
-.comment-detail {
-    padding: 10px 0 20px 0;
-}
-.glyphicon-comment, .glyphicon-thumbs-up {
-    margin-left: 10px;
-}
-.post-time {
-    margin-right: 30px;
-}
-.learn-status {
-    margin-left: 5px;
-}
-.post-user {
-    margin-right: 5px;
-}
-.btn-add-evaluation {
-    float: right;
+.status-message {
+    font-size: 17px;
+    margin-bottom: 50px;
 }
 
 
-/* signin modal part */
+
+
+/* signin modal part from bootstrap */
 .form-signin {
     max-width: 330px;
     padding: 30px 15px;
@@ -102,46 +143,4 @@ body {
 }
 .modal-signin {
     width: 380px;
-}
-.float-right {
-    float: right;
-}
-.tips {
-    margin: 20px 0;
-    padding: 15px;
-    border: 1px #ddd dashed;
-    border-radius: 8px;
-    font-size: 16px;
-    color: #999;
-}
-.status-message {
-    font-size: 17px;
-    margin-bottom: 50px;
-}
-.footer-link {
-    margin: 10px 0;
-    border-bottom: 1px #ddd solid;
-}
-.footer-btn {
-    display: inline-block;
-    padding: 10px 20px 10px 0;
-}
-
-.user-intro {
-    padding: 0 30px;
-}
-.avatar-sm {
-    width: 32px;
-    height: 32px;
-}
-.avatar-md {
-    width: 48px;
-    height: 48px;
-}
-.avatar-lg {
-    width: 96px;
-    height: 96px;
-}
-.cicle {
-    border-radius: 100%;    
 }

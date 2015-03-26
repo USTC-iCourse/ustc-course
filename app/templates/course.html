@@ -1,119 +1,193 @@
 {% extends "layout.html" %}
 {% block content %}
+
 <div class="container">
-  <div id="basic-info" class="float-element">
-    <span class="blue h3">多变量微积分</span>
-    <button class="btn btn-default" type="submit">关注</button>
-    <hr>
-    <p>评分：8.5</p>
-    <div class="row">
-      <div class="col-md-2">学期：2015春</div>
-      <div class="col-md-2">课堂号：00151311</div>
-      <div class="col-md-2">授课教师：李娟</div>
-      <div class="col-md-2">周学时：6</div>
-      <div class="col-md-2">起止周：1-20</div>
-      <div class="col-md-2">学分：6.0</div>
-    </div>
-  </div>
+  <div class="row float-element">
+    <div class="col-md-8 inline-h3">
+      <span class="blue h3">多变量微积分</span>
+      <span class="small grey align-bottom left-gap-sm">学期：2015春 &nbsp;课堂号：00151311</span>
+      <hr>
+      <div class="ud-gap-sm blue">
+        <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
+        <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
+        <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
+        <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
+        <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true" ></span>
+        <span class="rl-gap-sm h4">8.5</span><span class="rl-gap-sm text-muted">(8人评价)</span>
+      </div>
+      <div class="ud-gap-md">
+        <div class="row">
+          <span class="col-sm-2">课程难度：</span>
+          <div class="progress col-sm-6">
+            <div class="progress-bar progress-bar-success" style="width: 35%">
+              <span class="sr-only">35% Complete (success)</span>
+            </div>
+            <div class="progress-bar progress-bar-warning progress-bar-striped" style="width: 55%">
+              <span class="sr-only">55% Complete (warning)</span>
+            </div>
+            <div class="progress-bar progress-bar-danger" style="width: 10%">
+              <span class="sr-only">10% Complete (danger)</span>
+            </div>
+          </div>
+        </div>
 
+        <div class="row">
+          <span class="col-sm-2">睡眠指数：</span>
+          <div class="progress col-sm-6">
+            <div class="progress-bar progress-bar-success" style="width: 35%">
+              <span class="sr-only">35% Complete (success)</span>
+            </div>
+            <div class="progress-bar progress-bar-warning progress-bar-striped" style="width: 55%">
+              <span class="sr-only">55% Complete (warning)</span>
+            </div>
+            <div class="progress-bar progress-bar-danger" style="width: 10%">
+              <span class="sr-only">10% Complete (danger)</span>
+            </div>
+          </div>
+        </div>      <div class="row">
+          <span class="col-sm-2">给分好坏：</span>
+          <div class="progress col-sm-6">
+            <div class="progress-bar progress-bar-success" style="width: 35%">
+              <span class="sr-only">35% Complete (success)</span>
+            </div>
+            <div class="progress-bar progress-bar-warning progress-bar-striped" style="width: 55%">
+              <span class="sr-only">55% Complete (warning)</span>
+            </div>
+            <div class="progress-bar progress-bar-danger" style="width: 10%">
+              <span class="sr-only">10% Complete (danger)</span>
+            </div>
+          </div>
+        </div>      <div class="row">
+          <span class="col-sm-2">收获大小：</span>
+          <div class="progress col-sm-6">
+            <div class="progress-bar progress-bar-success" style="width: 35%">
+              <span class="sr-only">35% Complete (success)</span>
+            </div>
+            <div class="progress-bar progress-bar-warning progress-bar-striped" style="width: 55%">
+              <span class="sr-only">55% Complete (warning)</span>
+            </div>
+            <div class="progress-bar progress-bar-danger" style="width: 10%">
+              <span class="sr-only">10% Complete (danger)</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-
-
-  <div id="main" class="tab-container float-element">
-    <ul id="main-tab" class="nav nav-tabs" role="tablist">
-      <li role="presentation" class="active"><a href="#introduction" id="introduction-tab" role="tab" data-toggle="tab" aria-controls="intro">简介</a></li>
-      <li role="presentation"><a href="#evaluation" id="evaluation-tab" role="tab" data-toggle="tab" aria-controls="evaluation">点评</a></li>
-    </ul>
-
-
-
-    <div id="main-content" class="tab-content">
-      <div role="tabpanel" class="tab-pane fade in active text-container" id="introduction" aria-labelledBy="intro-tab">
-        <p>预修课程：单变量微积分</p>
-        <p>参考教材：《微积分学教程（第一卷，第二卷，第三卷）》，第3版，菲赫金哥尔茨著，叶彦谦等译，高等教育出版社，2006年，北京 </p>
-        <p>教材：《微积分学导论（下册）》， 李思敏，宣本金，罗罗，叶盛，中国科技大学出版社，2012年，合肥. 《微积分（下册）》，谢盛刚，李娟, 陈秋桂，中国科学出版社，2012年2月，北京 </p>
-        <p>课程简介：	多变量微积分阐述多变量函数的诸多分析性质，包括函数的极限和连续性，多元函数微分学和重积分的基本理论和运算，还涉及到两种类型的曲线积分和曲面积分以及与其有关的高斯定理，格林定理和斯托克斯定理。还有含参数的积分，无穷级数和傅里叶分析。 </p>
+      <span>课程主页：无</span>
+      <div class="ud-gap-md">
+        <button class="btn btn-blue" type="submit">关注 <span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button>
+        <button class="btn btn-blue" type="submit">推荐 <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></button>
+          <button class="btn btn-blue" type="submit">没有帮助 <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></button>
       </div>
 
 
-      <div role="tabpanel" class="tab-pane fade text-container" id="evaluation" aria-labelledBy="evaluation-tab">
-        <div>
-          <span class="blue h4">最新点评</span>
-          <button type="button" class="btn btn-primary btn-add-evaluation">写点评</button>
+      <div class="solid ud-gap-md">
+        <span class="blue h3">点评</span>
+        <button type="button" class="btn btn-default float-right blue">写点评</button>
+      </div>
+
+
+      <!-- 第一个 -->
+      <div class="ud-gap-md dashed">
+        <div class="ud-gap-sm">
+          <a><span class="right-gap-sm">jenny42</span></a>
+          <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
         </div>
-
-
-        <!-- 载入用户的评论 -->
-        {% for item in course.reviews %}
-        <div class="comment-container">
-          <div class="user-info">
-            <span><a><span class="post-user">{{ item.author.username}}</span></a>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
-            </span>
-          </div>
-          <div class="comment-text">
-            <p>{{ item.content }}</p>
-          </div>
-          <div class="comment-detail grey">
-            <span class="post-time">{{ item.publish_time }}</span>
-            <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true" ></span> {{ item.upvote }}
-            <span class="glyphicon glyphicon-comment blue" aria-hidden="true"></span> {{ item.conments|length }}
-          </div>
+        <div class="ud-gap-sm">
+          <p>李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！</p>
         </div>
-        {% endfor %}
-
-        <!-- 第二个 -->
-        <div class="comment-container">
-          <div class="user-info">
-            <span><a><span class="post-user">jenny42</span></a>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
-            </span>
-          </div>
-          <div class="comment-text">
-            <p>李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！</p>
-          </div>
-          <div class="comment-detail grey">
-            <span class="post-time">2015-03-17 19:45</span>
-            <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true" ></span> 1
-            <span class="glyphicon glyphicon-comment blue" aria-hidden="true"></span> 1
-          </div>
+        <div class="grey">
+          <span class="small">2015-03-17 19:45</span>
+          <span class="glyphicon glyphicon-thumbs-up blue left-gap-md" aria-hidden="true" ></span> 1
+          <span class="glyphicon glyphicon-comment blue left-gap-md" aria-hidden="true"></span> 1
         </div>
+      </div>
 
-
-
-        <!-- 第三个 -->
-        <div class="comment-container">
-          <div class="user-info">
-            <span><a><span class="post-user">jenny42</span></a>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-              <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-            </span>
-          </div>
-          <div class="comment-text">
-            <p>李娟老师女神！！最后给分也很好呢。</p>
-          </div>
-          <div class="comment-detail grey">
-            <span class="post-time">2015-03-17 19:45</span>
-            <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true" ></span> 0
-            <span class="glyphicon glyphicon-comment blue" aria-hidden="true"></span> 0
-          </div>
+      <!-- 第一个 -->
+      <div class="ud-gap-md dashed">
+        <div class="ud-gap-sm">
+          <a><span class="right-gap-sm">jenny42</span></a>
+          <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
         </div>
-        
+        <div class="ud-gap-sm">
+          <p>李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！</p>
+        </div>
+        <div class="grey">
+          <span class="small">2015-03-17 19:45</span>
+          <span class="glyphicon glyphicon-thumbs-up blue left-gap-md" aria-hidden="true" ></span> 1
+          <span class="glyphicon glyphicon-comment blue left-gap-md" aria-hidden="true"></span> 1
+        </div>
+      </div>
+
+
+      <!-- 第一个 -->
+      <div class="ud-gap-md dashed">
+        <div class="ud-gap-sm">
+          <a><span class="right-gap-sm">jenny42</span></a>
+          <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
+          <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
+        </div>
+        <div class="ud-gap-sm">
+          <p>李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！</p>
+        </div>
+        <div class="grey">
+          <span class="small">2015-03-17 19:45</span>
+          <span class="glyphicon glyphicon-thumbs-up blue left-gap-md" aria-hidden="true" ></span> 1
+          <span class="glyphicon glyphicon-comment blue left-gap-md" aria-hidden="true"></span> 1
+        </div>
+      </div>
+      
+    </div>
+
+
+
+
+    <!-- 右边栏 -->
+
+    <div class="col-md-4 rl-gap-lg">
+      <div class="ud-gap-md dashed">
+        <img class="avatar-lg cicle" src="/static/image/lijuan.jpg"/>
+        <h3 class="blue">李娟</h3>
+        <p>教师排行榜：23</p>
+        <p>所在系：数学系 副教授</p>
+        <p>研究方向：分析</p>
+        <p>教师主页：<a href="http://math.ustc.edu.cn/new/teachersinfo1.php?id=54">链接</a></p>
+      </div>
+
+      <div class="ud-gap-md dashed">
+        <h5 class="blue">更多李娟老师课程</h5>
+      </div>
+
+      <div class="ud-gap-md dashed">
+        <h5 class="blue">更多多变量微积分</h5>
       </div>
     </div>
-  </div>
-</div>
 
 
+
+  </div>  <!-- row  -->
+</div>  <!-- container -->
+{% endblock %}
+
+
+
+
+{% block script %}
+<script>
+ $('#myTab a').click(function (e) {
+   e.preventDefault()
+   $(this).tab('show')
+ })
+</script>
 {% endblock %}
