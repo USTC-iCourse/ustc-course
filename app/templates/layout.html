@@ -114,10 +114,10 @@
 
     <footer class="footer">
       <div class="container">
-        <div class="footer-link">
-          <a class="footer-btn" href='/about/'>About</a>
-          <a class="footer-btn" href='/blog/' style="display: none">Blog</a>
-          <a class="footer-btn" href='/report-bug/'>Report Bug</a>
+        <div class="solid ud-gap-sm">
+          <a class="right-gap-md" href='/about/'>About</a>
+          <a class="right-gap-md" href='/blog/' style="display: none">Blog</a>
+          <a class="right-gap-md" href='/report-bug/'>Report Bug</a>
         </div>
         <p class="footer-text text-muted">Copyright &copy; USTC评课社区 2015</p>
       </div>
@@ -133,12 +133,6 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
-    <script>
-     $('#myTab a').click(function (e) {
-       e.preventDefault()
-       $(this).tab('show')
-     })
-    </script>
     <script>
      $('#signin').on('shown.bs.modal', function () {
        $('#inputEmail').focus()
