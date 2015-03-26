@@ -3,6 +3,7 @@ from wtforms import (StringField, PasswordField, BooleanField, ValidationError)
 from wtforms.validators import (InputRequired,NumberRange, Email, EqualTo)
 
 from app.models import User
+import re
 
 class LoginForm(Form):
     username = StringField('Username',validators=[InputRequired()])
@@ -24,6 +25,10 @@ class RegisterForm(Form):
     def validate_username(form, field):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('The username has been taken!')
+        regex = re.compile("[a-zA-Z0-9_]+@(mail\.)?ustc\.edu\.cn")
+        if not regex.fullmatch(field.data):
+            raise ValidationError('必须使用科大邮箱注册!')
+
 
 class ForgotPasswordForm(Form):
     email = StringField('Email', validators=[InputRequired('必须输入邮箱地址'),

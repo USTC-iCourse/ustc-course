@@ -1,7 +1,8 @@
 import sys
 sys.path.append('..')  # fix import directory
+from app.models import User
 
 
-from app import app,db,user_datastore
-
-user_datastore.create_user(email='test@163.com',password='password')
+user = User('test','test@test.com','test')
+user.save()
+user.confirm()

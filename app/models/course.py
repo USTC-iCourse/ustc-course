@@ -86,8 +86,6 @@ class CourseReview(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
 
-    rate = db.Column(db.Integer)  #课程评分
-    title = db.Column(db.String(200))
     content = db.Column(db.Text())
     publish_time = db.Column(db.DateTime(),default=datetime.utcnow)
     update_time = db.Column(db.DateTime(),default=datetime.utcnow)
