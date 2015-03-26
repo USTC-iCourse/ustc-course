@@ -1,8 +1,76 @@
-<form method='post'>
-    {{ form.csrf_token}}
-    {{ form.rate.label }}
-    {{ form.rate }}
-    {{ form.content.label }}
-    {{ form.content }}
-    <input type='submit'>
-</form>
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="float-element">
+    <p class="blue h3">点评 &bull; 多变量微积分</p>
+    <hr>
+    <div class="rate-part">
+        <form class="form-horizontal" method="post" action="{{ url_for('review.new_review', course_id=form.course_id) }}">
+        {{ form.csrf_token }}
+        <div class="form-group">
+          <label for="" class="col-sm-2 control-label">课程难度:</label>
+          <div class="col-sm-3">
+            <button class="btn btn-default" type="submit">简单</button>
+            <button class="btn btn-default" type="submit">中等</button>
+            <button class="btn btn-default" type="submit">困难</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="" class="col-sm-2 control-label">睡眠指数:</label>
+          <div class="col-sm-3">
+            <button class="btn btn-default" type="submit">清醒</button>
+            <button class="btn btn-default" type="submit">时睡时醒</button>
+            <button class="btn btn-default" type="submit">催眠</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="" class="col-sm-2 control-label">给分好坏:</label>
+          <div class="col-sm-3">
+            <button class="btn btn-default" type="submit">超好</button>
+            <button class="btn btn-default" type="submit">厚道</button>
+            <button class="btn btn-default" type="submit">杀手</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="" class="col-sm-2 control-label">是否推荐:</label>
+          <div class="col-sm-3">
+            <button class="btn btn-default" type="submit">推荐</button>
+            <button class="btn btn-default" type="submit">无所谓</button>
+            <button class="btn btn-default" type="submit">大坑</button>
+          </div>
+        </div>
+
+        <!-- 这里样式还要改 先提交了 -->
+      </form>
+    </div>
+    <script type="text/plain" id="content-editor" style="width:800px;height:240px;">
+    </script>
+    <button type="submit"></button>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+    <link href="/static/css/umeditor/umeditor.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/static/js/umeditor/config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/static/js/umeditor/editor_api.js"></script>
+    <script type="text/javascript" src="/static/js/umeditor/lang-zh-cn.js"></script>
+    <script type="text/javascript">
+        var um = UM.getEditor('content-editor',{
+            //这里可以选择自己需要的工具按钮名称,此处仅选择如下七个
+            //toolbar:['fullscreen source undo redo bold italic underline'],
+            //关闭字数统计
+            wordCount:true,
+            //关闭elementPath
+            elementPathEnabled:false,
+            //默认的编辑区域高度
+            initialFrameHeight:300
+            //更多其他参数，请参考umeditor.config.js中的配置项
+        });
+    </script>
+{% endblock %}

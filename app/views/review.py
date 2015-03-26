@@ -12,7 +12,6 @@ review = Blueprint('review',__name__)
 def new_review():
     form = ReviewForm(request.form)
     course_id = request.args.get('course_id')
-    course_name = request.args.get('course_name')
     if not course_id:
         return 'need to specify a course'
     course = Course.query.get(course_id)
@@ -20,15 +19,9 @@ def new_review():
     review = CourseReview()
     if not course:
         return 404
-    if course_name != course.name:
-        return redirect(url_for('.new_review',
-            course_id=course_id,
-            course_name=course.name,
-            form=form)
-            )
+    form.course_id = course_id
     if form.validate_on_submit():
         form.populate_obj(review)
-        print(review)
         review.save(course,current_user)
         return '<p>'+course_name + str(review) +'</p>'
     return render_template('new-review.html', form=form)
