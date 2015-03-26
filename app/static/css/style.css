@@ -8,20 +8,19 @@ body {
     color: #999;
     font-size: 13px;
 }
-
 .blue {
     color: #337ab7;
+}
+.dashed {
+    padding-top: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px #ddd dashed;
 }
 .float-element {
     background-color: #ffffff;
     padding: 30px;
     margin: 20px 0;
 }
-
-#course-name {
-    font-size: 20px;
-}
-
 .container {
     width: 75%;
 }
@@ -126,4 +125,23 @@ body {
 .footer-btn {
     display: inline-block;
     padding: 10px 20px 10px 0;
+}
+
+.user-intro {
+    padding: 0 30px;
+}
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+}
+.avatar-md {
+    width: 48px;
+    height: 48px;
+}
+.avatar-lg {
+    width: 96px;
+    height: 96px;
+}
+.cicle {
+    border-radius: 100%;    
 }
