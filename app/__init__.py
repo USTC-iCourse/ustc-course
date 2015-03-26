@@ -23,12 +23,10 @@ login_manager.login_view = 'home.login'
 
 
 
-from app.views import course
-from app.views import home,review
-from app.views import api
+from app.views import *
 app.register_blueprint(home,url_prefix='')
 app.register_blueprint(course,url_prefix='/course')
 app.register_blueprint(review, url_prefix='/review')
 app.register_blueprint(api, url_prefix='/api')
-
+app.register_blueprint(user, url_prefix='/user')
 
