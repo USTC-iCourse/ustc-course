@@ -15,6 +15,7 @@ def view_profile():
 @user.route('/<int:user_id>/settings/')
 def account_settings():
     '''账户设置,包括改密码等'''
+
     return render_template('settings.html')
 
 

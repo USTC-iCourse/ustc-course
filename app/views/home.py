@@ -148,3 +148,10 @@ def test():
     '''前端html页面效果测试专用'''
 
     return render_template('review.html')
+
+@home.route('/test2/')
+def test2():
+    '''前端html页面效果测试专用2'''
+
+    return render_template('profile.html')
+
