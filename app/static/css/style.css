@@ -14,6 +14,7 @@ body {
     padding: 30px;
     margin: 20px 0;
 }
+.container-md { width: 640px }
 .dashed { border-bottom: 1px #ddd dashed; }
 .solid { border-bottom: 1px #ddd solid; }
 
@@ -21,6 +22,7 @@ p { line-height: 25px; }
 .ud-gap-sm { padding: 8px 0; }
 .ud-gap-md { padding: 15px 0; }
 .ud-gap-lg { padding: 30px 0; }
+.footer-gap { padding: 30px 0; }
 
 .rl-gap-sm { padding: 0 8px; }
 .rl-gap-md { padding: 0 15px; }
@@ -36,6 +38,8 @@ p { line-height: 25px; }
 
 .float-right { float: right; }
 .float-left { float: left; }
+
+.weight-heavy { font-weight: 600; }
 
 .align-bottom { vertical-align: text-bottom; }
 .inline-h3 {
@@ -70,7 +74,19 @@ p { line-height: 25px; }
 .grey { color: #999; }
 .blue { color: #337ab7; }
 
-.btn-blue {
+.shadow { box-shadow: 3px 3px 2px #ddd; }
+.btn-flat {
+    padding: 6px 22px 6px 22px;
+    border: 0;
+}
+.btn-white {
+    color: #666;
+    border-radius: 0;
+    font-weight: 550;
+    background-color: #fff;
+    border: 1px #ddd solid;
+}
+.btn-blue, .btn-grey:hover {
     color: #fff;
     font-weight: 600;
     background-color: #1caaea;
@@ -99,8 +115,7 @@ p { line-height: 25px; }
     font-size: 17px;
     margin-bottom: 50px;
 }
-
-
+.no-border td { border: none !important; }
 
 
 /* signin modal part from bootstrap */
