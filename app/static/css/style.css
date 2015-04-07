@@ -8,7 +8,21 @@ body {
   padding-bottom: 30px;
   background-color: #f3f3f3;
 }
-.container { width: 77%; }
+@media (min-width:768px){
+	.container{
+		width:750px
+	}
+}
+@media (min-width:992px){
+	.container{
+		width:970px;
+	}
+}
+@media (min-width:1200px){
+	.container{
+		width: 77%;
+	}
+}
 .float-element {
     background-color: #ffffff;
     padding: 30px;

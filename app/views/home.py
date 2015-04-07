@@ -8,7 +8,7 @@ home = Blueprint('home',__name__)
 
 @home.route('/')
 def index():
-    return redirect(url_for('course.index'))
+    return render_template('index.html')
 
 @home.route('/signin/',methods=['POST','GET'])
 def signin():
@@ -147,7 +147,7 @@ def about():
 def test():
     '''前端html页面效果测试专用'''
 
-    return render_template('review.html')
+    return render_template('test.html')
 
 @home.route('/test2/')
 def test2():

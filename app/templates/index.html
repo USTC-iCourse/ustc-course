@@ -1,13 +1,26 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container theme-showcase" role="main">
+<div class="container"">
 
-  <div class="jumbotron">
-    <h1>USTC评课社区</h1>
-    <p class="lead">在这里，你可以获取最有用的课程信息，可以点评任何一门课程。评价为了更好地选课。</p>
+  <div class="float-element">
+    <h2 class="blue">USTC评课社区</h2>
+    <hr>
+    <div class="tips">
+      <p>在这里，你可以获取最有用的课程信息，点评任何一门课程。</p>
+    </div>
+    <div class="tips">
+      <p>请搜索你感兴趣的课程。</p>
+    </div>
+    <div class="ud-gap-lg"></div>
   </div>
 
 </div><!-- /.container -->
 
+{% endblock %}
+
+{% block script %}
+<script>
+  $('#search').focus();
+</script>
 {% endblock %}
