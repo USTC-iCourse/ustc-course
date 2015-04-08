@@ -4,14 +4,18 @@
 */
 
 body {
-  padding-top: 60px;
-  padding-bottom: 30px;
-  background-color: #f3f3f3;
+    padding-bottom: 30px;
+    background-color: #f3f3f3;
+}
+@media (max-width:768px){
+    .desktop {
+        display: none;
+    }
 }
 @media (min-width:768px){
-	.container{
-		width:750px
-	}
+    .mobile {
+        display: none;
+    }
 }
 @media (min-width:992px){
 	.container{
@@ -23,32 +27,92 @@ body {
 		width: 77%;
 	}
 }
+@media (max-width:768px) {
+    .float-element {
+        padding: 15px;
+    }
+}
+@media (min-width:769px) {
+    .float-element {
+        padding: 30px;
+    }
+}
 .float-element {
     background-color: #ffffff;
-    padding: 30px;
-    margin: 20px 0;
+    margin: 10px 0 20px 0;
 }
 .container-md { width: 640px }
 .dashed { border-bottom: 1px #ddd dashed; }
 .solid { border-bottom: 1px #ddd solid; }
 
 p { line-height: 25px; }
-.ud-gap-sm { padding: 8px 0; }
-.ud-gap-md { padding: 15px 0; }
-.ud-gap-lg { padding: 30px 0; }
-.footer-gap { padding: 30px 0; }
 
-.rl-gap-sm { padding: 0 8px; }
-.rl-gap-md { padding: 0 15px; }
-.rl-gap-lg { padding: 0 30px; }
 
-.right-gap-sm { margin-right: 8px; }
-.right-gap-md { margin-right: 15px; }
-.right-gap-lg { margin-right: 30px; }
+.ud-pd-sm {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    }
+.ud-pd-md {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+.ud-pd-lg {
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+.rl-pd-sm {
+    padding-right: 8px;
+    padding-left: 8px;
+}
+.rl-pd-md {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+.rl-pd-lg {
+    padding-right: 30px;
+    padding-left: 30px;
+}
 
-.left-gap-sm { margin-left: 8px; }
-.left-gap-md { margin-left: 15px; }
-.left-gap-lg { margin-left: 30px; }
+.right-pd-sm { padding-right: 8px; }
+.right-pd-md { padding-right: 15px; }
+.right-pd-lg { padding-right: 30px; }
+
+.left-pd-sm { padding-left: 8px; }
+.left-pd-md { padding-left: 15px; }
+.left-pd-lg { padding-left: 30px; }
+
+.ud-mg-sm {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    }
+.ud-mg-md {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.ud-mg-lg {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+.rl-mg-sm {
+    margin-right: 8px;
+    margin-left: 8px;
+}
+.rl-mg-md {
+    margin-right: 15px;
+    margin-left: 15px;
+}
+.rl-mg-lg {
+    margin-right: 30px;
+    margin-left: 30px;
+}
+
+.right-mg-sm { margin-right: 8px; }
+.right-mg-md { margin-right: 15px; }
+.right-mg-lg { margin-right: 30px; }
+
+.left-mg-sm { margin-left: 8px; }
+.left-mg-md { margin-left: 15px; }
+.left-mg-lg { margin-left: 30px; }
 
 .float-right { float: right; }
 .float-left { float: left; }
@@ -131,6 +195,15 @@ p { line-height: 25px; }
 }
 .no-border td { border: none !important; }
 
+.rate-box {
+    text-align: center;
+    background-color: #eff6fa;
+    color: #698ebf;
+    border-radius: 5px;
+    width: 50px;
+    line-height: 50px;
+}
+
 
 /* signin modal part from bootstrap */
 .form-signin {
@@ -170,6 +243,13 @@ p { line-height: 25px; }
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
-.modal-signin {
-    width: 380px;
+@media (max-width:768px) {
+    .modal-signin {
+        width: 340px;
+    }
+}
+@media (min-width:769px) {
+    .modal-signin {
+        width: 380px;
+    }
 }

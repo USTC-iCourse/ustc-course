@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+x{% extends "layout.html" %}
 {% block content %}
 
 <div class="container">
@@ -7,29 +7,29 @@
     <hr>
     <form class="form-horizontal" method="post" action="{{ url_for('review.new_review', course_id=form.course_id) }}">
       {{ form.csrf_token }}
-      <div class="rate-part ud-gap-md">
-        <div class="ud-gap-sm">
+      <div class="rate-part ud-pd-md">
+        <div class="ud-pd-sm">
           <span class="btn-flat btn-white">课程难度</span>
           <button class="btn-flat btn-grey">简单</button>
           <button class="btn-flat btn-grey">中等</button>
           <button class="btn-flat btn-grey">困难</button>
         </div>
 
-        <div class="ud-gap-sm">
+        <div class="ud-pd-sm">
           <span class="btn-flat btn-white">睡眠指数</span>
           <button class="btn-flat btn-grey" >清醒</button>
           <button class="btn-flat btn-grey" >中等</button>
           <button class="btn-flat btn-grey" >催眠</button>
         </div>
 
-        <div class="ud-gap-sm">
+        <div class="ud-pd-sm">
           <span class="btn-flat btn-white">给分好坏</span>
           <button class="btn-flat btn-grey" >超好</button>
           <button class="btn-flat btn-grey" >厚道</button>
           <button class="btn-flat btn-grey" >杀手</button>
         </div>
 
-        <div class="ud-gap-sm">
+        <div class="ud-pd-sm">
           <span class="btn-flat btn-white">收获多少</span>
           <button class="btn-flat btn-grey" >很多</button>
           <button class="btn-flat btn-grey" >一般</button>
@@ -39,13 +39,13 @@
 
       <div class="container-md">
         <h4 class="grey">说几句吧！</h4>
-        <div class="ud-gap-sm">
+        <div class="ud-pd-sm">
           <script type="text/plain" id="content-editor" style="width:640px;height:240px;">
           </script>
         </div>
         <button type="submit" class="btn btn-default float-right shadow">发布</button>
       </div>
-      <div class="footer-gap">
+      <div class="ud-pd-lg">
       </div>
     </form>
   </div>

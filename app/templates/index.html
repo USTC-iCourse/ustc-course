@@ -6,21 +6,26 @@
   <div class="float-element">
     <h2 class="blue">USTC评课社区</h2>
     <hr>
-    <div class="tips">
-      <p>在这里，你可以获取最有用的课程信息，点评任何一门课程。</p>
+    <div class="ud-pd-md desktop">
     </div>
-    <div class="tips">
-      <p>请搜索你感兴趣的课程。</p>
+    <div class="tips mobile">
+      <p>搜索你感兴趣的课程</p>
     </div>
-    <div class="ud-gap-lg"></div>
-  </div>
-
+    <form class="form-inline">
+      <div class="form-group">
+        <input type="text" class="form-control input-lg" placeholder="输入课程名称、课堂号">
+      </div>
+      <button type="submit" class="btn btn-default btn-lg">搜索</button>
+    </form>
+    <div class="ud-pd-lg"></div>
+    <div class="ud-pd-lg"></div>
+  </div><!-- /.float-element -->
 </div><!-- /.container -->
 
 {% endblock %}
 
 {% block script %}
 <script>
-  $('#search').focus();
+ $('#search').focus();
 </script>
 {% endblock %}
