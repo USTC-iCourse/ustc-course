@@ -13,11 +13,10 @@
     </div>
     <form class="form-inline">
       <div class="form-group">
-        <input type="text" class="form-control input-lg" placeholder="输入课程名称、课堂号">
+        <input type="text" class="form-control input-lg" id="inputCourse" placeholder="输入课程名称、课堂号">
       </div>
       <button type="submit" class="btn btn-default btn-lg">搜索</button>
     </form>
-    <div class="ud-pd-lg"></div>
     <div class="ud-pd-lg"></div>
   </div><!-- /.float-element -->
 </div><!-- /.container -->
@@ -26,6 +25,6 @@
 
 {% block script %}
 <script>
- $('#search').focus();
+ $('#inputCourse').focus();
 </script>
 {% endblock %}

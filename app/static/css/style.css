@@ -204,6 +204,9 @@ p { line-height: 25px; }
     line-height: 50px;
 }
 
+#inputCourse {
+    width: 320px;
+}
 
 /* signin modal part from bootstrap */
 .form-signin {
