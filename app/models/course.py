@@ -77,6 +77,30 @@ review_upvotes = db.Table('review_upvotes',
     db.Column('author_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
 )
 
+class CourseRate(db.Model):
+    __tablename__ = 'course_rates'
+    id = db.Column(db.Integer,primary_key=True, unique=True)
+    difficulty_1_count = db.Column(db.Integer,default=0)
+    difficulty_2_count = db.Column(db.Integer,default=0)
+    difficulty_3_count = db.Column(db.Integer,default=0)
+    sleepy_1_count = db.Column(db.Integer,default=0)
+    sleepy_2_count = db.Column(db.Integer,default=0)
+    sleepy_3_count = db.Column(db.Integer,default=0)
+    grade_1_count = db.Column(db.Integer,default=0)
+    grade_2_count = db.Column(db.Integer,default=0)
+    grade_3_count = db.Column(db.Integer,default=0)
+    gain_1_count = db.Column(db.Integer,default=0)
+    gain_2_count = db.Column(db.Integer,default=0)
+    gain_3_count = db.Column(db.Integer,default=0)
+    difficulty = db.Column(db.Float,default=2)
+    sleepy = db.Column(db.Float,default=2)
+    grading = db.Column(db.Float,default=2)
+    gain = db.Column(db.Float,default=2)
+    rate = db.Column(db.Integer,default=0)
+    totoal_count = db.Column(db.Integer,default=0)
+
+
+
 class CourseReview(db.Model):
     __tablename__ = 'course_reviews'
     id = db.Column(db.Integer,primary_key=True, unique=True)

@@ -52,6 +52,7 @@ def signup():
         #login_user(user)
         '''注册完毕后显示一个需要激活的页面'''
         return render_template('feedback.html', status=True, message='Please activate your account by clicking link in your email.')
+#TODO: log error?
     if form.errors:
         print(form.errors)
     return render_template('signup.html',form=form)

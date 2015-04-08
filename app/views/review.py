@@ -1,4 +1,4 @@
-from flask import Blueprint,render_template,abort,redirect,url_for,request
+from flask import Blueprint,render_template,abort,redirect,url_for,request,abort
 from flask.ext.security import current_user,login_required
 from app.models import Course,CourseReview
 from app.forms import ReviewForm
@@ -6,20 +6,18 @@ from app.forms import ReviewForm
 review = Blueprint('review',__name__)
 
 
-
 @review.route('/new/',methods=['GET','POST'])
 #@login_required
 def new_review():
     form = ReviewForm(request.form)
-    course_id = request.args.get('course_id')
+    course_id = request.args.get('course_id', type=int)
     if not course_id:
-        return 404
+        abort(404)
     course = Course.query.get(course_id)
     form = ReviewForm()
     review = CourseReview()
     if not course:
-        return 404
-    form.course_id = course_id
+        abort(404)
     if form.validate_on_submit():
         form.populate_obj(review)
         review.author = current_user
@@ -33,10 +31,10 @@ def new_review():
 def edit_review():
     review_id = request.args.get('review_id')
     if not review_id:
-        return 404
+        abort(404)
     review = CourseReview.query.get(review_id)
     if not review:
-        return 404
+        abort(404)
 
     #check if the user is the author
     if review.author != current_user:
