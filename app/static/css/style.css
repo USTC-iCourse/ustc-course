@@ -30,16 +30,17 @@ body {
 @media (max-width:768px) {
     .float-element {
         padding: 15px;
+        margin-bottom: 15px;
     }
 }
 @media (min-width:769px) {
     .float-element {
         padding: 30px;
+        margin: 5px 0 20px 0;
     }
 }
 .float-element {
     background-color: #ffffff;
-    margin: 10px 0 20px 0;
 }
 .container-md { width: 640px }
 .dashed { border-bottom: 1px #ddd dashed; }
@@ -200,8 +201,8 @@ p { line-height: 25px; }
     background-color: #eff6fa;
     color: #698ebf;
     border-radius: 5px;
-    width: 50px;
-    line-height: 50px;
+    width: 45px;
+    line-height: 45px;
 }
 @media (min-width:768px){
     #inputCourse {
