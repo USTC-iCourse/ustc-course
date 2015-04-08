@@ -203,9 +203,10 @@ p { line-height: 25px; }
     width: 50px;
     line-height: 50px;
 }
-
-#inputCourse {
-    width: 320px;
+@media (min-width:768px){
+    #inputCourse {
+        width: 320px;
+    }
 }
 
 /* signin modal part from bootstrap */
