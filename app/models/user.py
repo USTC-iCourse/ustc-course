@@ -20,15 +20,28 @@ related_courses = db.Table('related_course',
     db.Column('dst', db.Integer, db.ForeignKey('courses.id'), primary_key=True)
 )
 
-follow_course = db.Table('follow_course',
-    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
-)
+class FollowCourse(db.Model):
+    __tablename__ = 'follow_course'
 
-join_course = db.Table('join_course',
-    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
-    db.Column('student_id', db.Integer, db.ForeignKey('students.sno'), primary_key=True)
-)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+
+    follow_time = db.Column(db.DateTime)
+
+    course = db.relationship('Course')
+
+class JoinCourse(db.Model):
+    __tablename__ = 'join_course'
+
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), primary_key=True)
+    student_id = db.Column(db.String, db.ForeignKey('students.sno'), primary_key=True)
+
+    course_type = db.Column(db.String(1))    # 课程类别
+    course_attr = db.Column(db.String(1))    # 课程属性
+    join_time = db.Column(db.DateTime)  # 选课时间
+
+    course = db.relationship('Course')
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -47,7 +60,7 @@ class User(db.Model, UserMixin):
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
     avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
 
-    courses_following = db.relationship('Course',secondary=follow_course, backref='followers')
+    courses_following = db.relationship('FollowCourse', backref='followers')
     student_info = db.relationship('Student', backref='user',uselist=False)
     teacher_info = db.relationship('Teacher', backref='user',uselist=False)
 
@@ -133,11 +146,12 @@ class Student(db.Model):
     sno = db.Column(db.String(20), unique=True, primary_key=True)
     name = db.Column(db.String(80))
     dept = db.Column(db.String(80))
-    description = db.Column(db.Text())
+    dept_class = db.Column(db.String(80))
+    major = db.Column(db.String(80))
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
-    courses_joined = db.relationship('Course',secondary=join_course, backref='students')
+    courses_joined = db.relationship('JoinCourse', backref='students')
 
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
