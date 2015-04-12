@@ -1,5 +1,6 @@
 from flask import Blueprint,jsonify,request
 from app.models import CourseReview as Review, CourseReviewComment as Comment, User,Course
+import re
 
 api = Blueprint('api',__name__)
 
@@ -81,7 +82,7 @@ def reg_verify():
         if User.query.filter_by(email=value).first():
             return 'Email Exists'
         regex = re.compile("[a-zA-Z0-9_]+@(mail\.)?ustc\.edu\.cn")
-        if not regex.fullmatch(email):
+        if not regex.fullmatch(value):
             return 'Illegal Address'
         return 'OK'
     return 'Invalid Request', 400
