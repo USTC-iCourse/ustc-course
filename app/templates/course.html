@@ -6,9 +6,9 @@
   <div class="float-element">
     <div class="row">
       <div class="col-md-8 inline-h3">
-        <span class="blue h3">多变量微积分</span><span class="h3 blue mobile">（李娟）</span>
-          <span class="small grey align-bottom left-pd-sm desktop">学期：2015春 &nbsp;课堂号：00151311</span>
-          <br><span class="small grey align-bottom mobile">学期：2015春 &nbsp;课堂号：00151311</span>
+        <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">（{{ course.teacher.name }}）</span>
+          <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+          <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
         <hr>
         <div class="ud-pd-sm blue">
           <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
@@ -30,17 +30,17 @@
 
         <table class="table table-condensed no-border">
           <tr>
-            <td><strong>学科类别：</strong>数学</td>
-            <td><strong>开课单位：</strong>数学科学学院</td>
+            <td><strong>学科类别：</strong>{{ course.course_major }}</td>
+            <td><strong>开课单位：</strong>{{ course.dept }}</td>
           </tr>
           <tr>
-            <td><strong>课程层次：</strong>全校通修</td>
-            <td><strong>预修课程：</strong>单变量微积分</td>
+            <td><strong>课程层次：</strong>{{ course.course_level }}</td>
+            <td><strong>周学时：</strong>{{ course.hours_per_week }}</td>
           </tr>
           <tr>
-            <td><strong>周学时：</strong>6</td>
-            <td><strong>学分：</strong>6
-              <span class="float-right"><a href="http://mis.teach.ustc.edu.cn/gradkcjs.do?kcid=182" target="_blank">更多信息</a><span></td>
+            <td><strong>评分制：</strong>{{ course.grading_type }}</td>
+            <td><strong>学分：</strong>{{ course.credit }}
+              <span class="float-right"><a href="http://mis.teach.ustc.edu.cn/gradkcjs.do?kcid={{ course.kcid }}" target="_blank">更多信息</a><span></td>
           </tr>
           </tbody>
         </table>
@@ -58,55 +58,14 @@
 
         <div class="solid ud-pd-md inline-h3">
           <span class="blue h3">点评</span>
-          <button type="button" class="btn btn-default float-right blue">写点评</button>
+          <button type="button" class="btn btn-default float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>写点评</button>
         </div>
 
 
         <!-- 第一个 -->
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
-            <a><span class="right-pd-sm">jenny42</span></a>
-            <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
-          </div>
-          <div class="ud-pd-sm">
-            <p>李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！</p>
-          </div>
-          <div class="grey">
-            <span class="small">2015-03-17 19:45</span>
-            <span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> 1
-            <span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> 1
-          </div>
-        </div>
-
-        <!-- 第一个 -->
-        <div class="ud-pd-md dashed">
-          <div class="ud-pd-sm">
-            <a><span class="right-pd-sm">jenny42</span></a>
-            <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
-          </div>
-          <div class="ud-pd-sm">
-            <p>李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！</p>
-          </div>
-          <div class="grey">
-            <span class="small">2015-03-17 19:45</span>
-            <span class="glyphicon glyphicon-thumbs-up blue left-pd-lg aria-hidden="true" ></span> 1
-            <span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> 1
-          </div>
-        </div>
-
-
-        <!-- 第一个 -->
-        <div class="ud-pd-md dashed">
-          <div class="ud-pd-sm">
-            <a><span class="right-pd-sm">jenny42</span></a>
+            <a><span class="right-pd-sm">{{ course.reviews.author_id }}</span></a>
             <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
@@ -132,7 +91,7 @@
       <div class="col-md-4 rl-pd-lg">
         <div class="ud-pd-lg dashed">
           <img class="avatar-lg cicle" src="/static/image/lijuan.jpg"/>
-          <h3 class="blue">李娟</h3>
+          <h3 class="blue">{{ course.teacher.name }}</h3>
           <p>数学系 副教授</p>
           <p>研究方向： 分析</p>
           <p><a href="http://math.ustc.edu.cn/new/teachersinfo1.php?id=54" target="_blank">教师介绍</a></p>

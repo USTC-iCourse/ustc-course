@@ -30,7 +30,7 @@ class Course(db.Model):
     term = db.Column(db.String(10)) # 学年学期，例如 20142 表示 2015 年春季学期
     name = db.Column(db.String(80)) # 课程名称
     kcid = db.Column(db.Integer)    # 课程id
-    dept = db.Column(db.String(80)) # 开课院系
+    dept = db.Column(db.String(80)) # 开课单位 
 
     course_major = db.Column(db.String(20)) # 学科类别
     course_type = db.Column(db.String(20)) # 课程类别，计划内，公选课……
@@ -58,6 +58,7 @@ class Course(db.Model):
     #students : backref to Student
     reviews = db.relationship('CourseReview',backref='course',lazy='dynamic')
     notes = db.relationship('CourseNote', backref='course',lazy='dynamic')
+    #upvote_count = db.Column(db.Integer) #推荐人数
 
     #posts = db.relationship('CourseForumPost')
 
@@ -93,9 +94,26 @@ class Course(db.Model):
         return self.query.filter_by(courseries=self.courseries).all()
 
     @property
-    def time_locations_str(self):
+    def time_locations_display(self):
         return [ row.location + ': ' + row.time ].join('; ')
 
+    @property
+    def term_display(self):
+        if self.term[4] == '1':
+            return self.term[0:4] + '秋'
+        elif self.term[4] == '2':
+            return str(int(self.term[0:4])+1) + '春'
+        elif self.term[4] == '3':
+            return str(int(self.term[0:4])+1) + '夏'
+        else:
+            return 'unkown'
+
+    @property
+    def course_major_display(self):
+        if self.course_major == None:
+            return '未知'
+
+    
 review_upvotes = db.Table('review_upvotes',
     db.Column('review_id', db.Integer, db.ForeignKey('course_reviews.id'), primary_key=True),
     db.Column('author_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
