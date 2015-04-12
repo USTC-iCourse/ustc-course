@@ -12,19 +12,7 @@
       <div id='csrf-token' class="form-group" type="hiddent">
         {{ form.csrf_token }}
       </div>
-      <div id="regverify-username" class="form-group">
-        <label for="reginput-username" class="col-sm-2 control-label">Username</label>
-        <div class="col-sm-4">
-          <input type="text" id="reginput-username" name="username" class="form-control" placeholder="Username" onchange="regverify('username')">
-          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
-          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
-          {% if form.errors.get('username') %}
-            {% for info in form.errors.get('username') %}
-              {{ info }}
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
+
 
       <div id="regverify-email" class="form-group">
         <label for="reginput-email" class="col-sm-2 control-label">USTC Email</label>
@@ -39,6 +27,25 @@
           {% endif %}
         </div>
       </div>
+
+
+
+            <div id="regverify-username" class="form-group">
+        <label for="reginput-username" class="col-sm-2 control-label">Username</label>
+        <div class="col-sm-4">
+          <input type="text" id="reginput-username" name="username" class="form-control" placeholder="Username" onchange="regverify('username')">
+          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
+          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+          {% if form.errors.get('username') %}
+            {% for info in form.errors.get('username') %}
+              {{ info }}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+
+
 
       <div id="regverify-password" class="form-group">
         <label for="reginput-password" class="col-sm-2 control-label">Password</label>
@@ -75,7 +82,7 @@
 
 {% block script %}
 <script>
- $('#reginput-username').focus();
+ $('#reginput-email').focus();
  function inputFeedback(elem, ok) {
    elem.find('.form-control-feedback').hide();
    if (ok) {
