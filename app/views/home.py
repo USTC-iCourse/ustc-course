@@ -1,6 +1,6 @@
 from flask import Blueprint,request, redirect,url_for,render_template,flash, abort
 from flask.ext.login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT
+from app.models import User, RevokedToken as RT, Course
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 
@@ -130,6 +130,17 @@ def reset_password(token):
 
 
 
+@home.route('/search/')
+def search():
+    ''' 搜索 '''
+    keyword = request.args.get('q')
+    courses = Course.query.filter_by(name=keyword)
+    if not courses:
+        return 404
+    else:
+        return render_template('search.html', keyword=keyword, courses=courses)
+
+
 @home.route('/report-bug/')
 def report_bug():
     ''' 报bug表单 '''
@@ -148,11 +159,7 @@ def about():
 def test():
     '''前端html页面效果测试专用'''
 
-    return render_template('test.html')
-
-@home.route('/test2/')
-def test2():
-    '''前端html页面效果测试专用2'''
-
     return render_template('profile.html')
+
+
 

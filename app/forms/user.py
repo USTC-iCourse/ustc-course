@@ -19,15 +19,15 @@ class RegisterForm(Form):
     confirm_password = PasswordField('confirm password')
 
     def validate_email(form, field):
+        regex = re.compile("[a-zA-Z0-9_]+@(mail\.)?ustc\.edu\.cn")
+        if not regex.fullmatch(field.data):
+            raise ValidationError('必须使用科大邮箱注册!')
         if User.query.filter_by(email=field.data).first():
             raise ValidationError('The email address has been registered.')
 
     def validate_username(form, field):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('The username has been taken!')
-        regex = re.compile("[a-zA-Z0-9_]+@(mail\.)?ustc\.edu\.cn")
-        if not regex.fullmatch(field.data):
-            raise ValidationError('必须使用科大邮箱注册!')
 
 
 class ForgotPasswordForm(Form):

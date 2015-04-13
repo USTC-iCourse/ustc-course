@@ -7,28 +7,48 @@ try:
 except:
     current_user=None
 
-course_time_locations = db.Table('course_time_locations',
-    db.Column('course_id', db.Integer, db.ForeignKey('courses.id')),
-    db.Column('time', db.String(20)),
-    db.Column('location', db.String(20))
-)
+class CourseTimeLocation(db.Model):
+    __tablename__ = 'course_time_locations'
+
+    # we do not need an ID, but ORM requires it
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    weekday = db.Column(db.Integer)
+    begin_hour = db.Column(db.Integer)
+    num_hours = db.Column(db.Integer)
+    location = db.Column(db.String(20))
+
+    note = db.Column(db.String(200))
+
 
 class Course(db.Model):
     __tablename__ = 'courses'
 
     id = db.Column(db.Integer,unique=True,primary_key=True)
-    cno = db.Column(db.String(20))  # 课堂号
+    cno = db.Column(db.String(20))  # course_no, 课堂号，长的
+    courseries = db.Column(db.String(20)) # course_series, 课程编号，短的
     term = db.Column(db.String(10)) # 学年学期，例如 20142 表示 2015 年春季学期
     name = db.Column(db.String(80)) # 课程名称
     kcid = db.Column(db.Integer)    # 课程id
-    dept = db.Column(db.String(80)) # 开课院系
-    description = db.Column(db.Text()) # 课程描述
+    dept = db.Column(db.String(80)) # 开课单位 
+
+    course_major = db.Column(db.String(20)) # 学科类别
+    course_type = db.Column(db.String(20)) # 课程类别，计划内，公选课……
+    course_level = db.Column(db.String(20)) # 课程层次
+    grading_type = db.Column(db.String(20)) # 评分制
+    teaching_material = db.Column(db.Text) # 教材
+    reference_material = db.Column(db.Text) # 参考书
+    student_requirements = db.Column(db.Text) # 预修课程
+    description = db.Column(db.Text()) # 课程简介
+    description_eng = db.Column(db.Text()) # 英文简介
 
     credit = db.Column(db.Integer) # 学分
     hours = db.Column(db.Integer)  # 学时
-    class_numbers = db.Column(db.String(200))   # 上课班级
-    start_end_week = db.Column(db.String(100))  # 起止周
-    time_locations = db.relationship('Course', secondary=course_time_locations)
+    hours_per_week = db.Column(db.Integer) # 周学时
+    class_numbers = db.Column(db.String(200)) # 上课班级
+    start_week = db.Column(db.Integer)  # 起始周
+    end_week = db.Column(db.Integer) # 终止周
+    time_locations = db.relationship('CourseTimeLocation', backref='course')
 
     __table_args__ = (db.UniqueConstraint('cno', 'term'), )
 
@@ -38,6 +58,7 @@ class Course(db.Model):
     #students : backref to Student
     reviews = db.relationship('CourseReview',backref='course',lazy='dynamic')
     notes = db.relationship('CourseNote', backref='course',lazy='dynamic')
+    #upvote_count = db.Column(db.Integer) #推荐人数
 
     #posts = db.relationship('CourseForumPost')
 
@@ -70,8 +91,29 @@ class Course(db.Model):
     @property
     def history_courses(self):
         '''returns the courses having the same course number'''
-        return self.query.filter_by(cno=self.cno).all()
+        return self.query.filter_by(courseries=self.courseries).all()
 
+    @property
+    def time_locations_display(self):
+        return [ row.location + ': ' + row.time ].join('; ')
+
+    @property
+    def term_display(self):
+        if self.term[4] == '1':
+            return self.term[0:4] + '秋'
+        elif self.term[4] == '2':
+            return str(int(self.term[0:4])+1) + '春'
+        elif self.term[4] == '3':
+            return str(int(self.term[0:4])+1) + '夏'
+        else:
+            return 'unkown'
+
+    @property
+    def course_major_display(self):
+        if self.course_major == None:
+            return '未知'
+
+    
 review_upvotes = db.Table('review_upvotes',
     db.Column('review_id', db.Integer, db.ForeignKey('course_reviews.id'), primary_key=True),
     db.Column('author_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)

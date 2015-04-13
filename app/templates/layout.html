@@ -29,10 +29,9 @@
 
 
 
-  
   <body>
 
-    <nav class="navbar navbar-default navbar-fixed-top">
+    <nav class="navbar navbar-default">
       <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -58,12 +57,12 @@
             <div class="form-group">
               <input type="text" class="form-control" id="search" placeholder="搜索课程名称、课堂号" style="width: 275px">
             </div>
-            <button type="submit" class="btn btn-default">Go</button>
+            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search grey"></span></button>
           </form>
 
           
           <ul class="nav navbar-nav navbar-right">
-              {% if current_user.is_authenticated() %}
+            {% if current_user.is_authenticated() %}
             <li><a href="#">Notice</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
@@ -75,7 +74,8 @@
               </ul>
             </li>
             {% else %}
-            <li><button type="button" class="btn btn-default navbar-btn right-gap-md" data-toggle="modal" data-target="#signin">登录</button></li>
+            <li><button type="button" class="btn btn-default navbar-btn left-mg-md" data-toggle="modal" data-target="#signin">登录</button></li>
+
             <div class="modal fade" id="signin" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-signin">
                 <div class="modal-content">
@@ -104,7 +104,7 @@
 
             {% endif %}
           </ul>
-          
+        
         </div><!--/.nav-collapse -->
       </div>
     </nav>
@@ -114,10 +114,10 @@
 
     <footer class="footer">
       <div class="container">
-        <div class="solid ud-gap-sm">
-          <a class="right-gap-md" href='/about/'>About</a>
-          <a class="right-gap-md" href='/blog/' style="display: none">Blog</a>
-          <a class="right-gap-md" href='/report-bug/'>Report Bug</a>
+        <div class="solid ud-pd-sm">
+          <a class="right-pd-md" href='/about/'>About</a>
+          <a class="right-pd-md" href='/blog/' style="display: none">Blog</a>
+          <a class="right-pd-md" href='/report-bug/'>Report Bug</a>
         </div>
         <p class="footer-text text-muted">Copyright &copy; USTC评课社区 2015</p>
       </div>
