@@ -24,18 +24,52 @@ def parse_file(filename):
 
     return data
 
+depts_map = dict()
+depts_mapbyid = dict()
+
+def load_depts():
+    count = 0
+    for c in parse_file('JT_DWDM.txt'):
+        dept = Dept()
+        dept.id = c['DWDM']
+        dept.name = c['DWMC']
+        dept.name_eng = c['YWMC']
+
+        db.session.add(dept)
+        count+=1
+        depts_map[dept.name] = dept.id
+        depts_mapbyid[dept.id] = dept.name
+
+    db.session.commit()
+    print('%d departments loaded' % count)
+
 def load_students():
+    sno_list = dict()
     count = 0
     for c in parse_file('XJ_XJQL_TJB.txt'):
         if c['XNXQ'] == '20141':
             stu = Student()
             stu.sno = c['SNO']
             stu.name = c['XM']
-            stu.dept = c['XZYXMC']
+            stu.dept_id = depts_map[c['XZYXMC']] if c['XZYXMC'] in depts_map else None
             stu.dept_class = c['XZBJMC']
             stu.major = c['XDYXMC']
+
             db.session.add(stu)
             count+=1
+            sno_list[stu.sno] = None
+
+    for c in parse_file('XJ_XSXXB.txt'):
+        if c['SNO'] in sno_list:
+            continue
+        stu = Student()
+        stu.sno = c['SNO']
+        stu.name = c['XM']
+        stu.dept_id = c['LQYX']
+
+        db.session.add(stu)
+        count+=1
+        sno_list[stu.sno] = None
 
     db.session.commit()
     print('%d students loaded' % count)
@@ -46,8 +80,10 @@ def load_teacher():
         t = Teacher()
         t.id = c['YHID']
         t.name = c['XM']
+        t.dept_id = int(c['DWDM']) if c['DWDM'] in depts_mapbyid else None
         t.email = c['EMAIL']
         t.description = c['INTRODUCTION']
+
         db.session.add(t)
         count+=1
 
@@ -252,6 +288,7 @@ def load_join_course():
 
 db.drop_all()
 db.create_all()
+load_depts()
 load_teacher()
 load_course()
 load_course_locations()
