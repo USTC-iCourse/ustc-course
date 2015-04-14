@@ -7,14 +7,14 @@ review = Blueprint('review',__name__)
 
 
 @review.route('/new/',methods=['GET','POST'])
-#@login_required
+@login_required
 def new_review():
     form = ReviewForm(request.form)
     course_id = request.args.get('course_id', type=int)
     if not course_id:
         abort(404)
     course = Course.query.get(course_id)
-    form = ReviewForm()
+    form = ReviewForm(request.form)
     review = CourseReview()
     if not course:
         abort(404)
@@ -22,12 +22,13 @@ def new_review():
         form.populate_obj(review)
         review.author = current_user
         review.course = course
-        review.save()
-        return '<p>'+course_name + str(review) +'</p>'
+        review.add()
+        return redirect(url_for('course.view_course',course_id=course_id))
+    print(form.errors)
     return render_template('new-review.html', form=form)
 
-@login_required
 @review.route('/edit/',methods=['GET','POST'])
+@login_required
 def edit_review():
     review_id = request.args.get('review_id')
     if not review_id:
@@ -48,4 +49,9 @@ def edit_review():
         return redirect(url_for('course.review', course_id=course.id, course_name=course.name))
 
     return render_template('review.html', form=form)
+
+@review.route('/delete/',methods=['POST'])
+@login_required
+def delete_review():
+    pass
 

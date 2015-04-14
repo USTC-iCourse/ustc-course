@@ -1,11 +1,11 @@
-x{% extends "layout.html" %}
+{% extends "layout.html" %}
 {% block content %}
 
 <div class="container">
   <div class="float-element">
     <p class="blue h3">点评 &bull; 多变量微积分</p>
     <hr>
-    <form class="form-horizontal" method="post" action="{{ url_for('review.new_review', course_id=form.course_id) }}">
+    <form class="form-horizontal" method="post" action="{{ url_for('review.new_review', course_id=request.args.get('course_id')) }}">
       {{ form.csrf_token }}
       <div class="rate-part ud-pd-md">
         <div class="ud-pd-sm">
@@ -13,13 +13,15 @@ x{% extends "layout.html" %}
           <button class="btn-flat btn-grey">简单</button>
           <button class="btn-flat btn-grey">中等</button>
           <button class="btn-flat btn-grey">困难</button>
+          <input type="" name="difficulty" class="difficult" value=2>
         </div>
 
         <div class="ud-pd-sm">
-          <span class="btn-flat btn-white">睡眠指数</span>
-          <button class="btn-flat btn-grey" >清醒</button>
+          <span class="btn-flat btn-white">作业多少</span>
+          <button class="btn-flat btn-grey" >很少</button>
           <button class="btn-flat btn-grey" >中等</button>
-          <button class="btn-flat btn-grey" >催眠</button>
+          <button class="btn-flat btn-grey" >很多</button>
+          <input type="" name="homework" class="homework" value=2>
         </div>
 
         <div class="ud-pd-sm">
@@ -27,6 +29,7 @@ x{% extends "layout.html" %}
           <button class="btn-flat btn-grey" >超好</button>
           <button class="btn-flat btn-grey" >厚道</button>
           <button class="btn-flat btn-grey" >杀手</button>
+          <input type="" name="grading" class="" value=2>
         </div>
 
         <div class="ud-pd-sm">
@@ -34,13 +37,18 @@ x{% extends "layout.html" %}
           <button class="btn-flat btn-grey" >很多</button>
           <button class="btn-flat btn-grey" >一般</button>
           <button class="btn-flat btn-grey" >没有</button>
+          <input type="" name="gain" class="" value=2>
         </div>
+      </div>
+      <div class="ud-pd-sm">
+          <!--占位 评分 rate 实际中应该为hiddern-->
+          <input type="" name="rate" class="" value=8>
       </div>
 
       <div class="container-md">
         <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
-          <script type="text/plain" id="content-editor" style="width:640px;height:240px;">
+          <script name="content" id="content-editor" style="width:640px;height:240px;">
           </script>
         </div>
         <button type="submit" class="btn btn-default float-right shadow">发布</button>
