@@ -1,12 +1,11 @@
 # Server config
-DEBUG = False
+DEBUG = True
 SECRET_KEY = 'secret-key'
 
 
 
 # SQL config
-SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
-
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://ustc_course:ustc_course@localhost/icourse?charset=utf8'
 
 # Flask mail
 MAIL_SERVER = 'localhost'
