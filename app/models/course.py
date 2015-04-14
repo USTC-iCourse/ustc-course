@@ -99,7 +99,7 @@ class Course(db.Model):
 
     @property
     def teacher(self):
-        if 0 in self.teachers:
+        if len(self.teachers) >= 1:
             return self.teachers[0]
         else:
             return None
