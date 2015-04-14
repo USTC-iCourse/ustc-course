@@ -133,8 +133,7 @@ review_upvotes = db.Table('review_upvotes',
 class CourseRate(db.Model):
     __tablename__ = 'course_rates'
 
-    id = db.Column(db.Integer,primary_key=True, unique=True)
-    course_id = db.Column(db.Integer,db.ForeignKey('courses.id'))
+    id = db.Column(db.Integer, db.ForeignKey('courses.id'), primary_key=True)
     _difficulty_total = db.Column(db.Integer,default=0)
     _homework_total = db.Column(db.Integer,default=0)
     _grading_total = db.Column(db.Integer,default=0)
