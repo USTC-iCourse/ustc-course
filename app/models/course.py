@@ -16,7 +16,7 @@ class CourseTimeLocation(db.Model):
     weekday = db.Column(db.Integer)
     begin_hour = db.Column(db.Integer)
     num_hours = db.Column(db.Integer)
-    location = db.Column(db.String(20))
+    location = db.Column(db.String(80))
 
     note = db.Column(db.String(200))
 
