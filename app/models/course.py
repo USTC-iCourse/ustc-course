@@ -20,6 +20,10 @@ class CourseTimeLocation(db.Model):
 
     note = db.Column(db.String(200))
 
+course_teachers = db.Table('course_teachers',
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id')),
+    db.Column('teacher_id', db.Integer, db.ForeignKey('teachers.id')),
+)
 
 class Course(db.Model):
     __tablename__ = 'courses'
@@ -52,8 +56,7 @@ class Course(db.Model):
 
     __table_args__ = (db.UniqueConstraint('cno', 'term'), )
 
-    teacher = db.relationship('Teacher',backref='courses')
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'))
+    teachers = db.relationship('Teacher', secondary=course_teachers, backref='courses')
     #:followers : backref to User
     #students : backref to Student
     reviews = db.relationship('CourseReview',backref='course',lazy='dynamic')
@@ -93,6 +96,13 @@ class Course(db.Model):
         db.session.add(self)
         db.session.commit()
         return self
+
+    @property
+    def teacher(self):
+        if 0 in self.teachers:
+            return self.teachers[0]
+        else:
+            return None
 
     @property
     def related_courses(self):
