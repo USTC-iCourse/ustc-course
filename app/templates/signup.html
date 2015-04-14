@@ -5,7 +5,6 @@
   <div class="float-element">
 
     {{ error }}
-
     <h3 class="blue">Sign Up</h3>
     <hr>
     <form class="form-horizontal" method="post" action="{{ url_for('home.signup') }}">
@@ -62,19 +61,25 @@
       </div>
 
       <div id="regverify-confirm-password" class="form-group">
-        <label for="reginput-confirm-password" class="col-sm-2 control-label"></label>
-        <div class="col-sm-4">
+        <div class="col-sm-offset-2 col-sm-4">
           <input type="password" class="form-control" name="confirm_password" id="reginput-confirm-password" placeholder="Confirm Password" onchange="checkConfirmPassword()">
           <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
           <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
         </div>
       </div>
       <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-          <button type="submit" class="btn btn-default">Submit</button>
+        <div class="col-sm-offset-2 col-sm-2">
+          <button type="submit" class="btn btn-blue btn-block">Submit</button>
         </div>
       </div>
     </form>
+
+    <div class="row ud-pd-md">
+      <div class="col-sm-offset-2 col-sm-4">
+        <span class="text-muted">Already have an account? <a href="/signin">Login</a></span>
+      </div>
+    </div>
+
   </div>
 </div>
 {% endblock %}

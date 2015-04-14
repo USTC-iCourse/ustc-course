@@ -25,21 +25,27 @@
       </div>
 
       <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
+        <div class="col-sm-offset-2 col-sm-4">
           <div class="checkbox">
             <label>
               <input type="checkbox"> Remember me
             </label>
+            <a class="float-right" href="/reset-password">Forgot Password?</a>
           </div>
         </div>
       </div>
       <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-          <button type="submit" class="btn btn-default">Sign in</button>
+        <div class="col-sm-offset-2 col-sm-2">
+          <button type="submit" class="btn btn-blue btn-block">Sign in</button>
         </div>
       </div>
     </form>
 
+    <div class="row ud-pd-md">
+      <div class="col-sm-offset-2 col-sm-4">
+        <span class="text-muted">Don't have an account? <a href="/signin">Sign Up</a></span>
+      </div>
+    </div>
 
   </div>
 </div>
@@ -48,6 +54,6 @@
 
 {% block script %}
 <script>
-  $('#inputEmail').focus();
+ $('#inputEmail').focus();
 </script>
 {% endblock %}
