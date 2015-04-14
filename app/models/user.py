@@ -137,6 +137,13 @@ def load_user(userid):
     return User.query.get(userid)
 
 
+# Department
+class Dept(db.Model):
+    __tablename__ = 'depts'
+
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    name = db.Column(db.String(100))
+    name_eng = db.Column(db.String(200))
 
 
 # Students could login
@@ -145,12 +152,13 @@ class Student(db.Model):
 
     sno = db.Column(db.String(20), unique=True, primary_key=True)
     name = db.Column(db.String(80))
-    dept = db.Column(db.String(80))
+    dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
     dept_class = db.Column(db.String(80))
     major = db.Column(db.String(80))
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
+    dept = db.relationship('Dept', backref='students')
     courses_joined = db.relationship('JoinCourse', backref='students')
 
     def __repr__(self):
@@ -200,13 +208,14 @@ class Teacher(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
 
     name = db.Column(db.String(80))
-    dept = db.Column(db.String(80))
+    dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
 
     email = db.Column(db.String(80))
     description = db.Column(db.Text())
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
+    dept = db.relationship('Dept', backref='teachers')
     #course
 
     def __repr__(self):
