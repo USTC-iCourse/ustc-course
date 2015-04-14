@@ -68,4 +68,4 @@ def edit_course(course_id=None):
         course = course.save()
         flash('course saved')
         return redirect('.view_course', course_id=course.id, course_name=course.name)
-    return render_tempalte('edit-course.html', form=course_form)
+    return render_template('edit-course.html', form=course_form)
