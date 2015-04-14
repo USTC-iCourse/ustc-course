@@ -9,7 +9,7 @@
     <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
     </div>
     <hr>
-    <form class="form-horizontal" method="post" action="{{ url_for('review.new_review', course_id=form.course_id) }}">
+    <form class="form-horizontal" method="post" action="{{ url_for('review.new_review', course_id=request.args.get('course_id')) }}">
       {{ form.csrf_token }}
       <div class="rate-part ud-pd-md">
         <div class="ud-pd-sm">
@@ -17,6 +17,7 @@
           <span class="btn-flat btn-grey">简单</span>
           <span class="btn-flat btn-grey">中等</span>
           <span class="btn-flat btn-grey">困难</span>
+          <input type="" name="difficulty" class="difficult" value=2>
         </div>
 
         <div class="ud-pd-md">
@@ -24,6 +25,7 @@
           <span class="btn-flat btn-grey">不多</span>
           <span class="btn-flat btn-grey">中等</span>
           <span class="btn-flat btn-grey">超多</span>
+          <input type="" name="homework" class="homework" value=2>
         </div>
 
         <div class="ud-pd-sm">
@@ -31,6 +33,7 @@
           <span class="btn-flat btn-grey">超好</span>
           <span class="btn-flat btn-grey">厚道</span>
           <span class="btn-flat btn-grey">杀手</span>
+          <input type="" name="grading" class="" value=2>
         </div>
 
         <div class="ud-pd-md">
@@ -38,6 +41,7 @@
           <span class="btn-flat btn-grey">很多</span>
           <span class="btn-flat btn-grey">一般</span>
           <span class="btn-flat btn-grey">没有</span>
+          <input type="" name="gain" class="" value=2>
         </div>
 
         <div class="ud-pd-sm">
@@ -52,11 +56,15 @@
           </span>
         </div>
       </div>
+      <div class="ud-pd-sm">
+          <!--占位 评分 rate 实际中应该为hiddern-->
+          <input type="" name="rate" class="" value=8>
+      </div>
 
       <div class="container-md desktop">
         <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
-          <script type="text/plain" id="content-editor" style="width:640px;height:240px;">
+          <script name="content" id="content-editor" style="width:640px;height:240px;">
           </script>
         </div>
         <button type="submit" class="btn btn-blue btn-flat float-right shadow">发布</button>

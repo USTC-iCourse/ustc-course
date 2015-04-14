@@ -58,7 +58,7 @@
 
         <div class="solid ud-pd-md inline-h3">
           <span class="blue h3">点评</span>
-          <button type="button" class="btn btn-white float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>写点评</button>
+          <button type="button" href={{ url_for('review.new_review',course_id=1) }} class="btn btn-white float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>写点评</button>
         </div>
 
 
@@ -83,6 +83,23 @@
           </div>
         </div>
       </div>
+
+      <!-- just for debug 
+      {{ course_rate.difficulty }}
+      {{ course_rate.homework }}
+      {{ course_rate.grading }}
+      {{ course_rate.gain }}
+      {{ course_rate.rate }}
+      {% for review in reviews %}
+      {{ review.difficulty }}
+      {{ review.homework }}
+      {{ review.grading }}
+      {{ review.gain }}
+      {{ review.content }}
+      {{ review.author.username }}
+      {{ review.author.email }}
+      {% endfor %}
+      -->
 
 
 

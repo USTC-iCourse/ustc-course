@@ -19,7 +19,7 @@ db = SQLAlchemy(app)
 CsrfProtect(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'home.login'
+login_manager.login_view = 'home.signin'
 
 
 

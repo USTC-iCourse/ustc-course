@@ -15,7 +15,7 @@ def parse_file(filename):
         for line in f:
             keys = [ col.strip() for col in line.split('\t') ]
             break
-        
+
         for line in f:
             cols = [ col.strip() for col in line.split('\t') ]
             if len(keys) != len(cols):
@@ -36,7 +36,7 @@ def load_students():
             stu.major = c['XDYXMC']
             db.session.add(stu)
             count+=1
-    
+
     db.session.commit()
     print('%d students loaded' % count)
 
@@ -86,7 +86,7 @@ def load_course():
         CN   =   '控制科学',
         CS   =   '计算机科学技术',
     )
-    
+
     course_type_dict = dict()
     course_type_dict['1'] = '本科计划内课程'
     course_type_dict['2'] = '入学考试'
@@ -143,7 +143,7 @@ def load_course():
         if not c['KCBH'] in course_kcbh:
             print('Course ' + c['KCBH'] + ' exists in MV_PK_PKJGXS but not in JH_KC_ZK: ' + str(c))
             continue
-        
+
         info = course_kcbh[c['KCBH']]
         info['term'] = c['XQ']
         info['cno'] = c['KCBJH']
@@ -160,10 +160,12 @@ def load_course():
             setattr(course, key, info[key])
         db.session.add(course)
         count+=1
+        if count == 20:
+            break
 
     db.session.commit()
     print('%d courses loaded' % count)
- 
+
 def load_course_locations():
     int_allow_empty = lambda string: int(string) if string.strip() else None
     def get_begin_hour(code, num_hours):
@@ -228,8 +230,11 @@ def load_join_course():
 
     print('%d xuanke info loaded' % count)
 
-load_teacher()
+
+db.drop_all()
+db.create_all()
+#load_teacher()
 load_course()
-load_course_locations()
-load_students()
-load_join_course()
+#load_course_locations()
+#load_students()
+#load_join_course()
