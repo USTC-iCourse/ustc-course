@@ -63,9 +63,10 @@
 
 
         <!-- 第一个 -->
+        {% for review in course.reviews %}
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
-            <a><span class="right-pd-sm">{{ course.reviews.author_id }}</span></a>
+            <a href={{ url_for('user.view_profile', user_id=review.author.id) }}><span class="right-pd-sm px16">{{ review.author.username }}</span></a>
             <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
@@ -73,15 +74,16 @@
             <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
           </div>
           <div class="ud-pd-sm">
-            <p>李娟老师真是一位好老师，上课从不迟到，板书特别好，不会像代数结构的老师，上课讲什么我们都听不懂...不过多变量微积分也很难啊！</p>
+            <p>{{ review.content }}</p>
           </div>
 
           <div class="grey">
-            <span class="small">2015-03-17 19:45</span>
-            <span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> 1
+            <span class="small">{{ review.publish_time }}</span>
+            <span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> {{ review.upvote }}
             <span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> 1
           </div>
         </div>
+        {% endfor %}
       </div>
 
       <!-- just for debug 
@@ -109,18 +111,18 @@
         <div class="ud-pd-lg dashed">
           <img class="avatar-lg cicle" src="/static/image/1.jpg"/>
           <h3 class="blue">{{ course.teacher.name }}</h3>
-          <p>数学系 副教授</p>
-          <p>研究方向： 分析</p>
-          <p><a href="http://math.ustc.edu.cn/new/teachersinfo1.php?id=54" target="_blank">教师介绍</a></p>
+          <p>{{ course.teacher.dept.name }}</p>
+          <p>研究方向：暂无</p>
+          <p><a target="_blank">教师介绍：暂无</a></p>
           <div class="ud-pd-md" style="display: none"><a>教师排行榜：23</a></div>
         </div>
 
         <div class="ud-pd-md dashed" style="display: none">
-          <h5 class="blue">更多李娟老师课程</h5>
+          <h5 class="blue">更多{{ course.teacher.name }}老师课程</h5>
         </div>
 
         <div class="ud-pd-md dashed" style="display: none">
-          <h5 class="blue">更多多变量微积分</h5>
+          <h5 class="blue">更多{{ course.name }}</h5>
         </div>
       </div>
     </div> <!-- row -->
