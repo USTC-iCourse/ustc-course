@@ -160,26 +160,27 @@ p { line-height: 25px; }
 .btn-flat {
     padding: 6px 22px 6px 22px;
     border: 0;
+    border-radius: 0;
 }
 .btn-white {
-    color: #666;
-    border-radius: 0;
-    font-weight: 550;
+    color: #1caaea;
+    font-weight: 600;
     background-color: #fff;
-    border: 1px #ddd solid;
+    border: 1px #1caaea solid;
 }
-.btn-blue, .btn-grey:hover {
+.btn-blue, .btn-grey:hover, .btn-white:hover {
     color: #fff;
     font-weight: 600;
     background-color: #1caaea;
-    border-radius: 0;
 }
 .btn-blue:hover {
     color: #fff;
     background-color: #128bc1;
 }
 .btn-grey {
-    color: #666;
+    color: #767676;
+    font-size: 14px;
+    font-weight: 600;
     background-color: #f3f3f3;
     border-radius: 0;
 }

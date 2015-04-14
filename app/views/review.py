@@ -25,7 +25,7 @@ def new_review():
         review.add()
         return redirect(url_for('course.view_course',course_id=course_id))
     print(form.errors)
-    return render_template('new-review.html', form=form)
+    return render_template('new-review.html', form=form, course=course)
 
 @review.route('/edit/',methods=['GET','POST'])
 @login_required
@@ -48,7 +48,7 @@ def edit_review():
         course = review.course
         return redirect(url_for('course.review', course_id=course.id, course_name=course.name))
 
-    return render_template('review.html', form=form)
+    return render_template('new-review.html', form=form)
 
 @review.route('/delete/',methods=['POST'])
 @login_required

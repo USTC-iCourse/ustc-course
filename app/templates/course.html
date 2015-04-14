@@ -23,7 +23,7 @@
         </table>
           <ul class="text-muted list-inline list-unstyled ud-pd-sm">
             <li class="right-mg-lg">课程难度：困难</li>
-            <li class="right-mg-lg">睡眠指数：中等</li>
+            <li class="right-mg-lg">作业多少：很多</li>
             <li class="right-mg-lg">给分好坏：暂无</li>
             <li class="right-mg-lg">收获大小：一般</li>
           </ul>
@@ -48,9 +48,9 @@
         <p style="display: none">课程主页：http://staff.ustc.edu.cn/~zhuang/clp.htm</p>
 
         <div class="ud-pd-md">
-          <button class="btn btn-blue" type="submit">关注 <span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button>
-          <button class="btn btn-blue" type="submit">推荐 <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></button>
-            <button class="btn btn-blue" type="submit">不推荐 <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></button>
+          <button class="btn btn-blue btn-flat" type="submit">关注 <span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button>
+          <button class="btn btn-blue btn-flat" type="submit">推荐 <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></button>
+            <button class="btn btn-blue btn-flat" type="submit">不推荐 <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></button>
               <span class="float-right" style="display: none" target="_blank"><a>查看同班同学</a></span>
         </div>
 
@@ -58,7 +58,7 @@
 
         <div class="solid ud-pd-md inline-h3">
           <span class="blue h3">点评</span>
-          <a type="button" href={{ url_for('review.new_review',course_id=1) }} class="btn btn-default float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>写点评</a>
+          <button type="button" href={{ url_for('review.new_review',course_id=1) }} class="btn btn-white float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>写点评</button>
         </div>
 
 
