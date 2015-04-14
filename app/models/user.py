@@ -34,7 +34,7 @@ class JoinCourse(db.Model):
     __tablename__ = 'join_course'
 
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), primary_key=True)
-    student_id = db.Column(db.String, db.ForeignKey('students.sno'), primary_key=True)
+    student_id = db.Column(db.String(20), db.ForeignKey('students.sno'), primary_key=True)
 
     course_type = db.Column(db.String(1))    # 课程类别
     course_attr = db.Column(db.String(1))    # 课程属性
@@ -210,7 +210,7 @@ class Teacher(db.Model):
     #course
 
     def __repr__(self):
-        return '<Teacher {} ({})'.format(self.name, self.tno)
+        return '<Teacher {}: {}'.format(self.id, self.name)
 
     @classmethod
     def create(cls, tno, name, dept=None,email=None,description=None):
