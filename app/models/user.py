@@ -157,7 +157,7 @@ class Student(db.Model):
         return '<Student {} ({})>'.format(self.name, self.sno)
 
     @classmethod
-    def create(cls, sno, name, dept=None, description=None):
+    def create(cls, sno, name, dept=None):
         '''
         creat a Student object and add it to database
         if the student object already exists in the db, it will
@@ -170,7 +170,7 @@ class Student(db.Model):
         if cls.query.get(sno):
             return None
         else:
-            student = cls(sno=sno, name=name, dept=dept, description=description)
+            student = cls(sno=sno, name=name, dept=dept)
             db.session.add(student)
             db.session.commit()
             return student
