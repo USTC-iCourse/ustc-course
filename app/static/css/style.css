@@ -149,8 +149,8 @@ p { line-height: 25px; }
     width: 300px;
     height: 225px;
 }
-.rect-md {
-
+.radius4 {
+    border-radius: 4px;
 }
 
 .grey { color: #999; }
