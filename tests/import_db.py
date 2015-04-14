@@ -65,7 +65,7 @@ def load_students():
         stu = Student()
         stu.sno = c['SNO']
         stu.name = c['XM']
-        stu.dept_id = c['LQYX']
+        stu.dept_id = c['LQYX'] if c['LQYX'] in depts_map else None
 
         db.session.add(stu)
         count+=1
