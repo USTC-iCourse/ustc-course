@@ -1,6 +1,6 @@
 from flask import Blueprint,render_template,abort,redirect,url_for,request,abort
 from flask.ext.security import current_user,login_required
-from app.models import Course,CourseReview
+from app.models import Course, Review
 from app.forms import ReviewForm
 
 review = Blueprint('review',__name__)
@@ -15,7 +15,7 @@ def new_review():
         abort(404)
     course = Course.query.get(course_id)
     form = ReviewForm(request.form)
-    review = CourseReview()
+    review = Review()
     if not course:
         abort(404)
     if form.validate_on_submit():
@@ -33,7 +33,7 @@ def edit_review():
     review_id = request.args.get('review_id')
     if not review_id:
         abort(404)
-    review = CourseReview.query.get(review_id)
+    review = Review.query.get(review_id)
     if not review:
         abort(404)
 

@@ -1,5 +1,5 @@
 from flask import Blueprint,jsonify,request
-from app.models import CourseReview as Review, CourseReviewComment as Comment, User,Course
+from app.models import Review, ReviewComment as Comment, User, Course
 import re
 
 api = Blueprint('api',__name__)
