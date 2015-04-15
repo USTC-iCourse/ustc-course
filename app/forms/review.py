@@ -2,7 +2,7 @@ from flask_wtf import Form
 from wtforms import (StringField, IntegerField, RadioField, TextAreaField)
 from wtforms.validators import (InputRequired,NumberRange)
 
-from app.models import CourseReview
+from app.models import Review
 
 class ReviewForm(Form):
     difficulty = IntegerField('grading',validators=[InputRequired(),NumberRange(1,3)])

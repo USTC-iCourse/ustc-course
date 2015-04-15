@@ -1,5 +1,5 @@
 from flask import Blueprint,render_template,abort,redirect,url_for,request, abort
-from app.models import User
+from app.models import *
 from app.forms import LoginForm
 from flask.ext.login import login_user, current_user
 
