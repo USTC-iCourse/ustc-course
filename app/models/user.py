@@ -15,7 +15,7 @@ Roles = ['Admin',
 Identidies =['Teacher',
         'Student']
 
-related_courses = db.Table('related_course',
+related_courses = db.Table('related_courses',
     db.Column('src', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
     db.Column('dst', db.Integer, db.ForeignKey('courses.id'), primary_key=True)
 )
