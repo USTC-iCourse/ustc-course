@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import url_for
 from app import db
 from .user import User
+from decimal import Decimal
 try:
     from flask.ext.login import current_user
 except:
@@ -64,7 +65,7 @@ class Course(db.Model):
     forum_threads = db.relationship('ForumThread', backref='course', lazy='dynamic')
     shares = db.relationship('Share', backref='course', lazy='dynamic')
 
-    _course_rate = db.relationship('CourseRate',backref='course',uselist=False)
+    _course_rate = db.relationship('CourseRate', backref='course', uselist=False, lazy='joined')
 
     def __repr__(self):
         return '<Course %s(%s)>'%(self.name,self.cno)
@@ -87,6 +88,10 @@ class Course(db.Model):
             self._course_rate =  CourseRate()
             self.save()
             return self._course_rate
+
+    @property
+    def rate(self):
+        return self.course_rate
 
     @property
     def url(self):
@@ -136,11 +141,11 @@ class Course(db.Model):
 
     @property
     def review_count(self):
-        return self._course_rate.review_count
+        return self.course_rate.review_count
 
     @property
     def upvote_count(self):
-        return self._course_rate.upvote_count
+        return self.course_rate.upvote_count
 
 
 class CourseRate(db.Model):
@@ -199,9 +204,9 @@ class CourseRate(db.Model):
         return None
 
     @property
-    def rate(self):
+    def average_rate(self):
         if self.review_count:
-            res = round(self._rate_total/self.review_count)
+            res = Decimal("%.1f" % (self._rate_total/self.review_count))
             return res
         return None
 
