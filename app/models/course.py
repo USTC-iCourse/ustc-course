@@ -225,10 +225,10 @@ class CourseRate(db.Model):
 
     def subtract(self,difficulty,homework,grading,gain,rate):
         self.review_count -= 1
-        self.difficulty -= difficulty
-        self.homework -= homework
-        self.grading -= grading
-        self.gain -= gain
-        self.rate -= rate
+        self._difficulty_total -= difficulty
+        self._homework_total -= homework
+        self._grading_total -= grading
+        self._gain_total -= gain
+        self._rate_total -= rate
         self.save()
 

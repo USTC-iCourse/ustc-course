@@ -1,4 +1,4 @@
-from flask import Blueprint,render_template,abort,redirect,url_for,request,abort
+from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify
 from flask.ext.security import current_user,login_required
 from app.models import Course, Review
 from app.forms import ReviewForm
@@ -36,15 +36,34 @@ def edit_review(review_id):
 
     form = ReviewForm(request.form,review)
     if form.validate_on_submit():
-        form.populate_obj(review)
-        review.save()
+        new_review = Review()
+        form.populate_obj(new_review)
+        review.update(new_review)
         course = review.course
-        return redirect(url_for('course.review', course_id=course.id, course_name=course.name))
+        return redirect(url_for('course.view_course', course_id=course.id, course_name=course.name))
 
-    return render_template('new-review.html', form=form)
+    course = review.course
+    return render_template('edit-review.html', form=form,review_id=review_id, course=course)
 
 @review.route('/delete/',methods=['POST'])
 @login_required
 def delete_review():
-    pass
+    review_id = request.form.get('id',type=int)
+    if not review_id:
+        message = 'You must specify a id.'
+        return jsonify(status=status,message=message)
+    review = Review.query.get(review_id)
+    status = False
+    message = 'Something wrong happend'
+    if not review:
+        message = 'Can\'t find the review.'
+        return jsonify(status=status,message=message)
+    #check if the user is the author
+    if review.author != current_user:
+        message = 'You have no right to do this.'
+        return jsonify(status=status,message=message)
+    review.delete()
+    status = True
+    message = 'The review has been deleted.'
+    return jsonify(status=status,message=message)
 

@@ -61,21 +61,22 @@ class Review(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def update(self,difficulty,
-            homework,
-            grading,
-            gain,
-            rate,
-            content):
+    def update(self,new):
         course_rate = self.course.course_rate
         course_rate.subtract(self.difficulty,
                 self.homework,
                 self.grading,
                 self.gain,
                 self.rate)
-        course_rate.add(difficulty,homework,grading,gain,rate)
-        self.content = content
+        self.difficulty = new.difficulty
+        self.homework = new.homework
+        self.grading = new.grading
+        self.gain = new.gain
+        self.rate = new.rate
+        self.content = new.content
         self.update_time = datetime.utcnow()
+#TODO: add a try block to mantain data consistency
+        course_rate.add(new.difficulty,new.homework,new.grading,new.gain,new.rate)
         db.session.add(self)
         db.session.commit()
 

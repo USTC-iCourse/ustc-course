@@ -1,0 +1,10 @@
+<html>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<body>
+<form action="/review/delete/" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input type="number" name="id" value=1>
+    <input type="submit">
+</form>
+</body>
+</html>
