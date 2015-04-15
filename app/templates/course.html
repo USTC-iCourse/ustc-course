@@ -7,8 +7,8 @@
     <div class="row">
       <div class="col-md-8 inline-h3">
         <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">（{{ course.teacher.name }}）</span>
-          <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
-          <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+        <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+        <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
         <hr>
         <div class="ud-pd-sm blue">
           <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
@@ -16,17 +16,17 @@
           <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
           <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
           <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true" ></span>
-          <span class="rl-pd-sm h4">8.5</span><span class="rl-pd-sm text-muted">({{ course.course_rate.review_count }}人评价)</span>
+          <span class="rl-pd-sm h4">9.9</span><span class="rl-pd-sm text-muted">({{ course.review_count }}人评价)</span>
         </div>
 
 
         </table>
-          <ul class="text-muted list-inline list-unstyled ud-pd-sm">
-            <li class="right-mg-lg">课程难度：困难</li>
-            <li class="right-mg-lg">作业多少：很多</li>
-            <li class="right-mg-lg">给分好坏：暂无</li>
-            <li class="right-mg-lg">收获大小：一般</li>
-          </ul>
+        <ul class="text-muted list-inline list-unstyled ud-pd-sm">
+          <li class="right-mg-lg">课程难度：困难</li>
+          <li class="right-mg-lg">作业多少：很多</li>
+          <li class="right-mg-lg">给分好坏：暂无</li>
+          <li class="right-mg-lg">收获大小：一般</li>
+        </ul>
 
         <table class="table table-condensed no-border">
           <tr>
@@ -61,7 +61,12 @@
           <a type="button" href={{ url_for('review.new_review',course_id=course.id) }} class="btn btn-white float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>写点评</a>
         </div>
 
-
+        {% if course.review_count == 0 %}
+        <div class="tips">
+          <p>还没有评论耶！放着我来！</p>
+        </div>
+        <div class="ud-pd-md"></div>
+        {% else %}
         {% for review in course.reviews %}
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
@@ -78,11 +83,12 @@
 
           <div class="grey">
             <span class="small">{{ review.publish_time }}</span>
-            <span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> {{ review.upvote }}
-            <span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> 暂无
+            <span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> {{ review.upvote_count }}
+            <span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> {{ review.comment_count }}
           </div>
         </div>
         {% endfor %}
+        {% endif %}
       </div>
 
       <!-- just for debug 

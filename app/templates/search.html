@@ -10,7 +10,7 @@
     <div class="ud-pd-md dashed">
       <div class="row">
         <div class="col-md-1 col-xs-2">
-          <div class="rate-box">23</div>
+          <div class="rate-box">{{ course.upvote_count }}</div>
         </div>
         <div class="col-md-8 col-xs-10">
           <a class="px16" href={{ url_for('course.view_course', course_id=course.id) }}>{{ course.name }}（{{ course.teacher.name }}）</a>
@@ -22,7 +22,7 @@
             <span class="glyphicon glyphicon-star" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star-empty" aria-hidden="true" ></span>
-            <span class="rl-pd-sm h4">8.5</span><span class="text-muted px12">({{ course.course_rate.review_count }}人评价)</span>
+            <span class="rl-pd-sm h4">8.5</span><span class="text-muted px12">({{ course.review_count }}人评价)</span>
           </div>
           <ul class="text-muted list-inline list-unstyled">
             <li class="right-mg-md">课程难度：困难</li>
