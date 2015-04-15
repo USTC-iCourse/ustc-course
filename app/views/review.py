@@ -20,7 +20,7 @@ def new_review(course_id):
         review.course = course
         review.add()
         return redirect(url_for('course.view_course',course_id=course_id))
-    print(form.errors)
+    #print(form.errors)
     return render_template('new-review.html', form=form, course=course)
 
 @review.route('/edit/<int:review_id>',methods=['GET','POST'])

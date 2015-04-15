@@ -9,7 +9,7 @@
     <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
     </div>
     <hr>
-    <form class="form-horizontal" method="post" action="{{ url_for('review.new_review', course_id=request.args.get('course_id')) }}">
+    <form class="form-horizontal" method="post" action="{{ url_for('review.new_review', course_id=course.id) }}">
       {{ form.csrf_token }}
       <div class="rate-part ud-pd-md">
         <div class="ud-pd-sm">
