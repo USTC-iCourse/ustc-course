@@ -1,6 +1,6 @@
 from flask import Blueprint,request, redirect,url_for,render_template,flash, abort, jsonify
 from flask.ext.login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course
+from app.models import User, RevokedToken as RT, Course, CourseRate
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 
@@ -147,7 +147,7 @@ def search():
     if not keyword:
         return redirect(url_for('home.index'))
 
-    courses = Course.query.filter(Course.name.like('%' + keyword + '%')).order_by(Course.term.desc())
+    courses = Course.query.filter(Course.name.like('%' + keyword + '%')).join(CourseRate).order_by(Course.term.desc()).order_by(CourseRate.upvote_count.desc())
     try:
         page = int(request.args.get('page', 1))
     except:
