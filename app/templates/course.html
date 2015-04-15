@@ -16,7 +16,7 @@
           <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
           <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
           <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true" ></span>
-          <span class="rl-pd-sm h4">8.5</span><span class="rl-pd-sm text-muted">(8人评价)</span>
+          <span class="rl-pd-sm h4">8.5</span><span class="rl-pd-sm text-muted">({{ course.course_rate.review_count }}人评价)</span>
         </div>
 
 
@@ -45,7 +45,7 @@
           </tbody>
         </table>
 
-        <p style="display: none">课程主页：http://staff.ustc.edu.cn/~zhuang/clp.htm</p>
+        <p>课程主页：暂无</p>
 
         <div class="ud-pd-md">
           <button class="btn btn-blue btn-flat" type="submit">关注 <span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button>
@@ -62,7 +62,6 @@
         </div>
 
 
-        <!-- 第一个 -->
         {% for review in course.reviews %}
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
@@ -80,7 +79,7 @@
           <div class="grey">
             <span class="small">{{ review.publish_time }}</span>
             <span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> {{ review.upvote }}
-            <span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> 1
+            <span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> 暂无
           </div>
         </div>
         {% endfor %}
