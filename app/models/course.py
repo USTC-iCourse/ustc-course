@@ -31,10 +31,10 @@ class Course(db.Model):
     id = db.Column(db.Integer,unique=True,primary_key=True)
     cno = db.Column(db.String(20))  # course_no, 课堂号，长的
     courseries = db.Column(db.String(20)) # course_series, 课程编号，短的
-    term = db.Column(db.String(10)) # 学年学期，例如 20142 表示 2015 年春季学期
-    name = db.Column(db.String(80)) # 课程名称
+    term = db.Column(db.String(10), index=True) # 学年学期，例如 20142 表示 2015 年春季学期
+    name = db.Column(db.String(80), index=True) # 课程名称
     kcid = db.Column(db.Integer)    # 课程id
-    dept = db.Column(db.String(80)) # 开课单位
+    dept = db.Column(db.String(80), index=True) # 开课单位
 
     course_major = db.Column(db.String(20)) # 学科类别
     course_type = db.Column(db.String(20)) # 课程类别，计划内，公选课……
