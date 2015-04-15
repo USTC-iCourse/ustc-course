@@ -1,4 +1,4 @@
-from flask import Blueprint,request, redirect,url_for,render_template,flash, abort
+from flask import Blueprint,request, redirect,url_for,render_template,flash, abort, jsonify
 from flask.ext.login import login_user, login_required, current_user, logout_user
 from app.models import User, RevokedToken as RT, Course
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
@@ -12,10 +12,11 @@ def index():
 
 @home.route('/signin/',methods=['POST','GET'])
 def signin():
+    next_url = request.args.get('next') or url_for('home.index')
     if current_user.is_authenticated():
-        return redirect(request.args.get('next') or url_for('home.index'))
+        return redirect(next_url)
     form = LoginForm()
-    error = ''
+    error = 'Invalid Request'
     if form.validate_on_submit():
         user,status = User.authenticate(form['username'].data,form['password'].data)
         remember = form['remember'].data
@@ -24,16 +25,25 @@ def signin():
             #validate uesr
             login_user(user, remember=remember)
             flash('Logged in')
-            return redirect(request.args.get('next') or url_for('home.index'))
+            if request.args.get('ajax'):
+                return jsonify(status=200, next=next_url)
+            else:
+                return redirect(next_url)
         elif user and not user.confirmed:
             '''没有确认邮箱的用户'''
-            return  render_template('feedback.html', status=False, message='Please activate your account by clicking link in your email! <a href=%s>Resend Email</a>'%url_for('.confirm_email',
-                    email=user.email,
-                    action='send'))
-            '''需要一个发送确认邮件的页面'''
+            message = 'Please activate your account by clicking link in your email! <a href=%s>Resend Email</a>'%url_for('.confirm_email',
+                email=user.email,
+                action='send')
+            if request.args.get('ajax'):
+                return jsonify(status=403, msg=message)
+            else:
+                return render_template('feedback.html', status=False, message=message)
         error = '用户名或密码错误'
     #TODO: log the form errors
-    return render_template('signin.html',form=form, error=error)
+    if request.args.get('ajax'):
+        return jsonify(status=404, msg=error)
+    else:
+        return render_template('signin.html',form=form, error=error)
 
 
 @home.route('/signup/',methods=['GET','POST'])
