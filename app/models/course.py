@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import url_for,abort
+from flask import url_for
 from app import db
 from .user import User
 try:
@@ -59,11 +59,11 @@ class Course(db.Model):
     teachers = db.relationship('Teacher', secondary=course_teachers, backref='courses')
     #:followers : backref to User
     #students : backref to Student
-    reviews = db.relationship('CourseReview',backref='course',lazy='dynamic')
-    notes = db.relationship('CourseNote', backref='course',lazy='dynamic')
-    #upvote_count = db.Column(db.Integer) #推荐人数
+    reviews = db.relationship('Review', backref='course', lazy='dynamic')
+    notes = db.relationship('Note', backref='course', lazy='dynamic')
+    forum_threads = db.relationship('ForumThread', backref='course', lazy='dynamic')
+    shares = db.relationship('Share', backref='course', lazy='dynamic')
 
-    #posts = db.relationship('CourseForumPost')
     _course_rate = db.relationship('CourseRate',backref='course',uselist=False)
 
     def __repr__(self):
@@ -134,11 +134,14 @@ class Course(db.Model):
         if self.course_major == None:
             return '未知'
 
+    @property
+    def review_count(self):
+        return self._course_rate.review_count
 
-review_upvotes = db.Table('review_upvotes',
-    db.Column('review_id', db.Integer, db.ForeignKey('course_reviews.id'), primary_key=True),
-    db.Column('author_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
-)
+    @property
+    def upvote_count(self):
+        return self._course_rate.upvote_count
+
 
 class CourseRate(db.Model):
     __tablename__ = 'course_rates'
@@ -150,6 +153,7 @@ class CourseRate(db.Model):
     _gain_total = db.Column(db.Integer,default=0)
     _rate_total = db.Column(db.Integer,default=0)
     review_count = db.Column(db.Integer,default=0) #点评数
+    upvote_count = db.Column(db.Integer,default=0) #推荐人数
 
     @property
     def difficulty(self):
@@ -222,185 +226,4 @@ class CourseRate(db.Model):
         self.gain -= gain
         self.rate -= rate
         self.save()
-
-
-class CourseReview(db.Model):
-    __tablename__ = 'course_reviews'
-    id = db.Column(db.Integer,primary_key=True, unique=True)
-
-    difficulty = db.Column(db.Integer,db.CheckConstraint('difficulty>=1 and difficulty<=3'))
-    homework = db.Column(db.Integer,db.CheckConstraint('homework>=1 and homework<=3'))
-    grading = db.Column(db.Integer,db.CheckConstraint('grading>=1 and grading<=3'))
-    gain = db.Column(db.Integer,db.CheckConstraint('gain>=1 and gain<=3'))
-    rate = db.Column(db.Integer,db.CheckConstraint('rate>=1 and rate<=10'))  #课程评分
-    content = db.Column(db.Text())
-
-    publish_time = db.Column(db.DateTime(),default=datetime.utcnow)
-    update_time = db.Column(db.DateTime(),default=datetime.utcnow)
-
-    upvote = db.Column(db.Integer,default=0) #点赞数量
-    upvotes = db.relationship('User', secondary=review_upvotes)
-    comments = db.relationship('CourseReviewComment',backref='review')
-
-    author = db.relationship('User',backref='reviews')
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
-    #course: Course
-
-
-    def add(self):
-        '''crete a new review'''
-        if self.course and self.author:
-            course_rate = self.course.course_rate
-            course_rate.add(self.difficulty,
-                    self.homework,
-                    self.grading,
-                    self.gain,
-                    self.rate)
-            db.session.add(self)
-            db.session.commit()
-            return self
-        return None
-
-    def delete(self):
-        if not self.id:
-            return None
-        course_rate = self.course.course_rate
-        course_rate.subtract(self.difficulty,
-                self.homework,
-                self.grading,self.gain,
-                self.rate)
-        db.session.delete(self)
-        db.session.commit()
-
-    def update(self,difficulty,
-            homework,
-            grading,
-            gain,
-            rate,
-            content):
-        course_rate = self.course.course_rate
-        course_rate.subtract(self.difficulty,
-                self.homework,
-                self.grading,
-                self.gain,
-                self.rate)
-        course_rate.add(difficulty,homework,grading,gain,rate)
-        self.content = content
-        self.update_time = datetime.utcnow()
-        db.session.add(self)
-        db.session.commit()
-
-    def add_comment(self, comment, author=current_user):
-        self.comments.append(comment)
-        self.save()
-
-    @classmethod
-    def create(cls,**kwargs):
-        course_id = kwargs.get('course_id')
-        if course_id:
-            course = Course.query.get(course_id)
-            kwargs['course'] = course
-        author_id = kwargs.get('author_id')
-        if author_id:
-            author = User.query.get(author_id)
-            kwargs['author'] = author
-        course_review = cls(**kwargs)
-        course_review.save()
-
-
-class CourseReviewComment(db.Model):
-    __tablename__ = 'course_review_comments'
-    id = db.Column(db.Integer, primary_key=True, unique=True)
-    review_id = db.Column(db.Integer, db.ForeignKey('course_reviews.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    content = db.Column(db.Text)
-    publish_time = db.Column(db.DateTime, default=datetime.utcnow)
-
-    author = db.relationship('User')
-    #:review: backref to CourseReview
-
-note_upvotes = db.Table('note_upvotes',
-    db.Column('note_id', db.Integer, db.ForeignKey('course_notes.id'), primary_key=True),
-    db.Column('author_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
-)
-
-class CourseNote(db.Model):
-    __tablename__ = 'course_notes'
-    id = db.Column(db.Integer, primary_key=True, unique=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
-
-    upvote = db.Column(db.Integer,default=0) #点赞数量
-    title = db.Column(db.String(200))
-    content = db.Column(db.Text())
-    publish_time = db.Column(db.DateTime(),default=datetime.utcnow)
-    update_time = db.Column(db.DateTime(),default=datetime.utcnow)
-
-    upvotes = db.relationship('User', secondary=note_upvotes)
-    author = db.relationship('User')
-    #:course: backref to Course
-    comments = db.relationship('CourseNoteComment', backref='note')
-
-class CourseNoteComment(db.Model):
-    __tablename__ = 'course_note_comments'
-    id = db.Column(db.Integer, primary_key=True, unique=True)
-    note_id = db.Column(db.Integer, db.ForeignKey('course_notes.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    content = db.Column(db.Text)
-    publish_time = db.Column(db.DateTime, default=datetime.utcnow)
-
-    author = db.relationship('User')
-    #:note: backref to CourseNote
-
-
-forum_thread_upvotes = db.Table('forum_thread_upvotes',
-    db.Column('thread_id', db.Integer, db.ForeignKey('course_forum_threads.id'), primary_key=True),
-    db.Column('author_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
-)
-
-
-class CourseForumThread(db.Model):
-    __tablename__ = 'course_forum_threads'
-    id = db.Column(db.Integer, primary_key=True, unique=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
-
-    upvote = db.Column(db.Integer,default=0) #点赞数量
-    title = db.Column(db.String(200))
-    content = db.Column(db.Text)
-    publish_time = db.Column(db.DateTime, default=datetime.utcnow)
-    update_time = db.Column(db.DateTime, default=datetime.utcnow)
-
-    author = db.relationship('User')
-    course = db.relationship('Course')
-    posts = db.relationship('CourseForumPost',backref='thread',lazy='dynamic')
-
-    upvotes = db.relationship('User', secondary=forum_thread_upvotes)
-
-forum_post_upvotes = db.Table('forum_post_upvotes',
-    db.Column('post_id', db.Integer, db.ForeignKey('course_forum_posts.id'), primary_key=True),
-    db.Column('author_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
-)
-
-class CourseForumPost(db.Model):
-    __tablename__ = 'course_forum_posts'
-    id = db.Column(db.Integer, primary_key=True, unique=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    thread_id = db.Column(db.Integer, db.ForeignKey('course_forum_threads.id'))
-
-    upvote = db.Column(db.Integer,default=0) #点赞数量
-    content = db.Column(db.Text)
-    publish_time = db.Column(db.DateTime, default=datetime.utcnow)
-    update_time = db.Column(db.DateTime, default=datetime.utcnow)
-
-    author = db.relationship('User')
-    upvotes = db.relationship('User', secondary=forum_post_upvotes)
-
-    def save(self, thread, author=current_user):
-        if thread and author:
-            self.thread = thread
-            self.author = author
-            db.session.add(self)
-            db.session.commit()
 
