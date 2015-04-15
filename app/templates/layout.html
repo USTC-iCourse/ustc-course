@@ -41,14 +41,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href={{ url_for('home.index') }}>USTC评课社区</a>
+          <a class="navbar-brand" href="{{ url_for('home.index') }}">USTC评课社区</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li style="display: none"><a href={{ url_for('home.index') }}>Home</a></li>
-            <li style="display: none" class="active"><a href={{ url_for('course.index') }}>Course</a></li>
+            <li style="display: none"><a href="{{ url_for('home.index') }}">Home</a></li>
+            <li style="display: none" class="active"><a href="{{ url_for('course.index') }}">Course</a></li>
             <li style="display: none"><a href="#">Forum</a></li>
           </ul>
 
@@ -70,7 +70,7 @@
                 <li><a href="#">Profile</a></li>
                 <li><a href="#">Settings</a></li>
                 <li class="divider"></li>
-                <li><a href={{ url_for('home.logout') }}>Log out</a></li>
+                <li><a href="{{ url_for('home.logout') }}">Log out</a></li>
               </ul>
             </li>
             {% else %}
