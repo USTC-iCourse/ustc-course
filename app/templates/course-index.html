@@ -12,19 +12,16 @@
   </div>
   <!-- /.row -->
 
-  {% for row in pagination.items|batch(3) %}
+  {% for row in pagination.items|batch(4) %}
   <!-- Projects Row -->
   <div class="row">
       {% for course in row %}
-    <div class="col-md-4 portfolio-item">
-      <a href="#">
-        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+    <div class="col-md-3 portfolio-item">
+      <a href={{ url_for('course.view_course', course_id=course.id) }}>
+        <img class="img-responsive" src="http://placehold.it/400x300" alt="">
       </a>
-      <h3>
-          <a href={{ course.url }}>{{ course.name }}</a>
-      </h3>
+      <h4><a href={{ course.url }}>{{ course.name }}（{{ course.teacher.name }}）</a></h4>
       {{ course.description }}
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida pellentesque urna varius vitae.</p>
     </div>
     {% endfor %}
   </div>
@@ -76,22 +73,5 @@
   <hr>
 </div>
 <!-- /.container -->
-
-<!-- 
-<html>
-  <body>
-    {% for item in pagination.items %}
-    
-    <table>
-      <tr>{{ item.cno }}</tr>
-      <tr><a href={{ item.url }}>{{ item.name }}</a></tr>
-      <tr>{{ item.dept }}</tr>
-      <tr>{{ item.description }}</tr>
-      <tr><a href={{ url_for('review.new_review',course_id=item.id, course_name=item.name) }}>New Rreview</a>
-    </table>
-    {% endfor %}
-  </body>
-</html>
--->
 
 {% endblock %}

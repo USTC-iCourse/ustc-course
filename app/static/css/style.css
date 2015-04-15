@@ -117,6 +117,7 @@ p { line-height: 25px; }
 
 .float-right { float: right; }
 .float-left { float: left; }
+.center { text-align: center; }
 
 .weight-heavy { font-weight: 600; }
 
@@ -144,15 +145,17 @@ p { line-height: 25px; }
     width: 96px;
     height: 96px;
 }
+.avatar-sp {
+    width: 120px;
+    height: 120px;
+}
 .cicle { border-radius: 100%; }
 .rect-lg {
     width: 300px;
     height: 225px;
 }
-.radius4 {
-    border-radius: 4px;
-}
-
+.radius4 { border-radius: 4px; }
+.radius0 { border-radius: 0; }
 .grey { color: #999; }
 .blue { color: #337ab7; }
 
@@ -182,7 +185,6 @@ p { line-height: 25px; }
     font-size: 14px;
     font-weight: 600;
     background-color: #f3f3f3;
-    border-radius: 0;
 }
 
 /* special elements */
