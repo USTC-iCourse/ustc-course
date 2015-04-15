@@ -14,7 +14,7 @@ def view_profile(user_id):
         message = '找不到该用户'
         return render_template('feedback.html',status=False,message=message)
 
-    courses_following = user.courses_folloing
+    courses_following = user.courses_following
     info = user.info # 注意，教师和学生返回的info类型不同,如果没有验证身份，则返回None
     return render_template('profile.html',user=user)
 

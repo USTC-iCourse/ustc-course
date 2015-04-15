@@ -13,7 +13,7 @@
           <div class="rate-box">23</div>
         </div>
         <div class="col-md-8 col-xs-10">
-          <span class="px16">{{ course.name }}（{{ course.teacher.name }}）</span>
+          <a class="px16" href={{ url_for('course.view_course', course_id=course.id) }}>{{ course.name }}（{{ course.teacher.name }}）</a>
           <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
           <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
           <div class="ud-pd-sm blue">
@@ -22,11 +22,11 @@
             <span class="glyphicon glyphicon-star" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star-empty" aria-hidden="true" ></span>
-            <span class="rl-pd-sm h4">8.5</span><span class="text-muted px12">(8人评价)</span>
+            <span class="rl-pd-sm h4">8.5</span><span class="text-muted px12">({{ course.course_rate.review_count }}人评价)</span>
           </div>
           <ul class="text-muted list-inline list-unstyled">
             <li class="right-mg-md">课程难度：困难</li>
-            <li class="right-mg-md">睡眠指数：中等</li>
+            <li class="right-mg-md">作业多少：很多</li>
             <li class="right-mg-md">给分好坏：暂无</li>
             <li class="right-mg-md">收获大小：一般</li>
           </ul>
