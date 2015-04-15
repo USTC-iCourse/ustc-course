@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+    <h2 class="blue">Accout Settings</h2>
+    <hr>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Profile picture</label>
+        <div class="col-sm-5">
+          <img class="avatar-lg cicle rl-mg-md" src="/static/image/avatar.jpg"/>
+          <button class="btn btn-grey radius4">Upload new</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Username</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" placeholder="{{ user.username }}">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">USTC Email</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" placeholder="{{ user.email }}" disabled>
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label for="inputDescription" class="col-sm-2 control-label">About Me</label>
+        <div class="col-sm-5">
+          <textarea type="text" class="form-control" rows="3" id="inputDescription" placeholder="物院大一"></textarea>
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Website</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" placeholder="jenny42.com">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Change Password</label>
+        <div class="col-sm-5">
+          <a class="btn btn-link">Send Email to change password</a>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-2">
+          <button type="submit" class="btn btn-blue btn-block">Update profile</button>
+        </div>
+      </div>
+    </form>
+
+    </div> <!-- end float-element -->
+  </div> <!-- end container -->
+
+  {% endblock %}
