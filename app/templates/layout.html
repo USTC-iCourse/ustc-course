@@ -41,14 +41,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href={{ url_for('home.index') }}>USTC评课社区</a>
+          <a class="navbar-brand" href="{{ url_for('home.index') }}">USTC评课社区</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li style="display: none"><a href={{ url_for('home.index') }}>Home</a></li>
-            <li style="display: none" class="active"><a href={{ url_for('course.index') }}>Course</a></li>
+            <li style="display: none"><a href="{{ url_for('home.index') }}">Home</a></li>
+            <li style="display: none" class="active"><a href="{{ url_for('course.index') }}">Course</a></li>
             <li style="display: none"><a href="#">Forum</a></li>
           </ul>
 
@@ -79,12 +79,13 @@
             <div class="modal fade" id="signin" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-signin">
                 <div class="modal-content">
-                  <form class="form-signin" action={{ url_for('home.signin', next=request.path) }} method='post'>
+                  <form id="signin-form" class="form-signin">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="form-signin-heading">
                       <span class="h2">Please sign in</span>
                       <a class="btn btn-default float-right" href="/signup">Sign Up</a>
                     </div>
+                    <div id="signin-alert" role="alert" class="display: none"></div>
                     <label for="inputEmail" class="sr-only">Username</label>
                     <input type="text" name="username" id="inputEmail" class="form-control" placeholder="Email or username" required autofocus>
                     <label for="inputPassword" class="sr-only">Password</label>
@@ -136,7 +137,42 @@
     <script>
      $('#signin').on('shown.bs.modal', function () {
        $('#inputEmail').focus()
-     })
+     });
+
+     function signin_alert(msg, type) {
+       if (!type)
+         type = "danger";
+       $('#signin-alert').attr("class", "alert alert-" + type);
+       $('#signin-alert').html(msg);
+       $('#signin-alert').show();
+     }
+
+     $('#signin-form').submit(function(e) {
+       e.preventDefault();
+       var formdata = {}
+       $('#signin-form input').each(function() {
+         formdata[$(this).attr("name")] = $(this).val();
+       });
+       $.ajax({
+         type: "POST",
+         url: "{{ url_for('home.signin', next=request.path, ajax=True) | safe }}",
+         data: formdata,
+         dataType: "json",
+         success: function(res) {
+            if (res.status == 200) {
+                if (res.next)
+                    window.location.href = res.next;
+                else
+                    signin_alert(res.msg, "success");
+            } else {
+                signin_alert(res.msg);
+            }
+         },
+         error: function(e) {
+            signin_alert('Oops! 服务器正在睡觉，请稍后再试。', "warning");
+         }
+       })
+     });
     </script>
 
     {% block script %}

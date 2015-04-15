@@ -6,18 +6,14 @@ from app.forms import ReviewForm
 review = Blueprint('review',__name__)
 
 
-@review.route('/new/',methods=['GET','POST'])
+@review.route('/new/<int:course_id>',methods=['GET','POST'])
 @login_required
-def new_review():
-    form = ReviewForm(request.form)
-    course_id = request.args.get('course_id', type=int)
-    if not course_id:
-        abort(404)
+def new_review(course_id):
     course = Course.query.get(course_id)
-    form = ReviewForm(request.form)
-    review = Review()
     if not course:
         abort(404)
+    form = ReviewForm(request.form)
+    review = Review()
     if form.validate_on_submit():
         form.populate_obj(review)
         review.author = current_user
@@ -27,12 +23,9 @@ def new_review():
     print(form.errors)
     return render_template('new-review.html', form=form, course=course)
 
-@review.route('/edit/',methods=['GET','POST'])
+@review.route('/edit/<int:review_id>',methods=['GET','POST'])
 @login_required
-def edit_review():
-    review_id = request.args.get('review_id')
-    if not review_id:
-        abort(404)
+def edit_review(review_id):
     review = Review.query.get(review_id)
     if not review:
         abort(404)
