@@ -3,10 +3,10 @@
 
 <div class="container"">
   <div class="float-element">
-    <span class="text-muted"> 搜索 "{{ keyword }}" 的结果<span class="small"> > 共{{ 未完成 }}条</span></span>
+    <span class="text-muted"> 搜索「{{ keyword }}」的结果 <span class="small"> > 共 {{ courses.total }} 门课</span></span>
     <hr>
 
-    {% for course in courses %}
+    {% for course in courses.items %}
     <div class="ud-pd-md dashed">
       <div class="row">
         <div class="col-md-1 col-xs-2">
@@ -36,23 +36,35 @@
     </div>
     {% endfor %}
 
-    <nav>   <!-- 分页，每页显示10条结果吧 -->
+    <nav>
       <ul class="pagination">
+        {% if courses.has_prev %} 
         <li>
-          <a href="#" aria-label="Previous">
+            <a href="{{ url_for('home.search', q=keyword, page=courses.prev_num) }}" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
-        <li class="active"><a href="#">1<span class="sr-only">(current)</span></a></li>
-        <li><a href="#">2</a></li>
-        <li><a href="#">3</a></li>
-        <li><a href="#">4</a></li>
-        <li><a href="#">5</a></li>
+        {% else %} 
+        <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+        {% endif %}
+        
+        {% for page in courses.iter_pages(left_edge=1, right_edge=1) %}
+            {% if page == courses.page %}
+            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
+            {% elif page %}
+            <li><a href="{{ url_for('home.search', q=keyword, page=page) }}">{{ page }}</a></li>
+            {% else %}
+            <li><a>...</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if courses.has_next %}
         <li>
-          <a href="#" aria-label="Next">
+          <a href="{{ url_for('home.search', q=keyword, page=courses.next_num) }}" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>
+        {% endif %}
       </ul>
     </nav>
 

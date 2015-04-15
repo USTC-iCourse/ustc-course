@@ -34,14 +34,19 @@ def view_course(course_id,course_name=None):
 
 #@course.route('/<int:course_id>/<course_name>/reviews/')
 @course.route('/<int:course_id>/reviews/')
-def review(course_id,course_name=None):
+def review(course_id, course_name=None):
     course = Course.query.get(course_id)
     if not course:
         abort(404)
     #if course_name != course.name:
     #    return redirect(url_for('.review',course_id=course_id,course_name=course.name))
 
-    reviews = course.reviews.paginate(page=1,per_page=10)
+    try:
+        page = int(request.args.get('page', 1))
+    except:
+        page = 1
+
+    reviews = course.reviews.paginate(page=page, per_page=10)
     if reviews.total:
         str = ''
         for item in reviews.items:

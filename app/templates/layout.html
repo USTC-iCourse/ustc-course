@@ -53,7 +53,7 @@
           </ul>
 
           
-          <form class="navbar-form navbar-left" role="search">
+          <form class="navbar-form navbar-left" action="{{ url_for('home.search') }}" method="get" role="search">
             <div class="form-group">
               <input type="text" name="q" class="form-control" id="search" placeholder="搜索课程名称、课堂号" style="width: 275px">
             </div>

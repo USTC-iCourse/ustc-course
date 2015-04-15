@@ -144,11 +144,19 @@ def reset_password(token):
 def search():
     ''' 搜索 '''
     keyword = request.args.get('q')
-    courses = Course.query.filter_by(name=keyword)
+    if not keyword:
+        return redirect(url_for('home.index'))
+
+    courses = Course.query.filter(Course.name.like('%' + keyword + '%')).order_by(Course.term.desc())
+    try:
+        page = int(request.args.get('page', 1))
+    except:
+        page = 1
+    courses_paged = courses.paginate(page=page, per_page=10)
     if not courses:
         return 404
     else:
-        return render_template('search.html', keyword=keyword, courses=courses)
+        return render_template('search.html', keyword=keyword, courses=courses_paged)
 
 
 @home.route('/report-bug/')
