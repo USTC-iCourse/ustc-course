@@ -42,7 +42,7 @@ body {
 .float-element {
     background-color: #ffffff;
 }
-.container-md { width: 640px }
+.container-md { width: 710px }
 .dashed { border-bottom: 1px #ddd dashed; }
 .solid { border-bottom: 1px #EEE solid; }
 .hr-box {
