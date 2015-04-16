@@ -59,6 +59,7 @@ class User(db.Model, UserMixin):
 
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
     avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
+    homepage = db.Column(db.Text)
 
     courses_following = db.relationship('FollowCourse', backref='followers')
     student_info = db.relationship('Student', backref='user',uselist=False)
@@ -212,9 +213,11 @@ class Teacher(db.Model):
 
     email = db.Column(db.String(80))
     description = db.Column(db.Text())
+    homepage = db.Column(db.Text)
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
+    avatar = db.Column(db.Integer, db.ForeignKey('image_store.id'))
     dept = db.relationship('Dept', backref='teachers')
     #course
 
