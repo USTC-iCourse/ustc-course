@@ -1,2 +1,2 @@
-from .review import ReviewForm, ReviewCommentForm
+from .review import *
 from .user import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm

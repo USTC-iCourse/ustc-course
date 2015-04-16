@@ -13,4 +13,6 @@ class ReviewForm(Form):
     content = TextAreaField('content',validators=[InputRequired()])
 
 class ReviewCommentForm(Form):
+    review_id = IntegerField('review id',validators=[InputRequired()])
     content = TextAreaField('content', validators=[InputRequired()])
+

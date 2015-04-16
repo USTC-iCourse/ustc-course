@@ -6,5 +6,15 @@
     <input type="file" name="image" value=>
     <input type="submit">
 </form>
+<div>
+<form action="/api/review/new_comment/" method="post" >
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input type="integer" name="review_id" value=>
+    <textarea name="content">
+        </textarea>
+    <input type="submit">
+</form>
+
+</div>
 </body>
 </html>

@@ -96,9 +96,6 @@ class Review(db.Model):
         self.save()
         return (True,"Sucess!")
 
-    def add_comment(self, comment, author=current_user):
-        self.comments.append(comment)
-        self.save()
 
     def save(self):
         db.session.add(self)
@@ -128,4 +125,24 @@ class ReviewComment(db.Model):
 
     author = db.relationship('User')
     #:review: backref to Review
+
+    def add(self,review,content,author=current_user):
+        self.content = content
+        self.review = review
+        review.comment_count += 1
+        self.author = author
+        db.session.add(self)
+        db.session.commit()
+        return True,"Success!"
+
+    def delete(self):
+        if self.review:
+            review = self.review
+            review.comments.remove(self)
+            review.comment_count -= 1
+            db.session.add(review)
+            db.session.commit()
+        db.session.delete(self)
+        db.session.commit()
+        return True,"Success"
 

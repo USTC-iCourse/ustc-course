@@ -1,6 +1,7 @@
 from flask import Blueprint,jsonify,request
-from flask.ext.login import login_required
-from app.models import Review, ReviewComment as Comment, User, Course, ImageStore
+from flask.ext.login import login_required,current_user
+from app.models import Review, ReviewComment , User, Course, ImageStore
+from app.forms import ReviewCommentForm
 from app.utils import rand_str
 from app import app
 
@@ -42,7 +43,7 @@ def get_reviews():
 
 @api.route('/review/upvote/',methods=['GET','POST'])
 def review_upvote():
-    review_id = request.values.get('id')
+    review_id = request.values.get('review_id')
     if not review_id:
         return jsonify(status=false,message="A id must be given")
     review = Review.query.get(review_id)
@@ -51,13 +52,43 @@ def review_upvote():
 
 @api.route('/review/cancel_upvote/',methods=['GET','POST'])
 def review_cancel_upvote():
-    review_id = request.values.get('id')
+    review_id = request.values.get('review_id')
     if not review_id:
-        return jsonify(status=false,message="A id must be given")
+        return jsonify(status=False,message="A id must be given")
     review = Review.query.get(review_id)
+    if not review:
+        return jsonify(status=False,message="The review dosen't exist.")
+    if review.author != current_user:
+        return jsonify(status=False,message="Forbiden")
     status,message = review.cancel_upvote()
     return jsonify(status=status,message=message)
 
+@api.route('/review/new_comment/',methods=['POST'])
+def review_new_comment():
+    form = ReviewCommentForm(request.form)
+    if form.validate_on_submit():
+        review_id = request.form.get('review_id')
+        review = Review.query.get(review_id)
+        if not review_id:
+            return jsonify(status=False,message="The review dosen't exist.")
+        comment = ReviewComment()
+        content = request.form.get('content')
+        status,message = comment.add(review,content)
+        return jsonify(status=status,message=message,content=content)
+    return jsonify(status=False,message=form.errors)
+
+@api.route('/review/delete_comment/',methods=['GET','POST'])
+def review_delete_comment():
+    comment_id = request.values.get('id')
+    if not comment_id:
+        return jsonify(status=False,message="A id must be given")
+    comment = ReviewComment.query.filter_by(id=comment_id).first()
+    if not comment:
+        return jsonify(status=False,message="The comment dosen't exist.")
+    if comment.author != current_user:
+        return jsonify(status=False,message="Forbiden")
+    status,message = comment.delete()
+    return jsonify(status=False,message=message)
 
 
 def allowed_file(filename):
@@ -84,21 +115,6 @@ def upload():
         return jsonify(status=True,filename=new_filename)
     return jsonify(status=False,message="Upload failed")
 
-
-@api.route('/review_comment/',methods=['POST'])
-def post_review_comment():
-    json = request.get_json
-    if not json:
-        return 404
-    if 'id' not in json or 'content' not in 'json':
-        return jsonify(status='Authentication failed')
-    id = json.get('id')
-    content = json.get('content')
-
-    review = Review.query.get(id)
-    comment = Comment(content=content)
-    review.add_comment(comment)
-    return jsonify(comment)
 
 
 
