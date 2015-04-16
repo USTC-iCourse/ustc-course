@@ -58,8 +58,9 @@ class User(db.Model, UserMixin):
     last_login_time = db.Column(db.DateTime())
 
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
-    avatar = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
     homepage = db.Column(db.Text)
+    avatar_id = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
+    avatar = db.relationship('ImageStore', foreign_keys='User.avatar_id', uselist=False)
 
     courses_following = db.relationship('FollowCourse', backref='followers')
     student_info = db.relationship('Student', backref='user',uselist=False)

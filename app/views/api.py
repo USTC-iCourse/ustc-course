@@ -1,6 +1,11 @@
 from flask import Blueprint,jsonify,request
-from app.models import Review, ReviewComment as Comment, User, Course
+from flask.ext.login import login_required
+from app.models import Review, ReviewComment as Comment, User, Course, ImageStore
+from app.utils import rand_str
+from app import app
+
 import re
+import os
 
 api = Blueprint('api',__name__)
 
@@ -34,9 +39,50 @@ def get_reviews():
         response['data'].append(review)
     return jsonify(response)
 
-@api.route('/review_upvote/',methods=['POST'])
+
+@api.route('/review/upvote/',methods=['GET','POST'])
 def review_upvote():
-    pass
+    review_id = request.values.get('id')
+    if not review_id:
+        return jsonify(status=false,message="A id must be given")
+    review = Review.query.get(review_id)
+    status,message = review.upvote()
+    return jsonify(status=status,message=message)
+
+@api.route('/review/cancel_upvote/',methods=['GET','POST'])
+def review_cancel_upvote():
+    review_id = request.values.get('id')
+    if not review_id:
+        return jsonify(status=false,message="A id must be given")
+    review = Review.query.get(review_id)
+    status,message = review.cancel_upvote()
+    return jsonify(status=status,message=message)
+
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+
+@api.route('/upload/',methods=['POST'])
+@login_required
+def upload():
+    file = request.files['image']
+    if file and allowed_file(file.filename):
+        old_filename = file.filename
+        file_suffix = old_filename.split('.')[-1]
+        new_filename = rand_str() + '.' + file_suffix
+        try:
+            upload_path = os.path.join(app.config['UPLOAD_FOLDER'], 'images/')
+            file.save(os.path.join(upload_path, new_filename))
+        except FileNotFoundError:
+            os.makedirs(upload_path)
+            file.save(os.path.join(upload_path, new_filename))
+        except:
+            return jsonify(status=False,message="Something WRONG")
+        img = ImageStore(old_filename,new_filename)
+        return jsonify(status=True,filename=new_filename)
+    return jsonify(status=False,message="Upload failed")
 
 
 @api.route('/review_comment/',methods=['POST'])

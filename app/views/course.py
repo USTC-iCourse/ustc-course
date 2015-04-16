@@ -3,12 +3,14 @@ from app.models import Course
 from app.forms import ReviewForm
 
 course = Blueprint('course',__name__)
+QUERY_ORDER = [Course.term.desc(),
+        Course.kcid]
 
 @course.route('/')
 def index():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
-    courses_page = Course.query.paginate(page,per_page=per_page)
+    courses_page = Course.query.order_by(*QUERY_ORDER).paginate(page,per_page=per_page)
     return render_template('course-index.html',pagination=courses_page)
 
 @course.route('/<int:course_id>/')

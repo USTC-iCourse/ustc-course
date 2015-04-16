@@ -27,7 +27,7 @@ class Review(db.Model):
     upvote_count = db.Column(db.Integer, default=0) #点赞数量
     comment_count = db.Column(db.Integer, default=0)
 
-    upvotes = db.relationship('User', secondary=review_upvotes)
+    upvote_users = db.relationship('User', secondary=review_upvotes)
     comments = db.relationship('ReviewComment',backref='review')
 
     author = db.relationship('User', backref='reviews')
@@ -80,9 +80,29 @@ class Review(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def upvote(self,author=current_user):
+        if author in self.upvote_users:
+            return False,"The user has upvoted!"
+        self.upvote_users.append(author)
+        self.upvote_count +=1
+        self.save()
+        return True,"Sucess!"
+
+    def cancel_upvote(self,author=current_user):
+        if author not in self.upvote_users:
+            return (False,"The user has not upvoted!")
+        self.upvote_users.remove(author)
+        self.upvote_count -=1
+        self.save()
+        return (True,"Sucess!")
+
     def add_comment(self, comment, author=current_user):
         self.comments.append(comment)
         self.save()
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
     @classmethod
     def create(cls,**kwargs):

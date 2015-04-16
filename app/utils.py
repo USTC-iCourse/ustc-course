@@ -2,11 +2,20 @@ from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail,Message
 from . import app
 from flask import render_template, url_for
-
+from random import randint
+from datetime import datetime
+import hashlib
 
 mail = Mail(app)
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
+
+def rand_str():
+    random_num = randint(100000,999999)
+    raw_str = str(datetime.utcnow()) + str(randint(100000,999999))
+    hash_fac = hashlib.new('ripemd160')
+    hash_fac.update(raw_str.encode('utf-8'))
+    return hash_fac.hexdigest()
 
 
 def send_confirm_mail(email):

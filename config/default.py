@@ -19,3 +19,7 @@ MAIL_DEFAULT_SENDER = 'test@ibat.me'
 MAIL_MAX_EMAILS = None
 #MAIL_SUPPRESS_SEND =
 MAIL_ASCII_ATTACHMENTS = False
+
+# Upload config
+UPLOAD_FOLDER = '/tmp/uploads'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
