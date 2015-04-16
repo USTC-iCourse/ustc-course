@@ -5,6 +5,59 @@
   <div class="float-element">
     <span class="text-muted"> 搜索「{{ keyword }}」的结果 <span class="small"> > 共 {{ courses.total }} 门课</span></span>
     <hr>
+    <div class="select-box">
+
+      <ul class="list-unstyled list-inline">
+        <span><strong>学期：</strong></span>
+        <li>全部</li>
+        <li>2015春</li>
+        <li>2014秋</li>
+        <li>2014夏</li>
+        <li>2014春</li>
+        <li>2013</li>
+        <li>
+          <div class="dropdown">
+            <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2012</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2011</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2010</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2009</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2008</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2007</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2006</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+
+      <ul class="list-unstyled list-inline">
+        <span><strong>老师：</strong></span>
+        <li>全部</li>
+        <li>AAA</li>
+        <li>BBB</li>
+        <li>CCC</li>
+        <li>ppp</li>
+        <li>ddd</li>
+        <li>eee</li>
+        <li>
+          <div class="dropdown">
+            <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">fff</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">ggg</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">lll</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">iii</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+
 
     {% for course in courses.items %}
     <div class="ud-pd-md dashed">
@@ -54,7 +107,7 @@
             <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
             <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
             <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            <span class="rl-pd-sm h4"><span class="text-muted px12">还没有人评价此课程</span>
+            <span class="rl-pd-sm h4"><span class="text-muted px12">暂无评价</span>
           </div>
           <ul class="text-muted list-inline list-unstyled">
               <li class="right-mg-md">课程难度：你猜</li>

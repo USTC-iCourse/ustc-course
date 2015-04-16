@@ -44,8 +44,17 @@ body {
 }
 .container-md { width: 640px }
 .dashed { border-bottom: 1px #ddd dashed; }
-.solid { border-bottom: 1px #ddd solid; }
-
+.solid { border-bottom: 1px #EEE solid; }
+.hr-box {
+    border-bottom: 1px #EEE solid;
+    padding-bottom: 20px;
+}
+.select-box {
+    padding: 15px 25px;
+    margin: 20px 0;
+    border: 1px #ddd dashed;
+    border-radius: 4px;
+}
 p { line-height: 25px; }
 
 

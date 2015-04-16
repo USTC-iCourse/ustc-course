@@ -5,6 +5,117 @@
 <div class="container">
 
   <!-- Page Header -->
+  <!-- 未来的筛选框 -->
+  <div class="float-element">
+    <div class="select-box">
+
+      <ul class="list-unstyled list-inline">
+        <span><strong>学期：</strong></span>
+        <li>全部</li>
+        <li>2015春</li>
+        <li>2014秋</li>
+        <li>2014夏</li>
+        <li>2014春</li>
+        <li>2013</li>
+        <li>
+          <div class="dropdown">
+            <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2012</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2011</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2010</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2009</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2008</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2007</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2006</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+
+
+            <ul class="list-unstyled list-inline">
+        <span><strong>内容：</strong></span>
+        <li>全部</li>
+        <li>数学</li>
+        <li>物理</li>
+        <li>化学</li>
+        <li>计算机</li>
+        <li>生物</li>
+        <li>人文</li>
+        <li>
+          <div class="dropdown">
+            <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">地空</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">经济</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">传播</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">管理</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">信息安全</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+
+
+
+      <ul class="list-unstyled list-inline">
+        <span><strong>老师：</strong></span>
+        <li>全部</li>
+        <li>AAA</li>
+        <li>BBB</li>
+        <li>CCC</li>
+        <li>ppp</li>
+        <li>ddd</li>
+        <li>eee</li>
+        <li>
+          <div class="dropdown">
+            <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">fff</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">ggg</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">lll</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">iii</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+
+
+
+      <ul class="list-unstyled list-inline">
+        <span><strong>语言：</strong></span>
+        <li>全部</li>
+        <li>中文</li>
+        <li>英语</li>
+        <li>俄语</li>
+        <li>
+          <div class="dropdown">
+            <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">fff</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">ggg</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">lll</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">iii</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+
+
+
+
+    </div><!-- end elect-box -->
+  </div><!-- end float-element -->
+
   <div class="row">
     <div class="col-lg-12">
       <h1 class="page-header">热门课程</h1>
@@ -15,7 +126,7 @@
   {% for row in pagination.items|batch(4) %}
   <!-- Projects Row -->
   <div class="row">
-      {% for course in row %}
+    {% for course in row %}
     <div class="col-md-3 portfolio-item">
       <a href={{ url_for('course.view_course', course_id=course.id) }}>
         <img class="img-responsive" src="http://placehold.it/400x300" alt="">
@@ -31,46 +142,46 @@
   <hr>
 
   <!-- Pagination -->
-<nav>
-  <ul class=pagination>
-        {%- if pagination.has_prev %} 
-        <li>
+  <nav>
+    <ul class=pagination>
+      {%- if pagination.has_prev %} 
+      <li>
         <a href={{ url_for('course.index',page=pagination.prev_num) }} aria-label="previous">
-           <span aria-hidden="true">&laquo;</span>
-       </a>
-       </li>
-       {% else %}
-       <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-       {% endif %}
-  {%- for page in pagination.iter_pages(left_edge=1,right_edge=1) %}
-    {% if page %}
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+      {% endif %}
+      {%- for page in pagination.iter_pages(left_edge=1,right_edge=1) %}
+      {% if page %}
       {% if page != pagination.page %}
       <li>
         <a href="{{ url_for('course.index', page=page) }}">{{ page }}</a>
-        </li>
+      </li>
       {% else %}
       <li class="active">
-      <a href="#"><strong>{{ page }}</strong></a>
-        </li>
+        <a href="#"><strong>{{ page }}</strong></a>
+      </li>
       {% endif %}
-    {% else %}
-        <li><span class=ellipsis>…</span></li>
-    {% endif %}
-    {%- endfor %}
-    {%- if pagination.has_next %} 
-        <li>
+      {% else %}
+      <li><span class=ellipsis>…</span></li>
+      {% endif %}
+      {%- endfor %}
+      {%- if pagination.has_next %} 
+      <li>
         <a href={{ url_for('course.index',page=pagination.next_num) }} aria-label="Next">
-           <span aria-hidden="true">&raquo;</span>
-       </a>
-       </li>
-        {% else %}
-       <li class="disabled"><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
-       {% endif %}
-  </ul>
-<nav>
-   <!-- /.row -->
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="disabled"><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+      {% endif %}
+    </ul>
+    <nav>
+      <!-- /.row -->
 
-  <hr>
+      <hr>
 </div>
 <!-- /.container -->
 
