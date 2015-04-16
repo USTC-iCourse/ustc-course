@@ -1,0 +1,62 @@
+<link href="/static/umeditor/themes/default/css/umeditor.min.css" type="text/css" rel="stylesheet">
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/umeditor/umeditor.min.js"></script>
+<script type="text/javascript">
+ var lang = (navigator.language||navigator.browserLanguage ||navigator.userLanguage).toLowerCase();
+ if (lang != 'en')
+   lang = 'zh-cn';
+ window.UMEDITOR_CONFIG = {
+   UMEDITOR_HOME_URL: '/static/umeditor/',
+   imageUrl: '/uploadimage/',
+   imagePath: '/uploads/',
+   imageFieldName: 'filename',
+   toolbar:[
+     'source | undo redo | bold italic underline strikethrough | superscript subscript | forecolor backcolor | removeformat |',
+     'justifyleft justifycenter justifyright justifyjustify |',
+     'insertorderedlist insertunorderedlist |',
+     'link unlink | emotion image video | map |',
+     'paragraph fontfamily |',
+     'horizontal | drafts | formula'
+   ],
+   lang: lang,
+   wordCount: true,
+   elementPathEnabled: false,
+   initialFrameHeight: 400,
+   textarea: 'inputDescription',
+   initialStyle: 'p { line-height: 1.42857143; font-size: 14px; color: #333; margin-bottom: 10px !important }',
+   fontfamily: [{
+        label: '',
+        name: 'monospace',
+        val: 'Consolas, Monospace, Courier New'
+    }, {
+        label: '',
+        name: 'songti',
+        val: '宋体,SimSun'
+    }, {
+        label: '',
+        name: 'kaiti',
+        val: '楷体,楷体_GB2312, SimKai'
+    }, {
+        label: '',
+        name: 'yahei',
+        val: '微软雅黑,Microsoft YaHei'
+    }, {
+        label: '',
+        name: 'heiti',
+        val: '黑体, SimHei'
+    }, {
+        label: '',
+        name: 'arial',
+        val: 'arial, helvetica,sans-serif'
+    }, {
+        label: '',
+        name: 'arialBlack',
+        val: 'arial black,avant garde'
+    }, {
+        label: '',
+        name: 'timesNewRoman',
+        val: 'times new roman'
+    }],
+ }
+ var um = UM.getEditor('content-editor');
+</script>
