@@ -49,11 +49,19 @@ body {
     border-bottom: 1px #EEE solid;
     padding-bottom: 20px;
 }
-.select-box {
-    padding: 15px 25px;
-    margin: 20px 0;
-    border: 1px #ddd dashed;
-    border-radius: 4px;
+@media (min-width:769px){
+    .select-box {
+        padding: 15px 25px;
+        margin: 20px 0;
+        border: 1px #ddd dashed;
+        border-radius: 4px;
+    }  
+}
+@media (max-width:768px){
+    .select-box {
+        padding-left: 8px;
+        margin: 15px 0;
+    } 
 }
 p { line-height: 25px; }
 
