@@ -30,7 +30,7 @@
             <label>
               <input type="checkbox"> Remember me
             </label>
-            <a class="float-right" href="/reset-password">Forgot Password?</a>
+            <a class="float-right" href="{{ url_for('home.forgot_password') }}">Forgot Password?</a>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@
 
     <div class="row ud-pd-md">
       <div class="col-sm-offset-2 col-sm-4">
-        <span class="text-muted">Don't have an account? <a href="/signin">Sign Up</a></span>
+        <span class="text-muted">Don't have an account? <a href="{{ url_for('home.signup') }}">Sign Up</a></span>
       </div>
     </div>
 

@@ -16,7 +16,7 @@ def signin():
     if current_user.is_authenticated():
         return redirect(next_url)
     form = LoginForm()
-    error = 'Invalid Request'
+    error = ''
     if form.validate_on_submit():
         user,status = User.authenticate(form['username'].data,form['password'].data)
         remember = form['remember'].data
@@ -101,6 +101,14 @@ def logout():
     logout_user()
     return redirect(url_for('home.index'))
 
+@home.route('/change-password/', methods=['GET'])
+def change_password():
+    '''在控制面板里修改密码'''
+    if not current_user.is_authenticated():
+        return redirect(url_for('home.signin'))
+    send_reset_password_mail(current_user.email)
+    return render_template('feedback.html', status=True, message='Reset password mail sent')
+
 
 @home.route('/reset-password/', methods=['GET','POST'])
 def forgot_password():
@@ -113,8 +121,12 @@ def forgot_password():
         user = User.query.filter_by(email=email).first()
         if user:
             send_reset_password_mail(email)
-            return 'Reset password mail sent.'  #一个反馈信息
-        flash('The email has not been registered')
+            message = 'Reset password mail sent.'  #一个反馈信息
+            status = True
+        else:
+            message = 'The email has not been registered'
+            status = False
+        return render_template('feedback.html', status=status, message=message)
     return render_template('forgot-password.html')
 
 @home.route('/reset-password/<string:token>/', methods=['GET','POST'])
