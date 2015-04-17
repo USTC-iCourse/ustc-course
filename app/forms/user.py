@@ -5,7 +5,7 @@ from app.models import User
 from flask.ext.login import current_user
 import re
 
-RESERVED_USRENAME = set(['管理员',
+RESERVED_USERNAME = set(['管理员',
     'Administrator'])
 
 class LoginForm(Form):
