@@ -20,6 +20,7 @@ related_courses = db.Table('related_courses',
     db.Column('dst', db.Integer, db.ForeignKey('courses.id'), primary_key=True)
 )
 
+
 class FollowCourse(db.Model):
     __tablename__ = 'follow_course'
 
@@ -42,6 +43,16 @@ class JoinCourse(db.Model):
 
     course = db.relationship('Course')
 
+upvote_course = db.Table('upvote_course',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'))
+    )
+
+downvote_course = db.Table('downvote_course',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'))
+    )
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -63,6 +74,8 @@ class User(db.Model, UserMixin):
     _avatar = db.Column(db.String(100))
 
     courses_following = db.relationship('FollowCourse', backref='followers')
+    courses_upvoted = db.relationship('Course', secondary = upvote_course, backref='upvote_users')
+    courses_downvoted = db.relationship('Course', secondary = downvote_course, backref='downvote_users')
     student_info = db.relationship('Student', backref='user',uselist=False)
     teacher_info = db.relationship('Teacher', backref='user',uselist=False)
 

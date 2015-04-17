@@ -1,10 +1,12 @@
-from flask import Blueprint,render_template,abort,redirect,url_for,request,abort
-from app.models import Course
+from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify
+from flask.ext.login import login_required
+from app.models import Course,CourseRate
 from app.forms import ReviewForm
 
 course = Blueprint('course',__name__)
 QUERY_ORDER = [Course.term.desc(),
-        Course.kcid]
+        Course.kcid,
+        ]
 
 @course.route('/')
 def index():
@@ -34,9 +36,31 @@ def view_course(course_id,course_name=None):
             teacher=teacher,
             same_teacher_courses=same_teacher_courses)
 
-#@course.route('/<int:course_id>/<course_name>/reviews/')
+@course.route('/<int:course_id>/upvote/')
+@login_required
+def upvote(course_id):
+    course = Course.query.get(course_id)
+    if not course or course.upvoted:
+        return jsonify(ok=False)
+    if course.downvoted:
+        course.un_downvote()
+    ok = course.upvote()
+    return jsonify(ok=ok)
+
+@course.route('/<int:course_id>/downvote/')
+@login_required
+def downvote(course_id):
+    course = Course.query.get(course_id)
+    if not course or course.downvoted:
+        return jsonify(ok=False)
+    if course.upvoted:
+        course.un_upvote()
+    ok = course.downvote()
+    return jsonify(ok=ok)
+
+
 @course.route('/<int:course_id>/reviews/')
-def review(course_id, course_name=None):
+def reviews(course_id, course_name=None):
     course = Course.query.get(course_id)
     if not course:
         abort(404)

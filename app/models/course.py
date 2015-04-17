@@ -148,6 +148,60 @@ class Course(db.Model):
     def upvote_count(self):
         return self.course_rate.upvote_count
 
+    def upvote(self,user=current_user):
+        user.courses_upvoted.append(self)
+        self.course_rate.upvote_count += 1
+        db.session.add(self)
+        db.session.add(user)
+        db.session.commit()
+        return True
+        return False
+
+    def un_upvote(self,user=current_user):
+        user.courses_upvoted.remove(self)
+        self.course_rate.upvote_count -= 1
+        db.session.add(self)
+        db.session.add(user)
+        db.session.commit()
+
+    def downvote(self,user=current_user):
+        user.courses_downvoted.append(self)
+        self.course_rate.upvote_count -= 1
+        db.session.add(self)
+        db.session.add(user)
+        db.session.commit()
+        return True
+
+    def un_downvote(self,user=current_user):
+        user.courses_downvoted.remove(self)
+        self.course_rate.upvote_count += 1
+        db.session.add(self)
+        db.session.add(user)
+        db.session.commit()
+        return True
+
+    @property
+    def vote_count(self):
+        return self.course_rate.vote_count
+
+    @property
+    def voted(self,user=current_user):
+        if user in self.upvote_users or user in self.downvote_users:
+            return True
+        return False
+
+    @property
+    def upvoted(self,user=current_user):
+        if user in self.upvote_users:
+            return True
+        return False
+
+    @property
+    def downvoted(self,user=current_user):
+        if user in self.downvote_users:
+            return True
+        return False
+
 
 class CourseRate(db.Model):
     __tablename__ = 'course_rates'
