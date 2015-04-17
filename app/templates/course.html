@@ -48,7 +48,7 @@
           <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true"></span>
           <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true"></span>
           <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true"></span>
-          <span class="rl-pd-sm h4"><span class="text-muted px12">还没有人评价此课程</span>
+          <span class="rl-pd-sm h4"><span class="text-muted px12">(暂无评价)</span>
         </div>
         <ul class="text-muted list-inline list-unstyled">
             <li class="right-mg-lg">课程难度：你猜</li>
@@ -150,14 +150,14 @@
       <div class="col-md-4 rl-pd-lg">
         <div class="ud-pd-lg dashed">
           {% if course.teacher %}
-          <img class="avatar-lg cicle" src="/static/image/1.jpg"/>
+          <img class="avatar-lg cicle" src="/static/image/teacher.jpg"/>
           <h3 class="blue">{{ course.teacher.name }}</h3>
           <p>{{ course.teacher.dept.name }}</p>
           <p>研究方向：暂无</p>
           <p><a target="_blank">教师介绍：暂无</a></p>
           <div class="ud-pd-md" style="display: none"><a>教师排行榜：23</a></div>
           {% else %}
-          <img class="avatar-lg cicle" src="/static/image/1.jpg"/>
+          <img class="avatar-lg cicle" src="/static/image/teacher.jpg"/>
           <h3 class="blue">老师甲</h3>
           {% endif %}
         </div>
