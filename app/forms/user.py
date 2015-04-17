@@ -29,6 +29,15 @@ class RegisterForm(Form):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('The username has been taken!')
 
+class PasswordForm(Form):
+    old_password = PasswordField('Old password',validators=[InputRequired()])
+    password = PasswordField('password', validators=[InputRequired(),
+        EqualTo('confirm_password', message='passwords must match')])
+    confirm_password = PasswordField('confirm password')
+    def validate_old_password(form,field):
+        if not current_user.check_password(field.data):
+            raise ValidationError('Verify password failed')
+
 
 class ForgotPasswordForm(Form):
     email = StringField('Email', validators=[InputRequired('必须输入邮箱地址'),

@@ -1,6 +1,6 @@
 from flask import Blueprint,render_template,abort,redirect,url_for,request, abort
 from app.models import *
-from app.forms import LoginForm, ProfileForm
+from app.forms import LoginForm, ProfileForm,PasswordForm
 from flask.ext.login import login_user, current_user, login_required
 from app.utils import handle_upload
 
@@ -43,7 +43,12 @@ def account_settings():
 @user.route('/settings/password',methods=['GET','POST'])
 @login_required
 def password():
-    pass
+    form = PasswordForm(request.form)
+    if form.validate_on_submit():
+        current_user.set_password(form.password.data)
+        return render_template('feedback.html',status=True,message='Password changed!')
+    return render_template('password.html',form=form)
+
 
 @user.route('/<int:user_id>/avatar')
 def avatar(user_id):
