@@ -6,26 +6,28 @@
 
     <h2 class="blue">Accout Settings</h2>
     <hr>
-    <form class="form-horizontal ud-pd-md">
+    <form class="form-horizontal ud-pd-md" method="post" enctype="multipart/form-data">
+        {{ form.csrf_token }}
       <div class="form-group">
         <label class="col-sm-2 control-label">Profile picture</label>
         <div class="col-sm-5">
-          <img class="avatar-lg cicle rl-mg-md" src="/static/image/user.png"/>
+            <img class="avatar-lg cicle rl-mg-md" src="{{ user.avatar }}"/>
           <button class="btn btn-grey radius4">Upload Now</button>
+          <input type="file" name="avatar">
         </div>
       </div>
 
       <div class="form-group">
         <label class="col-sm-2 control-label">Username</label>
         <div class="col-sm-5">
-          <input type="text" class="form-control" placeholder="{{ user.username }}">
+            <input type="text" class="form-control" value="{{form.username.data}}" name="username">
         </div>
       </div>
 
       <div class="form-group">
         <label class="col-sm-2 control-label">USTC Email</label>
         <div class="col-sm-5">
-          <input type="text" class="form-control" placeholder="{{ user.email }}" disabled>
+            <input type="text" class="form-control" value="{{user.email}}" disabled>
         </div>
       </div>
 
@@ -33,7 +35,7 @@
       <div class="form-group">
         <label for="inputDescription" class="col-sm-2 control-label">About Me</label>
         <div class="col-sm-5">
-          <textarea type="text" class="form-control" rows="3" id="inputDescription" placeholder="物院大一"></textarea>
+            <textarea type="text" class="form-control" rows="3" id="inputDescription" name="description" >{{ form.description.data }}</textarea>
         </div>
       </div>
 
@@ -41,7 +43,7 @@
       <div class="form-group">
         <label class="col-sm-2 control-label">Website</label>
         <div class="col-sm-5">
-          <input type="text" class="form-control" placeholder="jenny42.com">
+            <input type="text" class="form-control" name="homepage" value="{{ form.homepage.data }}">
         </div>
       </div>
 

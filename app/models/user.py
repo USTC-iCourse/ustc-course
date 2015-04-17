@@ -55,12 +55,12 @@ class User(db.Model, UserMixin):
     identity = db.Column(db.String(20)) # 学生或者教师
     register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
-    last_login_time = db.Column(db.DateTime())
+    last_login_time = db.Column(db.DateTime())#TODO:login
 
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
-    homepage = db.Column(db.Text)
-    avatar_id = db.Column(db.Integer, db.ForeignKey('image_store.id', name='avatar_storage', use_alter=True))
-    avatar = db.relationship('ImageStore', foreign_keys='User.avatar_id', uselist=False)
+    homepage = db.Column(db.String(200))
+    description = db.Column(db.Text)
+    _avatar = db.Column(db.String(100))
 
     courses_following = db.relationship('FollowCourse', backref='followers')
     student_info = db.relationship('Student', backref='user',uselist=False)
@@ -73,6 +73,15 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return '<User {} ({})>'.format(self.email, self.password)
+
+    @property
+    def avatar(self):
+        if self._avatar:
+            return '/uploads/images/' + self._avatar
+        return '/static/image/user.png'
+
+    def set_avatar(self,avatar):
+        self._avatar = avatar
 
     @property
     def confirmed(self):

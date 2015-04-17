@@ -1,7 +1,6 @@
 from flask_wtf import Form
-from wtforms import (StringField, PasswordField, BooleanField, ValidationError)
-from wtforms.validators import (InputRequired,NumberRange, Email, EqualTo)
-
+from wtforms import (StringField, PasswordField, BooleanField, ValidationError, TextAreaField, FileField)
+from wtforms.validators import (InputRequired,NumberRange, Email, EqualTo, Length)
 from app.models import User
 import re
 
@@ -39,4 +38,8 @@ class ResetPasswordForm(Form):
         EqualTo('confirm_password', message='passwords must match')])
     confirm_password = PasswordField('confirm password')
 
-
+class ProfileForm(Form):
+    username = StringField('Username', validators=[InputRequired()])
+    description = TextAreaField('Description', validators=[Length(max=1024)])
+    homepage = StringField('Homepage', validators=[Length(max=200,message="长度不大于200")])
+    avatar = FileField('Avatar', validators=[])
