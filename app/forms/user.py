@@ -5,6 +5,9 @@ from app.models import User
 from flask.ext.login import current_user
 import re
 
+RESERVED_USRENAME = set(['管理员',
+    'Administrator'])
+
 class LoginForm(Form):
     username = StringField('Username',validators=[InputRequired()])
     password = PasswordField('Password',validators=[InputRequired()])
@@ -28,6 +31,8 @@ class RegisterForm(Form):
     def validate_username(form, field):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('The username has been taken!')
+        if field.data in RESERVED_USERNAME:
+            raise ValidationError('The username is reserved!')
 
 class PasswordForm(Form):
     old_password = PasswordField('Old password',validators=[InputRequired()])
@@ -57,3 +62,5 @@ class ProfileForm(Form):
     def validate_username(form,field):
         if field.data!=current_user.username and User.query.filter_by(username=field.data).first():
             raise ValidationError('The username has been taken!')
+        if field.data in RESERVED_USERNAME:
+            raise ValidationError('The username is reserved!')
