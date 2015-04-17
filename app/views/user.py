@@ -19,14 +19,11 @@ def view_profile(user_id):
     info = user.info # 注意，教师和学生返回的info类型不同,如果没有验证身份，则返回None
     return render_template('profile.html', user=user)
 
-@user.route('/<int:user_id>/settings/',methods=['GET','POST'])
+@user.route('/settings/',methods=['GET','POST'])
 @login_required
-def account_settings(user_id):
+def account_settings():
     '''账户设置,包括改密码等'''
-    user = User.query.get(user_id)
-    if current_user.id != user_id:
-        message = '你没有权限访问此页面'
-        return render_template('feedback.html',status=False,message=message)
+    user = current_user
     form = ProfileForm(request.form,user)
     errors = []
     if form.validate_on_submit():
@@ -43,6 +40,10 @@ def account_settings(user_id):
         user.save()
     return render_template('settings.html', user=user, errors=errors, form=form)
 
+@user.route('/settings/password',methods=['GET','POST'])
+@login_required
+def password():
+    pass
 
 @user.route('/<int:user_id>/avatar')
 def avatar(user_id):

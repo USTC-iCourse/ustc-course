@@ -1,7 +1,8 @@
 from flask_wtf import Form
 from wtforms import (StringField, PasswordField, BooleanField, ValidationError, TextAreaField, FileField)
-from wtforms.validators import (InputRequired,NumberRange, Email, EqualTo, Length)
+from wtforms.validators import (InputRequired,NumberRange, Email, EqualTo, Length, Optional)
 from app.models import User
+from flask.ext.login import current_user
 import re
 
 class LoginForm(Form):
@@ -40,6 +41,10 @@ class ResetPasswordForm(Form):
 
 class ProfileForm(Form):
     username = StringField('Username', validators=[InputRequired()])
-    description = TextAreaField('Description', validators=[Length(max=1024)])
-    homepage = StringField('Homepage', validators=[Length(max=200,message="长度不大于200")])
+    description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])
+    homepage = StringField('Homepage', validators=[Optional(),Length(max=200,message="长度不大于200")])
     avatar = FileField('Avatar', validators=[])
+
+    def validate_username(form,field):
+        if field.data!=current_user.username and User.query.filter_by(username=field.data).first():
+            raise ValidationError('The username has been taken!')
