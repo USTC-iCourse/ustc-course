@@ -20,7 +20,6 @@ def signin():
     if form.validate_on_submit():
         user,status = User.authenticate(form['username'].data,form['password'].data)
         remember = form['remember'].data
-        print(remember)
         if user and status:
             #validate uesr
             login_user(user, remember=remember)

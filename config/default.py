@@ -1,4 +1,5 @@
 # Server config
+# SERVER_NAME = 'local.ibat.me:8080'
 DEBUG = True
 SECRET_KEY = 'secret-key'
 
@@ -22,4 +23,12 @@ MAIL_ASCII_ATTACHMENTS = False
 
 # Upload config
 UPLOAD_FOLDER = '/tmp/uploads'
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+# Alowed extentsions for a filetype
+# for example 'image': set(['png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = {
+        'image':set(['png', 'jpg', 'jpeg', 'gif'])
+        }
+
+
+
+IMAGE_PATH = 'uploads/images'

@@ -9,7 +9,7 @@ debug = True
 def start():
     if debug:
         db.create_all()
-    app.run(debug=debug,host='0.0.0.0',port=8080)
+    app.run(host='0.0.0.0')
 
 
 

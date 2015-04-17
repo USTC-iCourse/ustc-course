@@ -91,9 +91,29 @@ def review_delete_comment():
     return jsonify(ok=False,message=message)
 
 
-def allowed_file(filename):
+def allowed_file(filename,type):
     return '.' in filename and \
-            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS'][type]
+
+def handel_upload(file,type):
+    if file and allowed_file(file.filename,type):
+        old_filename = file.filename
+        file_suffix = old_filename.split('.')[-1]
+        new_filename = rand_str() + '.' + file_suffix
+        try:
+            upload_path = os.path.join(app.config['UPLOAD_FOLDER'], 'images/')
+            file.save(os.path.join(upload_path, new_filename))
+        except FileNotFoundError:
+            os.makedirs(upload_path)
+            file.save(os.path.join(upload_path, new_filename))
+        except:
+            return False,"Something WRONG"
+        img = ImageStore(old_filename,new_filename)
+        return jsonify(ok=True,filename=new_filename)
+    return False,"File type disallowd!"
+
+
+
 
 @api.route('/upload/',methods=['POST'])
 @login_required
