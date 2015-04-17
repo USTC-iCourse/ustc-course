@@ -4,7 +4,10 @@ from . import app
 from flask import render_template, url_for
 from random import randint
 from datetime import datetime
+from app.models import ImageStore
 import hashlib
+import os
+
 
 mail = Mail(app)
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
@@ -48,5 +51,29 @@ def send_reset_password_mail(email):
     mail.send(msg)
 
 
+
+def allowed_file(filename,type):
+    return '.' in filename and \
+            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS'][type]
+
+def handle_upload(file,type):
+    ''' type is the file type,for example:image.
+    more file type to be added in the future.'''
+    if file and allowed_file(file.filename,type):
+        old_filename = file.filename
+        file_suffix = old_filename.split('.')[-1]
+        new_filename = rand_str() + '.' + file_suffix
+        try:
+            upload_path = os.path.join(app.config['UPLOAD_FOLDER'],type+'s/')
+            file.save(os.path.join(upload_path, new_filename))
+        except FileNotFoundError:
+            os.makedirs(upload_path)
+            file.save(os.path.join(upload_path, new_filename))
+        except Exception as e:
+            return False,e
+        img = ImageStore(old_filename,new_filename)
+        img.save()
+        return True,new_filename
+    return False,"File type disallowd!"
 
 

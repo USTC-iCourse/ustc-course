@@ -2,7 +2,7 @@ from flask import Blueprint,jsonify,request
 from flask.ext.login import login_required,current_user
 from app.models import Review, ReviewComment , User, Course, ImageStore
 from app.forms import ReviewCommentForm
-from app.utils import rand_str
+from app.utils import rand_str, handle_upload
 from app import app
 
 import re
@@ -91,27 +91,6 @@ def review_delete_comment():
     return jsonify(ok=False,message=message)
 
 
-def allowed_file(filename,type):
-    return '.' in filename and \
-            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS'][type]
-
-def handel_upload(file,type):
-    if file and allowed_file(file.filename,type):
-        old_filename = file.filename
-        file_suffix = old_filename.split('.')[-1]
-        new_filename = rand_str() + '.' + file_suffix
-        try:
-            upload_path = os.path.join(app.config['UPLOAD_FOLDER'], 'images/')
-            file.save(os.path.join(upload_path, new_filename))
-        except FileNotFoundError:
-            os.makedirs(upload_path)
-            file.save(os.path.join(upload_path, new_filename))
-        except:
-            return False,"Something WRONG"
-        img = ImageStore(old_filename,new_filename)
-        return jsonify(ok=True,filename=new_filename)
-    return False,"File type disallowd!"
-
 
 
 
@@ -119,21 +98,8 @@ def handel_upload(file,type):
 @login_required
 def upload():
     file = request.files['image']
-    if file and allowed_file(file.filename):
-        old_filename = file.filename
-        file_suffix = old_filename.split('.')[-1]
-        new_filename = rand_str() + '.' + file_suffix
-        try:
-            upload_path = os.path.join(app.config['UPLOAD_FOLDER'], 'images/')
-            file.save(os.path.join(upload_path, new_filename))
-        except FileNotFoundError:
-            os.makedirs(upload_path)
-            file.save(os.path.join(upload_path, new_filename))
-        except:
-            return jsonify(ok=False,message="Something WRONG")
-        img = ImageStore(old_filename,new_filename)
-        return jsonify(ok=True,filename=new_filename)
-    return jsonify(ok=False,message="Upload failed")
+    ok,message = handle_upload(file,'image')
+    return jsonify(ok=ok,message=message)
 
 
 

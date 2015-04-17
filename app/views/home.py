@@ -74,6 +74,11 @@ def confirm_email():
     action = request.args.get('action')
     if action == 'confirm':
         token = request.args.get('token')
+        if not token:
+            return render_template('feedback.html', status=False, message='Token error!')
+        if RT.query.get(token):
+            return render_template('feedback.html', status=False, message='Token has been used!')
+        RT.add(token)
         try:
             email = ts.loads(token, salt="email-confirm-key", max_age=86400)
         except:

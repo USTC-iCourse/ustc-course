@@ -22,3 +22,7 @@ class ImageStore(db.Model):
             self.upload_time = datetime.now()
             self.stored_filename = stored_filename
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
