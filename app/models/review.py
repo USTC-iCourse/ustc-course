@@ -86,7 +86,7 @@ class Review(db.Model):
         self.upvote_users.append(author)
         self.upvote_count +=1
         self.save()
-        return True,"Sucess!"
+        return True,"Success!"
 
     def cancel_upvote(self,author=current_user):
         if author not in self.upvote_users:
@@ -94,7 +94,7 @@ class Review(db.Model):
         self.upvote_users.remove(author)
         self.upvote_count -=1
         self.save()
-        return (True,"Sucess!")
+        return (True,"Success!")
 
 
     def save(self):

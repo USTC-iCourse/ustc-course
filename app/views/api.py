@@ -13,19 +13,19 @@ api = Blueprint('api',__name__)
 
 @api.route('/reviews/')
 def get_reviews():
-    response = {'status':'ok',
+    response = {'ok':True,
             'info':'',
             'data': []
             }
     course_id = request.args.get('course_id',type=int)
     page = request.args.get('page',1,type=int)
     if not course_id:
-        response['status'] = 'error'
+        response['ok'] = False
         response['info'] = 'Need to specify a course id'
         return jsonify(response)
     course = Course.query.get(course_id)
     if not course:
-        response['status'] = 'error'
+        response['ok'] = False
         response['info'] = 'Course can\'t found'
         return jsonify(response)
     reviews = course.reviews.paginate(page)
@@ -45,23 +45,23 @@ def get_reviews():
 def review_upvote():
     review_id = request.values.get('review_id')
     if not review_id:
-        return jsonify(status=false,message="A id must be given")
+        return jsonify(ok=false,message="A id must be given")
     review = Review.query.get(review_id)
-    status,message = review.upvote()
-    return jsonify(status=status,message=message)
+    ok,message = review.upvote()
+    return jsonify(ok=ok,message=message)
 
 @api.route('/review/cancel_upvote/',methods=['GET','POST'])
 def review_cancel_upvote():
     review_id = request.values.get('review_id')
     if not review_id:
-        return jsonify(status=False,message="A id must be given")
+        return jsonify(ok=False,message="A id must be given")
     review = Review.query.get(review_id)
     if not review:
-        return jsonify(status=False,message="The review dosen't exist.")
+        return jsonify(ok=False,message="The review dosen't exist.")
     if review.author != current_user:
-        return jsonify(status=False,message="Forbiden")
-    status,message = review.cancel_upvote()
-    return jsonify(status=status,message=message)
+        return jsonify(ok=False,message="Forbiden")
+    ok,message = review.cancel_upvote()
+    return jsonify(ok=ok,message=message)
 
 @api.route('/review/new_comment/',methods=['POST'])
 def review_new_comment():
@@ -70,25 +70,25 @@ def review_new_comment():
         review_id = request.form.get('review_id')
         review = Review.query.get(review_id)
         if not review_id:
-            return jsonify(status=False,message="The review dosen't exist.")
+            return jsonify(ok=False,message="The review dosen't exist.")
         comment = ReviewComment()
         content = request.form.get('content')
-        status,message = comment.add(review,content)
-        return jsonify(status=status,message=message,content=content)
-    return jsonify(status=False,message=form.errors)
+        ok,message = comment.add(review,content)
+        return jsonify(ok=ok,message=message,content=content)
+    return jsonify(ok=False,message=form.errors)
 
 @api.route('/review/delete_comment/',methods=['GET','POST'])
 def review_delete_comment():
     comment_id = request.values.get('id')
     if not comment_id:
-        return jsonify(status=False,message="A id must be given")
+        return jsonify(ok=False,message="A id must be given")
     comment = ReviewComment.query.filter_by(id=comment_id).first()
     if not comment:
-        return jsonify(status=False,message="The comment dosen't exist.")
+        return jsonify(ok=False,message="The comment dosen't exist.")
     if comment.author != current_user:
-        return jsonify(status=False,message="Forbiden")
-    status,message = comment.delete()
-    return jsonify(status=False,message=message)
+        return jsonify(ok=False,message="Forbiden")
+    ok,message = comment.delete()
+    return jsonify(ok=False,message=message)
 
 
 def allowed_file(filename):
@@ -110,26 +110,13 @@ def upload():
             os.makedirs(upload_path)
             file.save(os.path.join(upload_path, new_filename))
         except:
-            return jsonify(status=False,message="Something WRONG")
+            return jsonify(ok=False,message="Something WRONG")
         img = ImageStore(old_filename,new_filename)
-        return jsonify(status=True,filename=new_filename)
-    return jsonify(status=False,message="Upload failed")
+        return jsonify(ok=True,filename=new_filename)
+    return jsonify(ok=False,message="Upload failed")
 
 
 
-
-@api.route('/review_comment/',methods=['GET'])
-def get_review_comment():
-    id = request.args.get('id')
-    if not id:
-        return jsonify(status='Id not found')
-
-    review = Review.query.get(id)
-    if review:
-        comments = review.comments
-    else:
-        return jsonify(status='Id not found',data=None)
-    return jsonify(status='OK',data=comments)
 
 @api.route('/reg_verify', methods=['GET'])
 def reg_verify():

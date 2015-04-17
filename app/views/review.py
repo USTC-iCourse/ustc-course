@@ -51,19 +51,19 @@ def delete_review():
     review_id = request.form.get('id',type=int)
     if not review_id:
         message = 'You must specify a id.'
-        return jsonify(status=status,message=message)
+        return jsonify(ok=ok,message=message)
     review = Review.query.get(review_id)
-    status = False
+    ok = False
     message = 'Something wrong happend'
     if not review:
         message = 'Can\'t find the review.'
-        return jsonify(status=status,message=message)
+        return jsonify(ok=ok,message=message)
     #check if the user is the author
     if review.author != current_user:
         message = 'You have no right to do this.'
-        return jsonify(status=status,message=message)
+        return jsonify(ok=ok,message=message)
     review.delete()
-    status = True
+    ok = True
     message = 'The review has been deleted.'
-    return jsonify(status=status,message=message)
+    return jsonify(ok=ok,message=message)
 
