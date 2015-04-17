@@ -2,6 +2,7 @@ from flask import Blueprint,render_template,abort,redirect,url_for,request,abort
 from flask.ext.security import current_user,login_required
 from app.models import Course, Review
 from app.forms import ReviewForm
+from lxml.html.clean import clean_html
 
 review = Blueprint('review',__name__)
 
@@ -15,12 +16,12 @@ def new_review(course_id):
     form = ReviewForm(request.form)
     review = Review()
     if form.validate_on_submit():
+        form.content.data = clean_html(form.content.data)
         form.populate_obj(review)
         review.author = current_user
         review.course = course
         review.add()
         return redirect(url_for('course.view_course',course_id=course_id))
-    #print(form.errors)
     return render_template('new-review.html', form=form, course=course)
 
 @review.route('/edit/<int:review_id>',methods=['GET','POST'])
