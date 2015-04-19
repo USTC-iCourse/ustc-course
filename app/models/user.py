@@ -69,7 +69,7 @@ class User(db.Model, UserMixin):
     last_login_time = db.Column(db.DateTime())#TODO:login
 
     # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
-    homepage = db.Column(db.String(200))
+    homepage = db.Column(db.String(200))  # 用户博客、主页等
     description = db.Column(db.Text)
     _avatar = db.Column(db.String(100))
 
