@@ -2,7 +2,7 @@ from flask import Blueprint,render_template,abort,redirect,url_for,request,abort
 from flask.ext.security import current_user,login_required
 from app.models import Course, Review
 from app.forms import ReviewForm
-from lxml.html.clean import clean_html
+from app.utils import sanitize
 
 review = Blueprint('review',__name__)
 
@@ -16,7 +16,7 @@ def new_review(course_id):
     form = ReviewForm(request.form)
     review = Review()
     if form.validate_on_submit():
-        form.content.data = clean_html(form.content.data)
+        form.content.data = sanitize(form.content.data)
         form.populate_obj(review)
         review.author = current_user
         review.course = course
@@ -38,6 +38,7 @@ def edit_review(review_id):
     form = ReviewForm(request.form,review)
     if form.validate_on_submit():
         new_review = Review()
+        form.content.data = sanitize(form.content.data)
         form.populate_obj(new_review)
         review.update(new_review)
         course = review.course

@@ -7,7 +7,7 @@ from datetime import datetime
 from app.models import ImageStore
 import hashlib
 import os
-
+from lxml.html.clean import clean_html
 
 mail = Mail(app)
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
@@ -77,3 +77,5 @@ def handle_upload(file,type):
     return False,"File type disallowd!"
 
 
+def sanitize(text):
+    return clean_html(text)

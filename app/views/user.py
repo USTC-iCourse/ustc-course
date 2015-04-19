@@ -2,7 +2,7 @@ from flask import Blueprint,render_template,abort,redirect,url_for,request, abor
 from app.models import *
 from app.forms import LoginForm, ProfileForm,PasswordForm
 from flask.ext.login import login_user, current_user, login_required
-from app.utils import handle_upload
+from app.utils import handle_upload, sanitize
 from flask.ext.babel import gettext as _
 import re
 
@@ -31,7 +31,7 @@ def account_settings():
     errors = []
     if form.validate_on_submit():
         user.username = form['username'].data
-        user.homepage = form['homepage'].data.strip()
+        user.homepage = sanitize(form['homepage'].data.strip())
         user.description = form['description'].data.strip()
         print('\'',user.username,'\'',user.description,'\'')
         if request.files.get('avatar'):
