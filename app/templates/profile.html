@@ -7,6 +7,9 @@
 
     <div class="col-md-8">
       <h4 class="blue"><strong>关注课程</strong></h4>
+      <div>
+        
+      </div>
       <hr>
       <h4 class="blue"><strong>点评</strong></h4>
       <hr>
@@ -14,7 +17,7 @@
 
 
     <div class="col-md-4 right-col">
-      <img class="avatar-lg cicle" src="/static/image/user.png"/>
+      <img class="avatar-lg cicle" src="{{ user.avatar }}"/>
       <h3 class="blue">{{ user.username }}</h3>
 
       <div class="ud-pd-md dashed">
@@ -28,10 +31,10 @@
         <ul>
       </div>
 
-      <div class="ud-pd-md dashed">
+      <div class="ud-pd-md dashed hidden">
         <ul class="list-unstyled dark-grey">
-          <li class="ud-pd-sm">点评：</li>
           <li class="ud-pd-sm">关注：</li>
+          <li class="ud-pd-sm">被关注：</li>
         </ul>
       </div>
 

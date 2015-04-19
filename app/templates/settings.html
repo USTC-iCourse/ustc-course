@@ -23,7 +23,7 @@
       <div class="form-group">
         <label class="col-sm-2 control-label">Username</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" value="{{form.username.data}}" name="username">
+            <input type="text" class="form-control" value="{{form.username.data}}" name="username" disabled>
         </div>
       </div>
 
@@ -47,6 +47,14 @@
         <label class="col-sm-2 control-label">Website</label>
         <div class="col-sm-5">
             <input type="text" class="form-control" name="homepage" {%- if form.homepage.data %}value="{{ form.homepage.data }}"{% else %}placeholder="homepage"{% endif %}>
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Student id</label>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" name="student_id" {%- if form.homepage.data %}value="{{ form.homepage.data }}"{% else %}placeholder="homepage"{% endif %}>
         </div>
       </div>
 
