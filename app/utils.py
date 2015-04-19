@@ -78,4 +78,7 @@ def handle_upload(file,type):
 
 
 def sanitize(text):
-    return clean_html(text)
+    if text.strip():
+        return clean_html(text)
+    else:
+        return text
