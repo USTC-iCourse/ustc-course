@@ -4,7 +4,15 @@
 <div class="container">
   <div class="float-element">
 
-    {{ error }}
+    {% if error %}
+    <!-- error message display -->
+    <div class="row">
+      <div class="alert alert-danger col-sm-6" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        {{ error }}
+      </div>
+    </div>
+    {% endif %}
 
     <h3 class="blue">Sign in</h3>
     <hr>

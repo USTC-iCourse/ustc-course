@@ -3,17 +3,39 @@
 
 <div class="container">
   <div class="row float-element">
+
+
     <div class="col-md-8">
-      <h4 class="blue">关注课程</h4>
+      <h4 class="blue"><strong>关注课程</strong></h4>
       <hr>
-      <h4 class="blue">点评</h4>
+      <h4 class="blue"><strong>点评</strong></h4>
       <hr>
     </div>
+
+
     <div class="col-md-4 right-col">
       <img class="avatar-lg cicle" src="/static/image/user.png"/>
       <h3 class="blue">{{ user.username }}</h3>
-      <p>物理学院大一、LUG成员</p>
-      <p>个人博客： <a href="http://jenny42.com">jenny42.com</a></p>
+
+      <div class="ud-pd-md dashed">
+        <ul class="list-unstyled">
+          <li class="ud-pd-sm"><span class="dark-grey">简介：</span>{{ user.description }}</li>
+          <li class="ud-pd-sm"><span class="dark-grey">博客：</span> 
+            <a href="{{ user.homepage  }}">
+              <span class="glyphicon glyphicon-link" aria-hidden="true"></span> {{ user.homepage }}
+            </a>
+          </li>
+        <ul>
+      </div>
+
+      <div class="ud-pd-md dashed">
+        <ul class="list-unstyled">
+          <li class="ud-pd-sm"><span class="dark-grey">点评：</span></li>
+          <li class="ud-pd-sm"><span class="dark-grey">关注：</span></li>
+        </ul>
+      </div>
+
+
     </div>
   </div>
 </div>
