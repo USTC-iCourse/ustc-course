@@ -21,24 +21,26 @@ def signin():
     if form.validate_on_submit():
         user,status = User.authenticate(form['username'].data,form['password'].data)
         remember = form['remember'].data
-        if user and status:
-            #validate uesr
-            login_user(user, remember=remember)
-            flash('Logged in')
-            if request.args.get('ajax'):
-                return jsonify(status=200, next=next_url)
+        if user:
+            if status:
+                #validate uesr
+                login_user(user, remember=remember)
+                flash('Logged in')
+                if request.args.get('ajax'):
+                    return jsonify(status=200, next=next_url)
+                else:
+                    return redirect(next_url)
             else:
-                return redirect(next_url)
-        elif user and not user.confirmed:
-            '''没有确认邮箱的用户'''
-            message = 'Please activate your account by clicking link in your email! <a href=%s>Resend Email</a>'%url_for('.confirm_email',
-                email=user.email,
-                action='send')
-            if request.args.get('ajax'):
-                return jsonify(status=403, msg=message)
-            else:
-                return render_template('feedback.html', status=False, message=message)
-        error = _('Username or password is wrong!')
+                '''没有确认邮箱的用户'''
+                message = 'Please activate your account by clicking link in your email! <a href=%s>Resend Email</a>'%url_for('.confirm_email',
+                    email=user.email,
+                    action='send')
+                if request.args.get('ajax'):
+                    return jsonify(status=403, msg=message)
+                else:
+                    return render_template('feedback.html', status=False, message=message)
+        else:
+            error = _('Username or password is wrong!')
     #TODO: log the form errors
     if request.args.get('ajax'):
         return jsonify(status=404, msg=error)
@@ -61,6 +63,10 @@ def signup():
             user.identity = 'Student'
         elif email_suffix == 'ustc.edu.cn':
             user.identity = 'Teacher'
+            ok,message = user.bind_teacher(email)
+            user.description = user.info.description
+            user.hompage = user.info.homepage
+            #TODO: deal with bind feedback
         else:
             #TODO: log Intenal error!
             pass
@@ -78,6 +84,7 @@ def signup():
 @home.route('/confirm-email/')
 def confirm_email():
     if current_user.is_authenticated():
+        #logout_user()
         return redirect(request.args.get('next') or url_for('home.index'))
     action = request.args.get('action')
     if action == 'confirm':
@@ -100,7 +107,9 @@ def confirm_email():
     elif action == 'send':
         email = request.args.get('email')
         user = User.query.filter_by(email=email).first_or_404()
+        print(user)
         if not user.confirmed:
+            print(email)
             send_confirm_mail(email)
         return render_template('feedback.html', status=True, message=_('Email has been sent!'))
     else:

@@ -44,7 +44,7 @@ def account_settings():
         user.save()
     return render_template('settings.html', user=user, errors=errors, form=form)
 
-@user.route('/settings/password',methods=['GET','POST'])
+@user.route('/settings/password/',methods=['GET','POST'])
 @login_required
 def password():
     form = PasswordForm(request.form)
@@ -53,6 +53,39 @@ def password():
         return render_template('feedback.html',status=True,message=_('Password changed!'))
     return render_template('signin.html',form=form)
 
+@user.route('/settings/bind/',methods=['GET','POST'])
+@login_required
+def bind_identity():
+    identity = current_user.identity
+    if identity == 'Student':
+        if request.method == "POST":
+            sno = request.form.get('sno')
+            if sno:
+                ok,message = current_user.bind_student(sno)
+                current_user.save()
+                if ok:
+                    return render_template('feedback.html',status=True,message=message)
+                else:
+                    return render_template('bind-stu.html',user=current_user,error=message)
+            else:
+                error = _('You must specify a student ID!')
+                return render_template('bind-stu.html',user=current_user,error=error)
+        else:
+            return render_template('bind-stu.html',user=current_user,error=None)
+    elif identity == 'Teacher':
+        return render_template('feedback.html',status=False,message=_('You can\'t bind a teacher identity now.Please contact us for more information.'))
+    else:
+        email_suffix = current_user.email.split('@')[-1]
+        if email_suffix == 'mail.ustc.edu.cn':
+            current_user.identity = 'Student'
+            current_user.save()
+            return redirect(url_for('.bind_identity'))
+        elif email_suffix == 'ustc.edu.cn':
+            current_user.identity = 'Teacher'
+            current_user.save()
+            return redirect(url_for('.bind_identity'))
+        else:
+            return render_template('feedback.html',status=False,message=_('The server met some problem.Please contact us.'))
 
 @user.route('/<int:user_id>/avatar')
 def avatar(user_id):

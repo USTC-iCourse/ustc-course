@@ -23,7 +23,7 @@
       <div class="form-group">
         <label class="col-sm-2 control-label">Username</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" value="{{form.username.data}}" name="username" disabled>
+            <input type="text" class="form-control" value="{{ user.username }}" name="username" disabled>
         </div>
       </div>
 
@@ -50,22 +50,26 @@
         </div>
       </div>
 
-
-      <div class="form-group">
-        <label class="col-sm-2 control-label">Student id</label>
-        <div class="col-sm-5">
-          <input type="text" class="form-control" name="student_id" {%- if form.homepage.data %}value="{{ form.homepage.data }}"{% else %}placeholder="homepage"{% endif %}>
-        </div>
-      </div>
-
-
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-2">
           <button type="submit" class="btn btn-blue btn-block">Update profile</button>
         </div>
       </div>
     </form>
-
+    {% if user.info %}
+        <!-- a student's information -->
+        {% if user.is_student() %}
+        <p class="text-success">{{ _('You have bind you identity with student ID <b>%(sno)s</b>. Is it <a href=%(url)s>wrong</a>?',sno=user.info.sno,url=url_for('user.bind_identity') ) }}</p> 
+        <!-- a teacher's information -->
+        {% elif user.is_teacher() %}
+        <p class="text-success">{{ _('You have bind you identity with a teahcer info:<b>%(name)s</b>. Is it <a href=%(url)s>wrong</a>?',name=user.info.name,url=url_for('user.bind_identity') ) }}</p> 
+        {% else %}
+        <p class="text-danger">{{ _('Suprise! We found an alien. Please contact us to aware us!') }}</p>
+        {% endif %}
+    {% else %}
+        <p class="text-primary">{{ _('You have not bind a student ID. Click <a href="%(sno)">here</a> to bind one!',url=url_for('user.bind_identity')) }}
+    {% endif %}
+ 
     <h2 class="blue">Change Password</h2>
     <hr>
     <form class="form-horizontal ud-pd-md" method="post" action="{{ url_for('user.password') }}">

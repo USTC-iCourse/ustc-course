@@ -66,13 +66,15 @@ class ResetPasswordForm(Form):
     confirm_password = PasswordField('confirm password')
 
 class ProfileForm(Form):
-    username = UsernameField('Username', validators=[DataRequired(),Length(max=30,message='The length must unser 30')])
+    #username = UsernameField('Username', validators=[DataRequired(),Length(max=30,message='The length must unser 30')])
     description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])
     homepage = StringField('Homepage', validators=[Optional(),Length(max=200,message="长度不大于200")])
     avatar = FileField('Avatar', validators=[])
 
+'''
     def validate_username(form,field):
         if field.data!=current_user.username and User.query.filter_by(username=field.data).first():
             raise ValidationError('The username has been taken!')
         if field.data in RESERVED_USERNAME:
             raise ValidationError('The username is reserved!')
+        '''

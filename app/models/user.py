@@ -8,6 +8,7 @@ from random import randint
 from flask.ext.login import UserMixin
 from werkzeug.security import generate_password_hash, \
      check_password_hash
+from flask.ext.babel import gettext as _
 
 Roles = ['Admin',
         'User']
@@ -63,7 +64,9 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255),nullable=False)
     active = db.Column(db.Boolean(), default=True) # 是否已经激活
     role = db.Column(db.String(20),default='User') # 用户或者管理员
+    gender = db.Column(db.Enum('male','female','unknown'),default='unknown')
     identity = db.Column(db.Enum(Identities)) # 学生或者教师
+
     register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
     last_login_time = db.Column(db.DateTime())#TODO:login
@@ -105,11 +108,17 @@ class User(db.Model, UserMixin):
     @property
     def info(self):
         if self.identity == 'Student':
-            return self.student_info
+            return self._student_info
         elif self.identity == 'Teacher':
-            return self.teacher_info
+            return self._teacher_info
         else:
             return None
+
+    def is_student(self):
+        return self.identity == 'Student'
+
+    def is_teacher(self):
+        return self.identity == 'Teacher'
 
     def is_authenticated(self):
         return True
@@ -150,7 +159,27 @@ class User(db.Model, UserMixin):
             authenticated = False
         return user, authenticated
 
+    def bind_student(self,sno):
+        if self.identity == 'Student':
+            student = Student.query.get(sno)
+            if student:
+                self._student_info = student
+                return True,_('Bind student successed!')
+            else:
+                return False,_('Can\' find a student with ID:%(sno)s!',sno=sno)
+        else:
+            return False,_('You can\'t bind a student identity.')
 
+    def bind_teacher(self,email):
+        if self.identity == 'Teacher':
+            teacher = Teacher.query.filter_by(email=email).first()
+            if teacher:
+                self._teacher_info = teacher
+                return True,_('Bind student successed!')
+            else:
+                return False,_('Can\' find a teacher with email:%(email)s!',email=email)
+        else:
+            return False,_('You can\'t bind a teacher identity.')
 
     def save(self):
         db.session.add(self)
