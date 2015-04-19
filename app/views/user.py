@@ -30,10 +30,9 @@ def account_settings():
     form = ProfileForm(request.form,user)
     errors = []
     if form.validate_on_submit():
-        user.username = form['username'].data
+        #user.username = form['username'].data
         user.homepage = sanitize(form['homepage'].data.strip())
         user.description = form['description'].data.strip()
-        print('\'',user.username,'\'',user.description,'\'')
         if request.files.get('avatar'):
             avatar = request.files['avatar']
             ok,info = handle_upload(avatar,'image')
