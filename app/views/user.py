@@ -3,6 +3,7 @@ from app.models import *
 from app.forms import LoginForm, ProfileForm,PasswordForm
 from flask.ext.login import login_user, current_user, login_required
 from app.utils import handle_upload
+import re
 
 
 user = Blueprint('user', __name__)
@@ -19,6 +20,7 @@ def view_profile(user_id):
     info = user.info # 注意，教师和学生返回的info类型不同,如果没有验证身份，则返回None.现在没做，以后做
     return render_template('profile.html', user=user,courses_following=courses_following)
 
+
 @user.route('/settings/',methods=['GET','POST'])
 @login_required
 def account_settings():
@@ -28,8 +30,9 @@ def account_settings():
     errors = []
     if form.validate_on_submit():
         user.username = form['username'].data
-        user.homepage = form['homepage'].data
-        user.description = form['description'].data
+        user.homepage = form['homepage'].data.strip()
+        user.description = form['description'].data.strip()
+        print('\'',user.username,'\'',user.description,'\'')
         if request.files.get('avatar'):
             avatar = request.files['avatar']
             ok,info = handle_upload(avatar,'image')
