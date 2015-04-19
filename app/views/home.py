@@ -4,6 +4,7 @@ from app.models import User, RevokedToken as RT, Course, CourseRate
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask.ext.babel import gettext as _
+from datetime import datetime
 
 home = Blueprint('home',__name__)
 
@@ -64,8 +65,6 @@ def signup():
         elif email_suffix == 'ustc.edu.cn':
             user.identity = 'Teacher'
             ok,message = user.bind_teacher(email)
-            user.description = user.info.description
-            user.hompage = user.info.homepage
             #TODO: deal with bind feedback
         else:
             #TODO: log Intenal error!

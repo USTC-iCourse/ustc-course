@@ -175,6 +175,8 @@ class User(db.Model, UserMixin):
             teacher = Teacher.query.filter_by(email=email).first()
             if teacher:
                 self._teacher_info = teacher
+                self.description = teacher.description
+                self.homepage = teacher.homepage
                 return True,_('Bind student successed!')
             else:
                 return False,_('Can\' find a teacher with email:%(email)s!',email=email)
