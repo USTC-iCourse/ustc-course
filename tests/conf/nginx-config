@@ -24,18 +24,24 @@ server {
 	server_name localhost;
 
 	location / {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_redirect default;
+		proxy_pass http://127.0.0.1:8080;
+		proxy_set_header Host $http_host;
+		proxy_redirect default;
 	}
 
-    location /phpmyadmin {
-        root /var/www;
-	    index index.html index.php;
-    }
-    
+	location /uploads {
+		root /tmp;
+		autoindex off;
+	}
+
+	location /phpmyadmin {
+		root /var/www;
+		index index.html index.php;
+	}
+
 	location ~ ^/phpmyadmin/.*\.php$ {
-        root /var/www;
-	    index index.html index.php;
+		root /var/www;
+		index index.html index.php;
 
 		fastcgi_split_path_info ^(.+\.php)(/.+)$;
 		fastcgi_pass unix:/var/run/php5-fpm.sock;
