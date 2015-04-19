@@ -287,3 +287,8 @@ p { line-height: 25px; }
         width: 380px;
     }
 }
+
+label.fileupload input {
+    position: fixed;
+    top: -1000px;
+}
