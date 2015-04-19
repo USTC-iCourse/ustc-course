@@ -12,7 +12,7 @@ from werkzeug.security import generate_password_hash, \
 Roles = ['Admin',
         'User']
 
-Identidies =['Teacher',
+Identities =['Teacher',
         'Student']
 
 related_courses = db.Table('related_courses',
@@ -63,7 +63,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255),nullable=False)
     active = db.Column(db.Boolean(), default=True) # 是否已经激活
     role = db.Column(db.String(20),default='User') # 用户或者管理员
-    identity = db.Column(db.String(20)) # 学生或者教师
+    identity = db.Column(db.Enum(Identities)) # 学生或者教师
     register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
     last_login_time = db.Column(db.DateTime())#TODO:login
@@ -76,8 +76,8 @@ class User(db.Model, UserMixin):
     courses_following = db.relationship('FollowCourse', backref='followers')
     courses_upvoted = db.relationship('Course', secondary = upvote_course, backref='upvote_users')
     courses_downvoted = db.relationship('Course', secondary = downvote_course, backref='downvote_users')
-    student_info = db.relationship('Student', backref='user',uselist=False)
-    teacher_info = db.relationship('Teacher', backref='user',uselist=False)
+    _student_info = db.relationship('Student', backref='user',uselist=False)
+    _teacher_info = db.relationship('Teacher', backref='user',uselist=False)
 
     def __init__(self, username, email, password):
         self.username = username

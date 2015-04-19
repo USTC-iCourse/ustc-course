@@ -56,12 +56,20 @@ def signup():
         email = request.form.get('email')
         password = request.form.get('password')
         user = User(username=username, email=email,password=password)
+        email_suffix = email.split('@')[-1]
+        if email_suffix == 'mail.ustc.edu.cn':
+            user.identity = 'Student'
+        elif email_suffix == 'ustc.edu.cn':
+            user.identity = 'Teacher'
+        else:
+            #TODO: log Intenal error!
+            pass
         send_confirm_mail(user.email)
         user.save()
         #login_user(user)
         '''注册完毕后显示一个需要激活的页面'''
         return render_template('feedback.html', status=True, message=_('Please activate your account by clicking link in your email.'))
-#TODO: log error?
+#TODO: log error
     if form.errors:
         print(form.errors)
     return render_template('signup.html',form=form)
