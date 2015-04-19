@@ -11,7 +11,7 @@
 
     <div class="tips">
       <p>
-        Help us fix small bugs in any page. The more information you can provide us, the faster we can solve them.
+        Help us fix bugs in any page. The more information you can provide us, the faster we can resolve them.
         <br>Thanks so much!
       </p>
     </div>
@@ -37,9 +37,10 @@
       <div class="form-group">
         <label for="uploadImage" class="col-sm-2 control-label blue"></label>
         <div class="col-sm-9">
-          <button type="button" class="btn btn-link">
-            Upload Screenshots
-          </button>
+          <label class="btn btn-grey fileupload">
+            <input type="file" class="btn btn-link" name="screenshot" onchange="$('#screenshot-upload-btn').html('Screenshot Uploaded')" />
+            <span id="screenshot-upload-btn">Upload Screenshot</span>
+          </label>
         </div>
       </div>
 
