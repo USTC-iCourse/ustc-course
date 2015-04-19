@@ -1,6 +1,6 @@
 from flask_wtf import Form
 from wtforms import (StringField, PasswordField, BooleanField, ValidationError, TextAreaField, FileField)
-from wtforms.validators import (InputRequired,NumberRange, Email, EqualTo, Length, Optional)
+from wtforms.validators import (DataRequired,NumberRange, Email, EqualTo, Length, Optional)
 from app.models import User
 from flask.ext.login import current_user
 import re
@@ -8,16 +8,25 @@ import re
 RESERVED_USERNAME = set(['管理员',
     'Administrator'])
 
+def strip_username(input_s):
+    strip_p = re.compile('\s+')
+    return strip_p.sub('',input_s)
+
+class UsernameField(StringField):
+    ''' a cumstom field of username '''
+    def process_data(self,value):
+        self.data = strip_username(value)
+
 class LoginForm(Form):
-    username = StringField('Username',validators=[InputRequired()])
-    password = PasswordField('Password',validators=[InputRequired()])
+    username = UsernameField('Username',validators=[DataRequired(), Length(max=30,message='The length must unser 30')])
+    password = PasswordField('Password',validators=[DataRequired()])
     remember = BooleanField('Remember me',default=False)
 
 
 class RegisterForm(Form):
-    username = StringField('Username', validators=[InputRequired()])
-    email = StringField('Email', validators=[InputRequired(), Email()])
-    password = PasswordField('password', validators=[InputRequired(),
+    username = UsernameField('Username', validators=[DataRequired(), Length(max=30,message='The length must unser 30')])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('password', validators=[DataRequired(),
         EqualTo('confirm_password', message='passwords must match')])
     confirm_password = PasswordField('confirm password')
 
@@ -35,8 +44,8 @@ class RegisterForm(Form):
             raise ValidationError('The username is reserved!')
 
 class PasswordForm(Form):
-    old_password = PasswordField('Old password',validators=[InputRequired()])
-    password = PasswordField('password', validators=[InputRequired(),
+    old_password = PasswordField('Old password',validators=[DataRequired()])
+    password = PasswordField('password', validators=[DataRequired(),
         EqualTo('confirm_password', message='passwords must match')])
     confirm_password = PasswordField('confirm password')
     def validate_old_password(form,field):
@@ -45,16 +54,16 @@ class PasswordForm(Form):
 
 
 class ForgotPasswordForm(Form):
-    email = StringField('Email', validators=[InputRequired('必须输入邮箱地址'),
+    email = StringField('Email', validators=[DataRequired('必须输入邮箱地址'),
         Email()])
 
 class ResetPasswordForm(Form):
-    password = PasswordField('password', validators=[InputRequired(),
+    password = PasswordField('password', validators=[DataRequired(),
         EqualTo('confirm_password', message='passwords must match')])
     confirm_password = PasswordField('confirm password')
 
 class ProfileForm(Form):
-    username = StringField('Username', validators=[InputRequired()])
+    username = UsernameField('Username', validators=[DataRequired(),Length(max=30,message='The length must unser 30')])
     description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])
     homepage = StringField('Homepage', validators=[Optional(),Length(max=200,message="长度不大于200")])
     avatar = FileField('Avatar', validators=[])
