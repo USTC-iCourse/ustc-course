@@ -1,1 +1,16 @@
-<a href={{ confirm_url}} >Confirm </a>
+{% include 'email/email-css.html' %}
+
+<p>您好！</p>
+
+<p>欢迎加入 USTC 评课社区。请点击下面的链接确认您的帐户。</p>
+
+<p><a href="{{ confirm_url }}">{{ confirm_url }}</a></p>
+
+<p>（如果该链接不能点击，请将其复制到浏览器地址栏中）</p>
+
+<p>如果您未曾加入 USTC 评课社区，请忽略此邮件。</p>
+
+<p>&nbsp;</p>
+
+<p>此致，<br />
+USTC 评课社区</p>
