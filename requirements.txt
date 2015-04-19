@@ -4,3 +4,8 @@ Flask-SQLAlchemy
 Flask-login
 itsdangerous
 flask-mail
+lxml
+flask-script
+flask-migrate
+flask-security
+flask-mysqldb
