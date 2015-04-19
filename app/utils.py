@@ -47,7 +47,7 @@ def send_reset_password_mail(email):
     html = render_template('email/reset-password.html',
             reset_url = reset_url)
 
-    msg = Message(subject=subject, html=html, sender='test@ibat.me', recipients=[email])
+    msg = Message(subject=subject, html=html, recipients=[email])
     mail.send(msg)
 
 
