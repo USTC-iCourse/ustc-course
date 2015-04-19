@@ -33,7 +33,7 @@ def send_confirm_mail(email):
     html = render_template('email/activate.html',
             confirm_url = confirm_url)
 
-    msg = Message(subject=subject, html=html, sender='test@ibat.me', recipients=[email])
+    msg = Message(subject=subject, html=html, recipients=[email])
     mail.send(msg)
 
 def send_reset_password_mail(email):

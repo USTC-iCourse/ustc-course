@@ -1,5 +1,5 @@
 # Server config
-# SERVER_NAME = 'local.ibat.me:8080'
+SERVER_NAME = None
 DEBUG = True
 SECRET_KEY = 'secret-key'
 
@@ -17,7 +17,7 @@ MAIL_USE_SSL = False
 MAIL_DEBUG = DEBUG
 MAIL_USERNAME = None
 MAIL_PASSWORD = None
-MAIL_DEFAULT_SENDER = 'test@ibat.me'
+MAIL_DEFAULT_SENDER = 'support@icourse.freeshell.ustc.edu.cn'
 MAIL_MAX_EMAILS = None
 #MAIL_SUPPRESS_SEND =
 MAIL_ASCII_ATTACHMENTS = False
