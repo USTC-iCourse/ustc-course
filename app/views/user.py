@@ -51,7 +51,7 @@ def password():
     if form.validate_on_submit():
         current_user.set_password(form.password.data)
         return render_template('feedback.html',status=True,message=_('Password changed!'))
-    return render_template('password.html',form=form)
+    return render_template('signin.html',form=form)
 
 
 @user.route('/<int:user_id>/avatar')
