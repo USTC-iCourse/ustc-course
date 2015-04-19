@@ -60,15 +60,40 @@
 
     <h2 class="blue">Change Password</h2>
     <hr>
-    <form class="form-horizontal">
+    <form class="form-horizontal ud-pd-md" method="post" action="{{ url_for('user.password') }}">
+    {{ form.csrf_token }}
       <div class="form-group">
-        <label class="col-sm-2 control-label">Change Password</label>
+        <label class="col-sm-2 control-label">Old Password</label>
         <div class="col-sm-5">
-          <a class="btn btn-link" href="{{ url_for('home.change_password') }}">Send Email to change password</a>
+          <input type="password" class="form-control" name="old_password">
         </div>
       </div>
 
-    </div> <!-- end float-element -->
-  </div> <!-- end container -->
+      <div class="form-group">
+        <label class="col-sm-2 control-label">New Password</label>
+        <div class="col-sm-5">
+          <input type="password" class="form-control" name="password">
+        </div>
+      </div>
 
-  {% endblock %}
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Confirm Password</label>
+        <div class="col-sm-5">
+          <input type="password" class="form-control" name="confirm_password">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-2">
+          <button type="submit" class="btn btn-blue btn-block">Submit</button>
+        </div>
+      </div>
+    </form>
+
+
+    <a class="btn btn-link" href="{{ url_for('home.change_password') }}">Or Send Email to change password</a>
+
+  </div> <!-- end float-element -->
+</div> <!-- end container -->
+
+{% endblock %}
