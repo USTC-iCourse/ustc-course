@@ -28,6 +28,11 @@ server {
         proxy_redirect default;
 	}
 
+    location /uploads {
+        root /tmp;
+        autoindex off;
+    }
+
     location /phpmyadmin {
         root /var/www;
 	    index index.html index.php;
