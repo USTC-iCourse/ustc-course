@@ -9,3 +9,4 @@ flask-script
 flask-migrate
 flask-security
 flask-mysqldb
+flask-babel
