@@ -3,6 +3,7 @@ from app.models import *
 from app.forms import LoginForm, ProfileForm,PasswordForm
 from flask.ext.login import login_user, current_user, login_required
 from app.utils import handle_upload
+from flask.ext.babel import gettext as _
 import re
 
 
@@ -13,7 +14,7 @@ def view_profile(user_id):
     '''用户的个人主页,展示用户在站点的活跃情况'''
     user = User.query.get(user_id)
     if not user:
-        message = '找不到该用户'
+        message = _('Sorry.But we can\'t find the user!')
         return render_template('feedback.html',status=False,message=message)
 
     courses_following = user.courses_following
@@ -39,7 +40,7 @@ def account_settings():
             if ok:
                 user.set_avatar(info)
             else:
-                errors.append("Avatar upload failed")
+                errors.append(_("Avatar upload failed"))
         user.save()
     return render_template('settings.html', user=user, errors=errors, form=form)
 
@@ -49,7 +50,7 @@ def password():
     form = PasswordForm(request.form)
     if form.validate_on_submit():
         current_user.set_password(form.password.data)
-        return render_template('feedback.html',status=True,message='Password changed!')
+        return render_template('feedback.html',status=True,message=_('Password changed!'))
     return render_template('password.html',form=form)
 
 

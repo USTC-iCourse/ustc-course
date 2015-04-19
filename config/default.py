@@ -4,6 +4,12 @@ DEBUG = True
 SECRET_KEY = 'secret-key'
 
 
+# available languages
+LANGUAGES = {
+        'en': 'English',
+        'zh': '中文'
+        }
+
 
 # SQL config
 #SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://ustc_course:ustc_course@localhost/icourse?charset=utf8'

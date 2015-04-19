@@ -33,7 +33,7 @@ def edit_review(review_id):
 
     #check if the user is the author
     if review.author != current_user:
-        return 'You have no right to do this'
+        return _('You have no right to do this')
 
     form = ReviewForm(request.form,review)
     if form.validate_on_submit():
@@ -51,20 +51,20 @@ def edit_review(review_id):
 def delete_review():
     review_id = request.form.get('id',type=int)
     if not review_id:
-        message = 'You must specify a id.'
+        message = _('You must specify a id.')
         return jsonify(ok=ok,message=message)
     review = Review.query.get(review_id)
     ok = False
-    message = 'Something wrong happend'
+    message = _('Something wrong happend.')
     if not review:
-        message = 'Can\'t find the review.'
+        message = _('Can\'t find the review.')
         return jsonify(ok=ok,message=message)
     #check if the user is the author
     if review.author != current_user:
-        message = 'You have no right to do this.'
+        message = _('You have no right to do this.')
         return jsonify(ok=ok,message=message)
     review.delete()
     ok = True
-    message = 'The review has been deleted.'
+    message = _('The review has been deleted.')
     return jsonify(ok=ok,message=message)
 

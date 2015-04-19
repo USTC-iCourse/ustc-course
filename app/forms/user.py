@@ -15,7 +15,10 @@ def strip_username(input_s):
 class UsernameField(StringField):
     ''' a cumstom field of username '''
     def process_data(self,value):
-        self.data = strip_username(value)
+        if value:
+            self.data = strip_username(value)
+        else:
+            self.data = value
 
 class LoginForm(Form):
     username = UsernameField('Username',validators=[DataRequired(), Length(max=30,message='The length must unser 30')])

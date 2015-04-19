@@ -3,6 +3,7 @@ from flask.ext.login import login_user, login_required, current_user, logout_use
 from app.models import User, RevokedToken as RT, Course, CourseRate
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
+from flask.ext.babel import gettext as _
 
 home = Blueprint('home',__name__)
 
@@ -37,7 +38,7 @@ def signin():
                 return jsonify(status=403, msg=message)
             else:
                 return render_template('feedback.html', status=False, message=message)
-        error = '用户名或密码错误'
+        error = _('Username or password is wrong!')
     #TODO: log the form errors
     if request.args.get('ajax'):
         return jsonify(status=404, msg=error)
@@ -57,10 +58,9 @@ def signup():
         user = User(username=username, email=email,password=password)
         send_confirm_mail(user.email)
         user.save()
-        flash('registered')
         #login_user(user)
         '''注册完毕后显示一个需要激活的页面'''
-        return render_template('feedback.html', status=True, message='Please activate your account by clicking link in your email.')
+        return render_template('feedback.html', status=True, message=_('Please activate your account by clicking link in your email.'))
 #TODO: log error?
     if form.errors:
         print(form.errors)
@@ -75,9 +75,9 @@ def confirm_email():
     if action == 'confirm':
         token = request.args.get('token')
         if not token:
-            return render_template('feedback.html', status=False, message='Token error!')
+            return render_template('feedback.html', status=False, message=_('Token error!'))
         if RT.query.get(token):
-            return render_template('feedback.html', status=False, message='Token has been used!')
+            return render_template('feedback.html', status=False, message=_('Token has been used!'))
         RT.add(token)
         try:
             email = ts.loads(token, salt="email-confirm-key", max_age=86400)
@@ -86,7 +86,7 @@ def confirm_email():
 
         user = User.query.filter_by(email=email).first_or_404()
         user.confirm()
-        flash('Your email has been confirmed')
+        flash(_('Your email has been confirmed'))
         login_user(user)
         return redirect(url_for('home.index'))
     elif action == 'send':
@@ -94,9 +94,9 @@ def confirm_email():
         user = User.query.filter_by(email=email).first_or_404()
         if not user.confirmed:
             send_confirm_mail(email)
-        return render_template('feedback.html', status=True, message='Email has been sent!')
+        return render_template('feedback.html', status=True, message=_('Email has been sent!'))
     else:
-        return 404
+        abort(404)
 
 
 @home.route('/logout/')
@@ -111,7 +111,7 @@ def change_password():
     if not current_user.is_authenticated():
         return redirect(url_for('home.signin'))
     send_reset_password_mail(current_user.email)
-    return render_template('feedback.html', status=True, message='Reset password mail sent')
+    return render_template('feedback.html', status=True, message=_('Reset password mail sent'))
 
 
 @home.route('/reset-password/', methods=['GET','POST'])
@@ -125,10 +125,10 @@ def forgot_password():
         user = User.query.filter_by(email=email).first()
         if user:
             send_reset_password_mail(email)
-            message = 'Reset password mail sent.'  #一个反馈信息
+            message = _('Reset password mail sent.')  #一个反馈信息
             status = True
         else:
-            message = 'The email has not been registered'
+            message = _('The email has not been registered')
             status = False
         return render_template('feedback.html', status=status, message=message)
     return render_template('forgot-password.html')
@@ -139,7 +139,7 @@ def reset_password(token):
     if current_user.is_authenticated():
         return redirect(request.args.get('next') or url_for('home.index'))
     if RT.query.get(token):
-        return render_template('feedback.html', status=False, message='Token has been used')
+        return render_template('feedback.html', status=False, message=_('Token has been used'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         RT.add(token)
