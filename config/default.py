@@ -39,3 +39,11 @@ ALLOWED_EXTENSIONS = {
 
 
 IMAGE_PATH = 'uploads/images'
+
+
+# Debugbar Settings
+# Enable the profiler on all requests
+DEBUG_TB_PROFILER_ENABLED = True
+# Enable the template editor
+DEBUG_TB_TEMPLATE_EDITOR_ENABLED =True
+DEBUG_TB_INTERCEPT_REDIRECTS = False

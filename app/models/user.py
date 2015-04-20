@@ -27,7 +27,7 @@ follow_course = db.Table('follow_course',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
 )
 
-join_course = db.Table('join_course', 
+join_course = db.Table('join_course',
     db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
     db.Column('student_id', db.String(20), db.ForeignKey('students.sno'), primary_key=True)
 )
@@ -86,6 +86,10 @@ class User(db.Model, UserMixin):
 
     def set_avatar(self,avatar):
         self._avatar = avatar
+
+    @property
+    def courses_reviewd(self):
+        pass
 
     @property
     def confirmed(self):

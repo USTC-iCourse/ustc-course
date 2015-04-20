@@ -10,3 +10,5 @@ flask-migrate
 flask-security
 flask-mysqldb
 flask-babel
+# for debug only
+flask-debugtoolbar

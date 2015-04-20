@@ -12,10 +12,13 @@ from flask.ext.login import LoginManager,current_user,user_logged_in,user_loaded
 from flask_wtf.csrf import CsrfProtect
 from flask.ext.babel import Babel
 from datetime import datetime
+from flask_debugtoolbar import DebugToolbarExtension
+
 
 app = Flask(__name__)
 app.config.from_object('config.default')
 
+toolbar = DebugToolbarExtension(app)
 
 db = SQLAlchemy(app)
 CsrfProtect(app)
