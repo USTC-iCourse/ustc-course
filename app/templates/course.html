@@ -60,22 +60,22 @@
 
         <table class="table table-condensed no-border">
           <tr>
-            <td><strong>学科类别：</strong>{{ course.course_major }}</td>
-            <td><strong>开课单位：</strong>{{ course.dept }}</td>
+            <td><strong>学科类别：</strong>{{ course.course_major or '未知' }}</td>
+            <td><strong>开课单位：</strong>{{ course.dept or '未知' }}</td>
           </tr>
           <tr>
-            <td><strong>课程层次：</strong>{{ course.course_level }}</td>
-            <td><strong>周学时：</strong>{{ course.hours_per_week }}</td>
+            <td><strong>课程层次：</strong>{{ course.course_level or '未知' }}</td>
+            <td><strong>周学时：</strong>{{ course.hours_per_week or '未知' }}</td>
           </tr>
           <tr>
-            <td><strong>评分制：</strong>{{ course.grading_type }}</td>
-            <td><strong>学分：</strong>{{ course.credit }}
+            <td><strong>评分制：</strong>{{ course.grading_type or '未知' }}</td>
+            <td><strong>学分：</strong>{{ course.credit or '未知' }}
               <span class="float-right"><a href="http://mis.teach.ustc.edu.cn/gradkcjs.do?kcid={{ course.kcid }}" target="_blank">更多信息</a><span></td>
           </tr>
           </tbody>
         </table>
 
-        <p>课程主页：暂无</p>
+        <p>课程主页：{{ course.homepage or '暂无' }}</p>
 
         <div class="ud-pd-md">
           <button class="btn btn-blue btn-flat" type="submit">关注 <span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button>
