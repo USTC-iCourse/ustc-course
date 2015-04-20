@@ -46,3 +46,4 @@ IMAGE_PATH = 'uploads/images'
 DEBUG_TB_PROFILER_ENABLED = True
 # Enable the template editor
 DEBUG_TB_TEMPLATE_EDITOR_ENABLED =True
+DEBUG_TB_INTERCEPT_REDIRECTS = False

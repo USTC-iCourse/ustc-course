@@ -7,7 +7,7 @@ from app.utils import sanitize
 review = Blueprint('review',__name__)
 
 
-@review.route('/new/<int:course_id>',methods=['GET','POST'])
+@review.route('/new/<int:course_id>/',methods=['GET','POST'])
 @login_required
 def new_review(course_id):
     course = Course.query.get(course_id)
@@ -24,7 +24,7 @@ def new_review(course_id):
         return redirect(url_for('course.view_course',course_id=course_id))
     return render_template('new-review.html', form=form, course=course)
 
-@review.route('/edit/<int:review_id>',methods=['GET','POST'])
+@review.route('/edit/<int:review_id>/',methods=['GET','POST'])
 @login_required
 def edit_review(review_id):
     review = Review.query.get(review_id)

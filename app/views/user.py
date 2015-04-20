@@ -20,7 +20,7 @@ def view_profile(user_id):
     courses_following = user.courses_following
     info = user.info # 注意，教师和学生返回的info类型不同,如果没有验证身份，则返回None.现在没做，以后做
     if info:
-        courses_joined = user.info.courses_joined.all()
+        courses_joined = user.info.courses_joined
     else:
         courses_joined = None
     num_review = request.args.get('num_review',5,type=int)
