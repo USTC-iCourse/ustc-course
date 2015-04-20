@@ -58,7 +58,7 @@ class Course(db.Model):
 
     __table_args__ = (db.UniqueConstraint('cno', 'term'), )
 
-    teachers = db.relationship('Teacher', secondary=course_teachers, backref='courses',lazy="joined")
+    teachers = db.relationship('Teacher', secondary=course_teachers, backref=db.backref('courses',lazy='dynamic'),lazy="joined")
     reviews = db.relationship('Review', backref='course', lazy='dynamic')
     notes = db.relationship('Note', backref='course', lazy='dynamic')
     forum_threads = db.relationship('ForumThread', backref='course', lazy='dynamic')
