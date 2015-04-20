@@ -231,6 +231,7 @@ $(function() {
             var undo_btn = $('.btn-' + action).filter('.btn-undo');
 
             function update_count(count) {
+                d.count = count;
                 $('.btn-' + action + ' .count').text(count);
             }
             function http_post_wrapper(url) {
@@ -241,24 +242,29 @@ $(function() {
             }
 
             do_btn.click(function() {
-                http_post_wrapper(d.do_url);
+                if (d.enabled)
+                    return;
+                console.log(action_data);
                 do_btn.hide();
                 undo_btn.show();
                 d.enabled = true;
-                d.count++;
+                update_count(d.count + 1);
                 if (d.conflict && action_data[d.conflict].enabled) {
                     $('.btn-' + d.conflict).filter('.btn-undo').click();
                 }
-                update_count(d.count);
+                http_post_wrapper(d.do_url);
             });
 
             undo_btn.click(function() {
-                http_post_wrapper(d.undo_url);
+                if (!d.enabled)
+                    return;
+                console.log('undo ' + action);
+                console.log(action_data);
                 undo_btn.hide();
                 do_btn.show();
                 d.enabled = false;
-                d.count--;
-                update_count(d.count);
+                update_count(d.count - 1);
+                http_post_wrapper(d.undo_url);
             });
 
             update_count(d.count);
