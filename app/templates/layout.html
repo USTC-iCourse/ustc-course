@@ -105,6 +105,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
+    {% include 'common-scripts.html' %}
     <script>
      $('#signin').on('shown.bs.modal', function () {
        $('#inputEmail').focus()
@@ -146,7 +147,6 @@
      });
     </script>
 
-    {% block script %}
-    {% endblock %}
+    {% block script %} {% endblock %}
   </body>
 </html>
