@@ -175,7 +175,7 @@ def reset_password(token):
 @home.route('/search/')
 def search():
     ''' 搜索 '''
-    keywords = request.args.get('q').split(' ')
+    keyword = request.args.get('q')
     if not keyword:
         return redirect(url_for('home.index'))
 
