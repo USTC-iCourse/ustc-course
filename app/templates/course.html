@@ -77,15 +77,18 @@
 
         <p>课程主页：{{ course.homepage or '暂无' }}</p>
 
-        <div class="ud-pd-md">
-          <button class="btn btn-blue btn-flat" type="submit">关注 <span class="glyphicon glyphicon-heart" aria-hidden="true"></span></button>
-          <button class="btn btn-blue btn-flat" type="submit">推荐 <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></button>
-            <button class="btn btn-blue btn-flat" type="submit">不推荐 <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></button>
-              <span class="float-right" style="display: none" target="_blank"><a>查看同班同学</a></span>
+        <div id="action-btn-group" class="ud-pd-md" style="display:none">
+            <button class="btn btn-white btn-flat btn-follow btn-do"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span> 关注 <small>(<span class="count"></span>)</small></button>
+            <button class="btn btn-blue btn-flat btn-follow btn-undo"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> 关注 <small>(<span class="count"></span>)</small></button>
+
+            <button class="btn btn-white btn-flat btn-upvote btn-do"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> 推荐 <small>(<span class="count"></span>)</small></button>
+            <button class="btn btn-blue btn-flat btn-upvote btn-undo"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> 推荐 <small>(<span class="count"></span>)</small></button>
+
+            <button class="btn btn-white btn-flat btn-downvote btn-do"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 不推荐 <small>(<span class="count"></span>)</small></button>
+            <button class="btn btn-blue btn-flat btn-downvote btn-undo"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 不推荐 <small>(<span class="count"></span>)</small></button>
+
+            <span class="float-right" style="display: none" target="_blank"><a>查看{{ course.join_count }}位同班同学</a></span>
         </div>
-        <p>推荐: {{ course.upvote_count }}
-
-
 
         <div class="solid ud-pd-md inline-h3">
           <span class="blue h3">点评</span>
@@ -185,5 +188,91 @@
    e.preventDefault()
    $(this).tab('show')
  })
+
+var action_data = {
+    'follow': {
+        'enabled': {{ 'true' if course.following else 'false' }},
+        'count': {{ course.follow_count or 0 }},
+        'do_url': "{{ url_for('course.follow', course_id=course.id) }}",
+        'undo_url': "{{ url_for('course.unfollow', course_id=course.id) }}",
+    },
+    'downvote': {
+        'enabled': {{ 'true' if course.downvoted else 'false' }},
+        'count': {{ course.downvote_count or 0 }},
+        'do_url': "{{ url_for('course.downvote', course_id=course.id) }}",
+        'undo_url': "{{ url_for('course.undo_downvote', course_id=course.id) }}",
+        'conflict': 'upvote',
+    },
+    'upvote': {
+        'enabled': {{ 'true' if course.upvoted else 'false' }},
+        'count': {{ course.upvote_count or 0 }},
+        'do_url': "{{ url_for('course.upvote', course_id=course.id) }}",
+        'undo_url': "{{ url_for('course.undo_upvote', course_id=course.id) }}",
+        'conflict': 'downvote',
+    },
+    'join': {
+        'enabled': {{ 'true' if course.joined else 'false' }},
+        'count': {{ course.join_count or 0 }},
+        'do_url': "{{ url_for('course.join', course_id=course.id) }}",
+        'undo_url': "{{ url_for('course.quit', course_id=course.id) }}",
+    },
+}
+
+$(function() {
+    for (action in action_data) {
+
+        if (! $('.btn-' + action).length)
+            continue;
+
+        (function(action) {
+            var d = action_data[action];
+
+            var do_btn = $('.btn-' + action).filter('.btn-do');
+            var undo_btn = $('.btn-' + action).filter('.btn-undo');
+
+            function update_count(count) {
+                $('.btn-' + action + ' .count').text(count);
+            }
+            function http_post_wrapper(url) {
+                $.post(url, null, function(o) {
+                    if (o.count)
+                        update_count(o.count);
+                }, 'json');
+            }
+
+            do_btn.click(function() {
+                http_post_wrapper(d.do_url);
+                do_btn.hide();
+                undo_btn.show();
+                d.enabled = true;
+                d.count++;
+                if (d.conflict && action_data[d.conflict].enabled) {
+                    $('.btn-' + d.conflict).filter('.btn-undo').click();
+                }
+                update_count(d.count);
+            });
+
+            undo_btn.click(function() {
+                http_post_wrapper(d.undo_url);
+                undo_btn.hide();
+                do_btn.show();
+                d.enabled = false;
+                d.count--;
+                update_count(d.count);
+            });
+
+            update_count(d.count);
+
+            if (d.enabled) {
+                undo_btn.show();
+                do_btn.hide();
+            } else {
+                do_btn.show();
+                undo_btn.hide();
+            }
+        })(action);
+    }
+    $('#action-btn-group').show();
+});
 </script>
 {% endblock %}
