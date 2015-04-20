@@ -67,7 +67,7 @@
         <p class="text-danger">{{ _('Suprise! We found an alien. Please contact us to aware us!') }}</p>
         {% endif %}
     {% else %}
-        <p class="text-primary">{{ _('You have not bind a student ID. Click <a href="%(sno)">here</a> to bind one!',url=url_for('user.bind_identity')) }}
+        <p class="text-primary">{{ _('You have not bind a student ID. Click <a href="%(url)s">here</a> to bind one!', url=url_for('user.bind_identity')) }}
     {% endif %}
  
     <h2 class="blue">Change Password</h2>
