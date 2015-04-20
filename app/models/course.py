@@ -59,12 +59,15 @@ class Course(db.Model):
     __table_args__ = (db.UniqueConstraint('cno', 'term'), )
 
     teachers = db.relationship('Teacher', secondary=course_teachers, backref='courses')
-    #:followers : backref to User
-    #students : backref to Student
     reviews = db.relationship('Review', backref='course', lazy='dynamic')
     notes = db.relationship('Note', backref='course', lazy='dynamic')
     forum_threads = db.relationship('ForumThread', backref='course', lazy='dynamic')
     shares = db.relationship('Share', backref='course', lazy='dynamic')
+
+    #students  : backref to Student
+    #followers : backref to User
+    #upvote_users: backref to User
+    #downvote_users: backref to User
 
     _course_rate = db.relationship('CourseRate', backref='course', uselist=False, lazy='joined')
 

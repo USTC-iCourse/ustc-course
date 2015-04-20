@@ -22,27 +22,15 @@ related_courses = db.Table('related_courses',
 )
 
 
-class FollowCourse(db.Model):
-    __tablename__ = 'follow_course'
+follow_course = db.Table('follow_course',
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+)
 
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-
-    follow_time = db.Column(db.DateTime)
-
-    course = db.relationship('Course')
-
-class JoinCourse(db.Model):
-    __tablename__ = 'join_course'
-
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), primary_key=True)
-    student_id = db.Column(db.String(20), db.ForeignKey('students.sno'), primary_key=True)
-
-    course_type = db.Column(db.String(1))    # 课程类别
-    course_attr = db.Column(db.String(1))    # 课程属性
-    join_time = db.Column(db.DateTime)  # 选课时间
-
-    course = db.relationship('Course')
+join_course = db.Table('join_course', 
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
+    db.Column('student_id', db.String(20), db.ForeignKey('students.sno'), primary_key=True)
+)
 
 upvote_course = db.Table('upvote_course',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
@@ -76,7 +64,7 @@ class User(db.Model, UserMixin):
     description = db.Column(db.Text)
     _avatar = db.Column(db.String(100))
 
-    courses_following = db.relationship('FollowCourse', backref='followers')
+    courses_following = db.relationship('Course', secondary = follow_course, backref='followers')
     courses_upvoted = db.relationship('Course', secondary = upvote_course, backref='upvote_users')
     courses_downvoted = db.relationship('Course', secondary = downvote_course, backref='downvote_users')
     _student_info = db.relationship('Student', backref='user',uselist=False)
@@ -214,7 +202,7 @@ class Student(db.Model):
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     dept = db.relationship('Dept', backref='students')
-    courses_joined = db.relationship('JoinCourse', backref='students')
+    courses_joined = db.relationship('Course', secondary = join_course, backref='students')
 
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
