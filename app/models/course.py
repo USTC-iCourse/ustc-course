@@ -151,6 +151,10 @@ class Course(db.Model):
     def upvote_count(self):
         return self.course_rate.upvote_count
 
+    @property
+    def downvote_count(self):
+        return self.course_rate.downvote_count
+
     def upvote(self,user=current_user):
         user.courses_upvoted.append(self)
         self.course_rate.upvote_count += 1
@@ -169,7 +173,7 @@ class Course(db.Model):
 
     def downvote(self,user=current_user):
         user.courses_downvoted.append(self)
-        self.course_rate.upvote_count -= 1
+        self.course_rate.downvote_count += 1
         db.session.add(self)
         db.session.add(user)
         db.session.commit()
@@ -177,15 +181,11 @@ class Course(db.Model):
 
     def un_downvote(self,user=current_user):
         user.courses_downvoted.remove(self)
-        self.course_rate.upvote_count += 1
+        self.course_rate.downvote_count -= 1
         db.session.add(self)
         db.session.add(user)
         db.session.commit()
         return True
-
-    @property
-    def vote_count(self):
-        return self.course_rate.vote_count
 
     @property
     def voted(self,user=current_user):
@@ -205,6 +205,51 @@ class Course(db.Model):
             return True
         return False
 
+    def follow(self, user=current_user):
+        if user in self.followers:
+            return False
+        self.followers.append(user)
+        self.course_rate.follow_count += 1
+        db.session.commit()
+        return True
+
+    def unfollow(self, user=current_user):
+        if not user in self.followers:
+            return False
+        self.followers.remove(user)
+        self.course_rate.follow_count -= 1
+        db.session.commit()
+        return True
+
+    @property
+    def following(self, user=current_user):
+        if user in self.followers:
+            return True
+        else:
+            return False
+
+    @property
+    def follow_count(self):
+        return self.course_rate.follow_count
+
+    @property
+    def student_count(self):
+        return len(self.students)
+
+    def join(self):
+        if not user.is_student or user.info in self.students:
+            return False
+        self.students.append(user.info)
+        db.session.commit()
+        return True
+
+    def quit(self):
+        if not user.is_student or not user.info in self.students:
+            return False
+        self.students.remove(user.info)
+        db.session.commit()
+        return True
+
 
 class CourseRate(db.Model):
     __tablename__ = 'course_rates'
@@ -217,6 +262,9 @@ class CourseRate(db.Model):
     _rate_total = db.Column(db.Integer,default=0)
     review_count = db.Column(db.Integer,default=0) #点评数
     upvote_count = db.Column(db.Integer,default=0) #推荐人数
+    downvote_count = db.Column(db.Integer,default=0) #不推荐人数
+    follow_count = db.Column(db.Integer,default=0) #关注人数
+    join_count = db.Column(db.Integer,default=0) #加入课程人数
 
     @property
     def difficulty(self):
