@@ -12,11 +12,11 @@
           <a>（10门）</a>
         </div>
 
-        {% for follow in courses_following %}
+        {% for course in courses_following %}
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
-          <a href="{{ url_for('course.view_course', course_id=follow.course.id) }}">{{ follow.course.name }}（{{ follow.course.teacher.name or _('Unknown') }}）</a>
-          <span class="small grey align-bottom left-pd-sm">学期：{{ follow.course.term_display }}</span>
+          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
+          <span class="small grey align-bottom left-pd-sm">学期：{{ course.term_display }}</span>
           <span class="text-muted small float-right">2015-10-15</span>
           </div>
           <p class="dark-grey">老师上课很满意老师上课很满意老师上课很满意老师上课很满意老师上课很满意老师上课很满意老师上课很... <a> 更多 >></a>
@@ -32,10 +32,10 @@
           <a>（10门）</a>
         </div>
 
-        {% for follow in courses_following %}
+        {% for course in courses_following %}
         <div class="ud-pd-md dashed">
-          <a href="{{ url_for('course.view_course', course_id=follow.course.id) }}">{{ follow.course.name }}（{{ follow.course.teacher.name or _('Unknown') }}）</a>
-          <span class="small grey align-bottom  float-right">学期：{{ follow.course.term_display }}</span>
+          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
+          <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
         </div>
         {% endfor %}
 
@@ -48,10 +48,10 @@
           <a>（10门）</a>
         </div>
 
-        {% for follow in courses_following %}
+        {% for course in courses_following %}
         <div class="ud-pd-md dashed">
-          <a href="{{ url_for('course.view_course', course_id=follow.course.id) }}">{{ follow.course.name }}（{{ follow.course.teacher.name or _('Unknown') }}）</a>
-          <span class="small grey align-bottom float-right">学期：{{ follow.course.term_display }}</span>
+          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
+          <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
         </div>
         {% endfor %}
 
