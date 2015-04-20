@@ -1,7 +1,8 @@
 from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify
 from flask.ext.login import login_required
-from app.models import Course,CourseRate
+from app.models import *
 from app.forms import ReviewForm
+from app import db
 
 course = Blueprint('course',__name__)
 QUERY_ORDER = [Course.term.desc(),
@@ -12,7 +13,25 @@ QUERY_ORDER = [Course.term.desc(),
 def index():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
-    courses_page = Course.query.order_by(*QUERY_ORDER).paginate(page,per_page=per_page)
+    term = request.args.get('term',None,type=str)
+    course_name = request.args.get('course',None,type=str)
+    course_type = request.args.get('type',None,type=str)
+    department = request.args.get('dept',None,type=str)
+    course_query = Course.query
+    if term:
+        '''学期'''
+        course_query = course_query.filter(Course.term==term)
+    if course_name:
+        '''课程名'''
+        course_query = course_query.filter(Course.name==course_name)
+    if course_type:
+        '''课程类型'''
+        course_query = course_query.filter(Course.course_type==course_type)
+    if department:
+        '''开课院系'''
+        course_query = course_query.filter(Course.dept==department)
+
+    courses_page = course_query.order_by(*QUERY_ORDER).paginate(page,per_page=per_page)
     return render_template('course-index.html',pagination=courses_page)
 
 @course.route('/<int:course_id>/')

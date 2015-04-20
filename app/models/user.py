@@ -42,7 +42,7 @@ class JoinCourse(db.Model):
     course_attr = db.Column(db.String(1))    # 课程属性
     join_time = db.Column(db.DateTime)  # 选课时间
 
-    course = db.relationship('Course')
+    course = db.relationship('Course',lazy="joined")
 
 upvote_course = db.Table('upvote_course',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
@@ -98,6 +98,10 @@ class User(db.Model, UserMixin):
 
     def set_avatar(self,avatar):
         self._avatar = avatar
+
+    @property
+    def courses_reviewd(self):
+        pass
 
     @property
     def confirmed(self):
@@ -214,7 +218,7 @@ class Student(db.Model):
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     dept = db.relationship('Dept', backref='students')
-    courses_joined = db.relationship('JoinCourse', backref='students')
+    courses_joined = db.relationship('JoinCourse', backref='students',lazy='dynamic')
 
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)

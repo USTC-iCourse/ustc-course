@@ -58,7 +58,7 @@ class Course(db.Model):
 
     __table_args__ = (db.UniqueConstraint('cno', 'term'), )
 
-    teachers = db.relationship('Teacher', secondary=course_teachers, backref='courses')
+    teachers = db.relationship('Teacher', secondary=course_teachers, backref='courses',lazy="joined")
     #:followers : backref to User
     #students : backref to Student
     reviews = db.relationship('Review', backref='course', lazy='dynamic')
