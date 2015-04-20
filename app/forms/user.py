@@ -1,8 +1,9 @@
 from flask_wtf import Form
-from wtforms import (StringField, PasswordField, BooleanField, ValidationError, TextAreaField, FileField)
-from wtforms.validators import (DataRequired,NumberRange, Email, EqualTo, Length, Optional)
+from wtforms import (StringField, PasswordField, BooleanField, ValidationError, TextAreaField, FileField, SelectField)
+from wtforms.validators import (DataRequired,NumberRange, Email, EqualTo, Length, Optional, AnyOf)
 from app.models import User
 from flask.ext.login import current_user
+from flask.ext.babel import gettext as _
 import re
 
 RESERVED_USERNAME = set(['管理员',
@@ -67,6 +68,7 @@ class ResetPasswordForm(Form):
 
 class ProfileForm(Form):
     #username = UsernameField('Username', validators=[DataRequired(),Length(max=30,message='The length must unser 30')])
+    gender = SelectField('Gender',choices=[('male',_('male')),('female',_('female')),('unkown',_('unkown'))],validators=[DataRequired()])
     description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])
     homepage = StringField('Homepage', validators=[Optional(),Length(max=200,message="长度不大于200")])
     avatar = FileField('Avatar', validators=[])

@@ -31,6 +31,7 @@ def account_settings():
     errors = []
     if form.validate_on_submit():
         #user.username = form['username'].data
+        user.gender = form['gender'].data
         user.homepage = sanitize(form['homepage'].data.strip())
         user.description = form['description'].data.strip()
         if request.files.get('avatar'):

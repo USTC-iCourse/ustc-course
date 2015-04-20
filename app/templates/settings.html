@@ -27,6 +27,7 @@
         </div>
       </div>
 
+
       <div class="form-group">
         <label class="col-sm-2 control-label">USTC Email</label>
         <div class="col-sm-5">
@@ -34,6 +35,12 @@
         </div>
       </div>
 
+      <div class="form-group">
+          <label class="col-sm-2 control-label">{{ _('Gender') }}</label>
+        <div class="col-sm-5">
+            {{ form.gender(class="form-control") }}
+        </div>
+      </div>
 
       <div class="form-group">
         <label for="inputDescription" class="col-sm-2 control-label">About Me</label>
@@ -67,7 +74,7 @@
         <p class="text-danger">{{ _('Suprise! We found an alien. Please contact us to aware us!') }}</p>
         {% endif %}
     {% else %}
-        <p class="text-primary">{{ _('You have not bind a student ID. Click <a href="%(url)s">here</a> to bind one!', url=url_for('user.bind_identity')) }}
+        <p class="text-info">{{ _('You have not bind a student ID. Click <a  href="%(url)s">here</a> to bind one!', url=url_for('user.bind_identity')) }}
     {% endif %}
  
     <h2 class="blue">Change Password</h2>
