@@ -36,7 +36,7 @@ def view_course(course_id,course_name=None):
             teacher=teacher,
             same_teacher_courses=same_teacher_courses)
 
-@course.route('/<int:course_id>/upvote/')
+@course.route('/<int:course_id>/upvote/', methods=['POST'])
 @login_required
 def upvote(course_id):
     course = Course.query.get(course_id)
@@ -45,9 +45,18 @@ def upvote(course_id):
     if course.downvoted:
         course.un_downvote()
     ok = course.upvote()
-    return jsonify(ok=ok)
+    return jsonify(ok=ok, count=course.upvote_count)
 
-@course.route('/<int:course_id>/downvote/')
+@course.route('/<int:course_id>/undo-upvote/', methods=['POST'])
+@login_required
+def undo_upvote(course_id):
+    course = Course.query.get(course_id)
+    if not course or not course.upvoted:
+        return jsonify(ok=False)
+    ok = course.un_upvote()
+    return jsonify(ok=ok, count=course.upvote_count)
+
+@course.route('/<int:course_id>/downvote/', methods=['POST'])
 @login_required
 def downvote(course_id):
     course = Course.query.get(course_id)
@@ -56,8 +65,53 @@ def downvote(course_id):
     if course.upvoted:
         course.un_upvote()
     ok = course.downvote()
-    return jsonify(ok=ok)
+    return jsonify(ok=ok, count=course.downvote_count)
 
+@course.route('/<int:course_id>/undo-downvote/', methods=['POST'])
+@login_required
+def undo_downvote(course_id):
+    course = Course.query.get(course_id)
+    if not course or not course.downvoted:
+        return jsonify(ok=False)
+    ok = course.un_downvote()
+    return jsonify(ok=ok, count=course.downvote_count)
+
+@course.route('/<int:course_id>/follow/', methods=['POST'])
+@login_required
+def follow(course_id):
+    course = Course.query.get(course_id)
+    if not course or course.following:
+        return jsonify(ok=False)
+    ok = course.follow()
+    return jsonify(ok=ok, count=course.follow_count)
+
+@course.route('/<int:course_id>/unfollow/', methods=['POST'])
+@login_required
+def unfollow(course_id):
+    course = Course.query.get(course_id)
+    if not course or not course.following:
+        return jsonify(ok=False)
+    ok = course.unfollow()
+    return jsonify(ok=ok, count=course.follow_count)
+
+@course.route('/<int:course_id>/join/', methods=['POST'])
+@login_required
+def join(course_id):
+    course = Course.query.get(course_id)
+    if not course or course.joined:
+        return jsonify(ok=False)
+    ok = course.join()
+    return jsonify(ok=ok, count=course.join_count)
+
+@course.route('/<int:course_id>/quit/',
+methods=['POST'])
+@login_required
+def quit(course_id):
+    course = Course.query.get(course_id)
+    if not course or not course.joined:
+        return jsonify(ok=False)
+    ok = course.quit()
+    return jsonify(ok=ok, count=course.join_count)
 
 @course.route('/<int:course_id>/reviews/')
 def reviews(course_id, course_name=None):
