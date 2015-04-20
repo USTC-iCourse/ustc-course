@@ -188,7 +188,7 @@ p { line-height: 25px; }
 
 .shadow { box-shadow: 3px 3px 2px #ddd; }
 .btn-flat {
-    padding: 6px 22px 6px 22px;
+    padding: 5px 21px;
     border: 0;
     border-radius: 0;
 }
@@ -202,16 +202,19 @@ p { line-height: 25px; }
     color: #fff;
     font-weight: 600;
     background-color: #1caaea;
+    border: 1px #1caaea solid;
 }
 .btn-blue:hover {
     color: #fff;
     background-color: #128bc1;
+    border: 1px #128bc1 solid;
 }
 .btn-grey {
     color: #767676;
     font-size: 14px;
     font-weight: 600;
     background-color: #f3f3f3;
+    border: 1px #f3f3f3 solid;
 }
 
 /* special elements */
