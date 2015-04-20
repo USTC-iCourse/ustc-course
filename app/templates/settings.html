@@ -36,6 +36,14 @@
 
 
       <div class="form-group">
+          <label class="col-sm-2 control-label">{{ _('Student id') }}</label>
+        <div class="col-sm-5">
+            <input type="text" name='sno' class="form-control" placeholder="只能绑定一次" >
+        </div>
+      </div>
+
+
+      <div class="form-group">
         <label for="inputDescription" class="col-sm-2 control-label">About Me</label>
         <div class="col-sm-5">
             <textarea type="text" class="form-control" rows="3" id="inputDescription" name="description" {%- if form.description.data %} >{{ form.description.data }}{% else %} placeholder="Description">{% endif -%}</textarea>
