@@ -6,7 +6,7 @@
 
 
     <div class="col-md-8">
-      <h4 class="blue"><strong>关注课程</strong></h4>
+      <h4 class="blue"><strong>关注</strong></h4>
       {% for follow in courses_following %}
       <div>
         <a class="px16" href="{{ url_for('course.view_course', course_id=follow.course.id) }}">{{ follow.course.name }}（{{ follow.course.teacher.name or _('Unknown') }}）</a>
@@ -33,7 +33,7 @@
               <span class="glyphicon glyphicon-link" aria-hidden="true"></span> {{ user.homepage }}
             </a>
           </li>
-        <ul>
+          <ul>
       </div>
 
       <div class="ud-pd-md dashed hidden">
