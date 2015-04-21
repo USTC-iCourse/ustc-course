@@ -135,11 +135,13 @@
             <p>{{ review.content|safe }}</p>
           </div>
 
-          <div class="grey">
+          <div id="review-{{ review.id }}" class="grey">
             <span class="small">{{ review.publish_time }}</span>
-            <span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> {{ review.upvote_count }}
-            <span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> {{ review.comment_count }}
-            <a href="javascirpt:void(0)"  class="rDel">Delete</a>
+            <a href="javascript: update_review('upvote')"><span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> {{ review.upvote_count }}</a>
+            <a href="javascript: show_review_comments('review', {{ review.id }})"><span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> {{ review.comment_count }}</a>
+            <span class="pull-right">
+                <a href="javascript: update_review('delete', {{ review.id }})"><span class="glyphicon glyphicon-trash blue left-pd-md" aria-hidden="true"></span> {{ _('Delete') }}</a>
+            </span>
           </div>
         </div>
         {% endfor %}
