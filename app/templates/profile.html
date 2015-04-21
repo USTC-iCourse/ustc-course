@@ -10,10 +10,10 @@
       <div class="bm-pd-lg">
         <div class="inline-h3">
           <span class="blue h4"><strong>点评</strong></span>
-          <a>（{{ num_review }}门）</a>
+          <a>（{{ user.reviews_count }}门）</a>
         </div>
 
-        {% for review in reviews[0:3] %}
+        {% for review in user.reviews[0:3] %}
         <!-- profile页面最多显示3条点评 -->
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
@@ -32,10 +32,10 @@
       <div class="bm-pd-lg">
         <div class="inline-h3">
           <span class="blue h4"><strong>关注</strong></span>
-          <a>（10门）</a>
+          <a>（{{ user.courses_following_count }}门）</a>
         </div>
 
-        {% for course in courses_following[0:6] %}
+        {% for course in user.courses_following[0:6] %}
         <!-- 关注课程最多显示6门 -->
         <div class="ud-pd-md dashed">
           <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
@@ -50,18 +50,16 @@
       <div class="bm-pd-lg">
         <div class="inline-h3">
           <span class="blue h4"><strong>学过</strong></span>
-          <a>（10门）</a>
+          <a>（{{ user.courses_joined_count }}门）</a>
         </div>
-        {% if current_user.id==user.id and current_user.info %}
 
-        {% for course in courses_joined[0:6] %}
+        {% for course in user.courses_joined[0:6] %}
         <!-- 学过课程最多显示6门 -->
         <div class="ud-pd-md dashed">
           <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
           <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
         </div>
         {% endfor %}
-        {% endif %}
       </div>
 
 
@@ -91,8 +89,6 @@
           <li class="ud-pd-sm">被关注：</li>
         </ul>
       </div>
-
-
 
     </div><!-- end col-md-4 -->
   </div><!-- end float-element -->

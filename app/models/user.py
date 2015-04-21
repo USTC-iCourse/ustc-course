@@ -79,6 +79,33 @@ class User(db.Model, UserMixin):
         return '<User {} ({})>'.format(self.email, self.password)
 
     @property
+    def reviews_count(self):
+        return len(self.reviews)
+
+    @property
+    def courses_following_count(self):
+        return len(self.courses_following)
+
+    @property
+    def courses_upvoted_count(self):
+        return len(self.courses_upvoted)
+
+    @property
+    def courses_downvoted_count(self):
+        return len(self.courses_downvoted)
+
+    @property
+    def courses_joined_count(self):
+        return len(self.courses_joined.all()) # need .all() because lazy=dynamic
+
+    @property
+    def courses_joined(self):
+        if self.is_student and self.info:
+            return self.info.courses_joined
+        else:
+            return []
+
+    @property
     def avatar(self):
         if self._avatar:
             return '/uploads/images/' + self._avatar

@@ -107,13 +107,29 @@
         {% else %}
         {% for review in course.reviews %}
         <div class="ud-pd-md dashed" id={{review.id}}>
-          <div class="ud-pd-sm">
+          <div class="ud-pd-sm blue">
             <a href={{ url_for('user.view_profile', user_id=review.author.id) }}><span class="right-pd-sm px16">{{ review.author.username }}</span></a>
-            <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star-empty blue" aria-hidden="true" ></span>
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+            {% if review.rate > 2 %}
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+            {% else %}
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            {% endif %}
+            {% if review.rate > 4 %}
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+            {% else %}
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            {% endif %}
+            {% if review.rate > 6 %}
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+            {% else %}
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            {% endif %}
+            {% if review.rate > 8 %}
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+            {% else %}
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            {% endif %}
           </div>
           <div class="ud-pd-sm">
             <p>{{ review.content|safe }}</p>
@@ -244,7 +260,6 @@ $(function() {
             do_btn.click(function() {
                 if (d.enabled)
                     return;
-                console.log(action_data);
                 do_btn.hide();
                 undo_btn.show();
                 d.enabled = true;
@@ -258,8 +273,6 @@ $(function() {
             undo_btn.click(function() {
                 if (!d.enabled)
                     return;
-                console.log('undo ' + action);
-                console.log(action_data);
                 undo_btn.hide();
                 do_btn.show();
                 d.enabled = false;

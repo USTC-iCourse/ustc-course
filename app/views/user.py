@@ -17,21 +17,9 @@ def view_profile(user_id):
         message = _('Sorry. But we could not find the user!')
         return render_template('feedback.html', status=False, message=message)
 
-    courses_following = user.courses_following
-    info = user.info # 注意，教师和学生返回的info类型不同,如果没有验证身份，则返回None.现在没做，以后做
-    if info:
-        courses_joined = user.info.courses_joined
-    else:
-        courses_joined = None
-    num_review = request.args.get('num_review',5,type=int) #这里是错的?为什么显示5门
-    reviews = user.reviews[0:num_review]
     return render_template('profile.html',
-            user=user,
-            info=info,
-            num_review = num_review,
-            reviews = reviews,
-            courses_following=courses_following,
-            courses_joined=courses_joined)
+                           user=user,
+                           info=(user.info if user.is_student else None))
 
 
 @user.route('/settings/',methods=['GET','POST'])
