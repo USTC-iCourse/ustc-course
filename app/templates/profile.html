@@ -4,40 +4,29 @@
 <div class="container">
   <div class="row float-element">
 
-<div class="col-md-8">
-       {% if current_user.id==user.id and current_user.info %}
-      <h4 class="blue"><strong>课程</strong></h4>
-      {% for course in courses_joined %}
-      <div>
-        <a class="px16" href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
-        <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
-        <span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
-      </div>
-      {% endfor %}
-      <hr>
-      <h4 class="blue"><strong>点评</strong></h4>
-      <hr>
-    {% endif %}
+    <div class="col-md-8">
+
 
       <div class="bm-pd-lg">
         <div class="inline-h3">
           <span class="blue h4"><strong>点评</strong></span>
-          <a>（10门）</a>
+          <a>（{{ num_review }}门）</a>
         </div>
 
-        {% for review in reviews %}
+        {% for review in reviews[0:3] %}
+        <!-- profile页面最多显示3条点评 -->
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
-              {% set course = review.course %}
-          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
-          <span class="small grey align-bottom left-pd-sm">学期：{{ course.term_display }}</span>
-          <span class="text-muted small float-right">{{ review.update_time }}</span>
+            {% set course = review.course %}
+            <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
+            <span class="small grey align-bottom left-pd-sm">学期：{{ course.term_display }}</span>
+            <span class="text-muted small float-right">{{ review.update_time }}</span>
           </div>
-          <p class="dark-grey">{{ review.content|safe }} <a href="{{ url_for('course.view_course', course_id=course.id,review_id=review.id) }}"> {{ _('more') }}</a>
+          <p class="dark-grey">{{ review.content|safe }}
+            <a href="{{ url_for('course.view_course', course_id=course.id,review_id=review.id) }}"> >>{{ _('more') }}</a>
           </p>
         </div>
         {% endfor %}
-
       </div>
 
       <div class="bm-pd-lg">
@@ -46,7 +35,8 @@
           <a>（10门）</a>
         </div>
 
-        {% for course in courses_following %}
+        {% for course in courses_following[0:6] %}
+        <!-- 关注课程最多显示6门 -->
         <div class="ud-pd-md dashed">
           <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
           <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
@@ -55,28 +45,28 @@
 
       </div>
 
+
+
       <div class="bm-pd-lg">
-    <!-- 这是干嘛的 ?
         <div class="inline-h3">
           <span class="blue h4"><strong>学过</strong></span>
           <a>（10门）</a>
         </div>
-        -->
+        {% if current_user.id==user.id and current_user.info %}
 
-        {% for course in courses_following %}
+        {% for course in courses_joined[0:6] %}
+        <!-- 学过课程最多显示6门 -->
         <div class="ud-pd-md dashed">
           <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
           <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
         </div>
         {% endfor %}
-
+        {% endif %}
       </div>
 
 
 
-
     </div><!-- end col-md-8 -->
-
 
 
 
@@ -92,7 +82,7 @@
               <span class="glyphicon glyphicon-link" aria-hidden="true"></span> {{ user.homepage }}
             </a>
           </li>
-          <ul>
+        </ul>
       </div>
 
       <div class="ud-pd-md dashed hidden">
@@ -103,8 +93,8 @@
       </div>
 
 
-    </div>
-  </div>
-</div>
 
+    </div><!-- end col-md-4 -->
+  </div><!-- end float-element -->
+</div><!-- end container -->
 {% endblock %}
