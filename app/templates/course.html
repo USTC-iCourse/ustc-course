@@ -170,23 +170,28 @@
       <!-- 右边栏 -->
 
       <div class="col-md-4 rl-pd-lg">
-        <div class="ud-pd-lg dashed">
-          {% if course.teacher %}
+        {% for teacher in course.teachers %}
+        <div class="ud-pd-md dashed">
           <img class="avatar-lg cicle" src="/static/image/teacher.jpg"/>
-          <h3 class="blue">{{ course.teacher.name }}</h3>
-          <p>{{ course.teacher.dept.name }}</p>
+          <h3 class="blue">{{ teacher.name }}</h3>
+          <p>{{ teacher.dept.name }}</p>
           <p>研究方向：暂无</p>
           <p><a target="_blank">教师介绍：暂无</a></p>
           <div class="ud-pd-md" style="display: none"><a>教师排行榜：23</a></div>
-          {% else %}
+        </div>
+        {% endfor %}
+        {% if course.teachers_count == 0 %}
+        <div class="ud-pd-md dashed">
           <img class="avatar-lg cicle" src="/static/image/teacher.jpg"/>
           <h3 class="blue">老师甲</h3>
-          {% endif %}
         </div>
+        {% endif %}
 
+        {% if course.teachers_count == 1 %}
         <div class="ud-pd-md dashed" style="display: none">
-          <h5 class="blue">更多{{ course.teacher.name }}老师课程</h5>
+          <h5 class="blue">更多{{ course.teachers[0].name }} 老师课程</h5>
         </div>
+        {% endif %}
 
         <div class="ud-pd-md dashed" style="display: none">
           <h5 class="blue">更多{{ course.name }}</h5>
