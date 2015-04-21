@@ -63,7 +63,7 @@ body {
         margin: 15px 0;
     } 
 }
-p { line-height: 25px; }
+p { line-height: 25px; word-wrap: break-word; }
 
 
 .bm-pd-md {
