@@ -96,12 +96,13 @@ class User(db.Model, UserMixin):
 
     @property
     def courses_joined_count(self):
-        return len(self.courses_joined.all()) # need .all() because lazy=dynamic
+        return len(self.courses_joined)
 
     @property
     def courses_joined(self):
         if self.is_student and self.info:
-            return self.info.courses_joined
+            # need .all() because lazy=dynamic
+            return self.info.courses_joined.all()
         else:
             return []
 
