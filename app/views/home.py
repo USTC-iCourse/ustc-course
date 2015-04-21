@@ -5,6 +5,8 @@ from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPassword
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask.ext.babel import gettext as _
 from datetime import datetime
+from sqlalchemy import union
+#from app import db
 
 home = Blueprint('home',__name__)
 
@@ -179,7 +181,14 @@ def search():
     if not keyword:
         return redirect(url_for('home.index'))
 
-    courses = Course.query.filter(Course.name.like('%' + keyword + '%')).join(CourseRate).order_by(Course.term.desc()).order_by(CourseRate.upvote_count.desc())
+    def match_courses(filter):
+        return Course.query.filter(filter).join(CourseRate).order_by(Course.term.desc()).order_by(CourseRate.upvote_count.desc()).subquery().select()
+
+    exact_match = match_courses(Course.name == keyword)
+    include_match = match_courses(Course.name.like('%' + keyword + '%'))
+    fuzzy_match = match_courses(Course.name.like('%' + '%'.join([ char for char in keyword ]) + '%'))
+    courses = Course.query.select_entity_from(union(exact_match, include_match, fuzzy_match))
+
     try:
         page = int(request.args.get('page', 1))
     except:
