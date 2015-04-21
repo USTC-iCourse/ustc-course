@@ -18,17 +18,13 @@ def view_profile(user_id):
         return render_template('feedback.html',status=False,message=message)
 
     courses_following = user.courses_following
-    info = user.info # 注意，教师和学生返回的info类型不同,如果没有验证身份，则返回None.现在没做，以后做
-    if info:
-        courses_joined = user.info.courses_joined
-    else:
-        courses_joined = None
-    num_review = request.args.get('num_review',5,type=int)
-    reviews = user.reviews[0:num_review]
+    courses_joined = user.courses_joined
+    display_review_num = request.args.get('num_review',5,type=int)
+    recent_reviews = user.reviews[0:display_review_num]
     return render_template('profile.html',
             user=user,
-            info=info,
-            reviews = reviews,
+            info=user.info if user.is_student else None,
+            recent_reviews=recent_reviews,
             courses_following=courses_following,
             courses_joined=courses_joined)
 
