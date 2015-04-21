@@ -49,6 +49,7 @@
 
 
 
+      {% if user.is_student and user.info %}
       <div class="bm-pd-lg">
         <div class="inline-h3">
           <span class="blue h4"><strong>学过</strong></span>
@@ -64,6 +65,7 @@
         </div>
         {% endfor %}
       </div>
+      {% endif %}
 
 
 
