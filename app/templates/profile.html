@@ -19,7 +19,7 @@
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
             {% set course = review.course %}
-            <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
+            <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
             <span class="small grey align-bottom left-pd-sm">学期：{{ course.term_display }}</span>
             <span class="text-muted small float-right desktop">{{ review.update_time }}</span>
           </div>
@@ -40,7 +40,7 @@
         {% for course in user.courses_following[0:6] %}
         <!-- 关注课程最多显示6门 -->
         <div class="ud-pd-md dashed">
-          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
+          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
           <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
         </div>
         {% endfor %}
@@ -60,7 +60,7 @@
         {% for course in user.courses_joined[0:6] %}
         <!-- 学过课程最多显示6门 -->
         <div class="ud-pd-md dashed">
-          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
+          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
           <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
         </div>
         {% endfor %}
