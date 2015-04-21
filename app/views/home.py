@@ -1,12 +1,11 @@
 from flask import Blueprint,request, redirect,url_for,render_template,flash, abort, jsonify
 from flask.ext.login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate
+from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask.ext.babel import gettext as _
 from datetime import datetime
-from sqlalchemy import union
-#from app import db
+from sqlalchemy import union, or_
 
 home = Blueprint('home',__name__)
 
@@ -181,13 +180,16 @@ def search():
     if not keyword:
         return redirect(url_for('home.index'))
 
+    def ordering(query_obj):
+        return query_obj.join(CourseRate).order_by(Course.term.desc()).order_by(CourseRate.upvote_count.desc()).subquery().select()
     def match_courses(filter):
-        return Course.query.filter(filter).join(CourseRate).order_by(Course.term.desc()).order_by(CourseRate.upvote_count.desc()).subquery().select()
+        return ordering(Course.query.filter(filter))
 
+    teacher_match = ordering(Course.query.join(Course.teachers).filter(Teacher.name == keyword))
     exact_match = match_courses(Course.name == keyword)
     include_match = match_courses(Course.name.like('%' + keyword + '%'))
     fuzzy_match = match_courses(Course.name.like('%' + '%'.join([ char for char in keyword ]) + '%'))
-    courses = Course.query.select_entity_from(union(exact_match, include_match, fuzzy_match))
+    courses = Course.query.select_entity_from(union(teacher_match, exact_match, include_match, fuzzy_match))
 
     try:
         page = int(request.args.get('page', 1))
