@@ -206,7 +206,7 @@ class Student(db.Model):
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     dept = db.relationship('Dept', backref='students')
-    courses_joined = db.relationship('Course', secondary = join_course, backref='students')
+    courses_joined = db.relationship('Course', secondary = join_course, backref='students',lazy='dynamic')
 
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)

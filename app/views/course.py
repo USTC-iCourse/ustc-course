@@ -1,5 +1,6 @@
 from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify
 from flask.ext.login import login_required
+from flask.ext.babel import gettext as _
 from app.models import *
 from app.forms import ReviewForm
 from app import db
@@ -153,6 +154,40 @@ def reviews(course_id, course_name=None):
         return str
     else:
         return 'No reviews'
+
+@course.route('/s/<string:id>/')
+def student_courses(id):
+    student = Student.query.get(id)
+    if student:
+        page = request.args.get('page',1,type=int)
+        per_page = request.args.get('perpage',15,type=int)
+        courses_page = student.courses_joined.order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
+        return render_template('list-courses.html',student=student,courses=courses_page)
+    else:
+        return render_template('feedback.html',status=False,message=_('We cant\'t find the User!'))
+
+@course.route('/t/<int:id>/')
+def teacher_courses(id):
+    teacher = Teacher.query.get(id)
+    if teacher:
+        page = request.args.get('page',1,type=int)
+        per_page = request.args.get('perpage',15,type=int)
+        courses_page = teacher.courses.order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
+        return render_template('list-courses.html',teacher=teacher,courses=courses_page)
+    else:
+        return render_template('feedback.html',status=False,message=_('We cant\'t find the User!'))
+
+@course.route('/c/<string:name>/')
+def same_name_courses(name):
+    name = name.strip()
+    page = request.args.get('page',1,type=int)
+    per_page = request.args.get('perpage',15,type=int)
+    courses_page = Course.query.filter_by(name=name).order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
+    if courses_page.items:
+        return render_template('list-courses.html',course_name=name,courses=courses_page)
+    else:
+        return render_template('list-courses.html',course_name=name,courses=courses_page,message=_("No course called %(name)s found!",name=name))
+
 
 
 

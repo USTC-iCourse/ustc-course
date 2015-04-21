@@ -98,7 +98,32 @@ def bind_identity():
         else:
             return render_template('feedback.html',status=False,message=_('The server met some problem.Please contact us.'))
 
+
+@user.route('/<int:user_id>/courses/')
+def courses(user_id):
+    user = User.query.get(user_id)
+    if user and user.info:
+        page = request.args.get('page',1,type=int)
+        per_page = request.args.get('perpage',15,type=int)
+        if user.is_teacher():
+            courses_page = user.info.courses.paginate(page=page,per_page=per_page)
+            return render_template('list-courses.html',teacher=user.info,courses = courses_page)
+        elif user.is_student():
+            courses_page = user.info.courses_joined.paginate(page=page,per_page=per_page)
+            return render_template('list-courses.html',student=user.info,courses=courses_page)
+        else:
+            return render_template('feedback.html',status=False,message=_('Erorr 203: please contact us!'))
+    elif user:
+        return render_template('feedback.html',status=False,message=_('This user have not bind a ID.Click\
+            <a href=%(url)s><b>here</b></a> to bind.',url=url_for('.bind_identity')))
+    else:
+        return render_template('feedback.html',status=False,message=_('We cant\'t find the User!'))
+
+
+
 @user.route('/<int:user_id>/avatar')
 def avatar(user_id):
     user = User.query.get(user_id)
     return '<img src='+user.avatar+'>'
+
+
