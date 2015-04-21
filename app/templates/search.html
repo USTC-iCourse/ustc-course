@@ -65,7 +65,7 @@
           <div class="rate-box">{{ course.upvote_count }}</div>
         </div>
         <div class="col-md-8 col-xs-10">
-          <a class="px16" href={{ url_for('course.view_course', course_id=course.id) }}>{{ course.name }}（{{ course.teacher.name }}）</a>
+            <a class="px16" href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher_names_display }}）</a>
           <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
           <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
           {% if course.review_count %}

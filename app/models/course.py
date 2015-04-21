@@ -254,6 +254,13 @@ class Course(db.Model):
     def teachers_count(self):
         return len(self.teachers)
 
+    @property
+    def teacher_names_display(self):
+        if self.teachers_count == 0:
+            return 'Unknown'
+        else:
+            return ', '.join([teacher.name for teacher in self.teachers])
+
 
 class CourseRate(db.Model):
     __tablename__ = 'course_rates'
