@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+
+    <div class="bm-pd-lg">
+      <div class="inline-h3">
+        <span class="blue h3"><strong>关注</strong></span>
+        <a>（{{ user.courses_following_count }}门）</a>
+      </div>
+
+      {% for course in user.courses_following %}
+      <!-- 关注课程最多显示6门 -->
+      <div class="ud-pd-md dashed">
+        <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
+        <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
+      </div>
+      {% endfor %}
+
+    </div>
+
+
+  </div><!-- end float-element -->
+</div><!-- end container -->
+{% endblock %}

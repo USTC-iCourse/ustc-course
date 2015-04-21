@@ -21,6 +21,47 @@ def view_profile(user_id):
                            user=user,
                            info=(user.info if user.is_student else None))
 
+@user.route('/<int:user_id>/reviews')
+def reviews(user_id):
+    '''用户点评过的所有课程'''
+    user = User.query.get(user_id)
+    if not user:
+        message = _('Sorry. But we could not find the user!')
+        return render_template('feedback.html', status=False, message=message)
+
+    return render_template('user-reviews.html',
+                           user=user,
+                           info=(user.info if user.is_student else None))
+
+
+@user.route('/<int:user_id>/follow-course')
+def follow_course(user_id):
+    '''用户关注过的所有课程'''
+    user = User.query.get(user_id)
+    if not user:
+        message = _('Sorry. But we could not find the user!')
+        return render_template('feedback.html', status=False, message=message)
+
+    return render_template('follow-course.html',
+                           user=user,
+                           courses=user.courses_following,
+                           info=(user.info if user.is_student else None))
+
+
+@user.route('/<int:user_id>/join-course')
+def join_course(user_id):
+    '''用户学过的所有课程'''
+    user = User.query.get(user_id)
+    if not user:
+        message = _('Sorry. But we could not find the user!')
+        return render_template('feedback.html', status=False, message=message)
+
+    return render_template('join-course.html',
+                           user=user,
+                           courses=user.courses_joined,
+                           info=(user.info if user.is_student else None))
+
+
 
 @user.route('/settings/',methods=['GET','POST'])
 @login_required
