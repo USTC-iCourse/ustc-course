@@ -21,7 +21,7 @@ def signin():
     form = LoginForm()
     error = ''
     if form.validate_on_submit():
-        user,status = User.authenticate(form['username'].data,form['password'].data)
+        user, status, confirmed = User.authenticate(form['username'].data,form['password'].data)
         remember = form['remember'].data
         if user:
             if status:
@@ -32,7 +32,7 @@ def signin():
                     return jsonify(status=200, next=next_url)
                 else:
                     return redirect(next_url)
-            else:
+            elif not confirmed:
                 '''没有确认邮箱的用户'''
                 message = 'Please activate your account by clicking link in your email! <a href=%s>Resend Email</a>'%url_for('.confirm_email',
                     email=user.email,
@@ -41,6 +41,8 @@ def signin():
                     return jsonify(status=403, msg=message)
                 else:
                     return render_template('feedback.html', status=False, message=message)
+            else:
+                error = _('Username or password is wrong!')
         else:
             error = _('Username or password is wrong!')
     #TODO: log the form errors
