@@ -376,15 +376,15 @@ def load_join_course():
 
     # join course info before 2012 does not exist in XKJGB
     for c in parse_file('CJ_CJXXB.txt'):
-        if int(c['CJ']) < 0: # 可能已经退课
+        if float(c['CJ']) < 0: # 可能已经退课
             continue
-        if int(c['CJ']) > 100: # 二等级或五等级制课程，正常录入
+        if float(c['CJ']) > 100: # 二等级或五等级制课程，正常录入
             pass
         unique_key = c['KCBJH'].upper() + '|' + c['XQ']
         if not unique_key in courses_map:
             print('Course not found:' + str(c))
             continue
-        course = course_map[unique_key]
+        course = courses_map[unique_key]
         if c['XH'] not in students_map:
             print('Student id ' + c['XH'] + ' not found: ' + str(c))
             continue
