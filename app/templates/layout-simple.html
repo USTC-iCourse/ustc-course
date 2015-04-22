@@ -1,39 +1,30 @@
 {% include 'common-header.html' %}
 
-  <body>
-    <nav class="navbar navbar-default">
-      <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <a class="navbar-brand" href={{ url_for('home.index') }}>USTC评课社区</a>
-        </div>
+<body>
+  <nav class="navbar navbar-default">
+    <div class="container">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <a class="navbar-brand" href={{ url_for('home.index') }}>USTC评课社区</a>
       </div>
-    </nav>
+    </div>
+  </nav>
 
-    {% block content %} {% endblock %}
+  {% block content %} {% endblock %}
 
 
-    <footer class="footer">
-      <div class="container">
-        <div class="solid ud-pd-sm">
-          <a class="right-pd-md" href='/about/'>About</a>
-          <a class="right-pd-md" href='/blog/' style="display: none">Blog</a>
-          <a class="right-pd-md" href='/report-bug/'>Report Bug</a>
-        </div>
-        <p class="footer-text text-muted">Copyright &copy; USTC评课社区 2015</p>
-      </div>
-    </footer>
+  {% include 'common-footer.html' %}
+</body>
 
 
 
 
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/static/js/jquery.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    {% include 'common-scripts.html' %}
-    {% block script %} {% endblock %}
-  </body>
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="/static/js/jquery.min.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  {% include 'common-scripts.html' %}
+  {% block script %} {% endblock %}
+</body>
 </html>

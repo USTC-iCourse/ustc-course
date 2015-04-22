@@ -222,7 +222,7 @@ def about():
 def test():
     '''前端html页面效果测试专用'''
 
-    return render_template('test.html')
+    return render_template('404.html')
 
 
 

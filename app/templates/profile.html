@@ -11,7 +11,7 @@
         <div class="inline-h3">
           <span class="blue h4"><strong>点评</strong></span>
           <a>（{{ user.reviews_count }}门）</a>
-          <span class="float-right"><a href="{{ url_for('user.reviews', user_id=user.id) }}">view all >> </a></span>
+          <span class="float-right"><a href="{{ url_for('user.reviews', user_id=user.id) }}">View details &raquo;</a></span>
         </div>
 
         {% for review in user.reviews[0:3] %}
@@ -34,7 +34,7 @@
         <div class="inline-h3">
           <span class="blue h4"><strong>关注</strong></span>
           <a>（{{ user.courses_following_count }}门）</a>
-          <span class="float-right"><a href="{{ url_for('user.follow_course', user_id=user.id) }}">view all >> </a></span>
+          <span class="float-right"><a href="{{ url_for('user.follow_course', user_id=user.id) }}">View details &raquo;</a></span>
         </div>
 
         {% for course in user.courses_following[0:6] %}
@@ -54,7 +54,7 @@
         <div class="inline-h3">
           <span class="blue h4"><strong>学过</strong></span>
           <a>（{{ user.courses_joined_count }}门）</a>
-          <span class="float-right"><a href="{{ url_for('user.join_course', user_id=user.id) }}">view all >> </a></span>
+          <span class="float-right"><a href="{{ url_for('user.join_course', user_id=user.id) }}">View details &raquo;</a></span>
         </div>
 
         {% for course in user.courses_joined[0:6] %}

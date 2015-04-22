@@ -127,7 +127,7 @@ class Course(db.Model):
 
     @property
     def time_locations_display(self):
-        return [ row.location + ': ' + row.time ].join('; ')
+        return [ row.location + ': ' + row.time for row in self.coourse_time_locations ].join('; ')
 
     @property
     def term_display(self):
