@@ -13,9 +13,6 @@ from flask.ext.babel import gettext as _
 Roles = ['Admin',
         'User']
 
-Identities =['Teacher',
-        'Student']
-
 related_courses = db.Table('related_courses',
     db.Column('src', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
     db.Column('dst', db.Integer, db.ForeignKey('courses.id'), primary_key=True)
@@ -53,7 +50,7 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean(), default=True) # 是否已经激活
     role = db.Column(db.String(20),default='User') # 用户或者管理员
     gender = db.Column(db.Enum('male','female','unknown'),default='unknown')
-    identity = db.Column(db.Enum(Identities)) # 学生或者教师
+    identity = db.Column(db.Enum('Teacher', 'Student')) # 学生或者教师
 
     register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
