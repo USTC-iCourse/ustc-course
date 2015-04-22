@@ -25,7 +25,6 @@ def parse_file(filename):
     return data
 
 depts_map = dict()
-depts_mapbyid = dict()
 
 def load_depts():
     count = 0
@@ -37,42 +36,129 @@ def load_depts():
 
         db.session.add(dept)
         count+=1
-        depts_map[dept.name] = dept.id
-        depts_mapbyid[dept.id] = dept.name
+        depts_map[dept.id] = dept.name
 
     db.session.commit()
     print('%d departments loaded' % count)
 
-def load_students():
-    sno_list = dict()
+classes_map = dict()
+
+def load_classes():
     count = 0
-    for c in parse_file('XJ_XJQL_TJB.txt'):
-        if c['XNXQ'] == '20141':
-            stu = Student()
-            stu.sno = c['SNO']
-            stu.name = c['XM']
-            stu.dept_id = depts_map[c['XZYXMC']] if c['XZYXMC'] in depts_map else None
-            stu.dept_class = c['XZBJMC']
-            stu.major = c['XDYXMC']
+    for c in parse_file('JT_XZBJB.txt'):
+        dept_class = DeptClass()
+        dept_class.id = c['BJID']
+        dept_class.name = c['XZBJMC']
+        if c['SSYX'] and not c['SSYX'] in depts_map:
+            print('Department ' + c['SZYX'] + ' not found for class ' + str(c))
+        else:
+            dept_class.dept = c['SSYX']
+        
+        db.session.add(dept_class)
+        count+=1
+        classes_map[dept_class.id] = dept_class.name
 
-            db.session.add(stu)
-            count+=1
-            sno_list[stu.sno] = None
+    db.session.commit()
+    print('%d classes loaded' % count)
 
-    for c in parse_file('XJ_XSXXB.txt'):
-        if c['SNO'] in sno_list:
-            continue
+majors_map = dict()
+
+def load_majors():
+    count = 0
+    for c in parse_file('JT_ZYDM.txt'):
+        major = Major()
+        major.id = c['ZYDM']
+        major.name = c['ZYMC']
+        major.name_eng = c['YWMC']
+        major.code = c['ZYBH']
+
+        db.session.add(major)
+        count+=1
+        majors_map[major.id] = major.name
+
+    db.session.commit()
+    print('%d majors loaded' % count)
+
+titles_map = dict()
+
+def load_titles():
+    count = 0
+    for c in parse_file('JT_TITLES.txt'):
+        titles_map[c['ZCDM']] = c['ZCMC']
+        count+=1
+
+    print('%d titles loaded' % count)
+
+students = dict()
+students_map = dict()
+
+def load_students():
+    count = 0
+    for c in parse_file('XJ_XSBYMDB.txt'):
         stu = Student()
         stu.sno = c['SNO']
         stu.name = c['XM']
-        stu.dept_id = c['LQYX'] if c['LQYX'] in depts_map else None
+
+        if c['XB'] == 1:
+            stu.gender = 'male'
+        elif c['XB'] == 2:
+            stu.gender = 'female'
+        else:
+            stu.gender = 'unknown'
+
+        if c['SZYX'] in depts_map:
+            stu.dept_id = int(c['SZYX'])
+        elif len(c['SZYX']) > 0:
+            print('Department ' + c['SZYX'] + ' not found for student ' + str(c))
+
+        if c['XZBJ'] in classes_map:
+            stu.dept_class_id = int(c['XZBJ'])
+        elif len(c['XZBJ']) > 0:
+            print('Class ' + c['XZBJ'] + ' not found for student ' + str(c))
+
+        if c['SXZY'] in majors_map:
+            stu.major_id = int(c['SXZY'])
+        elif len(c['SXZY']) > 0:
+            print('Major ' + c['SXZY'] + ' not found for student ' + str(c))
+
+        students[stu.sno] = stu;
+
+    for c in parse_file('XJ_XSXXB.txt'):
+        if c['SNO'] in students:
+            stu = students[c['SNO']]
+            stu.email = c['EMAIL']
+
+            del students[c['SNO']] # remove the student after added to db
+        else:
+            stu = Student()
+            stu.sno = c['SNO']
+            stu.name = c['XM']
+            stu.email = c['EMAIL']
+            if c['XB'] == 1:
+                stu.gender = 'male'
+            elif c['XB'] == 2:
+                stu.gender = 'female'
+            else:
+                stu.gender = 'unknown'
+            if c['LQYX'] in depts_map:
+                stu.dept_id = int(c['LQYX'])
+            else:
+                print('Department ' + c['LQYX'] + ' not found for student ' + str(c))
 
         db.session.add(stu)
         count+=1
-        sno_list[stu.sno] = None
+        students_map[stu.sno] = stu;
+
+    # students in XJ_XSBYMDB but not in XJ_XSXXB
+    for sno in students:
+        db.session.add(students[sno])
+        count+=1
+        students_map[stu.sno] = stu;
 
     db.session.commit()
     print('%d students loaded' % count)
+
+teachers_map = dict()
 
 def load_teacher():
     count = 0
@@ -80,15 +166,26 @@ def load_teacher():
         t = Teacher()
         t.id = c['YHID']
         t.name = c['XM']
-        t.dept_id = int(c['DWDM']) if c['DWDM'] in depts_mapbyid else None
+        if c['XBDM'] == 1:
+            t.gender = 'male'
+        elif c['XBDM'] == 2:
+            t.gender = 'female'
+        else:
+            t.gender = 'unknown'
+        t.dept_id = int(c['DWDM']) if c['DWDM'] in depts_map else None
         t.email = c['EMAIL']
+        t.title = titles_map[c['TITLEDM']] if c['TITLEDM'] in titles_map else None
+        t.office_phone = c['OFFICEPHONE']
         t.description = c['INTRODUCTION']
 
         db.session.add(t)
         count+=1
+        teachers_map[t.id] = t
 
     db.session.commit()
     print('%d teachers loaded' % count)
+
+courses_map = dict()
 
 def load_course():
     course_major_dict = dict(
@@ -174,23 +271,20 @@ def load_course():
             grading_type = grading_type_dict[int_allow_empty(c['PFZ'])],
         )
 
-    unique_check = dict()
     count = 0
     for c in parse_file('MV_PK_PKJGXS.txt'):
         if not c['KCBH'] in course_kcbh:
             print('Course ' + c['KCBH'] + ' exists in MV_PK_PKJGXS but not in JH_KC_ZK: ' + str(c))
             continue
 
-        c['KCBJH'] = c['KCBJH'].upper()
-        unique_key = c['KCBJH'] + '|' + c['XQ']
-        if unique_key in unique_check:
+        unique_key = c['KCBJH'].upper() + '|' + c['XQ']
+        if unique_key in courses_map:
             print('Course unique key ' + unique_key + ' conflicts: ' + str(c))
             continue
-        unique_check[unique_key] = None
 
         info = course_kcbh[c['KCBH']]
         info['term'] = c['XQ']
-        info['cno'] = c['KCBJH']
+        info['cno'] = c['KCBJH'].upper()
         info['courseries'] = c['KCBH']
         info['dept'] = c['DWMC']
         info['class_numbers'] = c['SKBJH']
@@ -204,13 +298,13 @@ def load_course():
 
         teacher_ids = c['JS'].split(',') if c['JS'] else []
         for teacher_id in teacher_ids:
-            teacher = Teacher.query.filter_by(id=teacher_id).first()
-            if not teacher:
+            if not teacher_id in teachers_map:
                 print('Teacher ID %s not found for course %s', teacher_id, str(c))
                 continue
-            course.teachers.append(teacher)
+            course.teachers.append(teachers_map[teacher_id])
 
         db.session.add(course)
+        courses_map[unique_key] = course
 
         course_rate = CourseRate()
         course_rate.course = course
@@ -243,10 +337,11 @@ def load_course_locations():
 
     count = 0
     for c in parse_file('PK_PKJGB.txt'):
-        course = Course.query.filter_by(cno = c['KCBJH'], term = c['ND'] + c['XQ']).first()
-        if not course:
+        unique_key = c['KCBJH'].upper() + '|' + c['ND'] + c['XQ']
+        if not unique_key in courses_map:
             print('Course not found: ' + str(c))
             continue
+        course = courses_map[unique_key]
 
         loc = CourseTimeLocation()
         loc.course = course
@@ -267,30 +362,49 @@ def load_course_locations():
 def load_join_course():
     count = 0
     for c in parse_file('XK_XKJGB.txt'):
-        course = Course.query.filter_by(cno = c['KCBJH'], term=c['XNXQ']).first()
-        if not course:
+        unique_key = c['KCBJH'].upper() + '|' + c['XNXQ']
+        if not unique_key in courses_map:
             print('Course not found:' + str(c))
             continue
-
-        join_course = JoinCourse()
-        join_course.course = course
-        join_course.student_id = c['XH']
-        join_course.course_type = c['KCLB']
-        join_course.course_attr = c['KCSX']
-        join_course.join_time = datetime.strptime(c['XZSJ'], "%Y-%m-%dT%H:%M:%S")
-
-        db.session.add(join_course)
-        db.session.commit()
+        course = courses_map[unique_key]
+        if c['XH'] not in students_map:
+            print('Student id ' + c['XH'] + ' not found: ' + str(c))
+            continue
+        student = students_map[c['XH']]
+        course.students.append(student)
         count+=1
 
+    # join course info before 2012 does not exist in XKJGB
+    for c in parse_file('CJ_CJXXB.txt'):
+        if int(c['CJ']) < 0: # 可能已经退课
+            continue
+        if int(c['CJ']) > 100: # 二等级或五等级制课程，正常录入
+            pass
+        unique_key = c['KCBJH'].upper() + '|' + c['XQ']
+        if not unique_key in courses_map:
+            print('Course not found:' + str(c))
+            continue
+        course = course_map[unique_key]
+        if c['XH'] not in students_map:
+            print('Student id ' + c['XH'] + ' not found: ' + str(c))
+            continue
+        student = students_map[c['XH']]
+        if not student in course.students:
+            course.students.append(student)
+            count+=1
+
+    db.session.commit()
     print('%d xuanke info loaded' % count)
 
 
 db.drop_all()
 db.create_all()
 load_depts()
+load_classes()
+load_majors()
+load_titles()
+load_students()
 load_teacher()
 load_course()
 load_course_locations()
-load_students()
 load_join_course()
