@@ -25,6 +25,7 @@ def parse_file(filename):
     return data
 
 depts_map = dict()
+depts_code_map = dict()
 
 def load_depts():
     count = 0
@@ -33,10 +34,12 @@ def load_depts():
         dept.id = c['DWDM']
         dept.name = c['DWMC']
         dept.name_eng = c['YWMC']
+        dept.code = c['DWBH']
 
-        db.session.add(dept)
+        db.session.merge(dept)
         count+=1
         depts_map[dept.id] = dept.name
+        depts_code_map[dept.code] = dept.id
 
     db.session.commit()
     print('%d departments loaded' % count)
@@ -396,8 +399,67 @@ def load_join_course():
     db.session.commit()
     print('%d xuanke info loaded' % count)
 
+def load_grad_students(insert=True):
+    count = 0
+    for c in parse_file('V_XSXX_GS.txt'):
+        if c['XUEHAO'] in students_map:
+            print('Graduate student found in undergradute map: ' + str(c))
+            continue
 
-db.drop_all()
+        stu = Student()
+        stu.sno = c['XUEHAO']
+        stu.name = c['NAME']
+        if c['DEPT_CODE'] in depts_code_map:
+            stu.dept_id = depts_code_map[c['DEPT_CODE']]
+
+        if c['XINGBIE'] == 1:
+            stu.gender = 'male'
+        elif c['XINGBIE'] == 2:
+            stu.gender = 'female'
+        else:
+            stu.gender = 'unknown'
+
+        db.session.merge(stu)
+        count+=1
+        students_map[stu.sno] = stu
+
+    db.session.commit()
+    print('%d grad students loaded' % count)
+
+def load_grad_join_course():
+    count = 0
+    for c in parse_file('GRAD_XK_GCB.txt'):
+        unique_key = c['KCBJH'].upper() + '|' + c['XNXQ']
+        if not unique_key in courses_map:
+            print('Course not found:' + str(c))
+            continue
+        course = courses_map[unique_key]
+        if c['SNO'] not in students_map:
+            print('Student id ' + c['SNO'] + ' not found: ' + str(c))
+            continue
+        student = students_map[c['SNO']]
+        course.students.append(student)
+        count+=1
+
+    for c in parse_file('GRAD_XK_JGB.txt'):
+        unique_key = c['KCBJH'].upper() + '|' + c['XNXQ']
+        if not unique_key in courses_map:
+            print('Course not found:' + str(c))
+            continue
+        course = courses_map[unique_key]
+        if c['SNO'] not in students_map:
+            print('Student id ' + c['SNO'] + ' not found: ' + str(c))
+            continue
+        student = students_map[c['SNO']]
+        if not student in course.students:
+            course.students.append(student)
+            count+=1
+
+    db.session.commit()
+    print('%d grad xuanke info loaded' % count)
+
+
+#db.drop_all()
 db.create_all()
 load_depts()
 load_classes()
