@@ -177,7 +177,7 @@ class User(db.Model, UserMixin):
             authenticated = user.check_password(password)
         else:
             authenticated = False
-        return user, authenticated
+        return user, authenticated, user.confirmed if user else False
 
     def bind_student(self,sno):
         if self.identity == 'Student':
