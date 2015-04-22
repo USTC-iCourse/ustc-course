@@ -216,6 +216,7 @@ class Dept(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
     name = db.Column(db.String(100))
     name_eng = db.Column(db.String(200))
+    code = db.Column(db.String(10))
 
 # 专业
 class Major(db.Model):
@@ -240,6 +241,7 @@ class Student(db.Model):
 
     sno = db.Column(db.String(20), unique=True, primary_key=True)
     name = db.Column(db.String(80))
+    email = db.Column(db.String(80))
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
     dept_class_id = db.Column(db.Integer, db.ForeignKey('dept_classes.id'))
     major_id = db.Column(db.Integer, db.ForeignKey('majors.id'))
