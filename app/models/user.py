@@ -307,6 +307,7 @@ class Teacher(db.Model):
     gender = db.Column(db.Enum('male','female','unknown'),default='unknown')
     description = db.Column(db.Text())
     homepage = db.Column(db.Text)
+    _image = db.Column(db.String(100))
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
@@ -326,6 +327,12 @@ class Teacher(db.Model):
             db.session.add(teacher)
             db.session.commit()
             return teacher
+
+    @property
+    def image(self):
+        if self._image:
+            return '/uploads/images/' + self._image
+        return '/static/image/user.png'
 
 
 

@@ -54,6 +54,8 @@ class Course(db.Model):
     class_numbers = db.Column(db.String(200)) # 上课班级
     start_week = db.Column(db.Integer)  # 起始周
     end_week = db.Column(db.Integer) # 终止周
+    _image = db.Column(db.String(100))
+
     time_locations = db.relationship('CourseTimeLocation', backref='course')
 
     __table_args__ = (db.UniqueConstraint('cno', 'term'), )
@@ -260,6 +262,12 @@ class Course(db.Model):
             return 'Unknown'
         else:
             return ', '.join([teacher.name for teacher in self.teachers])
+
+    @property
+    def image(self):
+        if self._image:
+            return '/uploads/images/' + self._image
+        return '/static/image/user.png'
 
 
 class CourseRate(db.Model):
