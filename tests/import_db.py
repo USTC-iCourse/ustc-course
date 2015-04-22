@@ -57,7 +57,7 @@ def load_classes():
         else:
             dept_class.dept = c['SSYX']
         
-        db.session.add(dept_class)
+        db.session.merge(dept_class)
         count+=1
         classes_map[dept_class.id] = dept_class.name
 
@@ -75,7 +75,7 @@ def load_majors():
         major.name_eng = c['YWMC']
         major.code = c['ZYBH']
 
-        db.session.add(major)
+        db.session.merge(major)
         count+=1
         majors_map[major.id] = major.name
 
@@ -148,13 +148,13 @@ def load_students():
             else:
                 print('Department ' + c['LQYX'] + ' not found for student ' + str(c))
 
-        db.session.add(stu)
+        db.session.merge(stu)
         count+=1
         students_map[stu.sno] = stu;
 
     # students in XJ_XSBYMDB but not in XJ_XSXXB
     for sno in students:
-        db.session.add(students[sno])
+        db.session.merge(students[sno])
         count+=1
         students_map[stu.sno] = stu;
 
@@ -181,7 +181,7 @@ def load_teacher():
         t.office_phone = c['OFFICEPHONE']
         t.description = c['INTRODUCTION']
 
-        db.session.add(t)
+        db.session.merge(t)
         count+=1
         teachers_map[t.id] = t
 
@@ -190,7 +190,7 @@ def load_teacher():
 
 courses_map = dict()
 
-def load_course():
+def load_course(insert=True):
     course_major_dict = dict(
         ES   =   '电子科学技术',
         NU   =   '核科学类',
@@ -295,7 +295,15 @@ def load_course():
         info['end_week'] = c['JZZ']
         info['course_level'] = course_level_dict[int_allow_empty(c['KCCCDM'])]
 
-        course = Course()
+        course = Course.query.filter_by(term=info['term'], cno=info['cno']).first()
+        if not course:
+            course = Course()
+            db.session.add(course)
+
+            course_rate = CourseRate()
+            course_rate.course = course
+            db.session.add(course_rate)
+
         for key in info:
             setattr(course, key, info[key])
 
@@ -306,13 +314,7 @@ def load_course():
                 continue
             course.teachers.append(teachers_map[teacher_id])
 
-        db.session.add(course)
         courses_map[unique_key] = course
-
-        course_rate = CourseRate()
-        course_rate.course = course
-        db.session.add(course_rate)
-
         count+=1
 
     db.session.commit()
@@ -356,7 +358,7 @@ def load_course_locations():
         else:
             loc.note = c['BEIY1']
 
-        db.session.add(loc)
+        db.session.merge(loc)
         count+=1
 
     db.session.commit()
@@ -459,6 +461,7 @@ def load_grad_join_course():
     print('%d grad xuanke info loaded' % count)
 
 
+# we have merge now, do not drop existing data
 #db.drop_all()
 db.create_all()
 load_depts()
@@ -470,3 +473,5 @@ load_teacher()
 load_course()
 load_course_locations()
 load_join_course()
+load_grad_students()
+load_grad_join_course()
