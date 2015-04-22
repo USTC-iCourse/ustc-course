@@ -217,6 +217,22 @@ class Dept(db.Model):
     name = db.Column(db.String(100))
     name_eng = db.Column(db.String(200))
 
+# 专业
+class Major(db.Model):
+    __tablename__ = 'majors'
+
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    name = db.Column(db.String(200))
+    name_eng = db.Column(db.String(200))
+    code = db.Column(db.String(20))
+
+# 行政班级
+class DeptClass(db.Model):
+    __tablename__ = 'dept_classes'
+
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    name = db.Column(db.String(100))
+    dept = db.Column(db.Integer, db.ForeignKey('depts.id'))
 
 # Students could login
 class Student(db.Model):
@@ -225,12 +241,15 @@ class Student(db.Model):
     sno = db.Column(db.String(20), unique=True, primary_key=True)
     name = db.Column(db.String(80))
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
-    dept_class = db.Column(db.String(80))
-    major = db.Column(db.String(80))
+    dept_class_id = db.Column(db.Integer, db.ForeignKey('dept_classes.id'))
+    major_id = db.Column(db.Integer, db.ForeignKey('majors.id'))
+    gender = db.Column(db.Enum('male','female','unknown'),default='unknown')
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     dept = db.relationship('Dept', backref='students')
+    dept_class = db.relationship('DeptClass', backref='students')
+    major = db.relationship('Major')
     courses_joined = db.relationship('Course', secondary = join_course, backref='students',lazy='dynamic')
 
     def __repr__(self):
@@ -283,6 +302,9 @@ class Teacher(db.Model):
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
 
     email = db.Column(db.String(80))
+    title = db.Column(db.String(80))
+    office_phone = db.Column(db.String(80))
+    gender = db.Column(db.Enum('male','female','unknown'),default='unknown')
     description = db.Column(db.Text())
     homepage = db.Column(db.Text)
 
