@@ -188,6 +188,8 @@ def load_teacher():
     db.session.commit()
     print('%d teachers loaded' % count)
 
+# We should load all existing courses, because SQLAlchemy does not support .merge on non-primary-key,
+# and we want to preserve course ID (primary key) for each (cno, term) pair.
 courses_map = dict()
 
 def load_course(insert=True):
@@ -252,6 +254,11 @@ def load_course(insert=True):
         '二分制',
         '五分制',
     ]
+    
+    existing_courses = Course.query.all()
+    for c in existing_courses:
+        unique_key = c.cno + '|' + c.term
+        courses_map[unique_key] = c
 
     int_allow_empty = lambda string: int(string) if string.strip() else 0
     course_kcbh = {}
@@ -280,11 +287,6 @@ def load_course(insert=True):
             print('Course ' + c['KCBH'] + ' exists in MV_PK_PKJGXS but not in JH_KC_ZK: ' + str(c))
             continue
 
-        unique_key = c['KCBJH'].upper() + '|' + c['XQ']
-        if unique_key in courses_map:
-            print('Course unique key ' + unique_key + ' conflicts: ' + str(c))
-            continue
-
         info = course_kcbh[c['KCBH']]
         info['term'] = c['XQ']
         info['cno'] = c['KCBJH'].upper()
@@ -295,8 +297,10 @@ def load_course(insert=True):
         info['end_week'] = c['JZZ']
         info['course_level'] = course_level_dict[int_allow_empty(c['KCCCDM'])]
 
-        course = Course.query.filter_by(term=info['term'], cno=info['cno']).first()
-        if not course:
+        unique_key = c['KCBJH'].upper() + '|' + c['XQ']
+        if unique_key in courses_map:
+            course = courses_map[unique_key]
+        else:
             course = Course()
             db.session.add(course)
 
