@@ -390,10 +390,10 @@ def load_join_course():
             print('Course not found:' + str(c))
             continue
         course = courses_map[unique_key]
-        if c['XH'] not in students_map:
-            print('Student id ' + c['XH'] + ' not found: ' + str(c))
+        if c['SNO'] not in students_map:
+            print('Student id ' + c['SNO'] + ' not found: ' + str(c))
             continue
-        student = students_map[c['XH']]
+        student = students_map[c['SNO']]
         if not student in course.students:
             course.students.append(student)
             count+=1
