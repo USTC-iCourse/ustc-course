@@ -269,6 +269,9 @@ class Course(db.Model):
             return '/uploads/images/' + self._image
         return '/static/image/user.png'
 
+    def reviewed(self, user=current_user):
+        return (user in self.review_users)
+
 
 class CourseRate(db.Model):
     __tablename__ = 'course_rates'

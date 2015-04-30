@@ -3,6 +3,7 @@ from flask.ext.security import current_user,login_required
 from app.models import Course, Review
 from app.forms import ReviewForm
 from app.utils import sanitize
+from flask.ext.babel import gettext as _
 
 review = Blueprint('review',__name__)
 
@@ -13,6 +14,10 @@ def new_review(course_id):
     course = Course.query.get(course_id)
     if not course:
         abort(404)
+    user = current_user
+    if course.reviewed():
+        return render_template('feedback.html', status=False, message = _('You can add one review for each course.Please modify your review.\
+                Click <a href='+ url_for('course.view_course',course_id=course_id) + '>here</a> to return.'))
     form = ReviewForm(request.form)
     review = Review()
     if form.validate_on_submit():

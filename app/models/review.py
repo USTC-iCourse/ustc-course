@@ -39,12 +39,18 @@ class Review(db.Model):
     def add(self):
         '''crete a new review'''
         if self.course and self.author:
+            # Make sure that each user can only add one review for each course
+            if self.author in self.course.review_users:
+                return None
             course_rate = self.course.course_rate
             course_rate.add(self.difficulty,
                     self.homework,
                     self.grading,
                     self.gain,
                     self.rate)
+            # Make sure that each user can only add one review for each course
+            self.course.review_users.append(self.author)
+            db.session.add(self.course)
             db.session.add(self)
             db.session.commit()
             return self

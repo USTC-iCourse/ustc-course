@@ -39,6 +39,10 @@ downvote_course = db.Table('downvote_course',
     db.Column('course_id', db.Integer, db.ForeignKey('courses.id'))
     )
 
+review_course = db.Table('review_course',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'))
+    )
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -56,7 +60,6 @@ class User(db.Model, UserMixin):
     confirmed_at = db.Column(db.DateTime())
     last_login_time = db.Column(db.DateTime())#TODO:login
 
-    # We need "use_alter" to avoid circular dependency in FOREIGN KEYs between Student and ImageStore
     homepage = db.Column(db.String(200))  # 用户博客、主页等
     description = db.Column(db.Text)
     _avatar = db.Column(db.String(100))
@@ -66,6 +69,7 @@ class User(db.Model, UserMixin):
     courses_downvoted = db.relationship('Course', secondary = downvote_course, backref='downvote_users')
     _student_info = db.relationship('Student', backref='user',uselist=False)
     _teacher_info = db.relationship('Teacher', backref='user',uselist=False)
+    reviewed_course = db.relationship('Course',secondary = review_course, backref='review_users')
 
     def __init__(self, username, email, password):
         self.username = username
