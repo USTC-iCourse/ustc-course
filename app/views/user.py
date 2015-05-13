@@ -97,7 +97,9 @@ def password():
 @user.route('/settings/bind/',methods=['GET','POST'])
 @login_required
 def bind_identity():
+    user = current_user
     identity = current_user.identity
+    form = ProfileForm(request.form,user)
     if identity == 'Student':
         if request.method == "POST":
             sno = request.form.get('sno')
@@ -105,16 +107,16 @@ def bind_identity():
                 ok,message = current_user.bind_student(sno)
                 current_user.save()
                 if ok:
-                    return render_template('feedback.html',status=True,message=message)
+                    return redirect(url_for('.account_settings'))
                 else:
                     return render_template('bind-stu.html',user=current_user,error=message)
             else:
-                error = _('You must specify a student ID!')
+                error = _('必须输入一个学号!')
                 return render_template('bind-stu.html',user=current_user,error=error)
         else:
             return render_template('bind-stu.html',user=current_user,error=None)
     elif identity == 'Teacher':
-        return render_template('feedback.html',status=False,message=_('You can\'t bind a teacher identity now.Please contact us for more information.'))
+        return render_template('feedback.html',status=False,message=_('暂时还不能用'))
     else:
         email_suffix = current_user.email.split('@')[-1]
         if email_suffix == 'mail.ustc.edu.cn':

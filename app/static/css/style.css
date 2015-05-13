@@ -241,11 +241,6 @@ p { line-height: 25px; word-wrap: break-word; }
     width: 45px;
     line-height: 45px;
 }
-@media (min-width:768px){
-    #inputCourse {
-        width: 320px;
-    }
-}
 
 /* signin modal part from bootstrap */
 .form-signin {

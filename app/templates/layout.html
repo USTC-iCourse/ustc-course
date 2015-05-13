@@ -18,9 +18,9 @@
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li style="display: none"><a href="{{ url_for('home.index') }}">Home</a></li>
-          <li><a href="{{ url_for('course.index') }}">Course</a></li>
-          <li style="display: none"><a href="#">Forum</a></li>
+          <li style="display: none"><a href="{{ url_for('home.index') }}">主页</a></li>
+          <li><a href="{{ url_for('course.index') }}">课程</a></li>
+          <li style="display: none"><a href="#">论坛</a></li>
         </ul>
 
         
@@ -34,14 +34,14 @@
         
         <ul class="nav navbar-nav navbar-right">
           {% if current_user.is_authenticated() %}
-          <li><a href="#" style="display: none">Notice</a></li>
+          <li><a href="#" style="display: none">通知</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
-              <li><a href="{{ url_for('user.view_profile', user_id=current_user.id) }}">Profile</a></li>
-              <li><a href="{{ url_for('user.account_settings', user_id=current_user.id) }}">Settings</a></li>
+              <li><a href="{{ url_for('user.view_profile', user_id=current_user.id) }}">个人主页</a></li>
+              <li><a href="{{ url_for('user.account_settings', user_id=current_user.id) }}">设置</a></li>
               <li class="divider"></li>
-              <li><a href="{{ url_for('home.logout') }}">Log out</a></li>
+              <li><a href="{{ url_for('home.logout') }}">退出</a></li>
             </ul>
           </li>
           {% else %}
@@ -53,21 +53,21 @@
                 <form id="signin-form" class="form-signin">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                   <div class="form-signin-heading">
-                    <span class="h2">Please sign in</span>
-                    <a class="btn btn-default float-right" href="/signup">Sign Up</a>
+                    <span class="h2">请登录</span>
+                    <a class="btn btn-default float-right" href="/signup">注册</a>
                   </div>
                   <div id="signin-alert" role="alert" class="display: none"></div>
-                  <label for="inputEmail" class="sr-only">Username</label>
-                  <input type="text" name="username" id="inputEmail" class="form-control" placeholder="Email or username" required autofocus>
-                  <label for="inputPassword" class="sr-only">Password</label>
-                  <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                  <label for="inputEmail" class="sr-only">用户名</label>
+                  <input type="text" name="username" id="inputEmail" class="form-control" placeholder="用户名或邮箱" required autofocus>
+                  <label for="inputPassword" class="sr-only">密码</label>
+                  <input type="password" name="password" id="inputPassword" class="form-control" placeholder="密码" required>
                   <div class="checkbox">
                     <label>
-                      <input type="checkbox" name="remember"> Remember me
+                      <input type="checkbox" name="remember">记住我
                     </label>
-                    <a class="float-right" href="{{ url_for('home.forgot_password') }}">Forgot Password</a>
+                    <a class="float-right" href="{{ url_for('home.forgot_password') }}">忘记密码</a>
                   </div>
-                  <button class="btn btn-lg btn-blue btn-block" type="submit">Sign in</button>
+                  <button class="btn btn-lg btn-blue btn-block" type="submit">登录</button>
                 </form>
 
               </div>
@@ -131,7 +131,7 @@
          }
        },
        error: function(e) {
-         signin_alert('Oops! 服务器正在睡觉，请稍后再试。', "warning");
+         signin_alert('天了噜! 服务器正在睡觉，请稍后再试。', "warning");
        }
      })
    });

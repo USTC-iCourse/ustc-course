@@ -185,11 +185,11 @@ class User(db.Model, UserMixin):
             student = Student.query.get(sno)
             if student:
                 self._student_info = student
-                return True,_('Bind student successed!')
+                return True,_('成功绑定！')
             else:
-                return False,_('Can\' find a student with ID:%(sno)s!',sno=sno)
+                return False,_('找不到这个学号：%(sno)s！',sno=sno)
         else:
-            return False,_('You can\'t bind a student identity.')
+            return False,_('无法绑定学号。')
 
     def bind_teacher(self,email):
         if self.identity == 'Teacher':
@@ -198,11 +198,11 @@ class User(db.Model, UserMixin):
                 self._teacher_info = teacher
                 self.description = teacher.description
                 self.homepage = teacher.homepage
-                return True,_('Bind student successed!')
+                return True,_('绑定成功！')
             else:
-                return False,_('Can\' find a teacher with email:%(email)s!',email=email)
+                return False,_('找不到教师邮箱：%(email)s！',email=email)
         else:
-            return False,_('You can\'t bind a teacher identity.')
+            return False,_('无法绑定教师身份。')
 
     def save(self):
         db.session.add(self)
