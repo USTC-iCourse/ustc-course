@@ -65,6 +65,9 @@ body {
 }
 p { line-height: 25px; word-wrap: break-word; }
 
+.lh-sm {
+    line-height: 20px;
+}
 
 .bm-pd-md {
     padding-bottom: 15px;

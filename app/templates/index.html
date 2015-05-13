@@ -7,27 +7,57 @@
     <h3 class="blue">USTC评课社区</h3>
     <hr>
 
-    <form class="form-inline mobile" action="search" method="get">
+    <form class="ud-pd-sm mobile" action="search" method="get">
       <div class="form-group">
         <input type="text" name="q" class="form-control input-lg" placeholder="搜索你感兴趣的课程">
       </div>
     </form>
 
-    <div class="ud-pd-sm">
-    <h4 class="blue">热门点评（Top10）</h4>
-    {% for i in range(10) %}
-    
-    {% endfor %}
+
+    <div class="bm-pd-md">
+      <h4 class="blue">热门点评（Top5）</h4>
+
+      <!-- 这是假数据，为了设计引入的。-->
+      {% for i in range(5) %}
+      <div class="ud-pd-md dashed">
+        <div class="row">
+          <div class="col-md-1 col-xs-2">
+            <div class="bm-pd-md"><a>jenny42</a></div>
+            <img class="avatar-md cicle" src="/static/image/avatar.jpg"/>
+          </div>
+          <div class="col-md-8 col-xs-10">
+            <div class="grey bm-pd-md">点评了 <a>代数结构（韩文廷）</a>
+              <span class="blue float-right"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>10</span>
+            </div>
+            <p class="text-muted">老师年轻有为，认真负责，态度诚恳，上课有趣，特别好啦啦啦啦啦啦，为什么要把 2013年11月20日的首页单独拿出来说呢？因为我觉得，首页的【精选推荐】实在是一大改进，我非常喜欢首页的推荐<a> >>更多</a> </p>
+          </div><!-- ./col-md-8 -->
+        </div><!-- ./row -->
+      </div><!-- ./dashed -->
+      {% endfor %}
     </div>
 
-    <div class="ud-pd-sm">
-    <h4 class="blue">最新点评（Last10）</h4>
-    {% for i in range(10) %}
-    
-    {% endfor %}
+    <div class="bm-pd-md">
+      <h4 class="blue">最新点评（Last5）</h4>
+
+      <!-- 这是假数据，为了设计引入的。-->
+      {% for i in range(5) %}
+      <div class="ud-pd-md dashed">
+        <div class="row">
+          <div class="col-md-1 col-xs-2">
+            <div class="bm-pd-md"><a>jenny42</a></div>
+            <img class="avatar-md cicle" src="/static/image/avatar.jpg"/>
+          </div>
+          <div class="col-md-8 col-xs-10">
+            <div class="grey bm-pd-md">点评了 <a>代数结构（韩文廷）</a>
+              <span class="float-right">5-13 12:00</span>
+            </div>
+            <p class="text-muted">老师年轻有为，认真负责，态度诚恳，上课有趣，特别好啦啦啦啦啦啦，为什么要把 2013年11月20日的首页单独拿出来说呢？因为我觉得，首页的【精选推荐】实在是一大改进，我非常喜欢首页的推荐<a> >>更多</a> </p>
+          </div><!-- ./col-md-8 -->
+        </div><!-- ./row -->
+      </div><!-- ./dashed -->
+      {% endfor %}
+
     </div>
-
-
 
   </div><!-- /.float-element -->
 </div><!-- /.container -->
