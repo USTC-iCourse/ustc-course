@@ -35,7 +35,7 @@ class Course(db.Model):
     term = db.Column(db.String(10), index=True) # 学年学期，例如 20142 表示 2015 年春季学期
     name = db.Column(db.String(80), index=True) # 课程名称
     kcid = db.Column(db.Integer)    # 课程id
-    dept = db.Column(db.String(80), index=True) # 开课单位
+    dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
 
     course_major = db.Column(db.String(20)) # 学科类别
     course_type = db.Column(db.String(20)) # 课程类别，计划内，公选课……
@@ -57,6 +57,7 @@ class Course(db.Model):
     _image = db.Column(db.String(100))
 
     time_locations = db.relationship('CourseTimeLocation', backref='course')
+    _dept = db.relationship('Dept', backref='courses', lazy='joined')
 
     __table_args__ = (db.UniqueConstraint('cno', 'term'), )
 
@@ -85,6 +86,10 @@ class Course(db.Model):
         db.session.add(course)
         db.session.commit()
         return course
+
+    @property
+    def dept(self):
+        return self._dept.name
 
     @property
     def course_rate(self):
