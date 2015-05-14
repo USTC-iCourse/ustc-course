@@ -28,18 +28,26 @@ depts_map = dict()
 depts_code_map = dict()
 
 def load_depts():
+    existing_depts = Course.query.all()
+    for dept in existing_depts:
+        depts_map[dept.id] = dept
+
     count = 0
     for c in parse_file('JT_DWDM.txt'):
-        dept = Dept()
-        dept.id = c['DWDM']
+        if int(c['DWDM']) in depts_map:
+            dept = depts_map[int(c['DWDM'])]
+        else:
+            dept = Dept()
+            dept.id = int(c['DWDM'])
         dept.name = c['DWMC']
         dept.name_eng = c['YWMC']
         dept.code = c['DWBH']
 
-        db.session.merge(dept)
+        if not dept in db.session:
+            db.session.add(dept)
         count+=1
-        depts_map[dept.id] = dept.name
-        depts_code_map[dept.code] = dept.id
+        depts_map[dept.id] = dept
+        depts_code_map[dept.code] = dept
 
     db.session.commit()
     print('%d departments loaded' % count)
@@ -47,17 +55,25 @@ def load_depts():
 classes_map = dict()
 
 def load_classes():
+    existing_classes = DeptClass.query.all()
+    for c in existing_classes:
+        classes_map[c.id] = c
+
     count = 0
     for c in parse_file('JT_XZBJB.txt'):
-        dept_class = DeptClass()
-        dept_class.id = c['BJID']
-        dept_class.name = c['XZBJMC']
-        if c['SSYX'] and not c['SSYX'] in depts_map:
-            print('Department ' + c['SZYX'] + ' not found for class ' + str(c))
+        if int(c['BJID']) in classes_map:
+            dept_class = classes_map[int(c['BJID'])]
         else:
-            dept_class.dept = c['SSYX']
+            dept_class = DeptClass()
+            dept_class.id = int(c['BJID'])
+        dept_class.name = c['XZBJMC']
+        if c['SSYX'] and not int(c['SSYX']) in depts_map:
+            print('Department ' + c['SSYX'] + ' not found for class ' + str(c))
+        else:
+            dept_class.dept = int(c['SSYX'])
         
-        db.session.merge(dept_class)
+        if not dept_class in db.session:
+            db.session.add(dept_class)
         count+=1
         classes_map[dept_class.id] = dept_class.name
 
@@ -67,15 +83,23 @@ def load_classes():
 majors_map = dict()
 
 def load_majors():
+    existing_majors = Major.query.all()
+    for major in existing_majors:
+        majors_map[major.id] = major
+
     count = 0
     for c in parse_file('JT_ZYDM.txt'):
-        major = Major()
-        major.id = c['ZYDM']
+        if int(c['ZYDM']) in majors_map:
+            major = majors_map[int(c['ZYDM'])]
+        else:
+            major = Major()
+            major.id = int(c['ZYDM'])
         major.name = c['ZYMC']
         major.name_eng = c['YWMC']
         major.code = c['ZYBH']
 
-        db.session.merge(major)
+        if not major in db.session:
+            db.session.add(major)
         count+=1
         majors_map[major.id] = major.name
 
@@ -96,33 +120,43 @@ students = dict()
 students_map = dict()
 
 def load_students():
+    existing_students = Student.query.all()
+    for stu in existing_students:
+        students_map[stu.sno] = stu
+
     count = 0
     for c in parse_file('XJ_XSBYMDB.txt'):
-        stu = Student()
-        stu.sno = c['SNO']
+        if c['SNO'] in students_map:
+            stu = students_map[c['SNO']]
+        else:
+            stu = Student()
+            stu.sno = c['SNO']
         stu.name = c['XM']
 
-        if c['XB'] == 1:
+        if c['XB'] == '1':
             stu.gender = 'male'
-        elif c['XB'] == 2:
+        elif c['XB'] == '2':
             stu.gender = 'female'
         else:
             stu.gender = 'unknown'
 
-        if c['SZYX'] in depts_map:
-            stu.dept_id = int(c['SZYX'])
-        elif len(c['SZYX']) > 0:
-            print('Department ' + c['SZYX'] + ' not found for student ' + str(c))
+        if c['SZYX']:
+            if int(c['SZYX']) in depts_map:
+                stu._dept = depts_map[int(c['SZYX'])]
+            elif int(c['SZYX']) > 0:
+                print('Department ' + c['SZYX'] + ' not found for student ' + str(c))
 
-        if c['XZBJ'] in classes_map:
-            stu.dept_class_id = int(c['XZBJ'])
-        elif len(c['XZBJ']) > 0:
-            print('Class ' + c['XZBJ'] + ' not found for student ' + str(c))
+        if c['XZBJ']:
+            if int(c['XZBJ']) in classes_map:
+                stu.dept_class_id = int(c['XZBJ'])
+            elif int(c['XZBJ']) > 0:
+                print('Class ' + c['XZBJ'] + ' not found for student ' + str(c))
 
-        if c['SXZY'] in majors_map:
-            stu.major_id = int(c['SXZY'])
-        elif len(c['SXZY']) > 0:
-            print('Major ' + c['SXZY'] + ' not found for student ' + str(c))
+        if c['SXZY']:
+            if int(c['SXZY']) in majors_map:
+                stu.major_id = int(c['SXZY'])
+            elif int(c['SXZY']) > 0:
+                print('Major ' + c['SXZY'] + ' not found for student ' + str(c))
 
         students[stu.sno] = stu;
 
@@ -137,51 +171,63 @@ def load_students():
             stu.sno = c['SNO']
             stu.name = c['XM']
             stu.email = c['EMAIL']
-            if c['XB'] == 1:
+            if c['XB'] == '1':
                 stu.gender = 'male'
-            elif c['XB'] == 2:
+            elif c['XB'] == '2':
                 stu.gender = 'female'
             else:
                 stu.gender = 'unknown'
-            if c['LQYX'] in depts_map:
-                stu.dept_id = int(c['LQYX'])
+            if c['LQYX'] and int(c['LQYX']) in depts_map:
+                stu._dept = depts_map[int(c['LQYX'])]
             else:
                 print('Department ' + c['LQYX'] + ' not found for student ' + str(c))
 
-        db.session.merge(stu)
+        if not stu in db.session:
+            db.session.add(stu)
         count+=1
         students_map[stu.sno] = stu;
 
     # students in XJ_XSBYMDB but not in XJ_XSXXB
     for sno in students:
-        db.session.merge(students[sno])
+        stu = students[sno]
+        if not stu in db.session:
+            db.session.add(stu)
         count+=1
-        students_map[stu.sno] = stu;
+        students_map[stu.sno] = stu
 
     db.session.commit()
     print('%d students loaded' % count)
 
 teachers_map = dict()
 
-def load_teacher():
+def load_teachers():
+    existing_teachers = Teacher.query.all()
+    for t in existing_teachers:
+        teachers_map[t.id] = t
+
     count = 0
     for c in parse_file('T_YHXXB.txt'):
-        t = Teacher()
-        t.id = c['YHID']
+        if int(c['YHID']) in teachers_map:
+            t = teachers_map[int(c['YHID'])]
+        else:
+            t = Teacher()
+            t.id = int(c['YHID'])
         t.name = c['XM']
-        if c['XBDM'] == 1:
+        if c['XBDM'] == '1':
             t.gender = 'male'
-        elif c['XBDM'] == 2:
+        elif c['XBDM'] == '2':
             t.gender = 'female'
         else:
             t.gender = 'unknown'
-        t.dept_id = int(c['DWDM']) if c['DWDM'] in depts_map else None
+        if c['DWDM'] and int(c['DWDM']) in depts_code_map:
+            t._dept = depts_code_map[int(c['DWDM'])]
         t.email = c['EMAIL']
         t.title = titles_map[c['TITLEDM']] if c['TITLEDM'] in titles_map else None
         t.office_phone = c['OFFICEPHONE']
         t.description = c['INTRODUCTION']
 
-        db.session.merge(t)
+        if not t in db.session:
+            db.session.add(t)
         count+=1
         teachers_map[t.id] = t
 
@@ -192,7 +238,7 @@ def load_teacher():
 # and we want to preserve course ID (primary key) for each (cno, term) pair.
 courses_map = dict()
 
-def load_course(insert=True):
+def load_courses(insert=True):
     course_major_dict = dict(
         ES   =   '电子科学技术',
         NU   =   '核科学类',
@@ -264,7 +310,7 @@ def load_course(insert=True):
     course_kcbh = {}
     for c in parse_file('JH_KC_ZK.txt'):
         course_kcbh[c['KCBH']] = dict(
-            kcid = c['KCID'],
+            kcid = int(c['KCID']),
             kcbh = c['KCBH'],
             name = c['KCZW'],
             name_eng = c['KCYW'],
@@ -287,34 +333,36 @@ def load_course(insert=True):
             print('Course ' + c['KCBH'] + ' exists in MV_PK_PKJGXS but not in JH_KC_ZK: ' + str(c))
             continue
 
-        info = course_kcbh[c['KCBH']]
-        info['term'] = c['XQ']
-        info['cno'] = c['KCBJH'].upper()
-        info['courseries'] = c['KCBH']
-        info['dept'] = c['DWMC']
-        info['class_numbers'] = c['SKBJH']
-        info['start_week'] = c['QSZ']
-        info['end_week'] = c['JZZ']
-        info['course_level'] = course_level_dict[int_allow_empty(c['KCCCDM'])]
-
         unique_key = c['KCBJH'].upper() + '|' + c['XQ']
         if unique_key in courses_map:
             course = courses_map[unique_key]
         else:
             course = Course()
+            course.term = c['XQ']
+            course.cno = c['KCBJH'].upper()
             db.session.add(course)
 
             course_rate = CourseRate()
             course_rate.course = course
             db.session.add(course_rate)
 
-        for key in info:
-            setattr(course, key, info[key])
+        course.courseries = c['KCBH']
+        if c['DWBH'] in depts_code_map:
+            course.dept_id = depts_code_map[c['DWBH']].id
+        else:
+            print('Department code ' + c['DWBH'] + ' not found in ' + str(c))
+        course.class_numbers = c['SKBJH']
+        course.start_week = c['QSZ']
+        course.end_week = c['JZZ']
+        course.course_level = course_level_dict[int_allow_empty(c['KCCCDM'])]
 
-        teacher_ids = c['JS'].split(',') if c['JS'] else []
+        for key in course_kcbh[c['KCBH']]:
+            setattr(course, key, course_kcbh[c['KCBH']][key])
+
+        teacher_ids = [ int(tid) for tid in c['JS'].split(',') ] if c['JS'] else []
         for teacher_id in teacher_ids:
             if not teacher_id in teachers_map:
-                print('Teacher ID %s not found for course %s', teacher_id, str(c))
+                print('Teacher ID ' + str(teacher_id) + ' not found for course ' + str(c))
                 continue
             course.teachers.append(teachers_map[teacher_id])
 
@@ -323,6 +371,8 @@ def load_course(insert=True):
 
     db.session.commit()
     print('%d courses loaded' % count)
+
+course_locations_map = dict()
 
 def load_course_locations():
     int_allow_empty = lambda string: int(string) if string.strip() else None
@@ -409,23 +459,23 @@ def load_grad_students(insert=True):
     count = 0
     for c in parse_file('V_XSXX_GS.txt'):
         if c['XUEHAO'] in students_map:
-            print('Graduate student found in undergradute map: ' + str(c))
-            continue
-
-        stu = Student()
-        stu.sno = c['XUEHAO']
+            stu = students_map[c['XUEHAO']]
+        else:
+            stu = Student()
+            stu.sno = c['XUEHAO']
         stu.name = c['NAME']
-        if c['DEPT_CODE'] in depts_code_map:
-            stu.dept_id = depts_code_map[c['DEPT_CODE']]
+        if c['DEPT_CODE'] and c['DEPT_CODE'] in depts_code_map:
+            stu._dept = depts_code_map[c['DEPT_CODE']]
 
-        if c['XINGBIE'] == 1:
+        if c['XINGBIE'] == '1':
             stu.gender = 'male'
-        elif c['XINGBIE'] == 2:
+        elif c['XINGBIE'] == '2':
             stu.gender = 'female'
         else:
             stu.gender = 'unknown'
 
-        db.session.merge(stu)
+        if not stu in db.session:
+            db.session.add(stu)
         count+=1
         students_map[stu.sno] = stu
 
@@ -472,9 +522,9 @@ load_depts()
 load_classes()
 load_majors()
 load_titles()
+load_teachers()
+load_courses()
 load_students()
-load_teacher()
-load_course()
 load_course_locations()
 load_join_course()
 load_grad_students()
