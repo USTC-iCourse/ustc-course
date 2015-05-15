@@ -166,7 +166,7 @@ def teacher_settings(teacher_id):
     form = ProfileForm(request.form, teacher)
     errors = []
     if form.validate_on_submit():
-        teacher.gender = form['gender'].data
+        #teacher.gender = form['gender'].data
         teacher.homepage = form['homepage'].data.strip()
         teacher.description = form['description'].data.strip()
         if request.files.get('avatar'):

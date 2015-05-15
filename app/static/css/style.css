@@ -191,9 +191,18 @@ p { line-height: 25px; word-wrap: break-word; }
 
 .shadow { box-shadow: 3px 3px 2px #ddd; }
 .btn-flat {
-    padding: 5px 21px;
     border: 0;
     border-radius: 0;
+}
+@media (max-width:768px) {
+.btn-flat {
+    padding: 5px 12px;
+    }
+}
+@media (min-width:769px) {
+.btn-flat {
+    padding: 5px 21px;
+    }
 }
 .btn-white {
     color: #1caaea;

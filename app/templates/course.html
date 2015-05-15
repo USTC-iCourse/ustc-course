@@ -95,7 +95,6 @@
 
           <button class="btn btn-white btn-flat btn-downvote btn-do"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 不推荐 <small>(<span class="count"></span>)</small></button>
           <button class="btn btn-blue btn-flat btn-downvote btn-undo"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 不推荐 <small>(<span class="count"></span>)</small></button>
-
           <span class="float-right" style="display: none" target="_blank"><a>查看{{ course.join_count }}位同班同学</a></span>
         </div>
 
@@ -144,14 +143,29 @@
             <p>{{ review.content|safe }}</p>
           </div>
 
-          <div id="review-{{ review.id }}" class="grey">
+          <div class="bm-pd-md grey" id="review-{{ review.id }}">
             <span class="small">{{ review.publish_time }}</span>
             <a href="javascript: update_review('upvote')"><span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> {{ review.upvote_count }}</a>
-            <a href="javascript: show_review_comments('review', {{ review.id }})"><span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> {{ review.comment_count }}</a>
+            <a href="javascript: show_review_comments({{ review.id }})"><span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> {{ review.comment_count }}</a>
             <span class="pull-right">
               <a href="javascript: update_review('delete', {{ review.id }})"><span class="glyphicon glyphicon-trash blue left-pd-md" aria-hidden="true"></span> {{ _('Delete') }}</a>
             </span>
           </div>
+
+          <div id="review-{{ review.id }}-comments" class="panel panel-default" style="display:none">
+            <div class="panel-body">
+              {% for i in range(3) %}
+              <div class="solid ud-pd-sm">
+                <a>jenny42</a>：
+                <span>lalallalalal</span>
+                <span class="text-muted small float-right">2015-5-13 12:20</span>
+              </div>
+              {% endfor %}
+              <textarea type="text" class="form-control" rows="2" id="comment" placeholder="你的评论"></textarea>
+              <div class="ud-pd-sm"><button class="btn btn-sm btn-white float-right">评论</button></div>
+            </div>
+          </div>
+
         </div>
         {% endfor %}
         {% endif %}
@@ -297,5 +311,15 @@
    }
    $('#action-btn-group').show();
  });
+
+ function show_review_comments(review_id)
+ {
+   if (document.getElementById('review-'+ review_id +'-comments').style.display=="block") {
+       document.getElementById('review-'+ review_id +'-comments').style.display="none";
+     }
+   else {
+     document.getElementById('review-'+ review_id +'-comments').style.display="block";
+   }
+ }
 </script>
 {% endblock %}
