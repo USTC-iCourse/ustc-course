@@ -101,7 +101,7 @@
         <div class="solid ud-pd-md inline-h3">
           <span class="blue h3">点评</span>
           {% if current_user.is_authenticated() %}
-          <a type="button" href="{{ url_for('review.new_review',course_id=course.id) }}" class="btn btn-white float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>写点评</a>
+          <a type="button" href="{{ url_for('course.new_review',course_id=course.id) }}" class="btn btn-white float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>写点评</a>
           {% else %}
           <a type="button" data-toggle="modal" data-target="#signin" class="btn btn-white float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true"></span>写点评</a>
           {% endif %}
