@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+
+  <div class="float-element">
+    <div class="row">
+      <div class="col-md-8 inline-h3">
+        <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">（{{ course.teacher.name }}）</span>
+        <span class="small grey align-bottom left-pd-sm">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+        <hr>
+
+        <table class="table table-condensed no-border">
+          <tr>
+            <td><strong>学科类别：</strong>{{ course.course_major or '未知' }}</td>
+            <td><strong>开课单位：</strong>{{ course.dept or '未知' }}</td>
+          </tr>
+          <tr>
+            <td><strong>课程层次：</strong>{{ course.course_level or '未知' }}</td>
+            <td><strong>学分：</strong>{{ course.credit or '未知' }}
+          </tr>
+          <tr>
+            <td><strong>时间：</strong>{{ course.time_locations_display or '未知' }}</td>
+            <td><strong>地点：</strong>{{ course.term_display or '未知' }}
+              <span class="float-right"><a href="http://mis.teach.ustc.edu.cn/gradkcjs.do?kcid={{ course.kcid }}" target="_blank">更多信息</a><span></td>
+          </tr>
+          <!--
+          暂时不用这些
+          <td><strong>评分制：</strong>{{ course.grading_type or '未知' }}</td>
+          <td><strong>周学时：</strong>{{ course.hours_per_week or '未知' }}</td>
+          -->
+          </tbody>
+        </table>
+
+        <form class="form-horizontal" method="post" enctype="multipart/form-data">
+          {{ form.csrf_token }}
+          <div>
+            课程主页链接：http://{{ form.homepage }}
+            <button type="submit" class="btn btn-sm btn-default">提交</button>
+          </div>
+        </form>
+
+      </div>
+
+    </div> <!-- row -->
+  </div>  <!-- float-element  -->
+</div>  <!-- container -->
+{% endblock %}
+
+
+
+
+{% block script %}
+<script></script>
+{% endblock %}

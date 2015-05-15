@@ -2,7 +2,7 @@ from flask import Blueprint,render_template,abort,redirect,url_for,request,abort
 from flask.ext.login import login_required
 from flask.ext.babel import gettext as _
 from app.models import *
-from app.forms import ReviewForm
+from app.forms import ReviewForm, CourseForm
 from app import db
 
 course = Blueprint('course',__name__)
@@ -205,6 +205,5 @@ def edit_course(course_id=None):
     if course_form.validate_on_submit():
         course_form.populate_obj(course)
         course = course.save()
-        flash('course saved')
-        return redirect('.view_course', course_id=course.id, course_name=course.name)
-    return render_template('edit-course.html', form=course_form)
+        db.session.commit()
+    return render_template('course-edit.html', form=course_form, course=course)

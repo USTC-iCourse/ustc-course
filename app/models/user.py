@@ -317,7 +317,6 @@ class Teacher(db.Model):
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
-    avatar = db.Column(db.Integer, db.ForeignKey('image_store.id'))
     dept = db.relationship('Dept', backref='teachers')
     #course
 
@@ -334,11 +333,16 @@ class Teacher(db.Model):
             db.session.commit()
             return teacher
 
+
     @property
     def image(self):
         if self._image:
             return '/uploads/images/' + self._image
-        return '/static/image/user.png'
+        return '/static/image/teacher.jpg'
 
+    def set_image(self, image):
+        self._image = image
 
-
+    def save(self):
+        db.session.add(self)
+        db.session.commit()

@@ -9,6 +9,8 @@
         <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">（{{ course.teacher.name }}）</span>
         <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
         <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+
+        <btn class="btn btn-link float-right"><a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程信息</a></btn>
         <hr>
         {% if course.review_count %}
         <div class="ud-pd-sm blue">
@@ -80,7 +82,9 @@
           </tbody>
         </table>
 
-        <p>课程主页：{{ course.homepage or '暂无' }}</p>
+        {% if course.homepage %}
+        <div>课程主页：<a href="http://{{ course.homepage }}">{{ course.homepage }}</a></div>
+        {% endif %}
 
         <div id="action-btn-group" class="ud-pd-md" style="display:none">
           <button class="btn btn-white btn-flat btn-follow btn-do"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span> 关注 <small>(<span class="count"></span>)</small></button>
@@ -153,23 +157,6 @@
         {% endif %}
       </div>
 
-      <!-- just for debug 
-      {{ course_rate.difficulty }}
-      {{ course_rate.homework }}
-      {{ course_rate.grading }}
-      {{ course_rate.gain }}
-      {{ course_rate.rate }}
-      {% for review in reviews %}
-      {{ review.difficulty }}
-      {{ review.homework }}
-      {{ review.grading }}
-      {{ review.gain }}
-      {{ review.content }}
-      {{ review.author.username }}
-      {{ review.author.email }}
-      {% endfor %}
-      -->
-
 
 
       <!-- 右边栏 -->
@@ -177,17 +164,22 @@
       <div class="col-md-4 rl-pd-lg">
         {% for teacher in course.teachers %}
         <div class="ud-pd-md dashed">
-          <img class="avatar-lg cicle" src="/static/image/teacher.jpg"/>
+          <img class="avatar-lg cicle" src="{{ teacher.image }}"/>
+          <btn class="btn btn-link float-right"><a href="{{ url_for('user.teacher_settings', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
           <h3 class="blue">{{ teacher.name }}</h3>
           <p>{{ teacher.dept.name }}</p>
           <p>研究方向：暂无</p>
-          <p><a target="_blank">教师介绍：暂无</a></p>
+          <p>教师主页：
+            {% if teacher.homepage %}
+            <a href="http://{{ teacher.homepage }}" target="_blank">{{ teacher.homepage }}</a>
+            {% else %}暂无{% endif %}
+          </p>
           <div class="ud-pd-md" style="display: none"><a>教师排行榜：23</a></div>
         </div>
         {% endfor %}
         {% if course.teachers_count == 0 %}
         <div class="ud-pd-md dashed">
-          <img class="avatar-lg cicle" src="/static/image/teacher.jpg"/>
+          <img class="avatar-lg cicle" src="{{ teacher.avatar }}"/>
           <h3 class="blue">老师甲</h3>
         </div>
         {% endif %}

@@ -68,7 +68,7 @@ class ResetPasswordForm(Form):
 
 class ProfileForm(Form):
     #username = UsernameField('Username', validators=[DataRequired(),Length(max=30,message='The length must unser 30')])
-    gender = SelectField('Gender',choices=[('male',_('male')),('female',_('female')),('unkown',_('unkown'))],validators=[DataRequired()])
+    #gender = SelectField('Gender',choices=[('male',_('male')),('female',_('female')),('unkown',_('unkown'))],validators=[DataRequired()])
     description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])
     homepage = StringField('Homepage', validators=[Optional(),Length(max=200,message="长度不大于200")])
     avatar = FileField('Avatar', validators=[])

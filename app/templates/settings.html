@@ -32,7 +32,7 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">科大邮箱</label>
           <div class="col-sm-5">
-            <input type="text" class="form-control" value="{{user.email}}" disabled>
+            <input type="text" class="form-control" value="{{ user.email }}" disabled>
           </div>
         </div>
 
@@ -41,7 +41,7 @@
         <div class="form-group">
           <label for="inputDescription" class="col-sm-2 control-label">个人简介</label>
           <div class="col-sm-5">
-            <textarea type="text" class="form-control" rows="3" id="inputDescription" name="description" {%- if form.description.data %} >{{ form.description.data }}{% else %} placeholder="还没有自我介绍">{% endif -%}</textarea>
+            <textarea type="text" class="form-control" rows="3" id="inputDescription" name="description" {% if form.description.data %}>{{ form.description.data }}{% else %} placeholder="还没有自我介绍">{% endif -%}</textarea>
           </div>
         </div>
 
@@ -49,7 +49,7 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">个人主页</label>
           <div class="col-sm-5">
-            <input type="text" class="form-control" name="homepage" {%- if form.homepage.data %}value="{{ form.homepage.data }}"{% else %}placeholder="博客"{% endif %}>
+            <input type="text" class="form-control" name="homepage" {% if form.homepage.data %} value="{{ form.homepage.data }}"{% else %}placeholder="博客"{% endif %}>
           </div>
         </div>
 

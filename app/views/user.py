@@ -68,12 +68,12 @@ def join_course(user_id):
 def account_settings():
     '''账户设置,包括改密码等'''
     user = current_user
-    form = ProfileForm(request.form,user)
+    form = ProfileForm(request.form, user)
     errors = []
     if form.validate_on_submit():
         #user.username = form['username'].data
-        user.gender = form['gender'].data
-        user.homepage = sanitize(form['homepage'].data.strip())
+        #user.gender = form['gender'].data
+        user.homepage = form['homepage'].data.strip()
         user.description = form['description'].data.strip()
         if request.files.get('avatar'):
             avatar = request.files['avatar']
@@ -159,3 +159,22 @@ def avatar(user_id):
     return '<img src='+user.avatar+'>'
 
 
+@user.route('/teacher/<int:teacher_id>/', methods=['GET','POST'])
+def teacher_settings(teacher_id):
+    '''编辑教师信息'''
+    teacher = Teacher.query.get(teacher_id)
+    form = ProfileForm(request.form, teacher)
+    errors = []
+    if form.validate_on_submit():
+        teacher.gender = form['gender'].data
+        teacher.homepage = form['homepage'].data.strip()
+        teacher.description = form['description'].data.strip()
+        if request.files.get('avatar'):
+            avatar = request.files['avatar']
+            ok,info = handle_upload(avatar,'image')
+            if ok:
+                teacher.set_image(info)
+            else:
+                errors.append(_("Avatar upload failed"))
+        teacher.save()
+    return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form)
