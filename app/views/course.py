@@ -6,14 +6,15 @@ from app.forms import ReviewForm, CourseForm
 from app import db
 
 course = Blueprint('course',__name__)
-QUERY_ORDER = [Course.term.desc(),
-        Course.kcid,
-        ]
+QUERY_ORDER = [
+    Course.term.desc(),
+    CourseRate.upvote_count.desc(),
+]
 
 @course.route('/')
 def index():
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 20, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
     term = request.args.get('term',None,type=str)
     course_name = request.args.get('course',None,type=str)
     course_type = request.args.get('type',None,type=str)
@@ -32,8 +33,8 @@ def index():
         '''开课院系'''
         course_query = course_query.filter(Course.dept==department)
 
-    courses_page = course_query.order_by(*QUERY_ORDER).paginate(page,per_page=per_page)
-    return render_template('course-index.html',pagination=courses_page)
+    courses_page = course_query.join(CourseRate).order_by(*QUERY_ORDER).paginate(page,per_page=per_page)
+    return render_template('course-index.html', courses=courses_page)
 
 @course.route('/<int:course_id>/')
 def view_course(course_id,course_name=None):
@@ -161,7 +162,7 @@ def student_courses(id):
     if student:
         page = request.args.get('page',1,type=int)
         per_page = request.args.get('perpage',15,type=int)
-        courses_page = student.courses_joined.order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
+        courses_page = student.courses_joined.join(CourseRate).order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
         return render_template('list-courses.html',student=student,courses=courses_page)
     else:
         return render_template('feedback.html',status=False,message=_('We cant\'t find the User!'))
@@ -172,7 +173,7 @@ def teacher_courses(id):
     if teacher:
         page = request.args.get('page',1,type=int)
         per_page = request.args.get('perpage',15,type=int)
-        courses_page = teacher.courses.order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
+        courses_page = teacher.courses.join(CourseRate).order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
         return render_template('list-courses.html',teacher=teacher,courses=courses_page)
     else:
         return render_template('feedback.html',status=False,message=_('We cant\'t find the User!'))
@@ -182,7 +183,7 @@ def same_name_courses(name):
     name = name.strip()
     page = request.args.get('page',1,type=int)
     per_page = request.args.get('perpage',15,type=int)
-    courses_page = Course.query.filter_by(name=name).order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
+    courses_page = Course.query.filter_by(name=name).join(CourseRate).order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
     if courses_page.items:
         return render_template('list-courses.html',course_name=name,courses=courses_page)
     else:

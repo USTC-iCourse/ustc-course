@@ -84,40 +84,105 @@
 
     <div class="row">
       <div class="col-lg-12">
-        <h4 class="blue">热门课程（Top10）</h4>
+        <h4 class="blue">热门课程 <span class="small"> &gt; 共 {{ courses.total }} 门课</span></h4>
 
-        <!-- 这是假数据，为了设计引入的。后端加上后可以从search.html里面抄过来，只要给我按推荐数排名的课程即可。 -->
-          {% for i in range(10) %}
-          <div class="ud-pd-md dashed">
-            <div class="row">
-              <div class="col-md-1 col-xs-2">
-                <div class="rate-box">10</div>
-              </div>
-              <div class="col-md-8 col-xs-10">
-                <a class="px16">代数结构（韩文廷）</a>
-                <span class="small grey align-bottom left-pd-sm desktop">学期：2015春 &nbsp;课堂号：111111</span>
-                <br><span class="small grey align-bottom left-pd-sm mobile">学期：2015春 &nbsp;课堂号：111111</span>
-                <div class="ud-pd-sm blue">
-                  <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                  <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                  <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                  <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-                  <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-                  <span class="rl-pd-sm h4">8</span><span class="text-muted px12">(100 人评价)</span>
-                </div>
-                <ul class="text-muted list-inline list-unstyled">
-                  <li class="right-mg-md">课程难度：困难</li>
-                  <li class="right-mg-md">作业多少：很少</li>
-                  <li class="right-mg-md">给分好坏：厚道</li>
-                  <li class="right-mg-md">收获大小：中等</li>
-                </ul>
-              </div>
-            </div>
+    {% for course in courses.items %}
+    <div class="ud-pd-md dashed">
+      <div class="row">
+        <div class="col-md-1 col-xs-2">
+          <div class="rate-box">{{ course.upvote_count }}</div>
+        </div>
+        <div class="col-md-8 col-xs-10">
+            <a class="px16" href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
+          <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+          <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+          {% if course.review_count %}
+          <div class="ud-pd-sm blue">
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+            {% if course.rate.average_rate > 2 %}
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+            {% else %}
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            {% endif %}
+            {% if course.rate.average_rate > 4 %}
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+            {% else %}
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            {% endif %}
+            {% if course.rate.average_rate > 6 %}
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+            {% else %}
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            {% endif %}
+            {% if course.rate.average_rate > 8 %}
+            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+            {% else %}
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            {% endif %}
+            <span class="rl-pd-sm h4">{{ course.rate.average_rate }}</span><span class="text-muted px12">({{ course.review_count }} 人评价)</span>
           </div>
-          {% endfor %}
+          <ul class="text-muted list-inline list-unstyled">
+              <li class="right-mg-md">课程难度：{{ course.rate.difficulty }}</li>
+              <li class="right-mg-md">作业多少：{{ course.rate.homework }}</li>
+              <li class="right-mg-md">给分好坏：{{ course.rate.grading }}</li>
+              <li class="right-mg-md">收获大小：{{ course.rate.gain }}</li>
+          </ul>
+          {% else %}
+          <div class="ud-pd-sm blue">
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            <span class="rl-pd-sm h4"><span class="text-muted px12">暂无评价</span>
+          </div>
+          <ul class="text-muted list-inline list-unstyled">
+              <li class="right-mg-md">课程难度：你猜</li>
+              <li class="right-mg-md">作业多少：你猜</li>
+              <li class="right-mg-md">给分好坏：你猜</li>
+              <li class="right-mg-md">收获大小：你猜</li>
+          </ul>
+          {% endif %}
+          <p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+
+    <nav>
+      <ul class="pagination">
+        {% if courses.has_prev %} 
+        <li>
+            <a href="{{ url_for('course.index', page=courses.prev_num) }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        {% else %} 
+        <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+        {% endif %}
+        
+        {% for page in courses.iter_pages(left_edge=1, right_edge=0) %}
+            {% if page == courses.page %}
+            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
+            {% elif page %}
+            <li><a href="{{ url_for('course.index', page=page) }}">{{ page }}</a></li>
+            {% else %}
+            <li><a>...</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if courses.has_next %}
+        <li>
+          <a href="{{ url_for('course.index', page=courses.next_num) }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
 
         </div><!--/row-->
-
 
       </div><!-- /.col-lg-12 -->
     </div><!-- /.row -->
