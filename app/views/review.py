@@ -9,7 +9,7 @@ from .course import course
 review = Blueprint('review',__name__)
 
 
-@course.route('/<int:course_id>/review/new/',methods=['GET','POST'])
+@course.route('/<int:course_id>/review/',methods=['GET','POST'])
 @login_required
 def new_review(course_id):
     course = Course.query.get(course_id)
