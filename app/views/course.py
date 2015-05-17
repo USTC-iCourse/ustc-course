@@ -195,7 +195,10 @@ def same_name_courses(name):
 
 @course.route('/new/',methods=['GET','POST'])
 @course.route('/<int:course_id>/edit/',methods=['GET','POSt'])
+@login_required
 def edit_course(course_id=None):
+    if not current_user.is_admin:
+        abort(403)
     if course_id:
         course = Course.query.get(course_id)
     else:

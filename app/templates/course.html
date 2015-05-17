@@ -10,7 +10,9 @@
         <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
         <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
 
+        {% if current_user.is_admin %}
         <btn class="btn btn-link float-right"><a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程信息</a></btn>
+        {% endif %}
         <hr>
         {% if course.review_count %}
         <div class="ud-pd-sm blue">
@@ -179,7 +181,9 @@
         {% for teacher in course.teachers %}
         <div class="ud-pd-md dashed">
           <img class="avatar-lg cicle" src="{{ teacher.image }}"/>
+          {% if current_user.is_admin %}
           <btn class="btn btn-link float-right"><a href="{{ url_for('user.teacher_settings', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
+          {% endif %}
           <h3 class="blue">{{ teacher.name }}</h3>
           <p>{{ teacher.dept.name }}</p>
           <p>研究方向：暂无</p>

@@ -160,8 +160,11 @@ def avatar(user_id):
 
 
 @user.route('/teacher/<int:teacher_id>/', methods=['GET','POST'])
+@login_required
 def teacher_settings(teacher_id):
     '''编辑教师信息'''
+    if not current_user.is_admin:
+       abort(403)
     teacher = Teacher.query.get(teacher_id)
     form = ProfileForm(request.form, teacher)
     errors = []
