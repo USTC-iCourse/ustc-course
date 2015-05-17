@@ -63,10 +63,10 @@
     </div>
     {% if user.info %}
     <!-- a student's information -->
-    {% if user.is_student() %}
+    {% if user.is_student %}
     <p class="text-success">{{ _('你已经绑定了学号<b>%(sno)s</b>。<a href=%(url)s>有错吗</a>？',sno=user.info.sno,url=url_for('user.bind_identity') ) }}</p> 
     <!-- a teacher's information -->
-    {% elif user.is_teacher() %}
+    {% elif user.is_teacher %}
     <p class="text-success">{{ _('你已经绑定了教工信息：<b>%(name)s</b>。<a href=%(url)s>有错吗</a>？',name=user.info.name,url=url_for('user.bind_identity') ) }}</p> 
     {% else %}
     <p class="text-danger">{{ _('唔，出错了！') }}</p>

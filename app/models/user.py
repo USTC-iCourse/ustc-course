@@ -135,14 +135,21 @@ class User(db.Model, UserMixin):
         else:
             return None
 
+    @property
     def is_student(self):
         return self.identity == 'Student'
 
+    @property
     def is_teacher(self):
         return self.identity == 'Teacher'
 
+    @property
     def is_authenticated(self):
         return True
+
+    @property
+    def is_admin(self):
+        return self.role == 'Admin'
 
     def is_active(self):
         if self.active:

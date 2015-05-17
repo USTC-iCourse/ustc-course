@@ -137,10 +137,10 @@ def courses(user_id):
     if user and user.info:
         page = request.args.get('page',1,type=int)
         per_page = request.args.get('perpage',15,type=int)
-        if user.is_teacher():
+        if user.is_teacher:
             courses_page = user.info.courses.paginate(page=page,per_page=per_page)
             return render_template('list-courses.html',teacher=user.info,courses = courses_page)
-        elif user.is_student():
+        elif user.is_student:
             courses_page = user.info.courses_joined.paginate(page=page,per_page=per_page)
             return render_template('list-courses.html',student=user.info,courses=courses_page)
         else:
