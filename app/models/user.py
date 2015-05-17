@@ -143,7 +143,6 @@ class User(db.Model, UserMixin):
     def is_teacher(self):
         return self.identity == 'Teacher'
 
-    @property
     def is_authenticated(self):
         return True
 

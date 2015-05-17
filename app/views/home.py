@@ -18,7 +18,7 @@ def index():
 @home.route('/signin/',methods=['POST','GET'])
 def signin():
     next_url = request.args.get('next') or url_for('home.index')
-    if current_user.is_authenticated:
+    if current_user.is_authenticated():
         return redirect(next_url)
     form = LoginForm()
     error = ''
@@ -56,7 +56,7 @@ def signin():
 
 @home.route('/signup/',methods=['GET','POST'])
 def signup():
-    if current_user.is_authenticated:
+    if current_user.is_authenticated():
         return redirect(request.args.get('next') or url_for('home.index'))
     form = RegisterForm()
     if form.validate_on_submit():
@@ -87,7 +87,7 @@ def signup():
 
 @home.route('/confirm-email/')
 def confirm_email():
-    if current_user.is_authenticated:
+    if current_user.is_authenticated():
         #logout_user()
         return redirect(request.args.get('next') or url_for('home.index'))
     action = request.args.get('action')
@@ -129,7 +129,7 @@ def logout():
 @home.route('/change-password/', methods=['GET'])
 def change_password():
     '''在控制面板里修改密码'''
-    if not current_user.is_authenticated:
+    if not current_user.is_authenticated():
         return redirect(url_for('home.signin'))
     send_reset_password_mail(current_user.email)
     return render_template('feedback.html', status=True, message=_('Reset password mail sent'))
@@ -138,7 +138,7 @@ def change_password():
 @home.route('/reset-password/', methods=['GET','POST'])
 def forgot_password():
     ''' 忘记密码'''
-    if current_user.is_authenticated:
+    if current_user.is_authenticated():
         return redirect(request.args.get('next') or url_for('home.index'))
     form = ForgotPasswordForm()
     if form.validate_on_submit():
@@ -157,7 +157,7 @@ def forgot_password():
 @home.route('/reset-password/<string:token>/', methods=['GET','POST'])
 def reset_password(token):
     '''重设密码'''
-    if current_user.is_authenticated:
+    if current_user.is_authenticated():
         return redirect(request.args.get('next') or url_for('home.index'))
     if RT.query.get(token):
         return render_template('feedback.html', status=False, message=_('Token has been used'))
