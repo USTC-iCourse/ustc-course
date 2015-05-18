@@ -17,6 +17,12 @@
     <h3 class="blue">Sign in</h3>
     <hr>
 
+    {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+      <div class="alert alert-info">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
     <form class="form-horizontal" method='post' action='/signin/'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <div class="form-group">

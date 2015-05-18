@@ -84,7 +84,6 @@ def account_settings():
         user.save()
     return render_template('settings.html', user=user, form=form)
 
-
 @user.route('/settings/bind/',methods=['GET','POST'])
 @login_required
 def bind_identity():

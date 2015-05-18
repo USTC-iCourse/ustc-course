@@ -311,3 +311,7 @@ label.fileupload input {
     position: fixed;
     top: -1000px;
 }
+
+a.nounderline, a.nounderline:hover, a.nounderline:active {
+    text-decoration: none;
+}

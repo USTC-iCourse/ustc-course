@@ -150,10 +150,10 @@
 
           <div class="bm-pd-md grey" id="review-{{ review.id }}">
             <span class="small">{{ review.publish_time }}</span>
-            <a href="javascript: upvote_review({{ review.id }})"><span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> {{ review.upvote_count }}</a>
-            <a href="javascript: show_review_comments({{ review.id }})"><span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> {{ review.comment_count }}</a>
+            <a class="nounderline" href="javascript: upvote_review({{ review.id }})"><span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> {{ review.upvote_count }}</a>
+            <a class="nounderline" href="javascript: show_review_comments({{ review.id }})"><span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> {{ review.comment_count }}</a>
             <span class="pull-right">
-              <a href="javascript: delete_review({{ review.id }})"><span class="glyphicon glyphicon-trash blue left-pd-md" aria-hidden="true"></span> {{ _('Delete') }}</a>
+              <a class="nounderline" href="javascript: delete_review({{ review.id }})"><span class="glyphicon glyphicon-trash blue left-pd-md" aria-hidden="true"></span> {{ _('删除') }}</a>
             </span>
           </div>
 
@@ -283,6 +283,7 @@
        }
 
        do_btn.click(function() {
+         {% if user.is_authenticated() %}
          if (d.enabled)
            return;
          do_btn.hide();
@@ -293,9 +294,13 @@
            $('.btn-' + d.conflict).filter('.btn-undo').click();
          }
          http_post_wrapper(d.do_url);
+         {% else %}
+         $('#signin').modal('show');
+         {% endif %}
        });
 
        undo_btn.click(function() {
+         {% if user.is_authenticated() %}
          if (!d.enabled)
            return;
          undo_btn.hide();
@@ -303,6 +308,9 @@
          d.enabled = false;
          update_count(d.count - 1);
          http_post_wrapper(d.undo_url);
+         {% else %}
+         $('#signin').modal('show');
+         {% endif %}
        });
 
        update_count(d.count);
