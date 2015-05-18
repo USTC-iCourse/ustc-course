@@ -75,41 +75,7 @@
     <p class="text-success">{{ _('你还没有绑定学号，<a  href="%(url)s">戳这里</a>绑定。', url=url_for('user.bind_identity')) }}
       {% endif %}
 
-
-      <div class="bm-pd-lg">
-        <h3 class="blue">修改密码</h3>
-        <hr>
-        <form class="form-horizontal ud-pd-md" method="post" action="{{ url_for('user.password') }}">
-          {{ form.csrf_token }}
-          <div class="form-group">
-            <label class="col-sm-2 control-label">旧密码</label>
-            <div class="col-sm-5">
-              <input type="password" class="form-control" name="old_password" autocomplete="off">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="col-sm-2 control-label">新密码</label>
-            <div class="col-sm-5">
-              <input type="password" class="form-control" name="password" autocomplete="off">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="col-sm-2 control-label">确认密码</label>
-            <div class="col-sm-5">
-              <input type="password" class="form-control" name="confirm_password" autocomplete="off">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-2">
-              <button type="submit" class="btn btn-blue btn-block">提交</button>
-            </div>
-          </div>
-        </form>
-
-        <p class="text-success">或者通过<a href="{{ url_for('home.change_password') }}">发送邮件</a>修改密码</p>
+      <p class="text-success">您可以通过<a href="{{ url_for('home.change_password') }}">发送邮件</a>修改密码</p>
       </div>
   </div> <!-- end float-element -->
 </div> <!-- end container -->
