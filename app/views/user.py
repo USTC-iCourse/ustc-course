@@ -85,15 +85,6 @@ def account_settings():
         user.save()
     return render_template('settings.html', user=user, errors=errors, form=form)
 
-@user.route('/settings/password/',methods=['GET','POST'])
-@login_required
-def password():
-    form = PasswordForm(request.form)
-    if form.validate_on_submit():
-        current_user.set_password(form.password.data)
-        return render_template('feedback.html',status=True,message=_('Password changed!'))
-    return render_template('signin.html',form=form)
-
 @user.route('/settings/bind/',methods=['GET','POST'])
 @login_required
 def bind_identity():
