@@ -218,6 +218,13 @@ def about():
     return render_template('about.html')
 
 
+@home.route('/copyright/')
+def copyright():
+    '''关于网站可能涉及的版权问题'''
+
+    return render_template('copyright.html')
+
+
 @home.route('/test/')
 def test():
     '''前端html页面效果测试专用'''

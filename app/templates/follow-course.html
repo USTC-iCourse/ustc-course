@@ -12,7 +12,6 @@
       </div>
 
       {% for course in user.courses_following %}
-      <!-- 关注课程最多显示6门 -->
       <div class="ud-pd-md dashed">
         <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
         <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
