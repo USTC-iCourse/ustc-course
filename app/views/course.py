@@ -55,7 +55,8 @@ def view_course(course_id,course_name=None):
             reviews=reviews,
             related_courses=related_courses,
             teacher=teacher,
-            same_teacher_courses=same_teacher_courses)
+            same_teacher_courses=same_teacher_courses,
+            user=current_user)
 
 @course.route('/<int:course_id>/upvote/', methods=['POST'])
 @login_required
