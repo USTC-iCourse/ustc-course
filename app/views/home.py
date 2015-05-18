@@ -29,14 +29,13 @@ def signin():
             if status:
                 #validate uesr
                 login_user(user, remember=remember)
-                flash('Logged in')
                 if request.args.get('ajax'):
                     return jsonify(status=200, next=next_url)
                 else:
                     return redirect(next_url)
             elif not confirmed:
                 '''没有确认邮箱的用户'''
-                message = 'Please activate your account by clicking link in your email! <a href=%s>Resend Email</a>'%url_for('.confirm_email',
+                message = '请点击邮箱里的激活链接。 <a href=%s>重发激活邮件</a>'%url_for('.confirm_email',
                     email=user.email,
                     action='send')
                 if request.args.get('ajax'):
@@ -44,9 +43,9 @@ def signin():
                 else:
                     return render_template('feedback.html', status=False, message=message)
             else:
-                error = _('Username or password is wrong!')
+                error = _('用户名或密码错误！')
         else:
-            error = _('Username or password is wrong!')
+            error = _('用户名或密码错误！')
     #TODO: log the form errors
     if request.args.get('ajax'):
         return jsonify(status=404, msg=error)
@@ -78,7 +77,7 @@ def signup():
         user.save()
         #login_user(user)
         '''注册完毕后显示一个需要激活的页面'''
-        return render_template('feedback.html', status=True, message=_('Please activate your account by clicking link in your email.'))
+        return render_template('feedback.html', status=True, message=_('我们已经向您发送了激活邮件，请在邮箱中点击激活链接。'))
 #TODO: log error
     if form.errors:
         print(form.errors)
@@ -94,9 +93,9 @@ def confirm_email():
     if action == 'confirm':
         token = request.args.get('token')
         if not token:
-            return render_template('feedback.html', status=False, message=_('Token error!'))
+            return render_template('feedback.html', status=False, message=_('此激活链接无效，请准确复制邮件中的链接。'))
         if RT.query.get(token):
-            return render_template('feedback.html', status=False, message=_('Token has been used!'))
+            return render_template('feedback.html', status=False, message=_('此激活链接已被使用过。'))
         RT.add(token)
         try:
             email = ts.loads(token, salt="email-confirm-key", max_age=86400)
@@ -115,7 +114,7 @@ def confirm_email():
         if not user.confirmed:
             print(email)
             send_confirm_mail(email)
-        return render_template('feedback.html', status=True, message=_('Email has been sent!'))
+        return render_template('feedback.html', status=True, message=_('邮件已经发送，请查收！'))
     else:
         abort(404)
 
@@ -132,7 +131,7 @@ def change_password():
     if not current_user.is_authenticated():
         return redirect(url_for('home.signin'))
     send_reset_password_mail(current_user.email)
-    return render_template('feedback.html', status=True, message=_('Reset password mail sent'))
+    return render_template('feedback.html', status=True, message=_('密码重置邮件已经发送。'))
 
 
 @home.route('/reset-password/', methods=['GET','POST'])
@@ -146,10 +145,10 @@ def forgot_password():
         user = User.query.filter_by(email=email).first()
         if user:
             send_reset_password_mail(email)
-            message = _('Reset password mail sent.')  #一个反馈信息
+            message = _('密码重置邮件已发送。')  #一个反馈信息
             status = True
         else:
-            message = _('The email has not been registered')
+            message = _('此邮件地址尚未被注册。')
             status = False
         return render_template('feedback.html', status=status, message=message)
     return render_template('forgot-password.html')
@@ -157,21 +156,20 @@ def forgot_password():
 @home.route('/reset-password/<string:token>/', methods=['GET','POST'])
 def reset_password(token):
     '''重设密码'''
-    if current_user.is_authenticated():
-        return redirect(request.args.get('next') or url_for('home.index'))
     if RT.query.get(token):
-        return render_template('feedback.html', status=False, message=_('Token has been used'))
+        return render_template('feedback.html', status=False, message=_('此密码重置链接已被使用过。'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         RT.add(token)
         try:
             email = ts.loads(token, salt="password-reset-key", max_age=86400)
         except:
-            return render_template('feedback.html', status=False, message='Your token has expired.')
+            return render_template('feedback.html', status=False, message=_('此密码重置链接无效，请准确复制邮件中的链接。'))
         user = User.query.filter_by(email=email).first_or_404()
         password = form['password'].data
         user.set_password(password)
-        flash('Password Changed')
+        logout_user()
+        flash('密码已经修改，请使用新密码登录。')
         return redirect(url_for('home.signin'))
     return render_template('reset-password.html',form=form)
 
