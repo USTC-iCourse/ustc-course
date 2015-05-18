@@ -84,8 +84,11 @@
           </tbody>
         </table>
 
+        <div class="ud-pd-sm">
         {% if course.homepage %}
-        <div>课程主页：<a href="http://{{ course.homepage }}">{{ course.homepage }}</a></div>
+          课程主页：<a href="http://{{ course.homepage }}">{{ course.homepage }}</a>
+          {% else %}
+          课程主页：暂无（如果你知道，劳烦告诉我们！）</div>
         {% endif %}
 
         <div id="action-btn-group" class="ud-pd-md" style="display:none">

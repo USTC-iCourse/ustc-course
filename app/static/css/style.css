@@ -68,6 +68,9 @@ p { line-height: 25px; word-wrap: break-word; }
 .lh-sm {
     line-height: 20px;
 }
+.lh-lg {
+    line-height: 25px;
+}
 
 .bm-pd-md {
     padding-bottom: 15px;
@@ -155,6 +158,7 @@ p { line-height: 25px; word-wrap: break-word; }
 .px10 { font-size: 10px; }
 .px12 { font-size: 12px; }
 .px16 { font-size: 16px; }
+.px20 { font-size: 20px; }
 
 .glyphicon-lg { font-size: 15px; }
 .glyphicon-sm { font-size: 12px; }

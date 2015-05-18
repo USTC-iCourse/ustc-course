@@ -1,4 +1,4 @@
-from flask import Blueprint,render_template,abort,redirect,url_for,request, abort
+from flask import Blueprint,render_template,abort,redirect,url_for,request, abort, flash
 from app.models import *
 from app.forms import LoginForm, ProfileForm,PasswordForm
 from flask.ext.login import login_user, current_user, login_required
@@ -69,7 +69,6 @@ def account_settings():
     '''账户设置,包括改密码等'''
     user = current_user
     form = ProfileForm(request.form, user)
-    errors = []
     if form.validate_on_submit():
         #user.username = form['username'].data
         #user.gender = form['gender'].data
@@ -83,16 +82,8 @@ def account_settings():
             else:
                 errors.append(_("Avatar upload failed"))
         user.save()
-    return render_template('settings.html', user=user, errors=errors, form=form)
+    return render_template('settings.html', user=user, form=form)
 
-@user.route('/settings/password/',methods=['GET','POST'])
-@login_required
-def password():
-    form = PasswordForm(request.form)
-    if form.validate_on_submit():
-        current_user.set_password(form.password.data)
-        return render_template('feedback.html',status=True,message=_('Password changed!'))
-    return render_template('signin.html',form=form)
 
 @user.route('/settings/bind/',methods=['GET','POST'])
 @login_required

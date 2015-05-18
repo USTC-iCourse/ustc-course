@@ -128,7 +128,7 @@ def logout():
 
 @home.route('/change-password/', methods=['GET'])
 def change_password():
-    '''在控制面板里修改密码'''
+    '''在控制面板里发邮件修改密码，另一个修改密码在user.py里面'''
     if not current_user.is_authenticated():
         return redirect(url_for('home.signin'))
     send_reset_password_mail(current_user.email)
@@ -206,18 +206,18 @@ def search():
         return render_template('search.html', keyword=keyword, courses=courses_paged)
 
 
-@home.route('/report-bug/')
-def report_bug():
-    ''' 报bug表单 '''
-
-    return render_template('report-bug.html')
-
-
 @home.route('/about/')
 def about():
-    '''关于我们,用来放一些联系方式'''
+    '''关于我们，网站介绍、联系方式'''
 
     return render_template('about.html')
+
+
+@home.route('/community-rules/')
+def community_rules():
+    '''社区规范页面'''
+
+    return render_template('community-rules.html')
 
 
 @home.route('/copyright/')
@@ -227,11 +227,14 @@ def copyright():
     return render_template('copyright.html')
 
 
-@home.route('/test/')
-def test():
-    '''前端html页面效果测试专用'''
+@home.route('/report-bug/')
+def report_bug():
+    ''' 报bug表单 '''
 
+    return render_template('report-bug.html')
+
+
+@home.route('/not_found/')
+def not_found():
+    '''返回404页面'''
     return render_template('404.html')
-
-
-
