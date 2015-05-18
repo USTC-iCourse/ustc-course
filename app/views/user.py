@@ -137,10 +137,10 @@ def courses(user_id):
     if user and user.info:
         page = request.args.get('page',1,type=int)
         per_page = request.args.get('perpage',15,type=int)
-        if user.is_teacher():
+        if user.is_teacher:
             courses_page = user.info.courses.paginate(page=page,per_page=per_page)
             return render_template('list-courses.html',teacher=user.info,courses = courses_page)
-        elif user.is_student():
+        elif user.is_student:
             courses_page = user.info.courses_joined.paginate(page=page,per_page=per_page)
             return render_template('list-courses.html',student=user.info,courses=courses_page)
         else:
@@ -160,8 +160,11 @@ def avatar(user_id):
 
 
 @user.route('/teacher/<int:teacher_id>/', methods=['GET','POST'])
+@login_required
 def teacher_settings(teacher_id):
     '''编辑教师信息'''
+    if not current_user.is_admin:
+       abort(403)
     teacher = Teacher.query.get(teacher_id)
     form = ProfileForm(request.form, teacher)
     errors = []

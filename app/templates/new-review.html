@@ -64,12 +64,11 @@
       <div class="container-md desktop">
         <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
-          <script name="content" id="content-editor" style="width:710px"></script>
+          <textarea id="content-editor" name="content"></textarea>
         </div>
         <button type="submit" class="btn btn-blue btn-flat float-right shadow">发布</button>
         <div class="ud-pd-lg"></div>
       </div>
-
 
       <div class="container mobile">
         <h4 class="grey">说几句吧！</h4>
@@ -87,5 +86,5 @@
 {% endblock %}
 
 {% block script %}
-{% include 'umeditor.html' %}
+{% include 'ckeditor.html' %}
 {% endblock %}

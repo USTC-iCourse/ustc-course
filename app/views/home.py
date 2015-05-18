@@ -1,6 +1,6 @@
 from flask import Blueprint,request, redirect,url_for,render_template,flash, abort, jsonify
 from flask.ext.login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher
+from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask.ext.babel import gettext as _
@@ -11,7 +11,9 @@ home = Blueprint('home',__name__)
 
 @home.route('/')
 def index():
-    return render_template('index.html')
+    top_reviews = Review.query.join(Course).join(CourseRate).order_by(CourseRate.upvote_count.desc()).limit(5)
+    latest_reviews = Review.query.order_by(Review.id.desc()).limit(5)
+    return render_template('index.html', top_reviews=top_reviews, latest_reviews=latest_reviews)
 
 @home.route('/signin/',methods=['POST','GET'])
 def signin():
