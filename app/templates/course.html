@@ -280,6 +280,7 @@
        }
 
        do_btn.click(function() {
+         {% if user.is_authenticated() %}
          if (d.enabled)
            return;
          do_btn.hide();
@@ -290,9 +291,13 @@
            $('.btn-' + d.conflict).filter('.btn-undo').click();
          }
          http_post_wrapper(d.do_url);
+         {% else %}
+         $('#signin').modal('show');
+         {% endif %}
        });
 
        undo_btn.click(function() {
+         {% if user.is_authenticated() %}
          if (!d.enabled)
            return;
          undo_btn.hide();
@@ -300,6 +305,9 @@
          d.enabled = false;
          update_count(d.count - 1);
          http_post_wrapper(d.undo_url);
+         {% else %}
+         $('#signin').modal('show');
+         {% endif %}
        });
 
        update_count(d.count);
