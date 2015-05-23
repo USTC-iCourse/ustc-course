@@ -48,7 +48,6 @@ class Review(db.Model):
                     self.grading,
                     self.gain,
                     self.rate)
-            # Make sure that each user can only add one review for each course
             self.course.review_users.append(self.author)
             db.session.add(self.course)
             db.session.add(self)
@@ -102,6 +101,8 @@ class Review(db.Model):
         self.save()
         return (True,"Success!")
 
+    def is_upvoted(self, user=current_user):
+        return user in self.upvote_users
 
     def save(self):
         db.session.add(self)
