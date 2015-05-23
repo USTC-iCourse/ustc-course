@@ -84,11 +84,8 @@
           </tbody>
         </table>
 
-        <div class="ud-pd-sm">
         {% if course.homepage %}
-          课程主页：<a href="http://{{ course.homepage }}">{{ course.homepage }}</a>
-          {% else %}
-          课程主页：暂无（如果你知道，劳烦告诉我们！）</div>
+        <div>课程主页：<a href="http://{{ course.homepage }}">{{ course.homepage }}</a></div>
         {% endif %}
 
         <div id="action-btn-group" class="ud-pd-md" style="display:none">
@@ -150,24 +147,33 @@
 
           <div class="bm-pd-md grey" id="review-{{ review.id }}">
             <span class="small">{{ review.publish_time }}</span>
-            <a class="nounderline" href="javascript: upvote_review({{ review.id }})"><span class="glyphicon glyphicon-thumbs-up blue left-pd-lg" aria-hidden="true" ></span> {{ review.upvote_count }}</a>
-            <a class="nounderline" href="javascript: show_review_comments({{ review.id }})"><span class="glyphicon glyphicon-comment blue left-pd-md" aria-hidden="true"></span> {{ review.comment_count }}</a>
+            <a class="nounderline" href="javascript: {{ 'cancel_' if review.is_upvoted() }}upvote_review({{ review.id }})">
+                <span class="glyphicon glyphicon-thumbs-up {{ 'blue' if review.is_upvoted() else 'grey' }} left-pd-lg" aria-hidden="true" ></span>
+                <span id="review-upvote-count-{{review.id}}">{{ review.upvote_count }}</span>
+            </a>
+            <a class="nounderline" href="javascript: show_review_comments({{ review.id }})"><span class="glyphicon glyphicon-comment grey left-pd-md" aria-hidden="true"></span> <span id="review-comment-count-{{review.id}}">{{ review.comment_count }}</span></a>
             <span class="pull-right">
-              <a class="nounderline" href="javascript: delete_review({{ review.id }})"><span class="glyphicon glyphicon-trash blue left-pd-md" aria-hidden="true"></span> {{ _('删除') }}</a>
+              {% if review.author == user or user.is_admin %}
+              <a class="nounderline" href="javascript: delete_review({{ review.id }})"><span class="glyphicon glyphicon-trash grey left-pd-md" aria-hidden="true"></span> {{ _('删除') }}</a>
+              {% endif %}
             </span>
           </div>
 
           <div id="review-{{ review.id }}-comments" class="panel panel-default" style="display:none">
             <div class="panel-body">
-              {% for i in range(3) %}
+              {% for comment in review.comments %}
               <div class="solid ud-pd-sm">
-                <a>jenny42</a>：
-                <span>lalallalalal</span>
-                <span class="text-muted small float-right">2015-5-13 12:20</span>
+                  <a href="{{ url_for('user.view_profile', user_id=comment.author.id) }}">{{ comment.author.username }}</a>：
+                  <span>{{ comment.content }}</span>
+                  <span class="text-muted small float-right">{{ comment.publish_time }}</span>
               </div>
               {% endfor %}
+              {% if user.is_authenticated() %}
               <textarea type="text" class="form-control" rows="2" id="comment" placeholder="你的评论"></textarea>
               <div class="ud-pd-sm"><button class="btn btn-sm btn-white float-right">评论</button></div>
+              {% else %}
+              <p>立即<a href="#" data-toggle="modal" data-target="#signin">登录</a>，说说你的看法</p>
+              {% endif %}
             </div>
           </div>
 
@@ -331,10 +337,52 @@
  {
    if (document.getElementById('review-'+ review_id +'-comments').style.display=="block") {
        document.getElementById('review-'+ review_id +'-comments').style.display="none";
+       $('#review-comment-count-' + review_id).parent().find('span.glyphicon').addClass('grey');
+       $('#review-comment-count-' + review_id).parent().find('span.glyphicon').removeClass('blue');
      }
    else {
-     document.getElementById('review-'+ review_id +'-comments').style.display="block";
+       document.getElementById('review-'+ review_id +'-comments').style.display="block";
+       $('#review-comment-count-' + review_id).parent().find('span.glyphicon').addClass('blue');
+       $('#review-comment-count-' + review_id).parent().find('span.glyphicon').removeClass('grey');
    }
+ }
+
+ function upvote_review(review_id)
+ {
+     elem = $('#review-upvote-count-' + review_id);
+     //elem.text(parseInt(elem.text()) + 1);
+     $.post("{{ url_for('api.review_upvote') }}", { review_id: review_id }, function(o) {
+       if (typeof o.count != "undefined") {
+         elem.text(o.count);
+         elem.parent().attr('href', 'javascript:cancel_upvote_review("' + review_id + '")');
+         elem.parent().find('span.glyphicon').removeClass('grey');
+         elem.parent().find('span.glyphicon').addClass('blue');
+       }
+     }, 'json');
+ }
+ 
+ function cancel_upvote_review(review_id)
+ {
+     elem = $('#review-upvote-count-' + review_id);
+     //elem.text(parseInt(elem.text()) - 1);
+     $.post("{{ url_for('api.review_cancel_upvote') }}", { review_id: review_id }, function(o) {
+       if (typeof o.count != "undefined") {
+         elem.text(o.count);
+         elem.parent().attr('href', 'javascript:upvote_review("' + review_id + '")');
+         elem.parent().find('span.glyphicon').removeClass('blue');
+         elem.parent().find('span.glyphicon').addClass('grey');
+       }
+     }, 'json');
+ }
+
+ function delete_review(review_id)
+ {
+     $.post("{{ url_for('review.delete_review') }}", { id: review_id }, function(o) {
+         if (o.ok)
+            window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
+         else
+            alert(o.message);
+     }, 'json');
  }
 
 </script>
