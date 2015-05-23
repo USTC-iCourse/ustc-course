@@ -40,29 +40,29 @@ def get_reviews():
     return jsonify(response)
 
 
-@api.route('/review/upvote/',methods=['GET','POST'])
+@api.route('/review/upvote/',methods=['POST'])
 def review_upvote():
     review_id = request.values.get('review_id')
     if review_id:
         review = Review.query.get(review_id)
-        ok,message = review.upvote()
-        return jsonify(ok=ok,message=message)
+        if review:
+            ok,message = review.upvote()
+            return jsonify(ok=ok,message=message, count=review.upvote_count)
+        else:
+            return jsonify(ok=False,message="The review dosen't exist.")
     else:
         return jsonify(ok=false,message="A id must be given")
 
-@api.route('/review/cancel_upvote/',methods=['GET','POST'])
+@api.route('/review/cancel_upvote/',methods=['POST'])
 def review_cancel_upvote():
     review_id = request.values.get('review_id')
     if review_id:
         review = Review.query.get(review_id)
         if review:
-            if review.author == current_user:
-                ok,message = review.cancel_upvote()
-                return jsonify(ok=ok,message=message)
-            else:
-                return jsonify(ok=False,message="Forbiden")
+            ok,message = review.cancel_upvote()
+            return jsonify(ok=ok,message=message, count=review.upvote_count)
         else:
-            return jsonify(ok=False,message="The review dosen't exist.")
+            return jsonify(ok=False,message="The review doesn't exist.")
     else:
         return jsonify(ok=False,message="A id must be given")
 
@@ -78,7 +78,7 @@ def review_new_comment():
             ok,message = comment.add(review,content)
             return jsonify(ok=ok,message=message,content=content)
         else:
-            return jsonify(ok=False,message="The review dosen't exist.")
+            return jsonify(ok=False,message="The review doesn't exist.")
     else:
         return jsonify(ok=False,message=form.errors)
 
@@ -89,13 +89,13 @@ def review_delete_comment():
     if comment_id:
         comment = ReviewComment.query.filter_by(id=comment_id).first()
         if comment:
-            if comment.author == current_user:
+            if comment.author == current_user or current_user.is_admin:
                 ok,message = comment.delete()
                 return jsonify(ok=ok,message=message)
             else:
-                return jsonify(ok=False,message="Forbiden")
+                return jsonify(ok=False,message="Forbidden")
         else:
-            return jsonify(ok=False,message="The comment dosen't exist.")
+            return jsonify(ok=False,message="The comment doesn't exist.")
     else:
         return jsonify(ok=False,message="A id must be given")
 
