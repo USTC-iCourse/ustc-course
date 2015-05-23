@@ -7,8 +7,8 @@ from app import db
 
 course = Blueprint('course',__name__)
 QUERY_ORDER = [
-    Course.term.desc(),
     CourseRate.upvote_count.desc(),
+    Course.term.desc(),
 ]
 
 @course.route('/')
