@@ -17,21 +17,25 @@ def index():
     per_page = request.args.get('per_page', 10, type=int)
     term = request.args.get('term',None,type=str)
     course_name = request.args.get('course',None,type=str)
-    course_type = request.args.get('type',None,type=str)
-    department = request.args.get('dept',None,type=str)
+    course_type = request.args.get('type',None,type=int)
+    department = request.args.get('dept',None,type=int)
+    campus = request.args.get('campus',None,type=str)
     course_query = Course.query
     if term:
-        '''学期'''
+        # 学期
         course_query = course_query.filter(Course.term==term)
     if course_name:
-        '''课程名'''
+        # 课程名
         course_query = course_query.filter(Course.name==course_name)
     if course_type:
-        '''课程类型'''
+        # 课程类型
         course_query = course_query.filter(Course.course_type==course_type)
     if department:
-        '''开课院系'''
-        course_query = course_query.filter(Course.dept==department)
+        # 开课院系
+        course_query = course_query.filter(Course.dept_id==department)
+    if campus:
+        # 开课地点
+        course_query = course_query.filter(Course.campus==campus)
 
     courses_page = course_query.join(CourseRate).order_by(*QUERY_ORDER).paginate(page,per_page=per_page)
     return render_template('course-index.html', courses=courses_page)
