@@ -4,73 +4,43 @@
 <div class="container">
   <div class="float-element">
     <div class="inline-h3">
-    <span class="blue h4">点评 &bull; {{ course.name }}（{{ course.teacher.name }}）</span>
+    <span class="blue h4">{% if not is_new %}编辑{% endif %}点评 &bull; {{ course.name }}（{{ course.teacher.name }}）</span>
     <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
     <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
     </div>
     <hr>
-    <form class="form-horizontal" method="post" action="{{ url_for('course.new_review', course_id=course.id) }}">
+    {% if message != '' %}
+    <div class="alert alert-danger">{{ message }}</div>
+    {% endif %}
+    <form id="review-form" class="form-horizontal" method="post" action="{{ url_for('course.new_review', course_id=course.id) }}">
       {{ form.csrf_token }}
       <div class="rate-part ud-pd-md">
-
+        {% for poll in polls %}
         <div class="ud-pd-sm">
-          <span class="right-pd-sm weight-heavy">课程难度</span>
+          <span class="right-pd-sm weight-heavy">{{ poll['display'] }}</span>
           <div class="btn-group btn-group-inv" data-toggle="buttons">
-            <label class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="difficulty" autocomplete="off" value="1">简单</label>
-            <label class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="difficulty" autocomplete="off" value="2">中等</label>
-            <label class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="difficulty" autocomplete="off" value="3">困难</label>
+            {% for option in poll['options'] %}
+            <label class="btn btn-flat btn-grey rl-mg-sm {% if review[poll['name']] == loop.index %}active{% endif %}">
+                <input type="radio" name="{{ poll['name'] }}" autocomplete="off" value="{{ loop.index }}" {% if review[poll['name']] == loop.index %}checked{% endif %}>
+                {{ option }}
+            </label>
+            {% endfor %}
           </div>
         </div>
+        {% endfor %}
 
+        <link rel="stylesheet" href="/static/css/star-rating.min.css" media="all" rel="stylesheet" type="text/css">
         <div class="ud-pd-sm">
-          <span class="right-pd-sm weight-heavy">作业多少</span>
-          <div class="btn-group btn-group-inv" data-toggle="buttons">
-            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="homework" autocomplete="off" value="1">不多</span>
-            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="homework" autocomplete="off" value="2">中等</span>
-            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="homework" autocomplete="off" value="3">超多</span>
-          </div>
+          <span class="weight-heavy pull-left">评个分吧？</span>
+          <input id="rate-star" name="rate" value="{{ review.rate / 2.0 if review.rate else 4 }}">
+          <span class="clearfix"></span>
         </div>
-
-        <div class="ud-pd-sm">
-          <span class="right-pd-sm weight-heavy">给分好坏</span>
-          <div class="btn-group btn-group-inv" data-toggle="buttons">
-            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="1">超好</span>
-            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="2">厚道</span>
-            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="3">杀手</span>
-          </div>
-        </div>
-
-        <div class="ud-pd-sm">
-          <span class="right-pd-sm weight-heavy">收获多少</span>
-          <div class="btn-group btn-group-inv" data-toggle="buttons">
-            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="1">很多</span>
-            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="2">一般</span>
-            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="3">没有</span>
-          </div>
-        </div>
-
-        <div class="ud-pd-sm">
-          <span class="weight-heavy">评个分吧？</span>
-          <span class="blue" id="rate-star">
-            <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
-            <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true" ></span>
-            <span class="rl-pd-sm h4">8</span>
-            <input type="hidden" name="rate" value="8" />
-          </span>
-        </div>
-      </div>
-      <div class="ud-pd-sm">
-          <!--占位 评分 rate 实际中应该为hiddern-->
-          <input type="hidden" name="rate" class="" value=8>
       </div>
 
       <div class="container-md desktop">
         <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
-          <textarea id="content-editor" name="content"></textarea>
+          <textarea id="content-editor" name="content">{{ review.content|safe }}</textarea>
         </div>
         <button type="submit" class="btn btn-blue btn-flat float-right shadow">发布</button>
         <div class="ud-pd-lg"></div>
@@ -92,5 +62,54 @@
 {% endblock %}
 
 {% block script %}
+<script src="/static/js/star-rating.min.js" type="text/javascript"></script>
+<script>
+$('#rate-star').rating({
+    min: 0,
+    max: 5,
+    step: 0.5,
+    size: "xs",
+    showClear: false,
+    glyphicon: false,
+    ratingClass: 'glyphicon glyphicon-star',
+    starCaptions: function(val) {
+        return val*2;
+    },
+    starCaptionClasses: function(val) {
+        return "blue";
+    },
+});
+
+$(function(){
+    $('#review-form').submit(function(e) {
+            if ($('input[name=difficulty]:radio:checked').length == 0) {
+                e.preventDefault();
+                alert('请选择课程难度！');
+                return;
+            }
+            if ($('input[name=homework]:radio:checked').length == 0) {
+                e.preventDefault();
+                alert('请选择作业多少！');
+                return;
+            }
+            if ($('input[name=grading]:radio:checked').length == 0) {
+                e.preventDefault();
+                alert('请选择给分好坏！');
+                return;
+            }
+            if ($('input[name=gain]:radio:checked').length == 0) {
+                e.preventDefault();
+                alert('请选择收获多少！');
+                return;
+            }
+            if ($('textarea[name=content]').val().trim().length < 10) {
+                e.preventDefault();
+                alert('点评内容太短啦！');
+                return;
+            }
+            $('input[name=rate]').val(Math.round($('input[name=rate]').val() * 2));
+    });
+});
+</script>
 {% include 'ckeditor.html' %}
 {% endblock %}
