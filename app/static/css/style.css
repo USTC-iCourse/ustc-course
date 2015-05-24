@@ -334,6 +334,9 @@ a.nounderline, a.nounderline:hover, a.nounderline:active {
 }
 
 /* styles for star rating... */
+.rate-part .btn {
+    box-shadow: none;
+    }
 .rating-stars {
     color: #337ab7 !important; 
 }
@@ -345,5 +348,5 @@ a.nounderline, a.nounderline:hover, a.nounderline:active {
     clear: both;
 }
 .star-rating .caption .blue {
-    font-size: 22px;
+    font-size: 14px;
 }
