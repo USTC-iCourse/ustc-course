@@ -7,6 +7,23 @@ body {
     padding-bottom: 30px;
     background-color: #f3f3f3;
 }
+/* Sticky footer styles */
+html, body { height: 100%; }
+#wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    /* Negative indent footer by it's height */
+    margin: 0 auto -60px;
+}
+#push, #footer {
+    height: 60px;
+}
+#footer {
+    margin-bottom: 20px;
+}
+/* -------------------------------------------------- */
+
 @media (max-width:768px){
     .desktop {
         display: none;
