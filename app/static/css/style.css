@@ -315,3 +315,18 @@ label.fileupload input {
 a.nounderline, a.nounderline:hover, a.nounderline:active {
     text-decoration: none;
 }
+
+/* styles for star rating... */
+.rating-stars {
+    color: #337ab7 !important; 
+}
+.star-rating {
+    float: left;
+    line-height: 1em;
+}
+.clearfix {
+    clear: both;
+}
+.star-rating .caption .blue {
+    font-size: 22px;
+}
