@@ -7,6 +7,23 @@ body {
     padding-bottom: 30px;
     background-color: #f3f3f3;
 }
+/* Sticky footer styles */
+html, body { height: 100%; }
+#wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    /* Negative indent footer by it's height */
+    margin: 0 auto -60px;
+}
+#push, #footer {
+    height: 60px;
+}
+#footer {
+    margin-bottom: 20px;
+}
+/* -------------------------------------------------- */
+
 @media (max-width:768px){
     .desktop {
         display: none;
@@ -317,6 +334,9 @@ a.nounderline, a.nounderline:hover, a.nounderline:active {
 }
 
 /* styles for star rating... */
+.rate-part .btn {
+    box-shadow: none;
+    }
 .rating-stars {
     color: #337ab7 !important; 
 }
@@ -328,7 +348,7 @@ a.nounderline, a.nounderline:hover, a.nounderline:active {
     clear: both;
 }
 .star-rating .caption .blue {
-    font-size: 22px;
+    font-size: 14px;
 }
 .select-box li.active, .select-box li.active a {
     color: #FFF;

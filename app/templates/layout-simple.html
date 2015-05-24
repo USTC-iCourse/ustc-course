@@ -1,6 +1,7 @@
 {% include 'common-header.html' %}
 
 <body>
+  <div id="wrap">
   <nav class="navbar navbar-default">
     <div class="container">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -12,7 +13,8 @@
 
   {% block content %} {% endblock %}
 
-
+  <div id="push"></div>
+  </div><!-- ./wrap -->
   {% include 'common-footer.html' %}
 </body>
 
