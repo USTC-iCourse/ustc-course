@@ -169,8 +169,8 @@
               </div>
               {% endfor %}
               {% if user.is_authenticated() %}
-              <textarea type="text" class="form-control" rows="2" id="comment" placeholder="你的评论"></textarea>
-              <div class="ud-pd-sm"><button class="btn btn-sm btn-white float-right">评论</button></div>
+              <textarea type="text" class="form-control" rows="2" id="review-comment-input-{{ review.id }}" placeholder="你的评论"></textarea>
+              <div class="ud-pd-sm"><button class="btn btn-sm btn-white float-right" onclick="submit_comment({{review.id}});">评论</button></div>
               {% else %}
               <p>立即<a href="#" data-toggle="modal" data-target="#signin">登录</a>，说说你的看法</p>
               {% endif %}
@@ -382,6 +382,25 @@
             window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
          else
             alert(o.message);
+     }, 'json');
+ }
+
+ function submit_comment(review_id)
+ {
+     content = $('#review-comment-input-' + review_id).val().trim();
+     if (content == '') {
+         alert('请输入评论内容');
+         return;
+     }
+     $.post("{{ url_for('api.review_new_comment') }}", {
+         review_id: review_id,
+         content: content
+     }, function(o) {
+         if (o.ok) {
+             window.location.reload();
+         } else {
+             alert(o.message);
+         }
      }, 'json');
  }
 
