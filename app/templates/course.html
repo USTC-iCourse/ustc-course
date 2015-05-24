@@ -380,6 +380,16 @@
      }, 'json');
  }
 
+ function reload_comments(review_id)
+ {
+             $.get("{{ url_for('review.show_comments') }}",
+                { review_id: review_id},
+                function(html) {
+                    $('#review-' + review_id + '-comments').replaceWith(html);
+                    $('#review-' + review_id + '-comments').show();
+             }, 'html');
+ }
+
  function submit_comment(review_id)
  {
      content = $('#review-comment-input-' + review_id).val().trim();
@@ -392,15 +402,22 @@
          content: content
      }, function(o) {
          if (o.ok) {
-             $.get("{{ url_for('review.show_comments') }}",
-                { review_id: review_id},
-                function(html) {
-                    $('#review-' + review_id + '-comments').replaceWith(html);
-                    $('#review-' + review_id + '-comments').show();
-             }, 'html');
+             reload_comments(review_id);
          } else {
              alert(o.message);
          }
+     }, 'json');
+ }
+
+ function delete_comment(review_id, comment_id)
+ {
+     $.post("{{ url_for('api.delete_comment') }}", { comment_id: comment_id },
+         function(o) {
+            if (o.ok) {
+               reload_comments(review_id);
+            } else {
+               alert(o.message);
+            }
      }, 'json');
  }
 

@@ -84,8 +84,8 @@ def review_new_comment():
 
 
 @api.route('/review/delete_comment/',methods=['GET','POST'])
-def review_delete_comment():
-    comment_id = request.values.get('id')
+def delete_comment():
+    comment_id = request.values.get('comment_id')
     if comment_id:
         comment = ReviewComment.query.filter_by(id=comment_id).first()
         if comment:

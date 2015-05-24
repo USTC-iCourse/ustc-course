@@ -4,7 +4,13 @@
               <div class="solid ud-pd-sm">
                   <a href="{{ url_for('user.view_profile', user_id=comment.author.id) }}">{{ comment.author.username }}</a>：
                   <span>{{ comment.content }}</span>
-                  <span class="text-muted small float-right">{{ comment.publish_time }}</span>
+                  <span class="text-muted small float-right">
+                    {% if user == comment.author %}
+                    <span class="glyphicon glyphicon-trash grey left-pd-md" aria-hidden="true"></span>
+                    <a href="javascript: delete_comment({{review.id}}, {{comment.id}});">删除</a>
+                    {% endif %}
+                    {{ comment.publish_time }}
+                  </span>
               </div>
               {% endfor %}
               {% if user.is_authenticated() %}
