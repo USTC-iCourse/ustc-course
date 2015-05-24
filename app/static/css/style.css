@@ -330,3 +330,16 @@ a.nounderline, a.nounderline:hover, a.nounderline:active {
 .star-rating .caption .blue {
     font-size: 22px;
 }
+.select-box li.active, .select-box li.active a {
+    color: #FFF;
+    background-color: #1caaea;
+}
+.select-box a {
+    text-decoration: none;
+    color: #333;
+}
+.select-box li.item:hover, .select-box li.item:hover a {
+    color: #FFF;
+    background-color: #1caaea;
+    cursor: pointer;
+}
