@@ -32,7 +32,7 @@
         <link rel="stylesheet" href="/static/css/star-rating.min.css" media="all" rel="stylesheet" type="text/css">
         <div class="ud-pd-sm">
           <span class="weight-heavy pull-left">评个分吧？</span>
-          <input id="rate-star" name="rate" value="{{ review.rate / 2.0 if review.rate else 4 }}">
+          <input id="rate-star" name="rate" value="{{ review.rate / 2.0 if review.rate else 0 }}">
           <span class="clearfix"></span>
         </div>
       </div>
@@ -40,7 +40,7 @@
       <div class="container-md desktop">
         <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
-          <textarea id="content-editor" name="content">{{ review.content|safe }}</textarea>
+          <textarea id="content-editor" name="content">{% if review.content %}{{ review.content|safe }}{% endif %}</textarea>
         </div>
         <button type="submit" class="btn btn-blue btn-flat float-right shadow">发布</button>
         <div class="ud-pd-lg"></div>
@@ -49,7 +49,7 @@
       <div class="container mobile">
         <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
-          <textarea type="text" class="form-control" rows="8" id="inputDescription"></textarea>
+          <textarea type="text" class="form-control" rows="8" id="inputDescription">{% if review.content %}{{ review.content|safe }}{% endif %}</textarea>
         </div>
         <button type="submit" class="btn btn-blue float-right">发布</button>
         <div class="ud-pd-lg"></div>
@@ -100,6 +100,11 @@ $(function(){
             if ($('input[name=gain]:radio:checked').length == 0) {
                 e.preventDefault();
                 alert('请选择收获多少！');
+                return;
+            }
+            if ($('input[name=rate]').val() <= 0 || $('input[name=rate]').val() > 5) {
+                e.preventDefault();
+                alert('请评分！');
                 return;
             }
             if ($('textarea[name=content]').val().trim().length < 10) {
