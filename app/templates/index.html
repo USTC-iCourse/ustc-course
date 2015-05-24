@@ -17,7 +17,6 @@
     <div class="bm-pd-md">
       <h4 class="blue">热门点评（Top5）</h4>
 
-      <!-- 这是假数据，为了设计引入的。-->
       {% for review in top_reviews %}
       <div class="ud-pd-md dashed">
         <div class="row">
@@ -29,7 +28,7 @@
             <div class="grey bm-pd-md">点评了 <a href="{{ url_for('course.view_course', course_id=review.course.id) }}">{{ review.course.name }}</a>
               <span class="blue float-right"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>{{ review.upvote_count }}</span>
             </div>
-            <p class="text-muted">{{ review.content }} <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>
+            <p class="text-muted">{{ review.content|striptags }} <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>
           </div><!-- ./col-md-8 -->
         </div><!-- ./row -->
       </div><!-- ./dashed -->
@@ -39,7 +38,6 @@
     <div class="bm-pd-md">
       <h4 class="blue">最新点评（Last5）</h4>
 
-      <!-- 这是假数据，为了设计引入的。-->
       {% for review in latest_reviews %}
       <div class="ud-pd-md dashed">
         <div class="row">
@@ -51,7 +49,7 @@
             <div class="grey bm-pd-md">点评了 <a href="{{ url_for('course.view_course', course_id=review.course.id) }}">{{ review.course.name }}</a>
               <span class="float-right">{{ review.publish_time }}</span>
             </div>
-            <p class="text-muted">{{ review.content }} <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>
+            <p class="text-muted">{{ review.content|striptags }} <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>
           </div><!-- ./col-md-8 -->
         </div><!-- ./row -->
       </div><!-- ./dashed -->
