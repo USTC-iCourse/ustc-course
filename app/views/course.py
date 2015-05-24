@@ -11,12 +11,53 @@ QUERY_ORDER = [
     Course.term.desc(),
 ]
 
+termlist = [
+    ['20143', '2015夏'],
+    ['20142', '2015春'],
+    ['20141', '2014秋'],
+    ['20133', '2014夏'],
+    ['20132', '2014春'],
+    ['20131', '2013秋'],
+    ['20123', '2013夏'],
+    ['20122', '2013春'],
+    ['20121', '2012秋'],
+    ['20113', '2012夏'],
+    ['20112', '2012春'],
+    ['20111', '2011秋'],
+    ['20103', '2011夏'],
+    ['20102', '2011春'],
+    ['20101', '2010秋'],
+]
+deptlist = [
+    [27, '体育'],
+    [73, '外语'],
+    [70, '数院'],
+    [40, '信院'],
+    [34, '物院'],
+    [20, '化院'],
+    [38, '地空'],
+    [37, '生院'],
+    [72, '精仪'],
+    [18, '统计'],
+    [74, '计院'],
+    [30, '人文'],
+    [4, '近代物理'],
+    [24, '电子'],
+    [31, '马克思'],
+    [53, '教务处'],
+    [71, '近代力学'],
+    [7, '电子工程'],
+    [13, '化学物理'],
+    [11, '自动化'],
+    [26, '科技传播'],
+    [23, '天文'],
+]
+
 @course.route('/')
 def index():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     term = request.args.get('term',None,type=str)
-    course_name = request.args.get('course',None,type=str)
     course_type = request.args.get('type',None,type=int)
     department = request.args.get('dept',None,type=int)
     campus = request.args.get('campus',None,type=str)
@@ -24,9 +65,6 @@ def index():
     if term:
         # 学期
         course_query = course_query.filter(Course.term==term)
-    if course_name:
-        # 课程名
-        course_query = course_query.filter(Course.name==course_name)
     if course_type:
         # 课程类型
         course_query = course_query.filter(Course.course_type==course_type)
@@ -38,7 +76,9 @@ def index():
         course_query = course_query.filter(Course.campus==campus)
 
     courses_page = course_query.join(CourseRate).order_by(*QUERY_ORDER).paginate(page,per_page=per_page)
-    return render_template('course-index.html', courses=courses_page)
+    return render_template('course-index.html', courses=courses_page,
+            dept=department, term=term,
+            deptlist=deptlist, termlist=termlist, this_module='course.index')
 
 @course.route('/<int:course_id>/')
 def view_course(course_id,course_name=None):
