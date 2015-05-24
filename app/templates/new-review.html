@@ -12,47 +12,53 @@
     <form class="form-horizontal" method="post" action="{{ url_for('course.new_review', course_id=course.id) }}">
       {{ form.csrf_token }}
       <div class="rate-part ud-pd-md">
+
         <div class="ud-pd-sm">
           <span class="right-pd-sm weight-heavy">课程难度</span>
-          <span class="btn-flat btn-grey">简单</span>
-          <span class="btn-flat btn-grey">中等</span>
-          <span class="btn-flat btn-grey">困难</span>
-          <input type="hidden" name="difficulty" class="difficult" value=2>
+          <div class="btn-group btn-group-inv" data-toggle="buttons">
+            <label class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="difficulty" autocomplete="off" value="1">简单</label>
+            <label class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="difficulty" autocomplete="off" value="2">中等</label>
+            <label class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="difficulty" autocomplete="off" value="3">困难</label>
+          </div>
         </div>
 
-        <div class="ud-pd-md">
+        <div class="ud-pd-sm">
           <span class="right-pd-sm weight-heavy">作业多少</span>
-          <span class="btn-flat btn-grey">不多</span>
-          <span class="btn-flat btn-grey">中等</span>
-          <span class="btn-flat btn-grey">超多</span>
-          <input type="hidden" name="homework" class="homework" value=2>
+          <div class="btn-group btn-group-inv" data-toggle="buttons">
+            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="homework" autocomplete="off" value="1">不多</span>
+            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="homework" autocomplete="off" value="2">中等</span>
+            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="homework" autocomplete="off" value="3">超多</span>
+          </div>
         </div>
 
         <div class="ud-pd-sm">
           <span class="right-pd-sm weight-heavy">给分好坏</span>
-          <span class="btn-flat btn-grey">超好</span>
-          <span class="btn-flat btn-grey">厚道</span>
-          <span class="btn-flat btn-grey">杀手</span>
-          <input type="hidden" name="grading" class="" value=2>
+          <div class="btn-group btn-group-inv" data-toggle="buttons">
+            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="1">超好</span>
+            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="2">厚道</span>
+            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="3">杀手</span>
+          </div>
         </div>
 
-        <div class="ud-pd-md">
+        <div class="ud-pd-sm">
           <span class="right-pd-sm weight-heavy">收获多少</span>
-          <span class="btn-flat btn-grey">很多</span>
-          <span class="btn-flat btn-grey">一般</span>
-          <span class="btn-flat btn-grey">没有</span>
-          <input type="hidden" name="gain" class="" value=2>
+          <div class="btn-group btn-group-inv" data-toggle="buttons">
+            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="1">很多</span>
+            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="2">一般</span>
+            <span class="btn btn-flat btn-grey rl-mg-sm"><input type="radio" name="grading" autocomplete="off" value="3">没有</span>
+          </div>
         </div>
 
         <div class="ud-pd-sm">
           <span class="weight-heavy">评个分吧？</span>
-          <span class="blue">
+          <span class="blue" id="rate-star">
             <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true" ></span>
             <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true" ></span>
-            <span class="rl-pd-sm h4">8.5</span>
+            <span class="rl-pd-sm h4">8</span>
+            <input type="hidden" name="rate" value="8" />
           </span>
         </div>
       </div>

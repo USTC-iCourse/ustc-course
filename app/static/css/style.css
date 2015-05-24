@@ -214,7 +214,7 @@ p { line-height: 25px; word-wrap: break-word; }
     background-color: #fff;
     border: 1px #1caaea solid;
 }
-.btn-blue, .btn-grey:hover, .btn-white:hover {
+.btn-blue, .btn-grey:hover, .btn-white:hover, .btn-group-inv .active {
     color: #fff;
     font-weight: 600;
     background-color: #1caaea;
