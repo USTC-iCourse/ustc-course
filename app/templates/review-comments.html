@@ -1,0 +1,17 @@
+          <div id="review-{{ review.id }}-comments" class="panel panel-default" style="display:none">
+            <div class="panel-body">
+              {% for comment in review.comments %}
+              <div class="solid ud-pd-sm">
+                  <a href="{{ url_for('user.view_profile', user_id=comment.author.id) }}">{{ comment.author.username }}</a>：
+                  <span>{{ comment.content }}</span>
+                  <span class="text-muted small float-right">{{ comment.publish_time }}</span>
+              </div>
+              {% endfor %}
+              {% if user.is_authenticated() %}
+              <textarea type="text" class="form-control" rows="2" id="review-comment-input-{{ review.id }}" placeholder="你的评论" autocomplete="off"></textarea>
+              <div class="ud-pd-sm"><button class="btn btn-sm btn-white float-right" onclick="submit_comment({{review.id}});">评论</button></div>
+              {% else %}
+              <p>立即<a href="#" data-toggle="modal" data-target="#signin">登录</a>，说说你的看法</p>
+              {% endif %}
+            </div>
+          </div>

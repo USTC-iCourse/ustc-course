@@ -80,3 +80,12 @@ def delete_review():
     message = _('The review has been deleted.')
     return jsonify(ok=ok,message=message)
 
+@review.route('/comments/', methods=['GET'])
+def show_comments():
+    review_id = request.args.get('review_id', type=int)
+    if not review_id:
+        abort(404)
+    review = Review.query.get(review_id)
+    if not review:
+        abort(404)
+    return render_template('review-comments.html', review=review, user=current_user)
