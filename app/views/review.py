@@ -16,7 +16,7 @@ def new_review(course_id):
     if not course:
         abort(404)
     user = current_user
-    review = Review.query.filter_by(course=course, author=user)
+    review = Review.query.filter_by(course=course, author=user).first()
     if not review:
         review = Review()
         review.course = course
@@ -51,7 +51,7 @@ def delete_review():
         message = _('Can\'t find the review.')
         return jsonify(ok=ok,message=message)
     #check if the user is the author
-    if review.author != current_user:
+    if review.author != current_user and not current_user.is_admin:
         message = _('You have no right to do this.')
         return jsonify(ok=ok,message=message)
     review.delete()

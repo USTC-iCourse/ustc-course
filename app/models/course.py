@@ -52,6 +52,7 @@ class Course(db.Model):
     hours = db.Column(db.Integer)  # 学时
     hours_per_week = db.Column(db.Integer) # 周学时
     class_numbers = db.Column(db.String(200)) # 上课班级
+    campus = db.Column(db.String(20)) # 校区
     start_week = db.Column(db.Integer)  # 起始周
     end_week = db.Column(db.Integer) # 终止周
     _image = db.Column(db.String(100))
