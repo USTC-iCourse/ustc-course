@@ -151,6 +151,11 @@ class Course(db.Model):
         if self.course_major == None:
             return '未知'
 
+    # not implemented yet
+    @property
+    def reviewed(self, user=current_user):
+        return False
+
     @property
     def review_count(self):
         return self.course_rate.review_count
@@ -170,7 +175,6 @@ class Course(db.Model):
         db.session.add(user)
         db.session.commit()
         return True
-        return False
 
     def un_upvote(self,user=current_user):
         user.courses_upvoted.remove(self)
@@ -178,6 +182,7 @@ class Course(db.Model):
         db.session.add(self)
         db.session.add(user)
         db.session.commit()
+        return True
 
     def downvote(self,user=current_user):
         user.courses_downvoted.append(self)

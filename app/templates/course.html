@@ -6,7 +6,7 @@
   <div class="float-element">
     <div class="row">
       <div class="col-md-8 inline-h3">
-        <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">（{{ course.teacher.name }}）</span>
+        <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</span>
         <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
         <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
 
@@ -103,7 +103,10 @@
         <div class="solid ud-pd-md inline-h3">
           <span class="blue h3">点评</span>
           {% if current_user.is_authenticated() %}
-          <a type="button" href="{{ url_for('course.new_review',course_id=course.id) }}" class="btn btn-white float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>写点评</a>
+          <a type="button" href="{{ url_for('course.new_review',course_id=course.id) }}" class="btn btn-white float-right blue">
+            <span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>
+            {% if not course.reviewed %}写点评{% else %}编辑点评{% endif %}
+          </a>
           {% else %}
           <a type="button" data-toggle="modal" data-target="#signin" class="btn btn-white float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true"></span>写点评</a>
           {% endif %}
@@ -153,30 +156,22 @@
             </a>
             <a class="nounderline" href="javascript: show_review_comments({{ review.id }})"><span class="glyphicon glyphicon-comment grey left-pd-md" aria-hidden="true"></span> <span id="review-comment-count-{{review.id}}">{{ review.comment_count }}</span></a>
             <span class="pull-right">
+              {% if review.author == user %}
+              <a class="nounderline" href="{{ url_for('course.new_review',course_id=course.id) }}">
+                <span class="glyphicon glyphicon-pencil grey left-pd-sm" aria-hidden="true" ></span>
+                编辑
+              </a>
+              {% endif %}
               {% if review.author == user or user.is_admin %}
-              <a class="nounderline" href="javascript: delete_review({{ review.id }})"><span class="glyphicon glyphicon-trash grey left-pd-md" aria-hidden="true"></span> {{ _('删除') }}</a>
+              <a class="nounderline" href="javascript: delete_review({{ review.id }})">
+                <span class="glyphicon glyphicon-trash grey left-pd-md" aria-hidden="true"></span>
+                删除
+              </a>
               {% endif %}
             </span>
           </div>
 
-          <div id="review-{{ review.id }}-comments" class="panel panel-default" style="display:none">
-            <div class="panel-body">
-              {% for comment in review.comments %}
-              <div class="solid ud-pd-sm">
-                  <a href="{{ url_for('user.view_profile', user_id=comment.author.id) }}">{{ comment.author.username }}</a>：
-                  <span>{{ comment.content }}</span>
-                  <span class="text-muted small float-right">{{ comment.publish_time }}</span>
-              </div>
-              {% endfor %}
-              {% if user.is_authenticated() %}
-              <textarea type="text" class="form-control" rows="2" id="comment" placeholder="你的评论"></textarea>
-              <div class="ud-pd-sm"><button class="btn btn-sm btn-white float-right">评论</button></div>
-              {% else %}
-              <p>立即<a href="#" data-toggle="modal" data-target="#signin">登录</a>，说说你的看法</p>
-              {% endif %}
-            </div>
-          </div>
-
+          {% include 'review-comments.html' %}
         </div>
         {% endfor %}
         {% endif %}
@@ -382,6 +377,47 @@
             window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
          else
             alert(o.message);
+     }, 'json');
+ }
+
+ function reload_comments(review_id)
+ {
+             $.get("{{ url_for('review.show_comments') }}",
+                { review_id: review_id},
+                function(html) {
+                    $('#review-' + review_id + '-comments').replaceWith(html);
+                    $('#review-' + review_id + '-comments').show();
+             }, 'html');
+ }
+
+ function submit_comment(review_id)
+ {
+     content = $('#review-comment-input-' + review_id).val().trim();
+     if (content == '') {
+         alert('请输入评论内容');
+         return;
+     }
+     $.post("{{ url_for('api.review_new_comment') }}", {
+         review_id: review_id,
+         content: content
+     }, function(o) {
+         if (o.ok) {
+             reload_comments(review_id);
+         } else {
+             alert(o.message);
+         }
+     }, 'json');
+ }
+
+ function delete_comment(review_id, comment_id)
+ {
+     $.post("{{ url_for('api.delete_comment') }}", { comment_id: comment_id },
+         function(o) {
+            if (o.ok) {
+               reload_comments(review_id);
+            } else {
+               alert(o.message);
+            }
      }, 'json');
  }
 

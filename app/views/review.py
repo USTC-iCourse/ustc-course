@@ -25,16 +25,37 @@ def new_review(course_id):
     else:
         is_new = False
 
+    message = ''
     form = ReviewForm(request.form)
-    if form.validate_on_submit():
-        form.content.data = sanitize(form.content.data)
-        form.populate_obj(review)
-        if is_new:
-            review.add()
-        else:
-            review.save()
-        return redirect(url_for('course.view_course',course_id=course_id))
-    return render_template('new-review.html', form=form, course=course, review=review)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            form.content.data = sanitize(form.content.data)
+            form.populate_obj(review)
+            if is_new:
+                review.add()
+            else:
+                review.save()
+            return redirect(url_for('course.view_course',course_id=course_id))
+        else: # invalid submission, try again
+            if form.content.data:
+                review.content = sanitize(form.content.data)
+            if form.difficulty.data:
+                review.difficulty = form.difficulty.data
+            if form.homework.data:
+                review.homework = form.homework.data
+            if form.gain.data:
+                review.gain = form.gain.data
+            if form.rate.data:
+                review.rate = form.rate.data
+            message = '提交失败，请编辑后重新提交！'
+
+    polls = [
+        {'name': 'difficulty', 'display': '课程难度', 'options': ['简单', '中等', '困难'] },
+        {'name': 'homework', 'display': '作业多少', 'options': ['不多', '中等', '超多'] },
+        {'name': 'grading', 'display': '给分好坏', 'options': ['超好', '厚道', '杀手'] },
+        {'name': 'gain', 'display': '收获多少', 'options': ['很多', '一般', '没有'] },
+    ]
+    return render_template('new-review.html', form=form, course=course, review=review, polls=polls, message=message, is_new=is_new)
 
 
 @review.route('/delete/',methods=['POST'])
@@ -59,3 +80,12 @@ def delete_review():
     message = _('The review has been deleted.')
     return jsonify(ok=ok,message=message)
 
+@review.route('/comments/', methods=['GET'])
+def show_comments():
+    review_id = request.args.get('review_id', type=int)
+    if not review_id:
+        abort(404)
+    review = Review.query.get(review_id)
+    if not review:
+        abort(404)
+    return render_template('review-comments.html', review=review, user=current_user)
