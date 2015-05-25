@@ -89,7 +89,7 @@ def sanitize(text):
 
 @app.template_filter('abstract')
 def html_abstract(text):
-    return Markup(text).striptags()[0:250]
+    return Markup(text).striptags()[0:150]
 
 def editor_parse_at(text):
     if not text.endswith('\n'):
