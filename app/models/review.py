@@ -65,6 +65,7 @@ class Review(db.Model):
                 self.grading,self.gain,
                 self.rate)
         db.session.delete(self)
+        self.course.review_users.remove(self.author)
         db.session.commit()
 
     def update(self,new):
