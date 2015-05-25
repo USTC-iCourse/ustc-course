@@ -35,7 +35,7 @@
         <form class="form-horizontal" method="post" enctype="multipart/form-data">
           {{ form.csrf_token }}
           <div>
-            课程主页链接：http://{{ form.homepage }}
+            课程主页链接：<input type="text" name="homepage" value="{{ course.homepage }}">
             <button type="submit" class="btn btn-sm btn-default">提交</button>
           </div>
         </form>

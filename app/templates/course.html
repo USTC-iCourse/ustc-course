@@ -81,7 +81,7 @@
 
         <div class="ud-pd-sm">
           {% if course.homepage %}
-          课程主页：<a href="http://{{ course.homepage }}">{{ course.homepage }}</a>
+          课程主页：<a href="{{ course.homepage }}">{{ course.homepage }}</a>
           {% else %}
           课程主页：暂无（如果你知道，劳烦告诉我们！）
         {% endif %}

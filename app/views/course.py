@@ -253,6 +253,8 @@ def edit_course(course_id=None):
     course_form = CourseForm(request.form, course)
     if course_form.validate_on_submit():
         course_form.populate_obj(course)
-        course = course.save()
+        if not course.homepage.startswith('http'):
+            course.homepage = 'http://' + course.homepage
+        course.save()
         db.session.commit()
     return render_template('course-edit.html', form=course_form, course=course)
