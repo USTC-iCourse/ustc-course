@@ -12,7 +12,7 @@ home = Blueprint('home',__name__)
 
 @home.route('/')
 def index():
-    top_reviews = Review.query.join(Course).join(CourseRate).order_by(CourseRate.upvote_count.desc()).limit(5)
+    top_reviews = Review.query.order_by(Review.upvote_count.desc()).limit(5)
     latest_reviews = Review.query.order_by(Review.id.desc()).limit(5)
     return render_template('index.html', top_reviews=top_reviews, latest_reviews=latest_reviews)
 
