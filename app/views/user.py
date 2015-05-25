@@ -76,6 +76,8 @@ def account_settings():
         #user.username = form['username'].data
         #user.gender = form['gender'].data
         user.homepage = form['homepage'].data.strip()
+        if not user.homepage.startswith('http'):
+            user.homepage = 'http://' + user.homepage
         user.description = form['description'].data.strip()
         if request.files.get('avatar'):
             avatar = request.files['avatar']
