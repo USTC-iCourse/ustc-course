@@ -26,7 +26,7 @@
             {% set course = review.course %}
             <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
             <span class="small grey align-bottom left-pd-sm">学期：{{ course.term_display }}</span>
-            <span class="text-muted small float-right desktop">{{ review.update_time }}</span>
+            <span class="text-muted small float-right desktop">{{ review.update_time|localtime }}</span>
           </div>
           <p class="dark-grey">{{ review.content[0:60]|striptags }}
             <a href="{{ url_for('course.view_course', course_id=course.id) }}#review-{{ review.id }}"> >>{{ _('更多') }}</a>

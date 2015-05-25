@@ -147,7 +147,7 @@
           </div>
 
           <div class="bm-pd-md grey" id="review-{{ review.id }}">
-            <span class="small">{{ review.publish_time }}</span>
+            <span class="small">{{ review.publish_time|localtime }}</span>
             <a class="nounderline" href="javascript: {{ 'cancel_' if review.is_upvoted() }}upvote_review({{ review.id }})">
                 <span class="glyphicon glyphicon-thumbs-up {{ 'blue' if review.is_upvoted() else 'grey' }} left-pd-lg" aria-hidden="true" ></span>
                 <span id="review-upvote-count-{{review.id}}">{{ review.upvote_count }}</span>
