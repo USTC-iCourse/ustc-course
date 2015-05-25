@@ -1,7 +1,7 @@
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail,Message
 from . import app
-from flask import render_template, url_for
+from flask import render_template, url_for, Markup
 from random import randint
 from datetime import datetime
 from app.models import ImageStore, User
@@ -86,6 +86,10 @@ def sanitize(text):
         return cleaner.clean_html(text)
     else:
         return text
+
+@app.template_filter('abstract')
+def html_abstract(text):
+    return Markup(text).striptags()[0:250]
 
 def editor_parse_at(text):
     if not text.endswith('\n'):
