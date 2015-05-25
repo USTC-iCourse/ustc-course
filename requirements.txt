@@ -12,3 +12,5 @@ flask-mysqldb
 flask-babel
 # for debug only
 flask-debugtoolbar
+html2text
+markdown
