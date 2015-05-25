@@ -86,6 +86,30 @@ def sanitize(text):
     else:
         return text
 
+def editor_parse_at(text):
+    if not text.endswith('\n'):
+        text = text + '\n' # the parse function will not work with @somebody
+    matches = re.findall('@[^@&<>"\'\s]+', text)
+    if not matches:
+        return text
+    for match in matches:
+        username = match[1:]
+        if len(username) > 30:
+            continue
+        if validate_username(username, check_db=False) == 'OK':
+            user = User.query.filter_by(username=username).first()
+            if user:
+                url = url_for('user.view_profile', user_id=user.id)
+                # replace @ to Unicode char ＠ to avoid further substitution when review is edited
+                atstring = '<a href="' + url + '">' + '＠' + username + '</a>'
+                # warn: simple str.replace is wrong.
+                # consider the following case: @boj @bojjenny42
+                #   @boj is first matched and replaced, then the string becomes <a href="">@boj</a> <a href="">@boj</a>jenny42
+                # the following regexp would do the trick.
+                text = re.sub("@" + re.escape(username) + '([@&<>"\'\s])',
+                              '<a href="' + url + '">' + '＠' + re.escape(username) + '</a>' + '\\1', text)
+    return text
+
 @app.template_filter('localtime')
 def localtime_minute(date):
     local = pytz.utc.localize(date, is_dst=False).astimezone(pytz.timezone('Asia/Shanghai'))
@@ -95,14 +119,14 @@ def localtime_minute(date):
 RESERVED_USERNAME = set(['管理员', 'admin', 'root',
     'Administrator', 'example', 'test'])
 
-def validate_username(username):
-    if re.search('[@<>"\'\s]', username):
+def validate_username(username, check_db=True):
+    if re.search('[@&<>"\'\s]', username):
         return ('此用户名含有非法字符，不能注册！')
     if re.match('[a-zA-Z0-9-]+\.[a-zA-Z]+$', username):
         return ('此用户名看起来像域名，不能注册！')
     if username in RESERVED_USERNAME:
         return ('此用户名已被保留，不能注册！')
-    if User.query.filter_by(username=username).first():
+    if check_db and User.query.filter_by(username=username).first():
         return ('此用户名已被他人使用！')
     return 'OK'
 
