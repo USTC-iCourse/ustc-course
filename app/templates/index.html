@@ -28,7 +28,7 @@
             <div class="grey bm-pd-md">点评了 <a href="{{ url_for('course.view_course', course_id=review.course.id) }}">{{ review.course.name }}</a>
               <span class="blue float-right"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span>{{ review.upvote_count }}</span>
             </div>
-            <p class="text-muted">{{ review.content[0:100]|striptags }} <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>
+            <p class="text-muted">{{ review.content|abstract }} <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>
           </div><!-- ./col-md-8 -->
         </div><!-- ./row -->
       </div><!-- ./dashed -->
@@ -49,7 +49,7 @@
             <div class="grey bm-pd-md">点评了 <a href="{{ url_for('course.view_course', course_id=review.course.id) }}">{{ review.course.name }}</a>
               <span class="float-right">{{ review.publish_time|localtime }}</span>
             </div>
-            <p class="text-muted">{{ review.content[0:100]|striptags }} <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>
+            <p class="text-muted">{{ review.content|abstract }} <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>
           </div><!-- ./col-md-8 -->
         </div><!-- ./row -->
       </div><!-- ./dashed -->
