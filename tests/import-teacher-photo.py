@@ -12,7 +12,7 @@ from datetime import datetime
 
 PHOTODIR = '../data/teacher-photos'
 LISTFILE = '../data/teacher-photo.txt'
-SIZE = 96, 96
+MAX_SIZE = 192
 
 def import_one(name, url):
     _, extension = os.path.splitext(url)
@@ -25,7 +25,12 @@ def import_one(name, url):
     except:
         print("Failed to open " + path)
     try:
-        img.thumbnail(SIZE, Image.ANTIALIAS)
+        width, height = img.size
+        if height > width:
+            img = img.crop((0, 0, width, width))
+        if width > height:
+            img = img.crop((int((width - height)/2), 0, int((width + height)/2), height))
+        img.thumbnail((MAX_SIZE, MAX_SIZE), Image.ANTIALIAS)
     except:
         print("Failed to thumbnail " + path)
 
