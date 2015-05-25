@@ -2,7 +2,7 @@ from flask import Blueprint,jsonify,request
 from flask.ext.login import login_required,current_user
 from app.models import Review, ReviewComment , User, Course, ImageStore
 from app.forms import ReviewCommentForm
-from app.utils import rand_str, handle_upload
+from app.utils import rand_str, handle_upload, validate_username, validate_email
 from app import app
 import re
 import os
@@ -119,14 +119,7 @@ def reg_verify():
     value = request.args.get('value')
 
     if name == 'username':
-        if User.query.filter_by(username=value).first():
-            return 'Username Exists'
-        return 'OK'
+        return validate_username(value)
     elif name == 'email':
-        if User.query.filter_by(email=value).first():
-            return 'Email Exists'
-        regex = re.compile("[a-zA-Z0-9_]+@(mail\.)?ustc\.edu\.cn")
-        if not regex.fullmatch(value):
-            return 'Illegal Address'
-        return 'OK'
+        return validate_email(value)
     return 'Invalid Request', 400

@@ -4,11 +4,12 @@ from . import app
 from flask import render_template, url_for
 from random import randint
 from datetime import datetime
-from app.models import ImageStore
+from app.models import ImageStore, User
 import hashlib
 import os
 from lxml.html.clean import clean_html
 import pytz
+import re
 
 
 mail = Mail(app)
@@ -89,3 +90,26 @@ def sanitize(text):
 def localtime_minute(date):
     local = pytz.utc.localize(date, is_dst=False).astimezone(pytz.timezone('Asia/Shanghai'))
     return local.strftime('%Y-%m-%d %H:%M')
+
+
+RESERVED_USERNAME = set(['管理员', 'admin', 'root',
+    'Administrator', 'example', 'test'])
+
+def validate_username(username):
+    if re.search('[@<>"\'\s]', username):
+        return ('此用户名含有非法字符，不能注册！')
+    if re.match('[a-zA-Z0-9-]+\.[a-zA-Z]+$', username):
+        return ('此用户名看起来像域名，不能注册！')
+    if username in RESERVED_USERNAME:
+        return ('此用户名已被保留，不能注册！')
+    if User.query.filter_by(username=username).first():
+        return ('此用户名已被他人使用！')
+    return 'OK'
+
+def validate_email(email):
+    regex = re.compile("[a-zA-Z0-9_]+@(mail\.)?ustc\.edu\.cn")
+    if not regex.fullmatch(email):
+        return ('必须使用科大邮箱注册!')
+    if User.query.filter_by(email=email).first():
+        return ('此邮件地址已被注册！')
+    return 'OK'
