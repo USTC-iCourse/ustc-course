@@ -11,6 +11,7 @@ class ReviewForm(Form):
     gain = IntegerField('gain',validators=[InputRequired(),NumberRange(1,3)])
     rate = IntegerField('rate',validators=[InputRequired(),NumberRange(1,10)])
     content = TextAreaField('content',validators=[InputRequired()])
+    is_mobile = IntegerField('is_mobile')
 
 class ReviewCommentForm(Form):
     review_id = IntegerField('review id',validators=[InputRequired()])

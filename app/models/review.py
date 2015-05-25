@@ -1,5 +1,6 @@
 from datetime import datetime
 from app import db
+import html2text
 try:
     from flask.ext.login import current_user
 except:
@@ -120,6 +121,10 @@ class Review(db.Model):
             kwargs['author'] = author
         review = cls(**kwargs)
         review.save()
+
+    @property
+    def content_text(self):
+        return html2text.html2text(self.content)
 
 
 class ReviewComment(db.Model):

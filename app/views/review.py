@@ -5,6 +5,7 @@ from app.forms import ReviewForm
 from app.utils import sanitize
 from flask.ext.babel import gettext as _
 from .course import course
+import markdown
 
 review = Blueprint('review',__name__)
 
@@ -29,6 +30,8 @@ def new_review(course_id):
     form = ReviewForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
+            if form.is_mobile.data:
+                form.content.data = markdown.markdown(form.content.data)
             form.content.data = sanitize(form.content.data)
             form.populate_obj(review)
             if is_new:

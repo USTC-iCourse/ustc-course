@@ -49,7 +49,8 @@
       <div class="container mobile">
         <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
-          <textarea type="text" class="form-control" rows="8" id="inputDescription">{% if review.content %}{{ review.content|safe }}{% endif %}</textarea>
+          <input type="hidden" name="is_mobile" value="1">
+          <textarea type="text" class="form-control" rows="8" name="content">{% if review.content %}{{ review.content_text }}{% endif %}</textarea>
         </div>
         <button type="submit" class="btn btn-blue float-right">发布</button>
         <div class="ud-pd-lg"></div>
@@ -81,6 +82,14 @@ $('#rate-star').rating({
 });
 
 $(function(){
+    // remove desktop/mobile-only elements to avoid name conflicts
+    if ($('.desktop').css('display') == 'none') {
+        $('.desktop').remove();
+    }
+    if ($('.mobile').css('display') == 'none') {
+        $('.mobile').remove();
+    }
+
     $('#review-form').submit(function(e) {
             if ($('input[name=difficulty]:radio:checked').length == 0) {
                 e.preventDefault();
@@ -112,6 +121,25 @@ $(function(){
                 alert('点评内容太短啦！');
                 return;
             }
+            /*
+            // mobile device: to HTML
+            if ($('.mobile').length > 0) {
+                var content = $('textarea[name=content]').val();
+                var lines = content.split('\n');
+                var newcontent = '';
+                for (var i in lines) {
+                    var line = lines[i];
+                    if (line.trim().length == 0)
+                        continue;
+                    else {
+                        line = line.replace(/ /g, "&nbsp;");
+                        newcontent += '<p>' + line + '</p>\n';
+                    }
+                }
+                console.log(newcontent);
+                $('textarea[name=content]').val(newcontent);
+            }
+            */
             $('input[name=rate]').val(Math.round($('input[name=rate]').val() * 2));
     });
 });
