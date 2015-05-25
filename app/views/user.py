@@ -168,6 +168,8 @@ def teacher_settings(teacher_id):
     if form.validate_on_submit():
         #teacher.gender = form['gender'].data
         teacher.homepage = form['homepage'].data.strip()
+        if not teacher.homepage.startswith('http'):
+            teacher.homepage = 'http://' + teacher.homepage
         teacher.description = form['description'].data.strip()
         if request.files.get('avatar'):
             avatar = request.files['avatar']
