@@ -8,6 +8,8 @@ from app.models import ImageStore
 import hashlib
 import os
 from lxml.html.clean import clean_html
+import pytz
+
 
 mail = Mail(app)
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
@@ -82,3 +84,8 @@ def sanitize(text):
         return clean_html(text)
     else:
         return text
+
+@app.template_filter('localtime')
+def localtime_minute(date):
+    local = pytz.utc.localize(date, is_dst=False).astimezone(pytz.timezone('Asia/Shanghai'))
+    return local.strftime('%Y-%m-%d %H:%M')
