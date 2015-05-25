@@ -7,7 +7,7 @@ from datetime import datetime
 from app.models import ImageStore, User
 import hashlib
 import os
-from lxml.html.clean import clean_html
+from lxml.html.clean import Cleaner
 import pytz
 import re
 
@@ -82,7 +82,8 @@ def handle_upload(file,type):
 
 def sanitize(text):
     if text.strip():
-        return clean_html(text)
+        cleaner = Cleaner(safe_attrs_only=False)
+        return cleaner.clean_html(text)
     else:
         return text
 
