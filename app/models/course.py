@@ -72,6 +72,7 @@ class Course(db.Model):
     #followers : backref to User
     #upvote_users: backref to User
     #downvote_users: backref to User
+    #review_users: backref to User
 
     _course_rate = db.relationship('CourseRate', backref='course', uselist=False, lazy='joined')
 
@@ -151,10 +152,9 @@ class Course(db.Model):
         if self.course_major == None:
             return '未知'
 
-    # not implemented yet
     @property
     def reviewed(self, user=current_user):
-        return False
+        return user in self.review_users
 
     @property
     def review_count(self):
