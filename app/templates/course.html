@@ -158,7 +158,7 @@
             </a>
             <span class="pull-right">
               {% if review.author == user %}
-              <a class="nounderline" href="{{ url_for('course.new_review',course_id=course.id) }}">
+              <a class="nounderline desktop" href="{{ url_for('course.new_review',course_id=course.id) }}">
                 <span class="glyphicon glyphicon-pencil grey left-pd-sm small" aria-hidden="true" ></span>
                 编辑
               </a>
