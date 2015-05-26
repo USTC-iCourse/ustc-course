@@ -94,7 +94,7 @@ def html_abstract(text):
 def editor_parse_at(text):
     if not text.endswith('\n'):
         text = text + '\n' # the parse function will not work with @somebody
-    matches = re.findall('@[^@&<>"\'\s]+', text)
+    matches = re.findall('@[^@&<>"\':;?+=,\s]+', text)
     if not matches:
         return text
     for match in matches:
@@ -111,7 +111,7 @@ def editor_parse_at(text):
                 # consider the following case: @boj @bojjenny42
                 #   @boj is first matched and replaced, then the string becomes <a href="">@boj</a> <a href="">@boj</a>jenny42
                 # the following regexp would do the trick.
-                text = re.sub("@" + re.escape(username) + '([@&<>"\'\s])',
+                text = re.sub("@" + re.escape(username) + '([@&<>"\':;?+=,\s])',
                               '<a href="' + url + '">' + '＠' + re.escape(username) + '</a>' + '\\1', text)
     return text
 
@@ -125,7 +125,7 @@ RESERVED_USERNAME = set(['管理员', 'admin', 'root',
     'Administrator', 'example', 'test'])
 
 def validate_username(username, check_db=True):
-    if re.search('[@&<>"\'\s]', username):
+    if re.search('[@&<>"\':;?+=,\s]', username):
         return ('此用户名含有非法字符，不能注册！')
     if re.match('[a-zA-Z0-9-]+\.[a-zA-Z]+$', username):
         return ('此用户名看起来像域名，不能注册！')
