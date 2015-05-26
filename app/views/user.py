@@ -19,7 +19,8 @@ def view_profile(user_id):
 
     return render_template('profile.html',
                            user=user,
-                           info=(user.info if user.is_student else None))
+                           info=(user.info if user.is_student else None),
+                           current_user=current_user)
 
 @user.route('/<int:user_id>/reviews')
 def reviews(user_id):
@@ -49,6 +50,7 @@ def follow_course(user_id):
 
 
 @user.route('/<int:user_id>/join-course')
+@login_required
 def join_course(user_id):
     '''用户学过的所有课程'''
     user = User.query.get(user_id)
