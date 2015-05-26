@@ -31,7 +31,7 @@ class Review(db.Model):
     upvote_users = db.relationship('User', secondary=review_upvotes)
     comments = db.relationship('ReviewComment',backref='review')
 
-    author = db.relationship('User', backref='reviews')
+    author = db.relationship('User', backref=db.backref('reviews', order_by='desc(Review.publish_time)'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     #course: Course

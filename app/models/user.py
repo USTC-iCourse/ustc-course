@@ -64,12 +64,12 @@ class User(db.Model, UserMixin):
     description = db.Column(db.Text)
     _avatar = db.Column(db.String(100))
 
-    courses_following = db.relationship('Course', secondary = follow_course, backref='followers')
-    courses_upvoted = db.relationship('Course', secondary = upvote_course, backref='upvote_users')
-    courses_downvoted = db.relationship('Course', secondary = downvote_course, backref='downvote_users')
+    courses_following = db.relationship('Course', secondary = follow_course, order_by='desc(Course.term)', backref='followers')
+    courses_upvoted = db.relationship('Course', secondary = upvote_course, order_by='desc(Course.term)', backref='upvote_users')
+    courses_downvoted = db.relationship('Course', secondary = downvote_course, order_by='desc(Course.term)', backref='downvote_users')
     _student_info = db.relationship('Student', backref='user',uselist=False)
     _teacher_info = db.relationship('Teacher', backref='user',uselist=False)
-    reviewed_course = db.relationship('Course',secondary = review_course, backref='review_users')
+    reviewed_course = db.relationship('Course',secondary = review_course, order_by='desc(Course.term)', backref='review_users')
 
     def __init__(self, username, email, password):
         self.username = username
@@ -262,7 +262,7 @@ class Student(db.Model):
     dept = db.relationship('Dept', backref='students')
     dept_class = db.relationship('DeptClass', backref='students')
     major = db.relationship('Major')
-    courses_joined = db.relationship('Course', secondary = join_course, backref='students',lazy='dynamic')
+    courses_joined = db.relationship('Course', secondary = join_course, order_by='desc(Course.term)', backref='students',lazy='dynamic')
 
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
