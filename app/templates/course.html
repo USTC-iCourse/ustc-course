@@ -423,5 +423,12 @@
      }, 'json');
  }
 
+ function reply_comment(review_id, reply_to)
+ {
+     var elem = $('#review-comment-input-' + review_id);
+     elem.val('回复 @' + reply_to + ': ');
+     elem.focus();
+ }
+
 </script>
 {% endblock %}
