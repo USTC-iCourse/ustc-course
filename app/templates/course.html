@@ -195,7 +195,7 @@
           <p>研究方向：暂无</p>
           <p>教师主页：
             {% if teacher.homepage %}
-            <a href="http://{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 链接</a>
+            <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>
             {% else %}暂无{% endif %}
           </p>
           <div class="ud-pd-md" style="display: none"><a>教师排行榜：23</a></div>
