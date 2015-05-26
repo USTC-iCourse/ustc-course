@@ -164,9 +164,10 @@ def teacher_settings(teacher_id):
     errors = []
     if form.validate_on_submit():
         #teacher.gender = form['gender'].data
-        teacher.homepage = form['homepage'].data.strip()
-        if not teacher.homepage.startswith('http'):
-            teacher.homepage = 'http://' + teacher.homepage
+        form['homepage'].data = form['homepage'].data.strip()
+        if not form['homepage'].data.startswith('http'):
+            form['homepage'].data = 'http://' + form['homepage'].data
+        teacher.homepage = form['homepage'].data
         teacher.description = form['description'].data.strip()
         if request.files.get('avatar'):
             avatar = request.files['avatar']
