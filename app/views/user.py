@@ -10,7 +10,6 @@ import re
 user = Blueprint('user', __name__)
 
 @user.route('/<int:user_id>')
-@login_required
 def view_profile(user_id):
     '''用户的个人主页,展示用户在站点的活跃情况'''
     user = User.query.get(user_id)
@@ -23,7 +22,6 @@ def view_profile(user_id):
                            info=(user.info if user.is_student else None))
 
 @user.route('/<int:user_id>/reviews')
-@login_required
 def reviews(user_id):
     '''用户点评过的所有课程'''
     user = User.query.get(user_id)
@@ -37,7 +35,6 @@ def reviews(user_id):
 
 
 @user.route('/<int:user_id>/follow-course')
-@login_required
 def follow_course(user_id):
     '''用户关注过的所有课程'''
     user = User.query.get(user_id)
@@ -127,7 +124,6 @@ def bind_identity():
 
 
 @user.route('/<int:user_id>/courses/')
-@login_required
 def courses(user_id):
     user = User.query.get(user_id)
     if user and user.info:
@@ -150,7 +146,6 @@ def courses(user_id):
 
 
 @user.route('/<int:user_id>/avatar')
-@login_required
 def avatar(user_id):
     user = User.query.get(user_id)
     return '<img src='+user.avatar+'>'
