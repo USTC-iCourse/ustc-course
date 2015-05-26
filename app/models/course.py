@@ -21,6 +21,29 @@ class CourseTimeLocation(db.Model):
 
     note = db.Column(db.String(200))
 
+    @property
+    def hours_list(self):
+        if not self.begin_hour or not self.num_hours:
+            return []
+        return range(self.begin_hour, self.begin_hour + self.num_hours)
+
+    @property
+    def hours_list_display(self):
+        return ','.join([str(c) for c in self.hours_list])
+
+    @property
+    def time_display(self):
+        if not self.weekday or not self.hours_list_display:
+            return None
+        return str(self.weekday) + '(' + self.hours_list_display + ')'
+
+    @property
+    def time_location_display(self):
+        if not self.location or not self.time_display:
+            return None
+        return self.location + ': ' + self.time_display
+
+
 course_teachers = db.Table('course_teachers',
     db.Column('course_id', db.Integer, db.ForeignKey('courses.id')),
     db.Column('teacher_id', db.Integer, db.ForeignKey('teachers.id')),
@@ -134,7 +157,9 @@ class Course(db.Model):
 
     @property
     def time_locations_display(self):
-        return [ row.location + ': ' + row.time for row in self.coourse_time_locations ].join('; ')
+        return '; '.join([
+            row.time_location_display for row in self.time_locations
+            if row.time_location_display is not None ])
 
     @property
     def term_display(self):
@@ -145,7 +170,7 @@ class Course(db.Model):
         elif self.term[4] == '3':
             return str(int(self.term[0:4])+1) + '夏'
         else:
-            return 'unkown'
+            return '未知'
 
     @property
     def course_major_display(self):
