@@ -40,8 +40,8 @@ CKEDITOR.editorConfig = function( config ) {
     // site specific settings
     config.height = 500;
 
-    config.filebrowserUploadUrl = '/upload/file';
-    config.filebrowserImageUploadUrl = '/upload/image';
+    config.filebrowserUploadUrl = '/api/upload/file';
+    config.filebrowserImageUploadUrl = '/api/upload/image';
 
     config.extraPlugins = 'simpleuploads';
     config.simpleuploads_acceptedExtensions ='7z|avi|csv|doc|docx|flv|gif|gz|gzip|jpeg|jpg|mov|mp3|mp4|mpc|mpeg|mpg|ods|odt|pdf|png|ppt|pxd|rar|rtf|tar|tgz|txt|vsd|wav|wma|wmv|xls|xml|zip';

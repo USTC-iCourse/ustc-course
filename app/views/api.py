@@ -105,16 +105,27 @@ def delete_comment():
         return jsonify(ok=False,message="A id must be given")
 
 
+def generic_upload(file, type):
+    ok,message = handle_upload(file, type)
+    script_head = '<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(2,'
+    script_tail = ');</script>'
+    if ok:
+        url = '/uploads/' + type + 's/' + message
+        return script_head + '"' + url + '"' + script_tail
+    else:
+        return script_head + '""' + ',' + '"' + message + '"' + script_tail
 
-
-
-@api.route('/upload/',methods=['POST'])
+@api.route('/upload/image',methods=['POST'])
 @login_required
-def upload():
-    file = request.files['image']
-    ok,message = handle_upload(file,'image')
-    return jsonify(ok=ok,message=message)
+@app.csrf.exempt
+def upload_image():
+    return generic_upload(request.files['upload'], 'image')
 
+@api.route('/upload/file', methods=['POST'])
+@login_required
+@app.csrf.exempt
+def upload_file():
+    return generic_upload(request.files['upload'], 'file')
 
 
 
