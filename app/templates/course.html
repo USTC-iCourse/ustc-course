@@ -80,7 +80,7 @@
         </table>
 
         <div class="ud-pd-sm">
-          {% if course.homepage %}
+          {% if course.homepage and course.homepage != 'http://' %}
           课程主页：<a href="{{ course.homepage }}">{{ course.homepage }}</a>
           {% else %}
           课程主页：暂无（如果你知道，劳烦告诉我们！）
@@ -194,7 +194,7 @@
           <p>{{ teacher.dept.name }}</p>
           <p>研究方向：暂无</p>
           <p>教师主页：
-            {% if teacher.homepage %}
+            {% if teacher.homepage and teacher.homepage != 'http://' %}
             <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>
             {% else %}暂无{% endif %}
           </p>
