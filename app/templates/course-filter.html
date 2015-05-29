@@ -1,26 +1,23 @@
     <div class="select-box">
-
       <ul class="list-unstyled list-inline">
         <span><strong>学期：</strong></span>
-        <li>全部</li>
-        <li>2015春</li>
-        <li>2014秋</li>
-        <li>2014夏</li>
-        <li>2014春</li>
-        <li>2013</li>
+        <li class="item {% if not term %}active{% endif %}">
+          <a href="{{ url_for(this_module, q=keyword, dept=dept) }}">全部</a>
+        </li>
+        {% for tno, tname in termlist[0:8] %}
+        <li class="item {% if term == tno %}active{% endif %}">
+          <a href="{{ url_for(this_module, q=keyword, dept=dept, term=tno) }}">{{ tname }}</a>
+        </li>
+        {% endfor %}
         <li>
           <div class="dropdown">
             <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2012</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2011</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2010</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2009</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2008</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2007</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2006</a></li>
+              {% for tno, tname in termlist[8:] %}
+              <li class="item" role="presentation"><a href="{{ url_for(this_module, q=keyword, dept=dept, term=tno) }}" role="menuitem" tabindex="-1">{{ tname }}</a></li>
+              {% endfor %}
             </ul>
           </div>
         </li>
@@ -29,30 +26,29 @@
 
       <ul class="list-unstyled list-inline">
         <span><strong>院系：</strong></span>
-        <li>全部</li>
-        <li>数学</li>
-        <li>物理</li>
-        <li>化学</li>
-        <li>计算机</li>
-        <li>生物</li>
-        <li>人文</li>
+        <li class="item {% if not dept %}active{% endif %}">
+          <a href="{{ url_for(this_module, q=keyword, term=term) }}">全部</a>
+        </li>
+        {% for dno, dname in deptlist[0:12] %}
+        <li class="item {% if dept == dno %}active{% endif %}">
+          <a href="{{ url_for(this_module, q=keyword, term=term, dept=dno) }}">{{ dname }}</a>
+        </li>
+        {% endfor %}
         <li>
           <div class="dropdown">
             <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">地空</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">经济</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">传播</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">管理</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">信息安全</a></li>
+              {% for dno, dname in deptlist[12:] %}
+              <li class="item" role="presentation"><a href="{{ url_for(this_module, q=keyword, dept=dno, term=term) }}" role="menuitem" tabindex="-1">{{ dname }}</a></li>
+              {% endfor %}
             </ul>
           </div>
         </li>
       </ul>
 
-
+<!--
       <ul class="list-unstyled list-inline">
         <span><strong>地点：</strong></span>
         <li>全部</li>
@@ -62,6 +58,7 @@
         <li>北区</li>
         <li>MOOC</li>
       </ul>
+-->
 
     </div><!-- end elect-box -->
 

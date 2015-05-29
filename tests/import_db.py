@@ -419,6 +419,18 @@ def load_course_locations():
     print('%d course locations loaded' % count)
 
 def load_join_course():
+    courses_id_map = {}
+
+    existing_students = Student.query.all()
+    for stu in existing_students:
+        students_map[stu.sno] = stu
+
+    existing_courses = Course.query.all()
+    for c in existing_courses:
+        unique_key = c.cno + '|' + c.term
+        courses_map[unique_key] = c
+        courses_id_map[str(c.kcid) + '|' + c.term] = c
+
     count = 0
     for c in parse_file('XK_XKJGB.txt'):
         unique_key = c['KCBJH'].upper() + '|' + c['XNXQ']
@@ -430,8 +442,9 @@ def load_join_course():
             print('Student id ' + c['XH'] + ' not found: ' + str(c))
             continue
         student = students_map[c['XH']]
-        course.students.append(student)
-        count+=1
+        if not student in course.students:
+            course.students.append(student)
+            count+=1
 
     # join course info before 2012 does not exist in XKJGB
     for c in parse_file('CJ_CJXXB.txt'):
@@ -439,16 +452,21 @@ def load_join_course():
             continue
         if float(c['CJ']) > 100: # 二等级或五等级制课程，正常录入
             pass
-        unique_key = c['KCBJH'].upper() + '|' + c['XQ']
-        if not unique_key in courses_map:
-            print('Course not found:' + str(c))
+        cno_key = c['KCBJH'].upper() + '|' + c['XQ']
+        id_key = str(c['KCID']) + '|' + c['XQ']
+        if cno_key in courses_map:
+            course = courses_map[cno_key]
+        elif id_key in courses_id_map:
+            course = courses_id_map[id_key]
+        else:
+            print('Course ID key ' + id_key + ' and CNO key ' + cno_key + ' not found:' + str(c))
             continue
-        course = courses_map[unique_key]
+
         if c['SNO'] not in students_map:
             print('Student id ' + c['SNO'] + ' not found: ' + str(c))
             continue
         student = students_map[c['SNO']]
-        if not student in course.students:
+        if student not in course.students:
             course.students.append(student)
             count+=1
 
@@ -510,6 +528,7 @@ def load_grad_join_course():
         if not student in course.students:
             course.students.append(student)
             count+=1
+            print(count)
 
     db.session.commit()
     print('%d grad xuanke info loaded' % count)

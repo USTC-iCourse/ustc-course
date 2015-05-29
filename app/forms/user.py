@@ -4,10 +4,8 @@ from wtforms.validators import (DataRequired,NumberRange, Email, EqualTo, Length
 from app.models import User
 from flask.ext.login import current_user
 from flask.ext.babel import gettext as _
+from app.utils import validate_username, validate_email
 import re
-
-RESERVED_USERNAME = set(['管理员',
-    'Administrator'])
 
 def strip_username(input_s):
     strip_p = re.compile('\s+')
@@ -35,17 +33,18 @@ class RegisterForm(Form):
     confirm_password = PasswordField('confirm password')
 
     def validate_email(form, field):
-        regex = re.compile("[a-zA-Z0-9_]+@(mail\.)?ustc\.edu\.cn")
-        if not regex.fullmatch(field.data):
-            raise ValidationError('必须使用科大邮箱注册!')
-        if User.query.filter_by(email=field.data).first():
-            raise ValidationError('The email address has been registered.')
+        res = validate_email(field.data)
+        if res == 'OK':
+            return True
+        else:
+            raise ValidationError(res)
 
     def validate_username(form, field):
-        if User.query.filter_by(username=field.data).first():
-            raise ValidationError('The username has been taken!')
-        if field.data in RESERVED_USERNAME:
-            raise ValidationError('The username is reserved!')
+        res = validate_username(field.data)
+        if res == 'OK':
+            return True
+        else:
+            raise ValidationError(res)
 
 class PasswordForm(Form):
     old_password = PasswordField('Old password',validators=[DataRequired()])

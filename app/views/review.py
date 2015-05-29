@@ -2,9 +2,10 @@ from flask import Blueprint,render_template,abort,redirect,url_for,request,abort
 from flask.ext.security import current_user,login_required
 from app.models import Course, Review
 from app.forms import ReviewForm
-from app.utils import sanitize
+from app.utils import sanitize, editor_parse_at
 from flask.ext.babel import gettext as _
 from .course import course
+import markdown
 
 review = Blueprint('review',__name__)
 
@@ -29,6 +30,9 @@ def new_review(course_id):
     form = ReviewForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
+            if form.is_mobile.data:
+                form.content.data = markdown.markdown(form.content.data)
+            form.content.data = editor_parse_at(form.content.data)
             form.content.data = sanitize(form.content.data)
             form.populate_obj(review)
             if is_new:

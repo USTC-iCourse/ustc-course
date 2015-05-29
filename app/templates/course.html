@@ -72,19 +72,20 @@
             <td><strong>学分：</strong>{{ course.credit or '未知' }}
           </tr>
           <tr>
-            <td><strong>时间：</strong>{{ course.time_locations_display or '未知' }}</td>
-            <td><strong>地点：</strong>{{ course.term_display or '未知' }}
+            <td><strong>时间地点：</strong>{{ course.time_locations_display or '未知' }}</td>
+            <td><strong>学期：</strong>{{ course.term_display or '未知' }}
               <span class="float-right"><a href="http://mis.teach.ustc.edu.cn/gradkcjs.do?kcid={{ course.kcid }}" target="_blank">更多信息</a><span></td>
           </tr>
           </tbody>
         </table>
 
         <div class="ud-pd-sm">
-          {% if course.homepage %}
-          课程主页：<a href="http://{{ course.homepage }}">{{ course.homepage }}</a>
+          {% if course.homepage and course.homepage != 'http://' %}
+          课程主页：<a href="{{ course.homepage }}">{{ course.homepage }}</a>
           {% else %}
-          课程主页：暂无（如果你知道，劳烦告诉我们！）</div>
+          课程主页：暂无（如果你知道，劳烦告诉我们！）
         {% endif %}
+        </div>
 
         <div id="action-btn-group" class="ud-pd-md" style="display:none">
           <button class="btn btn-white btn-flat btn-follow btn-do"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span> 关注 <small>(<span class="count"></span>)</small></button>
@@ -147,7 +148,7 @@
           </div>
 
           <div class="bm-pd-md grey" id="review-{{ review.id }}">
-            <span class="small">{{ review.publish_time }}</span>
+            <span class="small">{{ review.publish_time|localtime }}</span>
             <a class="nounderline" href="javascript: {{ 'cancel_' if review.is_upvoted() }}upvote_review({{ review.id }})">
                 <span class="glyphicon glyphicon-thumbs-up {{ 'blue' if review.is_upvoted() else 'grey' }} left-pd-lg" aria-hidden="true" ></span>
                 <span id="review-upvote-count-{{review.id}}">{{ review.upvote_count }}</span>
@@ -158,7 +159,7 @@
             </a>
             <span class="pull-right">
               {% if review.author == user %}
-              <a class="nounderline" href="{{ url_for('course.new_review',course_id=course.id) }}">
+              <a class="nounderline desktop" href="{{ url_for('course.new_review',course_id=course.id) }}">
                 <span class="glyphicon glyphicon-pencil grey left-pd-sm small" aria-hidden="true" ></span>
                 编辑
               </a>
@@ -193,8 +194,8 @@
           <p>{{ teacher.dept.name }}</p>
           <p>研究方向：暂无</p>
           <p>教师主页：
-            {% if teacher.homepage %}
-            <a href="http://{{ teacher.homepage }}" target="_blank">{{ teacher.homepage }}</a>
+            {% if teacher.homepage and teacher.homepage != 'http://' %}
+            <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>
             {% else %}暂无{% endif %}
           </p>
           <div class="ud-pd-md" style="display: none"><a>教师排行榜：23</a></div>
@@ -420,6 +421,13 @@
                alert(o.message);
             }
      }, 'json');
+ }
+
+ function reply_comment(review_id, reply_to)
+ {
+     var elem = $('#review-comment-input-' + review_id);
+     elem.val('回复 @' + reply_to + ': ');
+     elem.focus();
  }
 
 </script>

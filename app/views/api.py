@@ -1,8 +1,9 @@
-from flask import Blueprint,jsonify,request
+from flask import Blueprint,jsonify,request, Markup
 from flask.ext.login import login_required,current_user
 from app.models import Review, ReviewComment , User, Course, ImageStore
 from app.forms import ReviewCommentForm
-from app.utils import rand_str, handle_upload
+from app.utils import rand_str, handle_upload, validate_username, validate_email
+from app.utils import editor_parse_at
 from app import app
 import re
 import os
@@ -75,6 +76,10 @@ def review_new_comment():
             review = Review.query.get(review_id)
             comment = ReviewComment()
             content = request.form.get('content')
+            if len(content) > 500:
+                return jsonify(ok=False,message="评论太长了，不能超过 500 字哦")
+            content = Markup(content).striptags()
+            content = editor_parse_at(content)
             ok,message = comment.add(review,content)
             return jsonify(ok=ok,message=message,content=content)
         else:
@@ -100,16 +105,27 @@ def delete_comment():
         return jsonify(ok=False,message="A id must be given")
 
 
+def generic_upload(file, type):
+    ok,message = handle_upload(file, type)
+    script_head = '<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(2,'
+    script_tail = ');</script>'
+    if ok:
+        url = '/uploads/' + type + 's/' + message
+        return script_head + '"' + url + '"' + script_tail
+    else:
+        return script_head + '""' + ',' + '"' + message + '"' + script_tail
 
-
-
-@api.route('/upload/',methods=['POST'])
+@api.route('/upload/image',methods=['POST'])
 @login_required
-def upload():
-    file = request.files['image']
-    ok,message = handle_upload(file,'image')
-    return jsonify(ok=ok,message=message)
+@app.csrf.exempt
+def upload_image():
+    return generic_upload(request.files['upload'], 'image')
 
+@api.route('/upload/file', methods=['POST'])
+@login_required
+@app.csrf.exempt
+def upload_file():
+    return generic_upload(request.files['upload'], 'file')
 
 
 
@@ -119,14 +135,7 @@ def reg_verify():
     value = request.args.get('value')
 
     if name == 'username':
-        if User.query.filter_by(username=value).first():
-            return 'Username Exists'
-        return 'OK'
+        return validate_username(value)
     elif name == 'email':
-        if User.query.filter_by(email=value).first():
-            return 'Email Exists'
-        regex = re.compile("[a-zA-Z0-9_]+@(mail\.)?ustc\.edu\.cn")
-        if not regex.fullmatch(value):
-            return 'Illegal Address'
-        return 'OK'
+        return validate_email(value)
     return 'Invalid Request', 400

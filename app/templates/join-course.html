@@ -13,7 +13,9 @@
 
       {% for course in user.courses_joined %}
       <div class="ud-pd-md dashed">
-        <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
+        <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}
+        {% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}
+        </a>
         <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
       </div>
       {% endfor %}

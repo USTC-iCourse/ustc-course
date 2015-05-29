@@ -21,7 +21,7 @@ app.config.from_object('config.default')
 toolbar = DebugToolbarExtension(app)
 
 db = SQLAlchemy(app)
-CsrfProtect(app)
+app.csrf = CsrfProtect(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'home.signin'

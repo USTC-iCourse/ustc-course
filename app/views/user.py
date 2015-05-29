@@ -19,7 +19,8 @@ def view_profile(user_id):
 
     return render_template('profile.html',
                            user=user,
-                           info=(user.info if user.is_student else None))
+                           info=(user.info if user.is_student else None),
+                           current_user=current_user)
 
 @user.route('/<int:user_id>/reviews')
 def reviews(user_id):
@@ -49,6 +50,7 @@ def follow_course(user_id):
 
 
 @user.route('/<int:user_id>/join-course')
+@login_required
 def join_course(user_id):
     '''用户学过的所有课程'''
     user = User.query.get(user_id)
@@ -73,6 +75,8 @@ def account_settings():
         #user.username = form['username'].data
         #user.gender = form['gender'].data
         user.homepage = form['homepage'].data.strip()
+        if not user.homepage.startswith('http'):
+            user.homepage = 'http://' + user.homepage
         user.description = form['description'].data.strip()
         if request.files.get('avatar'):
             avatar = request.files['avatar']
@@ -160,7 +164,10 @@ def teacher_settings(teacher_id):
     errors = []
     if form.validate_on_submit():
         #teacher.gender = form['gender'].data
-        teacher.homepage = form['homepage'].data.strip()
+        form['homepage'].data = form['homepage'].data.strip()
+        if not form['homepage'].data.startswith('http'):
+            form['homepage'].data = 'http://' + form['homepage'].data
+        teacher.homepage = form['homepage'].data
         teacher.description = form['description'].data.strip()
         if request.files.get('avatar'):
             avatar = request.files['avatar']

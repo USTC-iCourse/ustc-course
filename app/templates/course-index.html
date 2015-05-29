@@ -9,7 +9,7 @@
 
     <div class="row">
       <div class="col-lg-12">
-        <h4 class="blue">热门课程 <span class="small"> &gt; 共 {{ courses.total }} 门课</span></h4>
+        <h4 class="blue">热门课程 <span class="small"> &gt; 共 {{ courses.total }} 门课（当前第 {{ courses.page }} 页）</span></h4>
 
         {% include "course-list.html" %}
 
@@ -17,7 +17,7 @@
       <ul class="pagination">
         {% if courses.has_prev %} 
         <li>
-            <a href="{{ url_for('course.index', page=courses.prev_num) }}" aria-label="Previous">
+            <a href="{{ url_for('course.index', page=courses.prev_num, term=term, dept=dept) }}" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
@@ -29,7 +29,7 @@
             {% if page == courses.page %}
             <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
             {% elif page %}
-            <li><a href="{{ url_for('course.index', page=page) }}">{{ page }}</a></li>
+            <li><a href="{{ url_for('course.index', page=page, term=term, dept=dept) }}">{{ page }}</a></li>
             {% else %}
             <li><a>...</a></li>
             {% endif %}
@@ -37,7 +37,7 @@
 
         {% if courses.has_next %}
         <li>
-          <a href="{{ url_for('course.index', page=courses.next_num) }}" aria-label="Next">
+          <a href="{{ url_for('course.index', page=courses.next_num, term=term, dept=dept) }}" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>

@@ -23,29 +23,39 @@ server {
 
 	server_name localhost;
 
-	location / {
-		proxy_pass http://127.0.0.1:8080;
-		proxy_set_header Host $http_host;
-		proxy_redirect default;
-	}
+    error_page 403 /static/error-pages/403.html;
+    error_page 404 /static/error-pages/404.html;
+    error_page 502 /static/error-pages/502.html;
 
-	location /uploads {
-		root /tmp;
-		autoindex off;
-	}
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $http_host;
+        proxy_redirect default;
+        proxy_intercept_errors on;
+    }
 
-	location /phpmyadmin {
-		root /var/www;
-		index index.html index.php;
-	}
+    location /static {
+        root /home/boj/ustc-course/app;
+        autoindex off;
+    }
 
-	location ~ ^/phpmyadmin/.*\.php$ {
-		root /var/www;
-		index index.html index.php;
+    location /uploads {
+        root /var/icourse;
+        autoindex off;
+    }
 
-		fastcgi_split_path_info ^(.+\.php)(/.+)$;
-		fastcgi_pass unix:/var/run/php5-fpm.sock;
-		fastcgi_index index.php;
-		include fastcgi_params;
-	}
+    location /phpmyadmin {
+        root /var/www;
+        index index.html index.php;
+    }
+
+    location ~ ^/phpmyadmin/.*\.php$ {
+        root /var/www;
+        index index.html index.php;
+
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/var/run/php5-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi_params;
+    }
 }

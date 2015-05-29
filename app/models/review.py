@@ -1,5 +1,6 @@
 from datetime import datetime
 from app import db
+import html2text
 try:
     from flask.ext.login import current_user
 except:
@@ -30,7 +31,7 @@ class Review(db.Model):
     upvote_users = db.relationship('User', secondary=review_upvotes)
     comments = db.relationship('ReviewComment',backref='review')
 
-    author = db.relationship('User', backref='reviews')
+    author = db.relationship('User', backref=db.backref('reviews', order_by='desc(Review.publish_time)'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     #course: Course
@@ -64,6 +65,7 @@ class Review(db.Model):
                 self.grading,self.gain,
                 self.rate)
         db.session.delete(self)
+        self.course.review_users.remove(self.author)
         db.session.commit()
 
     def update(self,new):
@@ -120,6 +122,10 @@ class Review(db.Model):
             kwargs['author'] = author
         review = cls(**kwargs)
         review.save()
+
+    @property
+    def content_text(self):
+        return html2text.html2text(self.content)
 
 
 class ReviewComment(db.Model):

@@ -6,14 +6,15 @@ from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask.ext.babel import gettext as _
 from datetime import datetime
 from sqlalchemy import union, or_
+from .course import termlist, deptlist
 
 home = Blueprint('home',__name__)
 
 @home.route('/')
 def index():
-    top_reviews = Review.query.join(Course).join(CourseRate).order_by(CourseRate.upvote_count.desc()).limit(5)
-    latest_reviews = Review.query.order_by(Review.id.desc()).limit(5)
-    return render_template('index.html', top_reviews=top_reviews, latest_reviews=latest_reviews)
+#top_reviews = Review.query.order_by(Review.upvote_count.desc()).limit(5)
+    latest_reviews = Review.query.order_by(Review.id.desc()).limit(10)
+    return render_template('index.html', latest_reviews=latest_reviews)
 
 @home.route('/signin/',methods=['POST','GET'])
 def signin():
@@ -182,26 +183,45 @@ def search():
     if not keyword:
         return redirect(url_for('home.index'))
 
-    def ordering(query_obj):
-        return query_obj.join(CourseRate).order_by(Course.term.desc()).order_by(CourseRate.upvote_count.desc()).subquery().select()
-    def match_courses(filter):
-        return ordering(Course.query.filter(filter))
+    term = request.args.get('term',None,type=str)
+    course_type = request.args.get('type',None,type=int)
+    department = request.args.get('dept',None,type=int)
+    campus = request.args.get('campus',None,type=str)
+    course_query = Course.query
+    if term:
+        # 学期
+        course_query = course_query.filter(Course.term==term)
+    if course_type:
+        # 课程类型
+        course_query = course_query.filter(Course.course_type==course_type)
+    if department:
+        # 开课院系
+        course_query = course_query.filter(Course.dept_id==department)
+    if campus:
+        # 开课地点
+        course_query = course_query.filter(Course.campus==campus)
 
-    teacher_match = ordering(Course.query.join(Course.teachers).filter(Teacher.name == keyword))
+    def ordering(query_obj):
+        return query_obj.join(CourseRate).order_by(CourseRate.upvote_count.desc()).order_by(Course.term.desc()).subquery().select()
+    def match_courses(filter):
+        return ordering(course_query.filter(filter))
+
+    teacher_match = ordering(course_query.join(Course.teachers).filter(Teacher.name == keyword))
     exact_match = match_courses(Course.name == keyword)
     include_match = match_courses(Course.name.like('%' + keyword + '%'))
     fuzzy_match = match_courses(Course.name.like('%' + '%'.join([ char for char in keyword ]) + '%'))
-    courses = Course.query.select_entity_from(union(teacher_match, exact_match, include_match, fuzzy_match))
 
-    try:
-        page = int(request.args.get('page', 1))
-    except:
-        page = 1
-    courses_paged = courses.paginate(page=page, per_page=10)
+    courses = Course.query.select_entity_from(union(teacher_match, exact_match, include_match, fuzzy_match))
     if not courses:
-        return 404
-    else:
-        return render_template('search.html', keyword=keyword, courses=courses_paged)
+        abort(404)
+
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    courses_paged = courses.paginate(page=page, per_page=per_page)
+
+    return render_template('search.html', keyword=keyword, courses=courses_paged,
+            dept=department, term=term,
+            deptlist=deptlist, termlist=termlist, this_module='home.search')
 
 
 @home.route('/about/')
