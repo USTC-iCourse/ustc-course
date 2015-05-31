@@ -224,6 +224,7 @@ def search():
             deptlist=deptlist, termlist=termlist, this_module='home.search')
 
 
+
 @home.route('/about/')
 def about():
     '''关于我们，网站介绍、联系方式'''
@@ -236,13 +237,6 @@ def community_rules():
     '''社区规范页面'''
 
     return render_template('community-rules.html')
-
-
-@home.route('/copyright/')
-def copyright():
-    '''关于网站可能涉及的版权问题'''
-
-    return render_template('copyright.html')
 
 
 @home.route('/report-bug/')

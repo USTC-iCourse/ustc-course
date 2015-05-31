@@ -178,3 +178,12 @@ def teacher_settings(teacher_id):
                 errors.append(_("Avatar upload failed"))
         teacher.save()
     return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form)
+
+
+
+
+@user.route('/notifications/')
+def notice():
+    '''消息、通知界面'''
+    user = current_user
+    return render_template('notice.html')
