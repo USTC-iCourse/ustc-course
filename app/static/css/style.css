@@ -369,3 +369,23 @@ a.nounderline, a.nounderline:hover, a.nounderline:active {
     background-color: #1caaea;
     cursor: pointer;
 }
+
+/* 通知的下拉框样式 */
+#notice-link {
+    color: grey;
+}
+#notice-link:focus, #notice-link:hover {
+    text-decoration: underline;
+}
+
+#dropdown-notice .dropdown-menu {
+    width: 400px;
+}
+
+#dropdown-notice .notice {
+    padding: 0 20px;
+}
+
+.notice-number-box {
+    background-color: #d23524;
+}
