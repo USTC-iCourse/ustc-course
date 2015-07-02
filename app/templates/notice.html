@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+
+    <div class="bm-pd-lg">
+        <h3 class="blue">全部消息</h3>
+
+        <!-- 写这么多主要是给出模板语句，请参考我的语句 -->
+        <div class="ud-pd-md dashed">
+          <a id="notice-link" href="#">
+            你在课程「力学」中的点评有了一个新支持
+          </a>
+          <span class="small grey align-bottom  float-right">05月31日</span>
+        </div>
+
+        <div class="ud-pd-md grey dashed">
+          <a id="notice-link" href="{{ url_for('user.notice') }}">
+            你在课程「力学」中的点评有了一个新评论
+          </a>
+          <span class="small align-bottom  float-right">05月31日</span>
+        </div>
+
+        <div class="ud-pd-md grey dashed">
+          <a id="notice-link" href="{{ url_for('user.notice') }}">
+            有人在课程「力学」中的点评中提到了你
+          </a>
+          <span class="small align-bottom  float-right">05月31日</span>
+        </div>
+
+
+        <div class="ud-pd-md grey dashed">
+          <a id="notice-link" href="{{ url_for('user.notice') }}">
+            你关注的课程「力学」有了新的点评
+          </a>
+          <span class="small align-bottom  float-right">05月31日</span>
+        </div>
+
+    </div>
+
+
+  </div><!-- end float-element -->
+</div><!-- end container -->
+{% endblock %}
