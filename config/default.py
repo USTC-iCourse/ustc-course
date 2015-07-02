@@ -34,7 +34,7 @@ UPLOAD_FOLDER = '/tmp/uploads'
 # for example 'image': set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = {
         'image':set(['png', 'jpg', 'jpeg', 'gif']),
-        'file':set('7z|avi|csv|doc|docx|flv|gif|gz|gzip|jpeg|jpg|mov|mp3|mp4|mpc|mpeg|mpg|ods|odt|pdf|png|ppt|pxd|rar|rtf|tar|tgz|txt|vsd|wav|wma|wmv|xls|xml|zip'.split('|')),
+        'file':set('7z|avi|csv|doc|docx|flv|gif|gz|gzip|jpeg|jpg|mov|mp3|mp4|mpc|mpeg|mpg|ods|odt|pdf|png|ppt|pptx|ps|pxd|rar|rtf|tar|tgz|txt|vsd|wav|wma|wmv|xls|xlsx|xml|zip'.split('|')),
         }
 MAX_CONTENT_LENGTH = 8 * 1024 * 1024
 
