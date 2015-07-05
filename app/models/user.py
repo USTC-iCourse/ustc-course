@@ -326,12 +326,13 @@ class Teacher(db.Model):
     gender = db.Column(db.Enum('male','female','unknown'),default='unknown')
     description = db.Column(db.Text())
     homepage = db.Column(db.Text)
+    research_interest = db.Column(db.Text)
     _image = db.Column(db.String(100))
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     dept = db.relationship('Dept', backref='teachers')
-    #course
+    #courses: backref to Course
 
     def __repr__(self):
         return '<Teacher {}: {}'.format(self.id, self.name)
