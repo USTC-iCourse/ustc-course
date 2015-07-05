@@ -81,11 +81,17 @@
 
         <div class="ud-pd-sm">
           {% if course.homepage and course.homepage != 'http://' %}
-          课程主页：<a href="{{ course.homepage }}">{{ course.homepage }}</a>
+          <strong>课程主页</strong>：<a href="{{ course.homepage }}">{{ course.homepage }}</a>
           {% else %}
-          课程主页：暂无（如果你知道，劳烦告诉我们！）
+          <strong>课程主页</strong>：暂无（如果你知道，劳烦告诉我们！）
         {% endif %}
         </div>
+
+        {% if course.description %}
+        <div class="ud-pd-sm">
+          <strong>课程简介</strong>：{{ course.description }}
+        </div>
+        {% endif %}
 
         <div id="action-btn-group" class="ud-pd-md" style="display:none">
           <button class="btn btn-white btn-flat btn-follow btn-do"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span> 关注 <small>(<span class="count"></span>)</small></button>
