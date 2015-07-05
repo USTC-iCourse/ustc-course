@@ -12,8 +12,7 @@ LANGUAGES = {
 
 
 # SQL config
-#SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://ustc_course:ustc_course@localhost/icourse?charset=utf8'
-SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://ustc_course:ustc_course@202.141.160.99:44712/icourse?charset=utf8'
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://ustc_course:ustc_course@localhost/icourse?charset=utf8'
 
 # Flask mail
 MAIL_SERVER = 'localhost'
