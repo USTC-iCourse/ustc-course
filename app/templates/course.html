@@ -374,6 +374,9 @@
 
  function delete_review(review_id)
  {
+     if (!confirm('你真的要删除此点评吗？')) {
+         return;
+     }
      $.post("{{ url_for('review.delete_review') }}", { id: review_id }, function(o) {
          if (o.ok)
             window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
@@ -413,6 +416,9 @@
 
  function delete_comment(review_id, comment_id)
  {
+     if (!confirm('你真的要删除此评论吗？')) {
+         return;
+     }
      $.post("{{ url_for('api.delete_comment') }}", { comment_id: comment_id },
          function(o) {
             if (o.ok) {
