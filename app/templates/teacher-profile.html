@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+    <div class="col-md-8">
+      <div class="bm-pd-lg">
+        <div class="inline-h3">
+          <span class="blue h4"><strong>课程</strong></span>
+          <a>（{{ courses|length }}门）</a>
+        </div>
+
+        {% if courses|length == 0 %}
+        <p class="text-muted">该老师还没有开过课。</p>
+        {% else %}
+        {% for course in courses %}
+        <div class="ud-pd-md dashed">
+          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
+          {% if current_user.is_authenticated and course in current_user.courses_joined %}
+          <span class="label label-info">已学过</span>
+          {% endif %}
+          {% if course.reviewed %}
+          <span class="label label-success">已点评</span>
+          {% endif %}
+          <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+      </div>
+
+
+
+    </div><!-- end col-md-8 -->
+
+
+
+    <div class="col-md-4 right-col">
+        <div class="ud-pd-md dashed">
+          <img class="avatar-lg cicle" src="{{ teacher.image }}"/>
+          {% if current_user.is_admin %}
+          <btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
+          {% endif %}
+          <h3 class="blue">{{ teacher.name }}</h3>
+          <p>{{ teacher.dept.name }}</p>
+          <p>研究方向：{{ teacher.research_interest or '暂无' }}</p>
+          <p>教师主页：
+            {% if teacher.homepage and teacher.homepage != 'http://' %}
+            <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>
+            {% else %}暂无{% endif %}
+          </p>
+          <div class="ud-pd-md" style="display: none"><a>教师排行榜：23</a></div>
+        </div>
+    </div><!-- end col-md-4 -->
+  </div><!-- end float-element -->
+</div><!-- end container -->
+
+{% endblock %}
