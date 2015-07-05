@@ -12,8 +12,13 @@ teacher = Blueprint('teacher', __name__)
 @teacher.route('/<int:teacher_id>/')
 def view_profile(teacher_id):
     teacher = Teacher.query.get(teacher_id)
-    courses = teacher.courses.all()
-    return render_template('teacher-profile.html', teacher=teacher, courses=courses)
+    if not teacher:
+        abort(404)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    courses = teacher.courses.join(CourseRate).order_by(*QUERY_ORDER)
+    courses_paged = courses.paginate(page=page, per_page=per_page)
+    return render_template('teacher-profile.html', teacher=teacher, courses=courses_paged)
 
 @teacher.route('/<int:teacher_id>/edit_profile/', methods=['GET','POST'])
 @login_required
