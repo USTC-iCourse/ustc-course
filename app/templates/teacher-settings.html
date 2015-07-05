@@ -36,6 +36,12 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label class="col-sm-2 control-label">教师研究方向</label>
+          <div class="col-sm-5">
+            <input type="text" class="form-control" name="research_interest" {% if form.research_interest.data %}value="{{ form.research_interest.data }}"{% endif %}>
+          </div>
+        </div>
 
         <div class="form-group">
           <div class="col-sm-offset-2 col-sm-2">

@@ -102,8 +102,7 @@ class User(db.Model, UserMixin):
     @property
     def courses_joined(self):
         if self.is_student and self.info:
-            # need .all() because lazy=dynamic
-            return self.info.courses_joined.all()
+            return self.info.courses_joined
         else:
             return []
 
@@ -262,8 +261,8 @@ class Student(db.Model):
     dept = db.relationship('Dept', backref='students')
     dept_class = db.relationship('DeptClass', backref='students')
     major = db.relationship('Major')
-    courses_joined = db.relationship('Course', secondary = join_course, order_by='desc(Course.term)', backref='students',lazy='dynamic')
-
+    courses_joined = db.relationship('Course', secondary = join_course, order_by='desc(Course.term)', backref='students')
+    
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
 
@@ -287,7 +286,6 @@ class Student(db.Model):
             return student
 
 
-    # course_type: 计划必修，自由选修……
     def join_course(self, course):
         if not course:
             return None
@@ -319,12 +317,13 @@ class Teacher(db.Model):
     gender = db.Column(db.Enum('male','female','unknown'),default='unknown')
     description = db.Column(db.Text())
     homepage = db.Column(db.Text)
+    research_interest = db.Column(db.Text)
     _image = db.Column(db.String(100))
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     dept = db.relationship('Dept', backref='teachers')
-    #course
+    #courses: backref to Course
 
     def __repr__(self):
         return '<Teacher {}: {}'.format(self.id, self.name)

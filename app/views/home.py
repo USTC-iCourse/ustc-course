@@ -6,7 +6,7 @@ from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask.ext.babel import gettext as _
 from datetime import datetime
 from sqlalchemy import union, or_
-from .course import termlist, deptlist
+from .course import termlist, deptlist, QUERY_ORDER
 
 home = Blueprint('home',__name__)
 
@@ -202,7 +202,7 @@ def search():
         course_query = course_query.filter(Course.campus==campus)
 
     def ordering(query_obj):
-        return query_obj.join(CourseRate).order_by(CourseRate.upvote_count.desc()).order_by(Course.term.desc()).subquery().select()
+        return query_obj.join(CourseRate).order_by(*QUERY_ORDER).subquery().select()
     def match_courses(filter):
         return ordering(course_query.filter(filter))
 

@@ -153,35 +153,6 @@ def avatar(user_id):
     return '<img src='+user.avatar+'>'
 
 
-@user.route('/teacher/<int:teacher_id>/', methods=['GET','POST'])
-@login_required
-def teacher_settings(teacher_id):
-    '''编辑教师信息'''
-    if not current_user.is_admin:
-       abort(403)
-    teacher = Teacher.query.get(teacher_id)
-    form = ProfileForm(request.form, teacher)
-    errors = []
-    if form.validate_on_submit():
-        #teacher.gender = form['gender'].data
-        form['homepage'].data = form['homepage'].data.strip()
-        if not form['homepage'].data.startswith('http'):
-            form['homepage'].data = 'http://' + form['homepage'].data
-        teacher.homepage = form['homepage'].data
-        teacher.description = form['description'].data.strip()
-        if request.files.get('avatar'):
-            avatar = request.files['avatar']
-            ok,info = handle_upload(avatar,'image')
-            if ok:
-                teacher.set_image(info)
-            else:
-                errors.append(_("Avatar upload failed"))
-        teacher.save()
-    return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form)
-
-
-
-
 @user.route('/notifications/')
 def notice():
     '''消息、通知界面'''

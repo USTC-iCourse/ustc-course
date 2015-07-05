@@ -81,11 +81,17 @@
 
         <div class="ud-pd-sm">
           {% if course.homepage and course.homepage != 'http://' %}
-          课程主页：<a href="{{ course.homepage }}">{{ course.homepage }}</a>
+          <strong>课程主页</strong>：<a href="{{ course.homepage }}">{{ course.homepage }}</a>
           {% else %}
-          课程主页：暂无（如果你知道，劳烦告诉我们！）
+          <strong>课程主页</strong>：暂无（如果你知道，劳烦告诉我们！）
         {% endif %}
         </div>
+
+        {% if course.description %}
+        <div class="ud-pd-sm">
+          <strong>课程简介</strong>：{{ course.description }}
+        </div>
+        {% endif %}
 
         <div id="action-btn-group" class="ud-pd-md" style="display:none">
           <button class="btn btn-white btn-flat btn-follow btn-do"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span> 关注 <small>(<span class="count"></span>)</small></button>
@@ -188,11 +194,11 @@
         <div class="ud-pd-md dashed">
           <img class="avatar-lg cicle" src="{{ teacher.image }}"/>
           {% if current_user.is_admin %}
-          <btn class="btn btn-link float-right"><a href="{{ url_for('user.teacher_settings', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
+          <btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
           {% endif %}
-          <h3 class="blue">{{ teacher.name }}</h3>
+          <h3 class="blue"><a href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}">{{ teacher.name }}</a></h3>
           <p>{{ teacher.dept.name }}</p>
-          <p>研究方向：暂无</p>
+          <p>研究方向：{{ teacher.research_interest or '暂无' }}</p>
           <p>教师主页：
             {% if teacher.homepage and teacher.homepage != 'http://' %}
             <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>

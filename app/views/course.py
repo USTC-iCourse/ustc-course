@@ -8,6 +8,7 @@ from app import db
 course = Blueprint('course',__name__)
 QUERY_ORDER = [
     CourseRate.upvote_count.desc(),
+    CourseRate.review_count.desc(),
     Course.term.desc(),
 ]
 
