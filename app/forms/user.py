@@ -79,3 +79,10 @@ class ProfileForm(Form):
         if field.data in RESERVED_USERNAME:
             raise ValidationError('The username is reserved!')
         '''
+
+class TeacherProfileForm(Form):
+    description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])
+    homepage = StringField('Homepage', validators=[Optional(),Length(max=200,message="长度不大于200")])
+    research_interest = StringField('Research_Interest', validators=[Optional(), Length(max=200, message="长度不大于200")])
+    avatar = FileField('Avatar', validators=[])
+
