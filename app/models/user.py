@@ -102,8 +102,7 @@ class User(db.Model, UserMixin):
     @property
     def courses_joined(self):
         if self.is_student and self.info:
-            # need .all() because lazy=dynamic
-            return self.info.courses_joined.all()
+            return self.info.courses_joined
         else:
             return []
 
@@ -262,8 +261,9 @@ class Student(db.Model):
     dept = db.relationship('Dept', backref='students')
     dept_class = db.relationship('DeptClass', backref='students')
     major = db.relationship('Major')
-    courses_joined = db.relationship('Course', secondary = join_course, order_by='desc(Course.term)', backref='students',lazy='dynamic')
-
+    _courses_joined = db.relationship('Course', secondary = join_course, order_by='desc(Course.term)', backref='students',lazy='dynamic')
+    _cached_courses_joined = None
+    
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
 
@@ -287,14 +287,21 @@ class Student(db.Model):
             return student
 
 
-    # course_type: 计划必修，自由选修……
     def join_course(self, course):
         if not course:
             return None
-        self.courses_joined.append(course)
+        self._courses_joined.append(course)
+        self._cached_courses_joined = None # invalidate cache
         db.session.add(self)
         db.session.commit()
         return self
+
+    @property
+    def courses_joined(self):
+        # need .all() because lazy=dynamic
+        if not self._cached_courses_joined:
+            self._cached_courses_joined = self._courses_joined.all()
+        return self._cached_courses_joined
 
     #deprecated
     def follow_course(self, course):
