@@ -261,8 +261,7 @@ class Student(db.Model):
     dept = db.relationship('Dept', backref='students')
     dept_class = db.relationship('DeptClass', backref='students')
     major = db.relationship('Major')
-    _courses_joined = db.relationship('Course', secondary = join_course, order_by='desc(Course.term)', backref='students',lazy='dynamic')
-    _cached_courses_joined = None
+    courses_joined = db.relationship('Course', secondary = join_course, order_by='desc(Course.term)', backref='students')
     
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
@@ -290,18 +289,10 @@ class Student(db.Model):
     def join_course(self, course):
         if not course:
             return None
-        self._courses_joined.append(course)
-        self._cached_courses_joined = None # invalidate cache
+        self.courses_joined.append(course)
         db.session.add(self)
         db.session.commit()
         return self
-
-    @property
-    def courses_joined(self):
-        # need .all() because lazy=dynamic
-        if not self._cached_courses_joined:
-            self._cached_courses_joined = self._courses_joined.all()
-        return self._cached_courses_joined
 
     #deprecated
     def follow_course(self, course):
