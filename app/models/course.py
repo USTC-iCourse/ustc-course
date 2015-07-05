@@ -179,7 +179,9 @@ class Course(db.Model):
 
     @property
     def reviewed(self, user=current_user):
-        return user in self.review_users
+        # the following is much more efficient than
+        # "user in self.review_users"
+        return self in user.reviewed_course
 
     @property
     def review_count(self):
@@ -261,10 +263,7 @@ class Course(db.Model):
 
     @property
     def following(self, user=current_user):
-        if user in self.followers:
-            return True
-        else:
-            return False
+        return self in user.courses_following
 
     @property
     def follow_count(self):
