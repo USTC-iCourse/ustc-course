@@ -18,6 +18,8 @@
         </a>
         {% if course.reviewed %}
         <span class="label label-success">已点评</span>
+        {% else %}
+        <span class="label label-default">未点评</span>
         {% endif %}
         <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
       </div>
