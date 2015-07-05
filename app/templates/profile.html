@@ -85,6 +85,9 @@
         <!-- 学过课程最多显示6门 -->
         <div class="ud-pd-md dashed">
           <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
+          {% if course.reviewed %}
+          <span class="label label-success">已点评</span>
+          {% endif %}
           <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
         </div>
         {% endfor %}
