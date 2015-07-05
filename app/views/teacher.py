@@ -4,6 +4,7 @@ from app.forms import TeacherProfileForm
 from flask.ext.login import login_user, current_user, login_required
 from app.utils import handle_upload, sanitize
 from flask.ext.babel import gettext as _
+from .course import QUERY_ORDER
 import re
 
 teacher = Blueprint('teacher', __name__)
