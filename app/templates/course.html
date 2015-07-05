@@ -196,7 +196,7 @@
           {% if current_user.is_admin %}
           <btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
           {% endif %}
-          <h3 class="blue">{{ teacher.name }}</h3>
+          <h3 class="blue"><a href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}">{{ teacher.name }}</a></h3>
           <p>{{ teacher.dept.name }}</p>
           <p>研究方向：{{ teacher.research_interest or '暂无' }}</p>
           <p>教师主页：
