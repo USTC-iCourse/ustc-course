@@ -45,6 +45,8 @@ def edit_profile(teacher_id):
             else:
                 errors.append(_("Avatar upload failed"))
         teacher.save()
+        db.session.commit()
+        return redirect(url_for('teacher.view_profile', teacher_id=teacher.id))
     return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form)
 
 

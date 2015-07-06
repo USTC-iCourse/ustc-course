@@ -260,4 +260,5 @@ def edit_course(course_id=None):
             course.homepage = 'http://' + course.homepage
         course.save()
         db.session.commit()
+        return redirect(url_for('course.view_course', course_id=course.id))
     return render_template('course-edit.html', form=course_form, course=course)
