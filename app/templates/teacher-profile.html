@@ -65,7 +65,6 @@
           {% endif %}
           <h3 class="blue">{{ teacher.name }}</h3>
           <p>{{ teacher.dept.name }}</p>
-          <p>研究方向：{{ teacher.research_interest or '暂无' }}</p>
           <p>教师主页：
             {% if teacher.homepage and teacher.homepage != 'http://' %}
             <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>
