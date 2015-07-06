@@ -4,6 +4,7 @@ from flask.ext.babel import gettext as _
 from app.models import *
 from app.forms import ReviewForm, CourseForm
 from app import db
+from app.utils import sanitize
 
 course = Blueprint('course',__name__)
 QUERY_ORDER = [
@@ -253,6 +254,7 @@ def edit_course(course_id=None):
         abort(404)
     course_form = CourseForm(request.form, course)
     if course_form.validate_on_submit():
+        course_form.introduction.data = sanitize(course_form.introduction.data)
         course_form.populate_obj(course)
         if not course.homepage.startswith('http'):
             course.homepage = 'http://' + course.homepage

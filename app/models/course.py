@@ -67,8 +67,9 @@ class Course(db.Model):
     teaching_material = db.Column(db.Text) # 教材
     reference_material = db.Column(db.Text) # 参考书
     student_requirements = db.Column(db.Text) # 预修课程
-    description = db.Column(db.Text()) # 课程简介
-    description_eng = db.Column(db.Text()) # 英文简介
+    description = db.Column(db.Text()) # 教务处课程简介
+    description_eng = db.Column(db.Text()) # 教务处英文简介
+    introduction = db.Column(db.Text()) # 老师提交的课程简介
     homepage = db.Column(db.Text) # 课程主页
 
     credit = db.Column(db.Integer) # 学分
