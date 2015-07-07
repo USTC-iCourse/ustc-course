@@ -6,3 +6,4 @@ from .forum import *
 from .utils import *
 from .image import *
 from .share import *
+from .notification import *
