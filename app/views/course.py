@@ -83,12 +83,12 @@ def index():
             deptlist=deptlist, termlist=termlist, this_module='course.index')
 
 @course.route('/<int:course_id>/')
-def view_course(course_id,course_name=None):
+def view_course(course_id):
     course = Course.query.get(course_id)
     if not course:
         abort(404)
 
-    related_courses = Course.query.filter_by(name=course_name).all()
+    related_courses = Course.query.filter_by(name=course.name).all()
     teacher = course.teacher
     reviews = course.reviews.all()
     if teacher:
@@ -188,12 +188,10 @@ def quit(course_id):
     return jsonify(ok=ok, count=course.join_count)
 
 @course.route('/<int:course_id>/reviews/')
-def reviews(course_id, course_name=None):
+def reviews(course_id):
     course = Course.query.get(course_id)
     if not course:
         abort(404)
-    #if course_name != course.name:
-    #    return redirect(url_for('.review',course_id=course_id,course_name=course.name))
 
     try:
         page = int(request.args.get('page', 1))
