@@ -209,12 +209,25 @@
 
         {% if course.teachers_count == 1 %}
         <div class="ud-pd-md dashed" style="display: none">
-          <h5 class="blue">更多{{ course.teachers[0].name }} 老师课程</h5>
+          <h3 class="blue">更多{{ course.teachers[0].name }} 老师课程</h5>
         </div>
         {% endif %}
 
-        <div class="ud-pd-md dashed" style="display: none">
-          <h5 class="blue">更多{{ course.name }}</h5>
+        <div class="ud-pd-md dashed">
+          <h4 class="blue">其他老师的「{{ course.name }}」</h5>
+          {% for rel_course in course.related_courses[0:10] %}
+          {% if rel_course != course %}
+          <div class="ud-pd-sm dashed">
+            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.teacher_names_display }}</a>
+            {% if rel_course.reviewed_by(current_user) %}
+            <span class="label label-success">已点评</span>
+            {% else %}
+            <span class="label label-default">未点评</span>
+            {% endif %}
+            <span class="small grey align-bottom  float-right">{{ course.term_display }}</span>
+          </div>
+          {% endif %}
+          {% endfor %}
         </div>
       </div>
     </div> <!-- row -->
