@@ -35,25 +35,22 @@
         <ul class="nav navbar-nav navbar-right">
           {% if current_user.is_authenticated() %}
           <li id="dropdown-notice">
-            <!--
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">消息
-              {% if 1 == 0 %}
-              <span class="badge">0</span>
-              {% elif 1 > 0 %}
-              <span class="badge notice-number-box">1</span>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" onclick="read_notification({{ current_user.unread_notification_count }})">消息
+              {% if current_user.unread_notification_count > 0 %}
+              <span class="badge notice-number-box">{{ current_user.unread_notification_count }}</span>
               {% endif %}
             </a>
             <ul class="dropdown-menu" role="menu">
-              {% for i in range(5) %}
+              {% if current_user.latest_notifications|length == 0 %}
+              <p>还没有消息哦！</p>
+              {% endif %}
+              {% for notification in current_user.latest_notifications %}
               <li class="ud-pd-sm dashed">
-                <div class="notice">
-                  <a id="notice-link" href="#">你在课程「多变量微积分新生研讨课马克思原理」中的点评有了一个新支持</a>
-                </div>
+                <div class="notice">{{ notification.display_text }}</div>
               </li>
               {% endfor %}
               <li class="ud-pd-sm pull-right"><a class="blue" href="{{ url_for('user.notice')}}">查看全部</a></li>
             </ul>
-            -->
 
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
@@ -156,6 +153,15 @@
        }
      })
    });
+
+   function read_notification(count) {
+     if (count == 0)
+         return;
+     $.ajax({
+        type: "POST",
+        url: "{{ url_for('api.read_notifications') }}",
+     });
+   }
   </script>
 
   {% block script %} {% endblock %}

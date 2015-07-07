@@ -154,7 +154,6 @@ def avatar(user_id):
 
 
 @user.route('/notifications/')
+@login_required
 def notice():
-    '''消息、通知界面'''
-    user = current_user
-    return render_template('notice.html')
+    return render_template('notice.html', notifications=current_user.notifications)

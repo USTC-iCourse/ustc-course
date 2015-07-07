@@ -7,37 +7,17 @@
 
     <div class="bm-pd-lg">
         <h3 class="blue">全部消息</h3>
+        
+        {% if notifications|length == 0 %}
+        <p>还没有消息哦！</p>
+        {% endif %}
 
-        <!-- 写这么多主要是给出模板语句，请参考我的语句 -->
+        {% for notification in notifications %}
         <div class="ud-pd-md dashed">
-          <a id="notice-link" href="#">
-            你在课程「力学」中的点评有了一个新支持
-          </a>
-          <span class="small grey align-bottom  float-right">05月31日</span>
+            {{ notification.display_text }}
+            <span class="small grey align-bottom  float-right">{{ notification.time|localtime }}</span>
         </div>
-
-        <div class="ud-pd-md grey dashed">
-          <a id="notice-link" href="{{ url_for('user.notice') }}">
-            你在课程「力学」中的点评有了一个新评论
-          </a>
-          <span class="small align-bottom  float-right">05月31日</span>
-        </div>
-
-        <div class="ud-pd-md grey dashed">
-          <a id="notice-link" href="{{ url_for('user.notice') }}">
-            有人在课程「力学」中的点评中提到了你
-          </a>
-          <span class="small align-bottom  float-right">05月31日</span>
-        </div>
-
-
-        <div class="ud-pd-md grey dashed">
-          <a id="notice-link" href="{{ url_for('user.notice') }}">
-            你关注的课程「力学」有了新的点评
-          </a>
-          <span class="small align-bottom  float-right">05月31日</span>
-        </div>
-
+        {% endfor %}
     </div>
 
 

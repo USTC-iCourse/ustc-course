@@ -139,3 +139,11 @@ def reg_verify():
     elif name == 'email':
         return validate_email(value)
     return 'Invalid Request', 400
+
+@api.route('/notifications/', methods=['POST'])
+@login_required
+def read_notifications():
+    current_user.unread_notification_count = 0
+    current_user.save()
+    return jsonify(ok=True)
+
