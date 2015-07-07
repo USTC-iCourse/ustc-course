@@ -235,10 +235,14 @@ class User(db.Model, UserMixin):
         db.session.commit()
 
     def notify(self, operation, ref_obj, from_user=current_user, obj_class_name=None):
+        # my operations should not be notified to myself
+        if from_user == self:
+            return False
         notification = Notification(self, from_user, operation, ref_obj, obj_class_name)
         notification.save()
         self.unread_notification_count += 1
         db.session.commit()
+        return True
 
     def follow(self, followed):
         if followed in self.followers:
