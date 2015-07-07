@@ -94,9 +94,10 @@ def html_abstract(text):
 def editor_parse_at(text):
     if not text.endswith('\n'):
         text = text + '\n' # the parse function will not work with @somebody
+    mentioned_users = []
     matches = re.findall('@[^@&<>"\':;?+=,\s]+', text)
     if not matches:
-        return text
+        return text, set(mentioned_users)
     for match in matches:
         username = match[1:]
         if len(username) > 30:
@@ -113,7 +114,8 @@ def editor_parse_at(text):
                 # the following regexp would do the trick.
                 text = re.sub("@" + re.escape(username) + '([@&<>"\':;?+=,\s])',
                               '<a href="' + url + '">' + '＠' + re.escape(username) + '</a>' + '\\1', text)
-    return text
+                mentioned_users.append(user)
+    return text, set(mentioned_users)
 
 @app.template_filter('localtime')
 def localtime_minute(date):
