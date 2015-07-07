@@ -87,7 +87,6 @@ html, body { height: 100%; }
     } 
 }
 p { line-height: 25px; word-wrap: break-word; }
-div { overflow: hidden; }
 
 .lh-sm {
     line-height: 20px;
