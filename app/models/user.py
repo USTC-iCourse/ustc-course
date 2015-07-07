@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-from flask import Flask
+from flask import Flask, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKeyConstraint
 from datetime import datetime
 from app import db, login_manager as lm
 from random import randint
-from flask.ext.login import UserMixin
+from flask.ext.login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, \
      check_password_hash
 from flask.ext.babel import gettext as _
+from .notification import Notification
 
 Roles = ['Admin',
         'User']
@@ -44,6 +45,11 @@ review_course = db.Table('review_course',
     db.Column('course_id', db.Integer, db.ForeignKey('courses.id'))
     )
 
+follow_user = db.Table('follow_user',
+    db.Column('follower_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('followed_id', db.Integer, db.ForeignKey('users.id'))
+    )
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
@@ -59,10 +65,14 @@ class User(db.Model, UserMixin):
     register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
     last_login_time = db.Column(db.DateTime())#TODO:login
+    unread_notification_count = db.Column(db.Integer, default=0)
 
     homepage = db.Column(db.String(200))  # 用户博客、主页等
     description = db.Column(db.Text)
     _avatar = db.Column(db.String(100))
+    
+    following_count = db.Column(db.Integer, default=0)
+    follower_count = db.Column(db.Integer, default=0)
 
     courses_following = db.relationship('Course', secondary = follow_course, order_by='desc(Course.term)', backref='followers')
     courses_upvoted = db.relationship('Course', secondary = upvote_course, order_by='desc(Course.term)', backref='upvote_users')
@@ -70,6 +80,13 @@ class User(db.Model, UserMixin):
     _student_info = db.relationship('Student', backref='user',uselist=False)
     _teacher_info = db.relationship('Teacher', backref='user',uselist=False)
     reviewed_course = db.relationship('Course',secondary = review_course, order_by='desc(Course.term)', backref='review_users')
+    users_following = db.relationship('User', 
+            secondary=follow_user,
+            primaryjoin=(follow_user.c.follower_id == id),
+            secondaryjoin=(follow_user.c.followed_id == id),
+            backref=db.backref('followers'))
+    # followers: backref to User
+    # notifications: backref to Notification
 
     def __init__(self, username, email, password):
         self.username = username
@@ -216,6 +233,37 @@ class User(db.Model, UserMixin):
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+    def notify(self, operation, ref_obj, from_user=current_user, obj_class_name=None):
+        notification = Notification(self, from_user, operation, ref_obj, obj_class_name)
+        notification.save()
+        self.unread_notification_count += 1
+        db.session.commit()
+
+    def follow(self, followed):
+        if followed in self.followers:
+            return False
+        self.followers.append(followed)
+        self.following_count += 1
+        followed.follower_count += 1
+        db.session.commit()
+        return True
+
+    def unfollow(self, followed):
+        if followed not in self.followers:
+            return False
+        self.followers.remove(followed)
+        self.following_count -= 1
+        followed.follower_count -= 1
+        db.session.commit()
+        return True
+
+    def followed_by(self, user=current_user):
+        return user in self.users_following
+
+    def following(self, user=current_user):
+        return user in self.followers
+
 
 @lm.user_loader
 def load_user(userid):
