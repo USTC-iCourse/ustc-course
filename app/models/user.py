@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, url_for
+from flask import Flask, url_for, Markup
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKeyConstraint
 from datetime import datetime
@@ -395,8 +395,12 @@ class Teacher(db.Model):
             return teacher
 
     @property
-    def link(self):
+    def url(self):
         return url_for('teacher.view_profile', teacher_id=self.id)
+
+    @property
+    def link(self):
+        return Markup('<a href="' + self.url + '">') + Markup.escape(self.name) + Markup('</a>')
 
     @property
     def image(self):

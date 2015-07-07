@@ -114,5 +114,9 @@ class Notification(db.Model):
         return self.from_user.link + ' ' + self.operation_text
 
     @property
+    def url(self):
+        return self.ref_obj.url
+
+    @property
     def link(self):
         return self.ref_obj.link

@@ -1,8 +1,8 @@
 from datetime import datetime
-from flask import url_for
+from flask import url_for, Markup
 from app import db
-from .user import User
 from decimal import Decimal
+from .user import User, Student, join_course
 try:
     from flask.ext.login import current_user
 except:
@@ -114,8 +114,16 @@ class Course(db.Model):
         return course
 
     @property
-    def link(self):
+    def url(self):
         return url_for('course.view_course', course_id=self.id)
+
+    @property
+    def link(self):
+        if self.teachers_count > 0:
+            teacher_names = '（' + self.teacher_names_display + '）'
+        else:
+            teacher_names = ''
+        return Markup('<a href="' + self.url + '">') + Markup.escape(self.name + teacher_names) + Markup('</a>')
 
     @property
     def dept(self):
@@ -133,10 +141,6 @@ class Course(db.Model):
     @property
     def rate(self):
         return self.course_rate
-
-    @property
-    def url(self):
-        return url_for('course.view_course',course_id=self.id,course_name=self.name)
 
     def save(self):
         db.session.add(self)

@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import url_for, Markup
 from datetime import datetime
 from app import db
 import html2text
@@ -125,8 +125,12 @@ class Review(db.Model):
         review.save()
 
     @property
+    def url(self):
+        return url_for('course.view_course', course_id=self.course_id) + '#review-' + str(self.id)
+
+    @property
     def link(self):
-        return url_for('course.view_course', course_id=self.course.id) + '#review-' + self.id
+        return Markup('<a href="' + self.url + '">') + Markup.escape(self.course.name) + Markup('</a>')
 
     @property
     def content_text(self):
@@ -164,3 +168,10 @@ class ReviewComment(db.Model):
         db.session.commit()
         return True,"Success"
 
+    @property
+    def url(self):
+        return self.review.url
+
+    @property
+    def link(self):
+        return self.review.link
