@@ -16,7 +16,7 @@
         <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}
         {% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}
         </a>
-        {% if course.reviewed %}
+        {% if course.reviewed_by(user) %}
         <span class="label label-success">已点评</span>
         {% else %}
         <span class="label label-default">未点评</span>

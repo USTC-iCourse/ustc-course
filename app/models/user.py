@@ -116,10 +116,6 @@ class User(db.Model, UserMixin):
         self._avatar = avatar
 
     @property
-    def courses_reviewd(self):
-        pass
-
-    @property
     def confirmed(self):
         if self.confirmed_at:
             return True

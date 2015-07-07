@@ -178,11 +178,14 @@ class Course(db.Model):
         if self.course_major == None:
             return '未知'
 
-    @property
-    def reviewed(self, user=current_user):
+    def reviewed_by(self, user=current_user):
         # the following is much more efficient than
         # "user in self.review_users"
         return self in user.reviewed_course
+
+    @property
+    def reviewed(self):
+        return self.reviewed_by(current_user)
 
     @property
     def review_count(self):
