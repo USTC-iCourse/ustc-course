@@ -316,6 +316,10 @@ class Course(db.Model):
             return '/uploads/images/' + self._image
         return '/static/image/user.png'
 
+    @property
+    def joined_users(self):
+        return User.query.join(Student).filter(Student.user_id == User.id).join(join_course).filter(join_course.c.course_id == self.id, join_course.c.student_id == Student.sno).all()
+
 
 class CourseRate(db.Model):
     __tablename__ = 'course_rates'

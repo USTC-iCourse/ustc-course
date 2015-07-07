@@ -5,17 +5,10 @@ from sqlalchemy import ForeignKeyConstraint
 from datetime import datetime
 from app import db, login_manager as lm
 from random import randint
-from flask.ext.login import UserMixin
+from flask.ext.login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, \
      check_password_hash
 from flask.ext.babel import gettext as _
-from .review import *
-from .course import *
-from .user import *
-from .image import *
-from .forum import *
-from .note import *
-from .share import *
 
 class Notification(db.Model):
     __tablename__ = 'notifications'
@@ -28,17 +21,19 @@ class Notification(db.Model):
     operation = db.Column(db.String(50), nullable=False)
     ref_class = db.Column(db.String(50))
     ref_obj_id = db.Column(db.Integer)
+    ref_display_class = db.Column(db.String(50))
 
-    to_user = db.relationship('User', foreign_keys=to_user_id, backref=db.backref('notifications', order_by='desc(Notification.time)'))
+    to_user = db.relationship('User', foreign_keys=to_user_id, backref=db.backref('notifications', order_by='desc(Notification.id)'))
     from_user = db.relationship('User', foreign_keys=from_user_id)
 
-    def __init__(self, to_user, from_user, operation, ref_obj, ref_class=None):
+    def __init__(self, to_user, from_user, operation, ref_obj, ref_display_class=None):
         self.to_user = to_user
         self.from_user = from_user
         self.date = datetime.utcnow().date()
         self.time = datetime.utcnow()
         self.operation = operation
-        self.ref_class = ref_class or ref_obj.__class__.__name__
+        self.ref_class = ref_obj.__class__.__name__
+        self.ref_display_class = ref_display_class or self.ref_class
         self.ref_obj_id = ref_obj.id
 
     def save(self):
@@ -47,16 +42,19 @@ class Notification(db.Model):
 
     @property
     def ref_obj(self):
+        from .review import Review, ReviewComment
+        from .course import Course
+        from .user import User, Teacher
         if self.ref_class == 'Review':
-            return Review.query.get(Review.id == ref_obj_id)
+            return Review.query.get(self.ref_obj_id)
         elif self.ref_class == 'ReviewComment':
-            return ReviewComment.query.get(ReviewComment.id == ref_obj_id)
+            return ReviewComment.query.get(self.ref_obj_id)
         elif self.ref_class == 'Course':
-            return Course.query.get(Course.id == ref_obj_id)
+            return Course.query.get(self.ref_obj_id)
         elif self.ref_class == 'User':
-            return User.query.get(User.id == ref_obj_id)
+            return User.query.get(self.ref_obj_id)
         elif self.ref_class == 'Teacher':
-            return Teacher.query.get(Teacher.id == ref_obj_id)
+            return Teacher.query.get(self.ref_obj_id)
         else:
             return None
 
@@ -76,18 +74,18 @@ class Notification(db.Model):
 
     @property
     def ref_obj_name(self):
-        if self.ref_class == 'Review':
-            return '课程「' + self.ref_obj.review.link + '」中 ' + self.ref_obj.author.link + ' 的点评'
-        elif self.ref_class == 'ReviewComment':
+        if self.ref_display_class == 'Review':
+            return '课程「' + self.ref_obj.link + '」中 ' + self.ref_obj.author.link + ' 的点评'
+        elif self.ref_display_class == 'ReviewComment':
             return '课程「' + self.ref_obj.review.link + '」中 ' + self.ref_obj.review.author.link + ' 的点评的 ' + self.ref_obj.author.link + ' 的评论'
-        elif self.ref_class == 'Course':
+        elif self.ref_display_class == 'Course':
             return '课程「' + self.ref_obj.link + '」'
-        elif self.ref_class == 'User':
+        elif self.ref_display_class == 'User':
             if self.ref_obj == current_user:
                 return '你'
             else:
                 return '用户「' + self.ref_obj.link + '」'
-        elif self.ref_class == 'Teacher':
+        elif self.ref_display_class == 'Teacher':
             return '老师「' + self.ref_obj.link + '」'
         else:
             return 'doge'
@@ -97,9 +95,9 @@ class Notification(db.Model):
         if self.operation == 'mention':
             return '在' + self.ref_obj_name + '中提到了你'
         elif self.operation == 'upvote':
-            return '给你在' + self.ref_obj_name + '点了个赞'
+            return '给' + self.ref_obj_name + '点了个赞'
         elif self.operation == 'downvote':
-            return '给你在' + self.ref_obj_name + '点了个反对'
+            return '给' + self.ref_obj_name + '点了个反对'
         elif self.operation == 'comment':
             return '评论了' + self.ref_obj_name
         elif self.operation == 'review':

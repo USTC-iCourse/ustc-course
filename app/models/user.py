@@ -97,7 +97,7 @@ class User(db.Model, UserMixin):
         return '<User {} ({})>'.format(self.email, self.password)
 
     @property
-    def link(self):
+    def url(self):
         return url_for('user.view_profile', user_id=self.id)
 
     @property
@@ -234,14 +234,16 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         db.session.commit()
 
-    def notify(self, operation, ref_obj, from_user=current_user, obj_class_name=None):
+    def notify(self, operation, ref_obj, from_user=current_user, ref_display_class=None):
         # my operations should not be notified to myself
         if from_user == self:
             return False
-        notification = Notification(self, from_user, operation, ref_obj, obj_class_name)
+        notification = Notification(self, from_user, operation, ref_obj, ref_display_class)
         notification.save()
         self.unread_notification_count += 1
         db.session.commit()
+        # clear cache
+        latest_notifications_cache.set(self.id, None)
         return True
 
     def follow(self, followed):
@@ -358,6 +360,7 @@ class Student(db.Model):
         db.session.add(self)
         db.session.commit()
         return self
+
 
 class Teacher(db.Model):
     __tablename__ = 'teachers'
