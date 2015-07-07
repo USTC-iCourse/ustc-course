@@ -14,9 +14,10 @@
     </form>
 
     <div class="bm-pd-md">
-      <h4 class="blue">最新点评（Last{{ latest_reviews.all()|length }}）</h4>
+      <h4 class="blue">最新点评</h4>
+      <span class="text-muted">共 {{ reviews.total }} 个点评（当前第 {{ reviews.page }} 页）</span>
 
-      {% for review in latest_reviews %}
+      {% for review in reviews.items %}
       <div class="ud-pd-md dashed">
         <div class="row">
           <div class="col-md-1 col-xs-2">
@@ -32,6 +33,39 @@
         </div><!-- ./row -->
       </div><!-- ./dashed -->
       {% endfor %}
+
+    <nav>
+      <ul class="pagination">
+        {% if reviews.has_prev %} 
+        <li>
+            <a href="{{ url_for('home.index', page=reviews.prev_num) }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        {% else %} 
+        <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+        {% endif %}
+        
+        {% for page in reviews.iter_pages(left_edge=1, right_edge=0) %}
+            {% if page == reviews.page %}
+            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
+            {% elif page %}
+            <li><a href="{{ url_for('home.index', page=page) }}">{{ page }}</a></li>
+            {% else %}
+            <li><a>...</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if reviews.has_next %}
+        <li>
+          <a href="{{ url_for('home.index', page=reviews.next_num) }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+
 
     </div>
 

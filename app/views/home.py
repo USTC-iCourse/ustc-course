@@ -12,9 +12,10 @@ home = Blueprint('home',__name__)
 
 @home.route('/')
 def index():
-#top_reviews = Review.query.order_by(Review.upvote_count.desc()).limit(5)
-    latest_reviews = Review.query.order_by(Review.id.desc()).limit(10)
-    return render_template('index.html', latest_reviews=latest_reviews)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    reviews_paged = Review.query.order_by(Review.id.desc()).paginate(page=page, per_page=per_page)
+    return render_template('index.html', reviews=reviews_paged)
 
 @home.route('/signin/',methods=['POST','GET'])
 def signin():
