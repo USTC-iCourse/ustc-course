@@ -42,6 +42,7 @@ def get_reviews():
 
 
 @api.route('/review/upvote/',methods=['POST'])
+@login_required
 def review_upvote():
     review_id = request.values.get('review_id')
     if review_id:
@@ -58,6 +59,7 @@ def review_upvote():
         return jsonify(ok=false,message="A id must be given")
 
 @api.route('/review/cancel_upvote/',methods=['POST'])
+@login_required
 def review_cancel_upvote():
     review_id = request.values.get('review_id')
     if review_id:
@@ -71,6 +73,7 @@ def review_cancel_upvote():
         return jsonify(ok=False,message="A id must be given")
 
 @api.route('/review/new_comment/',methods=['POST'])
+@login_required
 def review_new_comment():
     form = ReviewCommentForm(request.form)
     if form.validate_on_submit():
@@ -95,6 +98,7 @@ def review_new_comment():
 
 
 @api.route('/review/delete_comment/',methods=['POST'])
+@login_required
 def delete_comment():
     comment_id = request.values.get('comment_id')
     if comment_id:
@@ -112,6 +116,7 @@ def delete_comment():
 
 
 @api.route('/user/follow/', methods=['POST'])
+@login_required
 def follow_user():
     user_id = request.values.get('user_id')
     user = User.query.get(user_id)
@@ -127,6 +132,7 @@ def follow_user():
         return jsonify(ok=False, message='User does not exist')
 
 @api.route('/user/unfollow/', methods=['POST'])
+@login_required
 def unfollow_user():
     user_id = request.values.get('user_id')
     user = User.query.get(user_id)

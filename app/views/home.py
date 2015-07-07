@@ -62,6 +62,7 @@ def switch_user(user_id):
     user = User.query.get(user_id)
     if not user:
         abort(404)
+    logout_user()
     login_user(user)
     return redirect(url_for('home.index'))
 
