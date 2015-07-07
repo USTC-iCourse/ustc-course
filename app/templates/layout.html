@@ -41,12 +41,12 @@
               {% endif %}
             </a>
             <ul class="dropdown-menu" role="menu">
-              {% if current_user.latest_notifications|length == 0 %}
+              {% if current_user.latest_notifications_text|length == 0 %}
               <p>还没有消息哦！</p>
               {% endif %}
-              {% for notification in current_user.latest_notifications %}
+              {% for notification_text in current_user.latest_notifications_text %}
               <li class="ud-pd-sm dashed">
-                <div class="notice">{{ notification.display_text }}</div>
+                <div class="notice">{{ notification_text }}</div>
               </li>
               {% endfor %}
               <li class="ud-pd-sm pull-right"><a class="blue" href="{{ url_for('user.notice')}}">查看全部</a></li>

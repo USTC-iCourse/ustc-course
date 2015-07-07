@@ -10,6 +10,7 @@ from werkzeug.security import generate_password_hash, \
      check_password_hash
 from flask.ext.babel import gettext as _
 from .notification import Notification
+from werkzeug.contrib.cache import SimpleCache
 
 Roles = ['Admin',
         'User']
@@ -49,6 +50,8 @@ follow_user = db.Table('follow_user',
     db.Column('follower_id', db.Integer, db.ForeignKey('users.id')),
     db.Column('followed_id', db.Integer, db.ForeignKey('users.id'))
     )
+
+latest_notifications_cache = SimpleCache()
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -101,8 +104,18 @@ class User(db.Model, UserMixin):
         return url_for('user.view_profile', user_id=self.id)
 
     @property
-    def latest_notifications(self):
-        return self.notifications.limit(5)
+    def link(self):
+        return Markup('<a href="' + self.url + '">') + Markup.escape(self.username) + Markup('</a>')
+
+    @property
+    def latest_notifications_text(self):
+        text = latest_notifications_cache.get(self.id)
+        if text is None:
+            text = []
+            for notice in self.notifications[0:5]:
+                text.append(notice.display_text)
+            latest_notifications_cache.set(self.id, text)
+        return text
 
     @property
     def reviews_count(self):
