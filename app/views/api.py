@@ -48,9 +48,12 @@ def review_upvote():
         review = Review.query.get(review_id)
         if review:
             ok,message = review.upvote()
+            if ok:
+                for user in set(current_user.followers + [review.author]):
+                    user.notify('upvote', review)
             return jsonify(ok=ok,message=message, count=review.upvote_count)
         else:
-            return jsonify(ok=False,message="The review dosen't exist.")
+            return jsonify(ok=False,message="The review doesn't exist.")
     else:
         return jsonify(ok=false,message="A id must be given")
 
@@ -81,6 +84,9 @@ def review_new_comment():
             content = Markup(content).striptags()
             content = editor_parse_at(content)
             ok,message = comment.add(review,content)
+            if ok:
+                for user in set(current_user.followers + [review.author]):
+                    user.notify('comment', review)
             return jsonify(ok=ok,message=message,content=content)
         else:
             return jsonify(ok=False,message="The review doesn't exist.")
@@ -88,11 +94,11 @@ def review_new_comment():
         return jsonify(ok=False,message=form.errors)
 
 
-@api.route('/review/delete_comment/',methods=['GET','POST'])
+@api.route('/review/delete_comment/',methods=['POST'])
 def delete_comment():
     comment_id = request.values.get('comment_id')
     if comment_id:
-        comment = ReviewComment.query.filter_by(id=comment_id).first()
+        comment = ReviewComment.query.get(comment_id)
         if comment:
             if comment.author == current_user or current_user.is_admin:
                 ok,message = comment.delete()

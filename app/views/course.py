@@ -113,6 +113,8 @@ def upvote(course_id):
     if course.downvoted:
         course.un_downvote()
     ok = course.upvote()
+    for user in set(current_user.followers + course.followers):
+        user.notify('upvote', course)
     return jsonify(ok=ok, count=course.upvote_count)
 
 @course.route('/<int:course_id>/undo-upvote/', methods=['POST'])
@@ -133,6 +135,8 @@ def downvote(course_id):
     if course.upvoted:
         course.un_upvote()
     ok = course.downvote()
+    for user in set(current_user.followers + course.followers):
+        user.notify('downvote', course)
     return jsonify(ok=ok, count=course.downvote_count)
 
 @course.route('/<int:course_id>/undo-downvote/', methods=['POST'])
@@ -151,6 +155,8 @@ def follow(course_id):
     if not course or course.following:
         return jsonify(ok=False)
     ok = course.follow()
+    for user in set(current_user.followers + course.followers):
+        user.notify('follow', course)
     return jsonify(ok=ok, count=course.follow_count)
 
 @course.route('/<int:course_id>/unfollow/', methods=['POST'])

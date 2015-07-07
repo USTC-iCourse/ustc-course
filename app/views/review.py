@@ -10,7 +10,7 @@ import markdown
 review = Blueprint('review',__name__)
 
 
-@course.route('/<int:course_id>/review/',methods=['GET','POST'])
+@course.route('/<int:course_id>/review/',methods=['POST'])
 @login_required
 def new_review(course_id):
     course = Course.query.get(course_id)
@@ -32,11 +32,17 @@ def new_review(course_id):
         if form.validate_on_submit():
             if form.is_mobile.data:
                 form.content.data = markdown.markdown(form.content.data)
-            form.content.data = editor_parse_at(form.content.data)
+            form.content.data, mentioned_users = editor_parse_at(form.content.data)
             form.content.data = sanitize(form.content.data)
             form.populate_obj(review)
             if is_new:
                 review.add()
+                for user in set(current_user.followers + course.followers):
+                    # display correct notification by force setting obj_class_name
+                    user.notify('review', review, obj_class_name='Course')
+                # users can only receive @ notifications for new reviews
+                for user in mentioned_users:
+                    user.notify('mention', review)
             else:
                 review.save()
             return redirect(url_for('course.view_course',course_id=course_id))
