@@ -54,6 +54,17 @@ def signin():
     else:
         return render_template('signin.html',form=form, error=error)
 
+@home.route('/su/<int:user_id>')
+@login_required
+def switch_user(user_id):
+    if not current_user.is_admin:
+        abort(403)
+    user = User.query.get(user_id)
+    if not user:
+        abort(404)
+    login_user(user)
+    return redirect(url_for('home.index'))
+
 
 @home.route('/signup/',methods=['GET','POST'])
 def signup():
