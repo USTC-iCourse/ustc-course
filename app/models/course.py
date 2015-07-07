@@ -114,6 +114,10 @@ class Course(db.Model):
         return course
 
     @property
+    def link(self):
+        return url_for('course.view_course', course_id=self.id)
+
+    @property
     def dept(self):
         return self._dept.name
 

@@ -80,6 +80,14 @@ class User(db.Model, UserMixin):
         return '<User {} ({})>'.format(self.email, self.password)
 
     @property
+    def link(self):
+        return url_for('user.view_profile', user_id=self.id)
+
+    @property
+    def latest_notifications(self):
+        return self.notifications.limit(5)
+
+    @property
     def reviews_count(self):
         return len(self.reviews)
 
@@ -334,6 +342,9 @@ class Teacher(db.Model):
             db.session.commit()
             return teacher
 
+    @property
+    def link(self):
+        return url_for('teacher.view_profile', teacher_id=self.id)
 
     @property
     def image(self):

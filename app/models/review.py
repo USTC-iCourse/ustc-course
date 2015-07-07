@@ -1,3 +1,4 @@
+from flask import url_for
 from datetime import datetime
 from app import db
 import html2text
@@ -122,6 +123,10 @@ class Review(db.Model):
             kwargs['author'] = author
         review = cls(**kwargs)
         review.save()
+
+    @property
+    def link(self):
+        return url_for('course.view_course', course_id=self.course.id) + '#review-' + self.id
 
     @property
     def content_text(self):
