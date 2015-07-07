@@ -47,15 +47,15 @@ class Notification(db.Model):
 
     @property
     def ref_obj(self):
-        if ref_class == 'Review':
+        if self.ref_class == 'Review':
             return Review.query.get(Review.id == ref_obj_id)
-        elif ref_class == 'ReviewComment':
+        elif self.ref_class == 'ReviewComment':
             return ReviewComment.query.get(ReviewComment.id == ref_obj_id)
-        elif ref_class == 'Course':
+        elif self.ref_class == 'Course':
             return Course.query.get(Course.id == ref_obj_id)
-        elif ref_class == 'User':
+        elif self.ref_class == 'User':
             return User.query.get(User.id == ref_obj_id)
-        elif ref_class == 'Teacher':
+        elif self.ref_class == 'Teacher':
             return Teacher.query.get(Teacher.id == ref_obj_id)
         else:
             return None
@@ -94,17 +94,17 @@ class Notification(db.Model):
 
     @property
     def operation_text(self):
-        if operation == 'mention':
+        if self.operation == 'mention':
             return '在' + self.ref_obj_name + '中提到了你'
-        elif operation == 'upvote':
+        elif self.operation == 'upvote':
             return '给你在' + self.ref_obj_name + '点了个赞'
-        elif operation == 'downvote':
+        elif self.operation == 'downvote':
             return '给你在' + self.ref_obj_name + '点了个反对'
-        elif operation == 'comment':
+        elif self.operation == 'comment':
             return '评论了' + self.ref_obj_name
-        elif operation == 'review':
+        elif self.operation == 'review':
             return '点评了' + self.ref_obj_name
-        elif operation == 'follow':
+        elif self.operation == 'follow':
             return '关注了' + self.ref_obj_name
         else:
             return 'doge'
