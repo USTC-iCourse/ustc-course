@@ -37,9 +37,8 @@ def new_review(course_id):
             form.populate_obj(review)
             if is_new:
                 review.add()
-                for user in set(current_user.followers + course.followers):
-                    # display correct notification by force setting obj_class_name
-                    user.notify('review', review, obj_class_name='Course')
+                for user in set(current_user.followers + course.followers + course.joined_users):
+                    user.notify('review', review, ref_display_class='Course')
                 # users can only receive @ notifications for new reviews
                 for user in mentioned_users:
                     user.notify('mention', review)

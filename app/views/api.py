@@ -85,11 +85,13 @@ def review_new_comment():
             if len(content) > 500:
                 return jsonify(ok=False,message="评论太长了，不能超过 500 字哦")
             content = Markup(content).striptags()
-            content = editor_parse_at(content)
+            content, mentioned_users = editor_parse_at(content)
             ok,message = comment.add(review,content)
             if ok:
                 for user in set(current_user.followers + [review.author]):
                     user.notify('comment', review)
+                for user in mentioned_users:
+                    user.notify('mention', comment)
             return jsonify(ok=ok,message=message,content=content)
         else:
             return jsonify(ok=False,message="The review doesn't exist.")
