@@ -105,6 +105,35 @@ def delete_comment():
         return jsonify(ok=False,message="A id must be given")
 
 
+@api.route('/user/follow/', methods=['POST'])
+def follow_user():
+    user_id = request.values.get('user_id')
+    user = User.query.get(user_id)
+    if user:
+        if user == current_user:
+            return jsonify(ok=False, message='Cannot follow yourself')
+        elif user in current_user.followers:
+            return jsonify(ok=False, message='You have already followed the specified user')
+        current_user.follow(user)
+        user.notify('follow', user)
+        return jsonify(ok=True)
+    else:
+        return jsonify(ok=False, message='User does not exist')
+
+@api.route('/user/unfollow/', methods=['POST'])
+def unfollow_user():
+    user_id = request.values.get('user_id')
+    user = User.query.get(user_id)
+    if user:
+        if user == current_user:
+            return jsonify(ok=False, message='Cannot follow yourself')
+        elif user not in current_user.followers:
+            return jsonify(ok=False, message='You have not followed the specified user')
+        current_user.unfollow(user)
+        return jsonify(ok=True)
+    else:
+        return jsonify(ok=False, message='User does not exist')
+
 def generic_upload(file, type):
     ok,message = handle_upload(file, type)
     script_head = '<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(2,'
