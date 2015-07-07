@@ -119,17 +119,56 @@
             暂无
             {% endif %}
           </li>
+          <div id="action-btn-group">
+              <button style="display:none" onclick="follow_user({{ user.id }})" class="btn btn-white btn-flat btn-follow"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span> 关注</button>
+              <button style="display:none" onclick="unfollow_user({{ user.id }})" class="btn btn-blue btn-flat btn-unfollow"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> 已关注</button>
+          </div>
         </ul>
       </div>
 
-      <div class="ud-pd-md dashed hidden">
+      <div class="ud-pd-md dashed">
         <ul class="list-unstyled dark-grey">
-          <li class="ud-pd-sm">关注：</li>
-          <li class="ud-pd-sm">被关注：</li>
+            <li class="ud-pd-sm">关注了 <strong>{{ user.following_count }}</strong> 人</li>
+            <li class="ud-pd-sm">关注者 <strong>{{ user.follower_count }}</strong> 人</li>
+            <li class="ud-pd-sm">关注了 <strong>{{ user.courses_following_count }}</strong> 门课程</li>
+            <li class="ud-pd-sm">点评了 <strong>{{ user.reviews_count }}</strong> 门课程</li>
         </ul>
       </div>
 
     </div><!-- end col-md-4 -->
   </div><!-- end float-element -->
 </div><!-- end container -->
+{% endblock %}
+{% block script %}
+<script>
+$(function() {
+    {% if current_user.is_authenticated() and current_user.following(user) %}
+    $('.btn-unfollow').show();
+    {% else %}
+    $('.btn-follow').show();
+    {% endif %}
+});
+
+function follow_user(user_id) {
+    $.post("{{ url_for('api.follow_user') }}", { user_id: user_id }, function(o) {
+        if (o.ok) {
+            $('.btn-follow').hide();
+            $('.btn-unfollow').show();
+        }
+        else
+            alert('关注用户失败：' + o.message);
+    }, 'json');
+}
+
+function unfollow_user(user_id) {
+    $.post("{{ url_for('api.unfollow_user') }}", { user_id: user_id }, function(o) {
+        if (o.ok) {
+            $('.btn-unfollow').hide();
+            $('.btn-follow').show();
+        }
+        else
+            alert('取消关注用户失败：' + o.message);
+    }, 'json');
+}
+</script>
 {% endblock %}
