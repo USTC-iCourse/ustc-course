@@ -189,7 +189,10 @@ class Course(db.Model):
     def reviewed_by(self, user=current_user):
         # the following is much more efficient than
         # "user in self.review_users"
-        return self in user.reviewed_course
+        try:
+            return self in user.reviewed_course
+        except:
+            return False
 
     @property
     def reviewed(self):
@@ -275,7 +278,10 @@ class Course(db.Model):
 
     @property
     def following(self, user=current_user):
-        return self in user.courses_following
+        try:
+            return self in user.courses_following
+        except:
+            return False
 
     @property
     def follow_count(self):
@@ -285,14 +291,14 @@ class Course(db.Model):
     def student_count(self):
         return len(self.students)
 
-    def join(self):
+    def join(self, user=current_user):
         if not user.is_student or user.info in self.students:
             return False
         self.students.append(user.info)
         db.session.commit()
         return True
 
-    def quit(self):
+    def quit(self, user=current_user):
         if not user.is_student or not user.info in self.students:
             return False
         self.students.remove(user.info)
