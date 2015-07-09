@@ -125,7 +125,7 @@ def follow_user():
     if user:
         if user == current_user:
             return jsonify(ok=False, message='Cannot follow yourself')
-        elif user in current_user.followers:
+        elif user in current_user.users_following:
             return jsonify(ok=False, message='You have already followed the specified user')
         current_user.follow(user)
         user.notify('follow', user)
@@ -141,7 +141,7 @@ def unfollow_user():
     if user:
         if user == current_user:
             return jsonify(ok=False, message='Cannot follow yourself')
-        elif user not in current_user.followers:
+        elif user not in current_user.users_following:
             return jsonify(ok=False, message='You have not followed the specified user')
         current_user.unfollow(user)
         return jsonify(ok=True)

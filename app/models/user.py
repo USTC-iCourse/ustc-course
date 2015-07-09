@@ -260,28 +260,28 @@ class User(db.Model, UserMixin):
         return True
 
     def follow(self, followed):
-        if followed in self.followers:
+        if followed in self.users_following:
             return False
-        self.followers.append(followed)
+        self.users_following.append(followed)
         self.following_count += 1
         followed.follower_count += 1
         db.session.commit()
         return True
 
     def unfollow(self, followed):
-        if followed not in self.followers:
+        if followed not in self.users_following:
             return False
-        self.followers.remove(followed)
+        self.users_following.remove(followed)
         self.following_count -= 1
         followed.follower_count -= 1
         db.session.commit()
         return True
 
     def followed_by(self, user=current_user):
-        return user in self.users_following
+        return user in self.followers
 
     def following(self, user=current_user):
-        return user in self.followers
+        return user in self.users_following
 
 
 @lm.user_loader
