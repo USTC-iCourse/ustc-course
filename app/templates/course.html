@@ -218,8 +218,8 @@
           {% for rel_course in course.related_courses[0:10] %}
           {% if rel_course != course %}
           <div class="ud-pd-sm">
-            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.teacher_names_display }} ({{ course.term_display }})</a>
-            <span class="small grey align-bottom  float-right">{{ rel_course.time_locations_display }}</span>
+            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.teacher_names_display }}</a>
+            <span class="small grey align-bottom  float-right">{{ rel_course.term_display }}</span>
           </div>
           {% endif %}
           {% endfor %}
