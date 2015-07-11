@@ -4,6 +4,8 @@
 CKEDITOR.disableAutoInline = true;
 
 $(document).ready(function(){
-    $('#content-editor').ckeditor();
+    $('#content-editor').ckeditor({
+        autosave_Savekey: location.pathname,
+    });
 });
 </script>
