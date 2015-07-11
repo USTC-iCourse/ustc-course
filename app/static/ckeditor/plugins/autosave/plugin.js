@@ -110,7 +110,8 @@
 
                     editorInstance.loadSnapshot(jsonSavedContent.data);
 
-                    RemoveStorage(autoSaveKey);
+                    // do not remove saved editor content after loading
+                    //RemoveStorage(autoSaveKey);
                 },
                 onCancel: function() {
                     RemoveStorage(autoSaveKey);
