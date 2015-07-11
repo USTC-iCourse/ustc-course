@@ -178,7 +178,7 @@
 
             // check if the loaded editor content is the same as the autosaved content
             if (editorLoadedContent == autoSavedContent) {
-                localStorage.removeItem(autoSaveKey);
+                //localStorage.removeItem(autoSaveKey);
                 return;
             }
 
@@ -199,7 +199,8 @@
                 var confirmMessage = editorInstance.lang.autosave.loadSavedContent.replace("{0}", moment(autoSavedContentDate).locale(editorInstance.config.language).format(editorInstance.lang.autosave.dateFormat));
                 if (confirm(confirmMessage)) {
                     editorInstance.loadSnapshot(jsonSavedContent.data);
-                    RemoveStorage(autoSaveKey);
+                    // do not remove saved editor content after loading
+                    //RemoveStorage(autoSaveKey);
                 } else {
                     RemoveStorage(autoSaveKey);
                 }
