@@ -63,17 +63,15 @@
         savingActive = false;
 
     var startTimer = function(event) {
-        if (timeOutId) {
-            clearTimeout(timeOutId);
+        var delay = event.editor.config.autosave_delay != null ? event.editor.config.autosave_delay : 10;
+        if (!savingActive) {
+            savingActive = true;
+            timeOutId = setTimeout(onTimer, delay * 1000, event);
         }
-        var delay = CKEDITOR.config.autosave_delay != null ? CKEDITOR.config.autosave_delay : 10;
-        timeOutId = setTimeout(onTimer, delay * 1000, event);
     };
     var onTimer = function(event) {
-        if (savingActive) {
-            startTimer(event);
-        } else if (event.editor.checkDirty() || event.editor.plugins.bbcode) {
-            savingActive = true;
+        console.log("timer");
+        if (event.editor.checkDirty() || event.editor.plugins.bbcode) {
             var editor = event.editor,
                 autoSaveKey = editor.config.autosave_SaveKey != null ? editor.config.autosave_SaveKey : 'autosave_' + window.location + "_" + editor.id;
 

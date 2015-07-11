@@ -54,4 +54,8 @@ CKEDITOR.editorConfig = function( config ) {
     config.autosave_NotOlderThen = 14400;
     // uncomment the following to clear saved data upon submit
     //config.autosave_saveDetectionSelectors = "button[type='submit']";
+    config.autosave_saveDetectionSelectors = null;
+    // autosave delay seconds after change
+    config.autosave_delay = 5;
+    console.log(config.autosave_delay);
 };
