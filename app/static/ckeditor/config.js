@@ -57,5 +57,4 @@ CKEDITOR.editorConfig = function( config ) {
     config.autosave_saveDetectionSelectors = null;
     // autosave delay seconds after change
     config.autosave_delay = 5;
-    console.log(config.autosave_delay);
 };
