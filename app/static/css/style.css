@@ -95,6 +95,7 @@ p { line-height: 25px; word-wrap: break-word; }
     line-height: 25px;
 }
 
+div { overflow: hidden; word-wrap: break-word; }
 .bm-pd-md {
     padding-bottom: 15px;
 }
@@ -104,7 +105,6 @@ p { line-height: 25px; word-wrap: break-word; }
 .ud-pd-sm {
     padding-top: 8px;
     padding-bottom: 8px;
-    overflow: hidden;
 }
 .ud-pd-md {
     padding-top: 15px;
