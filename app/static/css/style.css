@@ -205,6 +205,10 @@ div { overflow: hidden; word-wrap: break-word; }
     width: 120px;
     height: 120px;
 }
+.avatar-auto {
+    width: 100%;
+    height: auto;
+}
 .cicle { border-radius: 100%; }
 .rect-lg {
     width: 300px;
@@ -212,6 +216,8 @@ div { overflow: hidden; word-wrap: break-word; }
 }
 .radius4 { border-radius: 4px; }
 .radius0 { border-radius: 0; }
+
+
 
 
 .grey { color: #999; }
