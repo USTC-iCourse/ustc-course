@@ -20,7 +20,7 @@
       {% for review in reviews.items %}
       <div class="ud-pd-md dashed">
         <div class="row">
-          <div class="col-md-1 col-xs-2">
+          <div class="col-md-1 col-xs-2 right-pd-no">
             <div class="bm-pd-md"><a href="{{ url_for('user.view_profile', user_id=review.author.id) }}">{{ review.author.username }}</a></div>
             <img class="avatar-md cicle" src="{{ review.author.avatar }}"/>
           </div>
