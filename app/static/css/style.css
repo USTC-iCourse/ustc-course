@@ -127,10 +127,12 @@ div { overflow: hidden; word-wrap: break-word; }
     padding-left: 30px;
 }
 
+.right-pd-no { padding-right: 0px; }
 .right-pd-sm { padding-right: 8px; }
 .right-pd-md { padding-right: 15px; }
 .right-pd-lg { padding-right: 30px; }
 
+.left-pd-no { padding-right: 0px; }
 .left-pd-sm { padding-left: 8px; }
 .left-pd-md { padding-left: 15px; }
 .left-pd-lg { padding-left: 30px; }
