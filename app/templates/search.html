@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="container">
-  <div class="float-element">
+  <div class="row float-element">
     <span class="text-muted"> 搜索「{{ keyword }}」的结果 <span class="small"> &gt; 共 {{ courses.total }} 门课（当前第 {{ courses.page }} 页）</span></span>
     <hr>
     {% include "course-filter.html" %}

@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="container">
-  <div class="float-element">
+  <div class="row float-element">
     <div class="inline-h3">
     <span class="blue h4">{% if not is_new %}编辑{% endif %}点评 &bull; <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a></span>
     <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
