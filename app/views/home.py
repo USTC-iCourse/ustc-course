@@ -221,8 +221,9 @@ def search():
 
     teacher_match = ordering(course_query.join(Course.teachers).filter(Teacher.name == keyword))
     exact_match = match_courses(Course.name == keyword)
-    include_match = match_courses(Course.name.like('%' + keyword + '%'))
-    fuzzy_match = match_courses(Course.name.like('%' + '%'.join([ char for char in keyword ]) + '%'))
+    fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
+    include_match = match_courses(Course.name.like('%' + fuzzy_keyword + '%'))
+    fuzzy_match = match_courses(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
     courses = Course.query.select_entity_from(union(teacher_match, exact_match, include_match, fuzzy_match))
     if not courses:
