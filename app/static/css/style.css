@@ -95,36 +95,51 @@ p { line-height: 25px; word-wrap: break-word; }
     line-height: 25px;
 }
 
-div { overflow: hidden; word-wrap: break-word; }
 .bm-pd-md {
     padding-bottom: 15px;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 .bm-pd-lg {
     padding-bottom: 30px;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 .ud-pd-sm {
     padding-top: 8px;
     padding-bottom: 8px;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 .ud-pd-md {
     padding-top: 15px;
     padding-bottom: 15px;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 .ud-pd-lg {
     padding-top: 30px;
     padding-bottom: 30px;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 .rl-pd-sm {
     padding-right: 8px;
     padding-left: 8px;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 .rl-pd-md {
     padding-right: 15px;
     padding-left: 15px;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 .rl-pd-lg {
     padding-right: 30px;
     padding-left: 30px;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 
 .right-pd-no { padding-right: 0px; }
