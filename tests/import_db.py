@@ -116,21 +116,23 @@ def load_titles():
 
     print('%d titles loaded' % count)
 
-students = dict()
 students_map = dict()
 
 def load_students():
     existing_students = Student.query.all()
+    count = 0
     for stu in existing_students:
         students_map[stu.sno] = stu
+        count += 1
 
-    count = 0
     for c in parse_file('XJ_XSBYMDB.txt'):
         if c['SNO'] in students_map:
             stu = students_map[c['SNO']]
         else:
             stu = Student()
             stu.sno = c['SNO']
+            students_map[stu.sno] = stu;
+
         stu.name = c['XM']
 
         if c['XB'] == '1':
@@ -158,17 +160,18 @@ def load_students():
             elif int(c['SXZY']) > 0:
                 print('Major ' + c['SXZY'] + ' not found for student ' + str(c))
 
-        students[stu.sno] = stu;
+        if not stu in db.session:
+            db.session.add(stu)
+            count+=1
 
     for c in parse_file('XJ_XSXXB.txt'):
-        if c['SNO'] in students:
-            stu = students[c['SNO']]
+        if c['SNO'] in students_map:
+            stu = students_map[c['SNO']]
             stu.email = c['EMAIL']
-
-            del students[c['SNO']] # remove the student after added to db
         else:
             stu = Student()
             stu.sno = c['SNO']
+            students_map[stu.sno] = stu;
             stu.name = c['XM']
             stu.email = c['EMAIL']
             if c['XB'] == '1':
@@ -184,16 +187,7 @@ def load_students():
 
         if not stu in db.session:
             db.session.add(stu)
-        count+=1
-        students_map[stu.sno] = stu;
-
-    # students in XJ_XSBYMDB but not in XJ_XSXXB
-    for sno in students:
-        stu = students[sno]
-        if not stu in db.session:
-            db.session.add(stu)
-        count+=1
-        students_map[stu.sno] = stu
+            count+=1
 
     db.session.commit()
     print('%d students loaded' % count)
