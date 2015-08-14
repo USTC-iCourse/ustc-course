@@ -110,10 +110,9 @@
 
 
     <div class="col-md-4 right-col">
-      <img class="avatar-lg cicle" src="{{ user.avatar }}"/>
-      <h3 class="blue">{{ user.username }}</h3>
-
       <div class="ud-pd-md dashed">
+	<img class="avatar-lg cicle" src="{{ user.avatar }}"/>
+	<h3 class="blue">{{ user.username }}</h3>
         <ul class="list-unstyled dark-grey">
           <li class="ud-pd-sm">简介：{{ user.description }}</li>
           <li class="ud-pd-sm" style="overflow:hidden">博客：
@@ -126,9 +125,9 @@
             {% endif %}
           </li>
 	  {% if user != current_user  %}
-          <div id="action-btn-group">
-              <button style="display:none" onclick="follow_user({{ user.id }})" class="btn btn-white btn-flat btn-follow"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span> 关注</button>
-              <button style="display:none" onclick="unfollow_user({{ user.id }})" class="btn btn-blue btn-flat btn-unfollow"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> 已关注</button>
+          <div id="action-btn-group" class="ud-pd-sm">
+            <button style="display:none" onclick="follow_user({{ user.id }})" class="btn btn-white btn-flat btn-follow"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span> 关注</button>
+            <button style="display:none" onclick="unfollow_user({{ user.id }})" class="btn btn-blue btn-flat btn-unfollow"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> 已关注</button>
           </div>
 	  {% endif %}
         </ul>

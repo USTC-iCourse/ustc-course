@@ -1,75 +1,75 @@
-    {% for course in courses.items %}
-    <div class="ud-pd-md dashed">
-      <div class="row">
-        <div class="col-md-1 col-xs-2">
-          <div class="rate-box">{{ course.upvote_count }}</div>
-        </div>
-        <div class="col-md-8 col-xs-10">
-            <a class="px16" href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
-
-          {% if current_user.is_authenticated and course in current_user.courses_joined %}
-          <span class="label label-info">已学过</span>
-          {% endif %}
-          {% if course.reviewed %}
-          <span class="label label-success">已点评</span>
-          {% endif %}
-	  {% if course.introduction %}
-	  <span class="label label-danger">课程简介</span>
-	  {% endif %}
-
-          <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
-          <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
-
-          {% if course.review_count %}
-          <div class="ud-pd-sm blue">
-            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-            {% if course.rate.average_rate > 2 %}
-            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-            {% else %}
-            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            {% endif %}
-            {% if course.rate.average_rate > 4 %}
-            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-            {% else %}
-            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            {% endif %}
-            {% if course.rate.average_rate > 6 %}
-            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-            {% else %}
-            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            {% endif %}
-            {% if course.rate.average_rate > 8 %}
-            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-            {% else %}
-            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            {% endif %}
-            <span class="rl-pd-sm h4">{{ course.rate.average_rate }}</span><span class="text-muted px12">({{ course.review_count }} 人评价)</span>
-          </div>
-          <ul class="text-muted list-inline list-unstyled">
-              <li class="right-mg-md">课程难度：{{ course.rate.difficulty }}</li>
-              <li class="right-mg-md">作业多少：{{ course.rate.homework }}</li>
-              <li class="right-mg-md">给分好坏：{{ course.rate.grading }}</li>
-              <li class="right-mg-md">收获大小：{{ course.rate.gain }}</li>
-          </ul>
-          {% else %}
-          <div class="ud-pd-sm blue">
-            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            <span class="rl-pd-sm h4"><span class="text-muted px12">暂无评价</span>
-          </div>
-          <ul class="text-muted list-inline list-unstyled">
-              <li class="right-mg-md">课程难度：你猜</li>
-              <li class="right-mg-md">作业多少：你猜</li>
-              <li class="right-mg-md">给分好坏：你猜</li>
-              <li class="right-mg-md">收获大小：你猜</li>
-          </ul>
-          {% endif %}
-          <p>
-        </div>
-      </div>
+{% for course in courses.items %}
+<div class="ud-pd-md dashed">
+  <div class="row">
+    <div class="col-md-1 col-xs-2">
+      <div class="rate-box">{{ course.upvote_count }}</div>
     </div>
-    {% endfor %}
+    <div class="col-md-11 col-xs-10">
+      <a class="px16" href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
+
+      {% if course.introduction %}
+      <span class="label label-danger">课程简介</span>
+      {% endif %}
+      {% if current_user.is_authenticated and course in current_user.courses_joined %}
+      <span class="label label-info">已学过</span>
+      {% endif %}
+      {% if course.reviewed %}
+      <span class="label label-success">已点评</span>
+      {% endif %}
+
+      <span class="small grey align-bottom float-right desktop">{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+      <br><span class="small grey align-bottom mobile">{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+
+      {% if course.review_count %}
+      <div class="ud-pd-sm blue">
+        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+        {% if course.rate.average_rate > 2 %}
+        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+        {% else %}
+        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+        {% endif %}
+        {% if course.rate.average_rate > 4 %}
+        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+        {% else %}
+        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+        {% endif %}
+        {% if course.rate.average_rate > 6 %}
+        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+        {% else %}
+        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+        {% endif %}
+        {% if course.rate.average_rate > 8 %}
+        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+        {% else %}
+        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+        {% endif %}
+        <span class="rl-pd-sm h4">{{ course.rate.average_rate }}</span><span class="text-muted px12">({{ course.review_count }} 人评价)</span>
+      </div>
+      <ul class="text-muted list-inline list-unstyled">
+        <li class="right-mg-md">课程难度：{{ course.rate.difficulty }}</li>
+        <li class="right-mg-md">作业多少：{{ course.rate.homework }}</li>
+        <li class="right-mg-md">给分好坏：{{ course.rate.grading }}</li>
+        <li class="right-mg-md">收获大小：{{ course.rate.gain }}</li>
+      </ul>
+      {% else %}
+      <div class="ud-pd-sm blue">
+        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+        <span class="rl-pd-sm h4"><span class="text-muted px12">暂无评价</span>
+      </div>
+      <ul class="text-muted list-inline list-unstyled">
+        <li class="right-mg-md">课程难度：你猜</li>
+        <li class="right-mg-md">作业多少：你猜</li>
+        <li class="right-mg-md">给分好坏：你猜</li>
+        <li class="right-mg-md">收获大小：你猜</li>
+      </ul>
+      {% endif %}
+      <p>
+    </div>
+  </div>
+</div>
+{% endfor %}
 
