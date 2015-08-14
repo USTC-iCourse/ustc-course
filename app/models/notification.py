@@ -97,7 +97,7 @@ class Notification(db.Model):
         elif self.operation == 'upvote':
             return '给' + self.ref_obj_name + '点了个赞'
         elif self.operation == 'downvote':
-            return '给' + self.ref_obj_name + '点了个反对'
+            return '给' + self.ref_obj_name + '点了不支持'
         elif self.operation == 'comment':
             return '评论了' + self.ref_obj_name
         elif self.operation == 'review':
