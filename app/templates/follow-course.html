@@ -14,7 +14,13 @@
       {% for course in user.courses_following %}
       <div class="ud-pd-md dashed">
         <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
-        <span class="small grey align-bottom  float-right">学期：{{ course.term_display }}</span>
+	{% if course.introduction %}
+	<span class="label label-danger">课程简介</span>
+	{% endif %}
+	{% if course in user.courses_joined %}
+        <span class="label label-info">已学过</span>
+        {% endif %}
+        <span class="small grey align-bottom  float-right">{{ course.term_display }}</span>
       </div>
       {% endfor %}
 
