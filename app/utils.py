@@ -122,6 +122,17 @@ def localtime_minute(date):
     local = pytz.utc.localize(date, is_dst=False).astimezone(pytz.timezone('Asia/Shanghai'))
     return local.strftime('%Y-%m-%d %H:%M')
 
+@app.template_filter('updatetime')
+def updatetime_minute(date):
+    local = pytz.utc.localize(date, is_dst=False).astimezone(pytz.timezone('Asia/Shanghai'))
+    now = datetime.now()
+    if (now.date() - local.date()).days == 0:
+        return local.strftime('今天 %H:%M')
+    if (now.date() - local.date()).days == 1:
+        return local.strftime('昨天 %H:%M')
+    else:
+        return local.strftime('%m月%d日 %H:%M')
+
 
 RESERVED_USERNAME = set(['管理员', 'admin', 'root',
     'Administrator', 'example', 'test'])
