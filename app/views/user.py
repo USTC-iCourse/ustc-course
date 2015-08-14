@@ -157,3 +157,27 @@ def avatar(user_id):
 @login_required
 def notice():
     return render_template('notice.html', notifications=current_user.notifications)
+
+
+@user.route('/<int:user_id>/followers')
+def followers(user_id):
+    '''被关注的人页面'''
+    user = User.query.get(user_id)
+    if not user:
+        message = _('Sorry. But we could not find the user!')
+        return render_template('feedback.html', status=False, message=message)
+
+    return render_template('followers.html',
+                           user=user)
+
+
+@user.route('/<int:user_id>/followings')
+def followings(user_id):
+    '''关注的人页面'''
+    user = User.query.get(user_id)
+    if not user:
+        message = _('Sorry. But we could not find the user!')
+        return render_template('feedback.html', status=False, message=message)
+
+    return render_template('followings.html',
+                           user=user)

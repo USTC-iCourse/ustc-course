@@ -128,10 +128,10 @@
 
       <div class="ud-pd-md dashed">
         <ul class="list-unstyled dark-grey">
-            <li class="ud-pd-sm">关注了 <strong>{{ user.following_count }}</strong> 人</li>
-            <li class="ud-pd-sm">关注者 <strong>{{ user.follower_count }}</strong> 人</li>
-            <li class="ud-pd-sm">关注了 <strong>{{ user.courses_following_count }}</strong> 门课程</li>
-            <li class="ud-pd-sm">点评了 <strong>{{ user.reviews_count }}</strong> 门课程</li>
+            <li class="ud-pd-sm">关注了 <strong><a href="{{ url_for('user.followings', user_id=user.id) }}">{{ user.following_count }}</a></strong> 人</li>
+            <li class="ud-pd-sm">被关注 <strong><a href="{{ url_for('user.followers', user_id=user.id) }}">{{ user.follower_count }}</a></strong> 人</li>
+            <li class="ud-pd-sm">关注了 <strong><a href="{{ url_for('user.follow_course', user_id=user.id) }}">{{ user.courses_following_count }}</a></strong> 门课程</li>
+            <li class="ud-pd-sm">点评了 <strong><a href="{{ url_for('user.reviews', user_id=user.id) }}">{{ user.reviews_count }}</a></strong> 门课程</li>
         </ul>
       </div>
 

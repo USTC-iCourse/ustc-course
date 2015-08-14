@@ -6,8 +6,8 @@
 
       <div class="bm-pd-lg">
         <div class="inline-h3">
-          <span class="blue h3">点评</span>
-          <a>（{{ user.reviews_count }}门）</a>
+          <span class="blue h3">{{ user.username }} 点评</span>
+          （{{ user.reviews_count }}门）
         </div>
 
         {% for review in user.reviews %}

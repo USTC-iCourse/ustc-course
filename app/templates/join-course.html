@@ -7,8 +7,8 @@
 
     <div class="bm-pd-lg">
       <div class="inline-h3">
-        <span class="blue h3">学过课程</span>
-        <a>（{{ user.courses_joined_count }}门）</a>
+        <span class="blue h3">{{ user.username }} 学过</span>
+        （{{ user.courses_joined_count }}门）
       </div>
 
       {% for course in user.courses_joined %}
