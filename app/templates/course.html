@@ -127,8 +127,8 @@
         <div class="ud-pd-md"></div>
         {% else %}
         {% for review in course.reviews %}
-        <div class="ud-pd-md dashed" id="review-{{review.id}}">
-          <div class="ud-pd-sm blue">
+        <div class="ud-pd-sm dashed" id="review-{{review.id}}">
+          <div class="blue">
 	    <img class="avatar-md cicle" src="{{ review.author.avatar }}"/> 
             <a href={{ url_for('user.view_profile', user_id=review.author.id) }}><span class="right-pd-sm px16">{{ review.author.username }}</span></a>
             <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
@@ -153,7 +153,7 @@
             <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
             {% endif %}
           </div>
-          <div class="ud-pd-sm">
+          <div>
             <p>{{ review.content|safe }}</p>
           </div>
 
