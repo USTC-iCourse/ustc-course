@@ -13,6 +13,9 @@
           {% if course.reviewed %}
           <span class="label label-success">已点评</span>
           {% endif %}
+	  {% if course.introduction %}
+	  <span class="label label-danger">课程简介</span>
+	  {% endif %}
 
           <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
           <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
