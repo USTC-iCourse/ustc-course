@@ -222,7 +222,7 @@
         </div>
         {% endif %}
 
-        <div class="ud-pd-md dashed">
+        <div class="ud-pd-md dashed" style="display:none">
           <h4 class="blue">更多「{{ course.name }}」</h5>
           {% for rel_course in course.related_courses[0:10] %}
           {% if rel_course != course %}
