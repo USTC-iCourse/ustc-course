@@ -19,7 +19,7 @@
             <span class="text-muted small float-right desktop">{{ review.update_time|localtime }}</span>
           </div>
           <p class="dark-grey">{{ review.content|abstract }}
-            <a href="{{ url_for('course.view_course', course_id=course.id,review_id=review.id) }}"> >>{{ _('more') }}</a>
+            <a href="{{ url_for('course.view_course', course_id=course.id) }}#review-{{ review.id }}"> >>{{ _('more') }}</a>
           </p>
         </div>
         {% endfor %}
