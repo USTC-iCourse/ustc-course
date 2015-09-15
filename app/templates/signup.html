@@ -5,7 +5,7 @@
   <div class="row float-element">
 
     {{ error }}
-    <h3 class="blue">Sign Up</h3>
+    <h3 class="blue">注册</h3>
     <hr>
     <form class="form-horizontal" method="post" action="{{ url_for('home.signup') }}">
       <div id='csrf-token' class="form-group" type="hiddent">
@@ -14,7 +14,7 @@
 
 
       <div id="regverify-email" class="form-group">
-        <label for="reginput-email" class="col-sm-2 control-label">USTC Email</label>
+        <label for="reginput-email" class="col-sm-2 control-label">科大邮箱</label>
         <div class="col-sm-4">
           <input type="email" id="reginput-email" name="email" class="form-control" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn" onchange="regverify('email')">
           <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
@@ -30,7 +30,7 @@
 
 
       <div id="regverify-username" class="form-group">
-        <label for="reginput-username" class="col-sm-2 control-label">Username</label>
+        <label for="reginput-username" class="col-sm-2 control-label">用户名</label>
         <div class="col-sm-4">
           <input type="text" id="reginput-username" name="username" class="form-control" placeholder="Username" onchange="regverify('username')">
           <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
@@ -47,7 +47,7 @@
 
 
       <div id="regverify-password" class="form-group">
-        <label for="reginput-password" class="col-sm-2 control-label">Password</label>
+        <label for="reginput-password" class="col-sm-2 control-label">密码</label>
         <div class="col-sm-4">
           <input type="password" name="password" class="form-control" id="reginput-password" placeholder="Password" onchange="checkPassword()">
           <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
@@ -61,22 +61,23 @@
       </div>
 
       <div id="regverify-confirm-password" class="form-group">
-        <div class="col-sm-offset-2 col-sm-4">
+        <label for="reginput-confirm-password" class="col-sm-2 control-label">确认密码</label>
+        <div class="col-sm-4">
           <input type="password" class="form-control" name="confirm_password" id="reginput-confirm-password" placeholder="Confirm Password" onchange="checkConfirmPassword()">
           <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
           <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
         </div>
       </div>
       <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-2">
-          <button type="submit" class="btn btn-blue btn-block">Submit</button>
+        <div class="col-sm-offset-2 col-sm-4">
+          <button type="submit" class="btn btn-blue btn-block">注册</button>
         </div>
       </div>
     </form>
 
     <div class="row ud-pd-md">
       <div class="col-sm-offset-2 col-sm-4">
-        <span class="text-muted">Already have an account? <a href="{{ url_for('home.signin') }}">Login</a></span>
+        <span class="text-muted">已有账号？ <a href="{{ url_for('home.signin') }}">马上登录</a></span>
       </div>
     </div>
 

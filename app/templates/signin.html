@@ -14,25 +14,25 @@
     </div>
     {% endif %}
 
-    <h3 class="blue">Sign in</h3>
+    <h3 class="blue">登录</h3>
     <hr>
 
     {% with messages = get_flashed_messages() %}
-      {% for message in messages %}
-      <div class="alert alert-info">{{ message }}</div>
-      {% endfor %}
+    {% for message in messages %}
+    <div class="alert alert-info">{{ message }}</div>
+    {% endfor %}
     {% endwith %}
 
     <form class="form-horizontal" method='post' action='/signin/'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <div class="form-group">
-        <label for="inputEmail" class="col-sm-2 control-label">USTC Email</label>
+        <label for="inputEmail" class="col-sm-2 control-label">科大邮箱</label>
         <div class="col-sm-4">
           <input type="text" name="username" class="form-control" id="inputEmail" placeholder="Email or username" autocomplete="off">
         </div>
       </div>
       <div class="form-group">
-        <label for="inputPassword" class="col-sm-2 control-label">Password</label>
+        <label for="inputPassword" class="col-sm-2 control-label">密码</label>
         <div class="col-sm-4">
           <input type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
         </div>
@@ -42,22 +42,22 @@
         <div class="col-sm-offset-2 col-sm-4">
           <div class="checkbox">
             <label>
-              <input type="checkbox"> Remember me
+              <input type="checkbox"> 记住我
             </label>
-            <a class="float-right" href="{{ url_for('home.forgot_password') }}">Forgot Password?</a>
+            <a class="float-right" href="{{ url_for('home.forgot_password') }}">忘记密码？</a>
           </div>
         </div>
       </div>
       <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-2">
-          <button type="submit" class="btn btn-blue btn-block">Sign in</button>
+        <div class="col-sm-offset-2 col-sm-4">
+          <button type="submit" class="btn btn-blue btn-block">登录</button>
         </div>
       </div>
     </form>
 
     <div class="row ud-pd-md">
       <div class="col-sm-offset-2 col-sm-4">
-        <span class="text-muted">Don't have an account? <a href="{{ url_for('home.signup') }}">Sign Up</a></span>
+        <span class="text-muted">没有账号？ <a href="{{ url_for('home.signup') }}">立即注册</a></span>
       </div>
     </div>
 
