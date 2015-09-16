@@ -96,7 +96,7 @@
           {% if course.reviewed_by(current_user) %}
           <span class="label label-success">我已点评</span>
           {% endif %}
-          <span class="small grey align-bottom  float-right">{{ course.term_ids|term_display }}</span>
+          <span class="small grey align-bottom  float-right">{{ course.term|term_display }}</span>
         </div>
         {% endfor %}
         {% endif %}
