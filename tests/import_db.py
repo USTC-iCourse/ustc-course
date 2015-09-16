@@ -344,22 +344,27 @@ def load_courses(insert=True):
             for tid in c['JS'].split(','):
                 if int(tid) in teachers_map:
                     teacher_ids.append(int(tid))
+        # remove duplicates
+        teacher_ids = list(set(teacher_ids)).sort()
 
         # course
         name = course_kcbh[c['KCBH']]['name']
-        course_key = name + '(' + ','.join(map(str, teacher_ids)) + ')'
+        if teacher_ids:
+            course_key = name + '(' + ','.join(map(str, teacher_ids)) + ')'
+        else:
+            course_key = name + '()'
         if course_key in courses_map:
             course = courses_map[course_key]
         else:
             course = Course()
             course.name = name
             if c['DWBH'] in depts_code_map:
-                print(course.name, c['DWBH'], depts_code_map[c['DWBH']].id)
                 course.dept_id = depts_code_map[c['DWBH']].id
             else:
                 print('Department code ' + c['DWBH'] + ' not found in ' + str(c))
-            for t in teacher_ids:
-                course.teachers.append(teachers_map[t])
+            if teacher_ids:
+                for t in teacher_ids:
+                    course.teachers.append(teachers_map[t])
 
             db.session.add(course)
             courses_map[course_key] = course
@@ -554,7 +559,6 @@ def load_grad_join_course():
         if not student in course.students:
             course.students.append(student)
             count+=1
-            print(count)
 
     db.session.commit()
     print('%d grad xuanke info loaded' % count)

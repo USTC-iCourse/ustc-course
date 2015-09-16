@@ -150,7 +150,7 @@ for table in tables:
     cursor.execute("DROP TABLE IF EXISTS backup_%s" % (table, ))
     cursor.execute("RENAME TABLE %s TO backup_%s, new_%s TO %s" % (table, table, table, table))
 
-#cursor.execute("DROP TABLE old_courses")
+cursor.execute("DROP TABLE old_courses")
 
 cursor.execute("SET foreign_key_checks = 1")
 # end
