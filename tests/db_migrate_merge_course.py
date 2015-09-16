@@ -72,10 +72,20 @@ cursor.execute("INSERT INTO course_classes (id, course_id, term, cno) SELECT old
 # course_time_locations
 print("migrating course_time_locations...")
 cursor.execute("DROP TABLE IF EXISTS new_course_time_locations")
-cursor.execute("CREATE TABLE new_course_time_locations LIKE course_time_locations")
-cursor.execute("ALTER TABLE new_course_time_locations ADD COLUMN term VARCHAR(10)")
-cursor.execute("ALTER TABLE new_course_time_locations ADD INDEX key_term (term)")
-cursor.execute("INSERT INTO new_course_time_locations (id, course_id, term, weekday, begin_hour, num_hours, location, note) SELECT course_time_locations.id, course_classes.course_id, course_classes.term, weekday, begin_hour, num_hours, location, note FROM course_time_locations JOIN course_classes ON course_time_locations.course_id=course_classes.id")
+cursor.execute('''CREATE TABLE new_course_time_locations (
+    id INT(10) PRIMARY KEY AUTO_INCREMENT,
+    course_id INT(10),
+    class_id INT(10),
+    term VARCHAR(10),
+    weekday INT(10),
+    begin_hour INT(10),
+    num_hours INT(10),
+    location VARCHAR(80),
+    note VARCHAR(200),
+    FOREIGN KEY (course_id) REFERENCES courses (id),
+    FOREIGN KEY (class_id) REFERENCES course_classes (id)
+)''')
+cursor.execute("INSERT INTO new_course_time_locations (course_id, class_id, term, weekday, begin_hour, num_hours, location, note) SELECT course_classes.course_id, course_classes.id, course_classes.term, weekday, begin_hour, num_hours, location, note FROM course_time_locations JOIN course_classes ON course_time_locations.course_id=course_classes.id")
 
 # follow_course
 print("migrating follow_course...")
