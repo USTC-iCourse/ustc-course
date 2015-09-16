@@ -9,7 +9,7 @@ import re
 sys.path.append('../config')
 from default import SQLALCHEMY_DATABASE_URI
 
-m = re.search('://(\w+):(\w+)@(\w+)/(\w+)', SQLALCHEMY_DATABASE_URI)
+m = re.search('://([^:]+):([^@]+)@(\w+)/(\w+)', SQLALCHEMY_DATABASE_URI)
 if not m:
     print("Invalid " + SQLALCHEMY_DATABASE_URI)
     sys.exit(1)
