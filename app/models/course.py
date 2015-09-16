@@ -77,20 +77,12 @@ class CourseClass(db.Model):
             if row.time_location_display is not None ])
 
     # sqlalchemy uses __getattr__, so we cannot use it
-    @property
-    def courseries(self):
-        return self.course.courseries
-
-    @property
-    def kcid(self):
-        return self.course.kcid
-
-    @property
-    def reviewed(self):
-        return self.course.reviewed_by(current_user)
-
-    def reviewed_by(self, user):
-        return self.course.reviewed_by(user)
+    # this WILL cause problem when creating new CourseClass!
+    def __getattr__(self, name):
+        try:
+            return object.__getattr__(self, name)
+        except:
+            return getattr(self.course, name)
 
 
 # CourseTerm: distinct (name, set of teachers, term)
