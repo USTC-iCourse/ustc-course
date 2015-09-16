@@ -33,7 +33,7 @@ cursor.execute('''CREATE TABLE new_courses (
         dept_id INT(10),
         _image VARCHAR(100),
         INDEX key_name (name),
-        FOREIGN KEY (dept_id) REFERENCES course_terms(id)
+        FOREIGN KEY (dept_id) REFERENCES depts (id)
 )''')
 cursor.execute("INSERT INTO new_courses (name, teacher_list, dept_id, _image) SELECT name, teacher_list, dept_id, _image FROM old_courses GROUP BY name, teacher_list")
 
