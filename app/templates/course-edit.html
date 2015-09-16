@@ -7,7 +7,7 @@
     <div class="row">
       <div class="col-md-8 inline-h3">
         <span class="blue h3"><a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}</a></span><span class="h3 blue mobile">（{{ course.teacher.name }}）</span>
-        <span class="small grey align-bottom left-pd-sm">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+        <span class="small grey align-bottom left-pd-sm">学期：{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
         <hr>
 
         <table class="table table-condensed no-border">
@@ -21,7 +21,7 @@
           </tr>
           <tr>
             <td><strong>时间：</strong>{{ course.time_locations_display or '未知' }}</td>
-            <td><strong>地点：</strong>{{ course.term_display or '未知' }}
+            <td><strong>地点：</strong>{{ course.term_ids|term_display or '未知' }}
               <span class="float-right"><a href="http://mis.teach.ustc.edu.cn/gradkcjs.do?kcid={{ course.kcid }}" target="_blank">更多信息</a><span></td>
           </tr>
           <!--

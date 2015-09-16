@@ -25,7 +25,7 @@
           <div class="ud-pd-sm">
             {% set course = review.course %}
             <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
-            <span class="small grey align-bottom left-pd-sm">{{ course.term_display }}</span>
+            <span class="small grey align-bottom left-pd-sm">{{ review.term_display }}</span>
             <span class="text-muted small float-right desktop">{{ review.update_time|localtime }}</span>
           </div>
           <p class="dark-grey">{{ review.content|abstract }}
@@ -59,7 +59,6 @@
 	  {% if course in user.courses_joined %}
           <span class="label label-info">已学过</span>
           {% endif %}
-          <span class="small grey align-bottom  float-right">{{ course.term_display }}</span>
         </div>
         {% endfor %}
 
@@ -72,31 +71,32 @@
           <span class="blue h4"><strong>学过</strong></span>
 
           {% if user.info.sno %}
-          <a href="{{ url_for('user.join_course', user_id=user.id) }}">（{{ user.courses_joined_count }}门）</a>
+          <a href="{{ url_for('user.join_course', user_id=user.id) }}">（{{ user.classes_joined_count }}门）</a>
           {% else %}
           <span class="text-muted">（绑定学号才能显示学过课程）</span>
           {% endif %}
-          {% if user.courses_joined_count > 6 %}
+          {% if user.classes_joined_count > 6 %}
           <span class="float-right"><a href="{{ url_for('user.join_course', user_id=user.id) }}">查看更多 &raquo;</a></span>
           {% endif %}
         </div>
 
-        {% if user.courses_joined_count == 0 %}
+        {% if user.classes_joined_count == 0 %}
         <p class="text-muted">还没有学过的课程呢。</p>
         {% endif %}
         {% if not current_user.is_authenticated() %}
         <p class="text-muted">为保护隐私，您需要 <a data-toggle="modal" data-target="#signin">登录</a> 才能查看已学课程。</p>
         {% else %}
-        {% for course in user.courses_joined[0:6] %}
+        {% for course in user.classes_joined[0:6] %}
         <!-- 学过课程最多显示6门 -->
         <div class="ud-pd-md dashed">
           <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
-          {% if course.reviewed_by(user) %}
-          <span class="label label-success">已点评</span>
-          {% else %}
-          <span class="label label-default">未点评</span>
+          {% if user != current_user and course.reviewed_by(user) %}
+          <span class="label label-success">TA已点评</span>
           {% endif %}
-          <span class="small grey align-bottom  float-right">{{ course.term_display }}</span>
+          {% if course.reviewed_by(current_user) %}
+          <span class="label label-success">我已点评</span>
+          {% endif %}
+          <span class="small grey align-bottom  float-right">{{ course.term_ids|term_display }}</span>
         </div>
         {% endfor %}
         {% endif %}

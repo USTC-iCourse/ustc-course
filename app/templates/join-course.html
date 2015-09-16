@@ -8,20 +8,21 @@
     <div class="bm-pd-lg">
       <div class="inline-h3">
         <span class="blue h3">{{ user.username }} 学过</span>
-        （{{ user.courses_joined_count }}门）
+        （{{ user.classes_joined_count }}门）
       </div>
 
-      {% for course in user.courses_joined %}
+      {% for course in user.classes_joined %}
       <div class="ud-pd-md dashed">
         <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}
         {% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}
         </a>
-        {% if course.reviewed_by(user) %}
-        <span class="label label-success">已点评</span>
-        {% else %}
-        <span class="label label-default">未点评</span>
+        {% if user != current_user and course.reviewed_by(user) %}
+        <span class="label label-success">TA已点评</span>
         {% endif %}
-        <span class="small grey align-bottom  float-right">{{ course.term_display }}</span>
+        {% if course.reviewed_by(current_user) %}
+        <span class="label label-success">我已点评</span>
+        {% endif %}
+        <span class="small grey align-bottom  float-right">{{ course.term_ids|term_display }}</span>
       </div>
       {% endfor %}
 

@@ -7,8 +7,8 @@
     <div class="row">
       <div class="col-md-8 inline-h3">
         <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</span>
-        <span class="small grey align-bottom left-pd-sm desktop">{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
-        <br><span class="small grey align-bottom mobile">{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+        <span class="small grey align-bottom left-pd-sm desktop">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
+        <br><span class="small grey align-bottom mobile">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
 
         {% if current_user.is_admin %}
         <btn class="btn btn-link float-right"><a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程信息</a></btn>
@@ -151,6 +151,8 @@
             {% else %}
             <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
             {% endif %}
+
+            <span class="left-pd-md">{{ review.term|term_display }}</span>
           </div>
           <div>
             <p>{{ review.content|safe }}</p>
@@ -228,7 +230,7 @@
           {% if rel_course != course %}
           <div class="ud-pd-sm">
             <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.teacher_names_display }}</a>
-            <span class="small grey align-bottom  float-right">{{ rel_course.term_display }}</span>
+            <span class="small grey align-bottom  float-right">{{ rel_course.term_ids|term_display }}</span>
           </div>
           {% endif %}
           {% endfor %}

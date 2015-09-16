@@ -1,37 +1,12 @@
     <div class="select-box">
       <ul class="list-unstyled list-inline">
-        <span><strong>学期：</strong></span>
-        <li class="item {% if not term %}active{% endif %}">
-          <a href="{{ url_for(this_module, q=keyword, dept=dept) }}">全部</a>
-        </li>
-        {% for tno, tname in termlist[0:8] %}
-        <li class="item {% if term == tno %}active{% endif %}">
-          <a href="{{ url_for(this_module, q=keyword, dept=dept, term=tno) }}">{{ tname }}</a>
-        </li>
-        {% endfor %}
-        <li>
-          <div class="dropdown">
-            <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-              {% for tno, tname in termlist[8:] %}
-              <li class="item" role="presentation"><a href="{{ url_for(this_module, q=keyword, dept=dept, term=tno) }}" role="menuitem" tabindex="-1">{{ tname }}</a></li>
-              {% endfor %}
-            </ul>
-          </div>
-        </li>
-      </ul>
-
-
-      <ul class="list-unstyled list-inline">
         <span><strong>院系：</strong></span>
         <li class="item {% if not dept %}active{% endif %}">
-          <a href="{{ url_for(this_module, q=keyword, term=term) }}">全部</a>
+          <a href="{{ url_for(this_module, q=keyword) }}">全部</a>
         </li>
         {% for dno, dname in deptlist[0:12] %}
         <li class="item {% if dept == dno %}active{% endif %}">
-          <a href="{{ url_for(this_module, q=keyword, term=term, dept=dno) }}">{{ dname }}</a>
+          <a href="{{ url_for(this_module, q=keyword, dept=dno) }}">{{ dname }}</a>
         </li>
         {% endfor %}
         <li>
@@ -41,7 +16,7 @@
             </a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
               {% for dno, dname in deptlist[12:] %}
-              <li class="item" role="presentation"><a href="{{ url_for(this_module, q=keyword, dept=dno, term=term) }}" role="menuitem" tabindex="-1">{{ dname }}</a></li>
+              <li class="item" role="presentation"><a href="{{ url_for(this_module, q=keyword, dept=dno) }}" role="menuitem" tabindex="-1">{{ dname }}</a></li>
               {% endfor %}
             </ul>
           </div>

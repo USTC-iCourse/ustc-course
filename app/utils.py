@@ -128,10 +128,28 @@ def updatetime_minute(date):
     now = datetime.now()
     if (now.date() - local.date()).days == 0:
         return local.strftime('今天 %H:%M')
-    if (now.date() - local.date()).days == 1:
+    elif (now.date() - local.date()).days == 1:
         return local.strftime('昨天 %H:%M')
+    elif now.year == local.year:
+        return str(local.month) + '月' + str(local.day) + '日 ' + local.strftime('%H:%M')
     else:
-        return local.strftime('%m月%d日 %H:%M')
+        return str(local.year) + '年' + str(local.month) + '月' + str(local.day) + '日 ' + local.strftime('%H:%M')
+
+@app.template_filter('term_display')
+def term_display(term):
+    if isinstance(term, list):
+        return ' '.join([ term_display(t) for t in term ])
+    try:
+        if term[4] == '1':
+            return term[0:4] + '秋'
+        elif term[4] == '2':
+            return str(int(term[0:4])+1) + '春'
+        elif term[4] == '3':
+            return str(int(term[0:4])+1) + '夏'
+        else:
+            return '未知'
+    except:
+        return '未知'
 
 
 RESERVED_USERNAME = set(['管理员', 'admin', 'root',

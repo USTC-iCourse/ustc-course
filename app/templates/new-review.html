@@ -5,8 +5,8 @@
   <div class="row float-element">
     <div class="inline-h3">
     <span class="blue h4">{% if not is_new %}编辑{% endif %}点评 &bull; <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a></span>
-    <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
-    <br><span class="small grey align-bottom mobile">学期：{{ course.term_display }} &nbsp;课堂号：{{ course.cno }}</span>
+    <span class="align-bottom left-pd-sm desktop">学期：{{ review.term|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
+    <br><span class="align-bottom mobile">学期：{{ review.term|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
     </div>
     <hr>
     {% if message != '' %}
@@ -15,6 +15,17 @@
     <form id="review-form" class="form-horizontal" method="post" action="{{ url_for('course.new_review', course_id=course.id) }}">
       {{ form.csrf_token }}
       <div class="rate-part ud-pd-md">
+        <div class="ud-pd-sm">
+          <span class="right-pd-sm weight-heavy">学　　期</span>
+
+          <select name="term">
+            {% for term in course.term_ids %}
+            <option value="{{ term }}" {% if review.term == term %}selected="selected"{% endif %}>{{ term|term_display }}</option>
+            {% endfor %}
+          </select>
+          <span class="clearfix"></span>
+        </div>
+
         {% for poll in polls %}
         <div class="ud-pd-sm">
           <span class="right-pd-sm weight-heavy">{{ poll['display'] }}</span>
