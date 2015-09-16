@@ -13,6 +13,8 @@ class CourseTimeLocation(db.Model):
 
     # we do not need an ID, but ORM requires it
     id = db.Column(db.Integer, primary_key=True)
+    # we have two non-independent foreign keys to make query easier
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     class_id = db.Column(db.Integer, db.ForeignKey('course_classes.id'))
     weekday = db.Column(db.Integer)
     begin_hour = db.Column(db.Integer)
