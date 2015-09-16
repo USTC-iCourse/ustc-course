@@ -233,13 +233,16 @@ def edit_course(course_id=None):
         course = Course()
     if not course:
         abort(404)
+    latest_term = course.latest_term
+    if not latest_term:
+        abort(404)
     course_form = CourseForm(request.form, course)
     if course_form.validate_on_submit():
         course_form.introduction.data = sanitize(course_form.introduction.data)
-        course_form.populate_obj(course)
-        if not course.homepage.startswith('http'):
-            course.homepage = 'http://' + course.homepage
-        course.save()
+        course_form.populate_obj(latest_term)
+        if not latest_term.homepage.startswith('http'):
+            latest_term.homepage = 'http://' + course.homepage
+        latest_term.save()
         db.session.commit()
         return redirect(url_for('course.view_course', course_id=course.id))
     return render_template('course-edit.html', form=course_form, course=course)
