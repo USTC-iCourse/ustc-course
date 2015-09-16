@@ -30,13 +30,13 @@ class Review(db.Model):
     comment_count = db.Column(db.Integer, default=0)
 
     upvote_users = db.relationship('User', secondary=review_upvotes)
-    comments = db.relationship('ReviewComment',backref='review')
+    comments = db.relationship('ReviewComment', backref='review', lazy='joined')
 
     author = db.relationship('User', backref=db.backref('reviews', order_by='desc(Review.publish_time)'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    term = db.Column(db.String(10), index=True)
     #course: Course
-
 
     def add(self):
         '''crete a new review'''
@@ -135,6 +135,17 @@ class Review(db.Model):
     @property
     def content_text(self):
         return html2text.html2text(self.content)
+
+    @property
+    def term_display(self):
+        if self.term[4] == '1':
+            return self.term[0:4] + '秋'
+        elif self.term[4] == '2':
+            return str(int(self.term[0:4])+1) + '春'
+        elif self.term[4] == '3':
+            return str(int(self.term[0:4])+1) + '夏'
+        else:
+            return '未知'
 
 
 class ReviewComment(db.Model):

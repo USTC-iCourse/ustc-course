@@ -15,26 +15,20 @@ from werkzeug.contrib.cache import SimpleCache
 Roles = ['Admin',
         'User']
 
-related_courses = db.Table('related_courses',
-    db.Column('src', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
-    db.Column('dst', db.Integer, db.ForeignKey('courses.id'), primary_key=True)
-)
-
-
 follow_course = db.Table('follow_course',
     db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
 )
 
 join_course = db.Table('join_course',
-    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
+    db.Column('class_id', db.Integer, db.ForeignKey('course_classes.id'), primary_key=True),
     db.Column('student_id', db.String(20), db.ForeignKey('students.sno'), primary_key=True)
 )
 
 upvote_course = db.Table('upvote_course',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
     db.Column('course_id', db.Integer, db.ForeignKey('courses.id'))
-    )
+)
 
 downvote_course = db.Table('downvote_course',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
@@ -77,12 +71,12 @@ class User(db.Model, UserMixin):
     following_count = db.Column(db.Integer, default=0)
     follower_count = db.Column(db.Integer, default=0)
 
-    courses_following = db.relationship('Course', secondary = follow_course, order_by='desc(Course.term)', backref='followers')
-    courses_upvoted = db.relationship('Course', secondary = upvote_course, order_by='desc(Course.term)', backref='upvote_users')
-    courses_downvoted = db.relationship('Course', secondary = downvote_course, order_by='desc(Course.term)', backref='downvote_users')
+    courses_following = db.relationship('Course', secondary = follow_course, backref='followers')
+    courses_upvoted = db.relationship('Course', secondary = upvote_course, backref='upvote_users')
+    courses_downvoted = db.relationship('Course', secondary = downvote_course, backref='downvote_users')
     _student_info = db.relationship('Student', backref='user',uselist=False)
     _teacher_info = db.relationship('Teacher', backref='user',uselist=False)
-    reviewed_course = db.relationship('Course',secondary = review_course, order_by='desc(Course.term)', backref='review_users')
+    reviewed_course = db.relationship('Course',secondary = review_course, backref='review_users')
     users_following = db.relationship('User', 
             secondary=follow_user,
             primaryjoin=(follow_user.c.follower_id == id),
@@ -141,6 +135,17 @@ class User(db.Model, UserMixin):
     def courses_joined(self):
         if self.is_student and self.info:
             return self.info.courses_joined
+        else:
+            return []
+
+    @property
+    def classes_joined_count(self):
+        return len(self.classes_joined)
+
+    @property
+    def classes_joined(self):
+        if self.is_student and self.info:
+            return self.info.classes_joined
         else:
             return []
 
@@ -332,7 +337,7 @@ class Student(db.Model):
     dept = db.relationship('Dept', backref='students')
     dept_class = db.relationship('DeptClass', backref='students')
     major = db.relationship('Major')
-    courses_joined = db.relationship('Course', secondary = join_course, order_by='desc(Course.term)', backref='students')
+    classes_joined = db.relationship('CourseClass', secondary = join_course, order_by='desc(CourseClass.term)', backref='students')
     
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
@@ -357,10 +362,10 @@ class Student(db.Model):
             return student
 
 
-    def join_course(self, course):
+    def join_class(self, course):
         if not course:
             return None
-        self.courses_joined.append(course)
+        self.classes_joined.append(course)
         db.session.add(self)
         db.session.commit()
         return self
@@ -373,6 +378,11 @@ class Student(db.Model):
         db.session.add(self)
         db.session.commit()
         return self
+
+    @property
+    def courses_joined(self):
+        from .course import CourseClass, Course
+        return Course.query.join(CourseClass).join(join_course).filter(join_course.c.student_id == self.sno).all()
 
 
 class Teacher(db.Model):

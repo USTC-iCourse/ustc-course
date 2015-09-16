@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import url_for, Markup
 from app import db
 from decimal import Decimal
-from .user import User, Student, join_course
+from sqlalchemy import orm
 try:
     from flask.ext.login import current_user
 except:
@@ -13,7 +13,7 @@ class CourseTimeLocation(db.Model):
 
     # we do not need an ID, but ORM requires it
     id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    class_id = db.Column(db.Integer, db.ForeignKey('course_classes.id'))
     weekday = db.Column(db.Integer)
     begin_hour = db.Column(db.Integer)
     num_hours = db.Column(db.Integer)
@@ -29,7 +29,7 @@ class CourseTimeLocation(db.Model):
 
     @property
     def hours_list_display(self):
-        return ','.join([str(c) for c in self.hours_list])
+        return ','.join(map(str, self.hours_list))
 
     @property
     def time_display(self):
@@ -47,18 +47,50 @@ class CourseTimeLocation(db.Model):
 course_teachers = db.Table('course_teachers',
     db.Column('course_id', db.Integer, db.ForeignKey('courses.id')),
     db.Column('teacher_id', db.Integer, db.ForeignKey('teachers.id')),
+    db.UniqueConstraint('course_id', 'teacher_id'),
 )
 
-class Course(db.Model):
-    __tablename__ = 'courses'
+# course crawled from teach.ustc.edu.cn
+class CourseClass(db.Model):
+    __tablename__ = 'course_classes'
 
-    id = db.Column(db.Integer,unique=True,primary_key=True)
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    term = db.Column(db.String(10), index=True)
     cno = db.Column(db.String(20))  # course_no, 课堂号，长的
-    courseries = db.Column(db.String(20)) # course_series, 课程编号，短的
+
+    time_locations = db.relationship('CourseTimeLocation', backref='class')
+    #course: backref to Course
+    #students: backref to Student
+
+    __table_args__ = (db.UniqueConstraint('term', 'cno'), )
+
+    def __repr__(self):
+        return self.cno + '@' + self.term
+
+    @property
+    def time_locations_display(self):
+        return '; '.join([
+            row.time_location_display for row in self.time_locations
+            if row.time_location_display is not None ])
+
+    def __getattr__(self, name):
+        try:
+            return object.__getattr__(self, name)
+        except:
+            return getattr(self.course, name)
+
+
+# CourseTerm: distinct (name, set of teachers, term)
+class CourseTerm(db.Model):
+    __tablename__ = 'course_terms'
+
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     term = db.Column(db.String(10), index=True) # 学年学期，例如 20142 表示 2015 年春季学期
-    name = db.Column(db.String(80), index=True) # 课程名称
+
+    courseries = db.Column(db.String(20)) # course_series, 课程编号，短的
     kcid = db.Column(db.Integer)    # 课程id
-    dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
 
     course_major = db.Column(db.String(20)) # 学科类别
     course_type = db.Column(db.String(20)) # 课程类别，计划内，公选课……
@@ -79,20 +111,38 @@ class Course(db.Model):
     campus = db.Column(db.String(20)) # 校区
     start_week = db.Column(db.Integer)  # 起始周
     end_week = db.Column(db.Integer) # 终止周
+
+    #course: backref to Course
+
+    def __repr__(self):
+        return self.course.name + '(' + ','.join(map(str, self.course.teacher_id_list)) + ')' + '@' + self.term
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+
+# course: distinct (name, set of teachers)
+class Course(db.Model):
+    __tablename__ = 'courses'
+
+    id = db.Column(db.Integer,unique=True,primary_key=True)
+    name = db.Column(db.String(80), index=True) # 课程名称
+    dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
+
     _image = db.Column(db.String(100))
 
-    time_locations = db.relationship('CourseTimeLocation', backref='course')
+    terms = db.relationship('CourseTerm', backref='course', order_by='desc(CourseTerm.term)', lazy='joined')
+    classes = db.relationship('CourseClass', backref='course', lazy='joined')
     _dept = db.relationship('Dept', backref='courses', lazy='joined')
 
-    __table_args__ = (db.UniqueConstraint('cno', 'term'), )
-
-    teachers = db.relationship('Teacher', secondary=course_teachers, backref=db.backref('courses', order_by='desc(Course.term)', lazy='dynamic'),lazy="joined")
+    teachers = db.relationship('Teacher', secondary=course_teachers, backref=db.backref('courses', lazy='dynamic'), order_by='Teacher.id', lazy="joined")
     reviews = db.relationship('Review', backref='course', order_by='desc(Review.upvote_count), desc(Review.id)', lazy='dynamic')
     notes = db.relationship('Note', backref='course', order_by='desc(Note.upvote_count), desc(Note.id)', lazy='dynamic')
     forum_threads = db.relationship('ForumThread', backref='course', order_by='desc(ForumThread.id)', lazy='dynamic')
     shares = db.relationship('Share', backref='course', order_by='desc(Share.upvote_count), desc(Share.id)', lazy='dynamic')
 
-    #students  : backref to Student
     #followers : backref to User
     #upvote_users: backref to User
     #downvote_users: backref to User
@@ -100,8 +150,18 @@ class Course(db.Model):
 
     _course_rate = db.relationship('CourseRate', backref='course', uselist=False, lazy='joined')
 
+    def __getattr__(self, name):
+        try:
+            return object.__getattr__(self, name)
+        except:
+            return getattr(self.latest_term, name)
+
+    @property
+    def teacher_id_list(self):
+        return [ teacher.id for teacher in self.teachers ]
+
     def __repr__(self):
-        return '<Course %s(%s)>'%(self.name,self.cno)
+        return self.name + '(' + ','.join(map(str, self.teacher_id_list)) + ')'
 
     @classmethod
     def create(cls,cno,term,**kwargs):
@@ -165,23 +225,6 @@ class Course(db.Model):
         return self.query.filter_by(courseries=self.courseries).all()
 
     @property
-    def time_locations_display(self):
-        return '; '.join([
-            row.time_location_display for row in self.time_locations
-            if row.time_location_display is not None ])
-
-    @property
-    def term_display(self):
-        if self.term[4] == '1':
-            return self.term[0:4] + '秋'
-        elif self.term[4] == '2':
-            return str(int(self.term[0:4])+1) + '春'
-        elif self.term[4] == '3':
-            return str(int(self.term[0:4])+1) + '夏'
-        else:
-            return '未知'
-
-    @property
     def course_major_display(self):
         if self.course_major == None:
             return '未知'
@@ -214,7 +257,6 @@ class Course(db.Model):
         user.courses_upvoted.append(self)
         self.course_rate.upvote_count += 1
         db.session.add(self)
-        db.session.add(user)
         db.session.commit()
         return True
 
@@ -288,6 +330,11 @@ class Course(db.Model):
         return self.course_rate.follow_count
 
     @property
+    def students(self):
+        from .user import Student, join_course
+        return Student.query.join(join_course).join(CourseClass).filter(CourseClass.course_id == self.id).all()
+
+    @property
     def student_count(self):
         return len(self.students)
 
@@ -324,7 +371,16 @@ class Course(db.Model):
 
     @property
     def joined_users(self):
-        return User.query.join(Student).filter(Student.user_id == User.id).join(join_course).filter(join_course.c.course_id == self.id, join_course.c.student_id == Student.sno).all()
+        return User.query.join(Student).filter(Student.user_id == User.id).join(CourseClass).filter(self.id == CourseClass.course_id).join(join_course).filter(join_course.c.class_id == CourseClass.id, join_course.c.student_id == Student.sno).all()
+
+    @property
+    def latest_term(self):
+        return self.terms[0]
+
+    @property
+    def term_ids(self):
+        return [ t.term for t in self.terms ]
+
 
 
 class CourseRate(db.Model):

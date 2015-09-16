@@ -16,6 +16,7 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    term = db.Column(db.String(10), index=True)
 
     title = db.Column(db.String(200))
     content = db.Column(db.Text())
