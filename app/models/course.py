@@ -74,11 +74,14 @@ class CourseClass(db.Model):
             row.time_location_display for row in self.time_locations
             if row.time_location_display is not None ])
 
-    def __getattr__(self, name):
-        try:
-            return object.__getattr__(self, name)
-        except:
-            return getattr(self.course, name)
+    # sqlalchemy uses __getattr__, so we cannot use it
+    @property
+    def courseries(self):
+        return self.course.courseries
+
+    @property
+    def kcid(self):
+        return self.course.kcid
 
 
 # CourseTerm: distinct (name, set of teachers, term)
@@ -149,12 +152,6 @@ class Course(db.Model):
     #review_users: backref to User
 
     _course_rate = db.relationship('CourseRate', backref='course', uselist=False, lazy='joined')
-
-    def __getattr__(self, name):
-        try:
-            return object.__getattr__(self, name)
-        except:
-            return getattr(self.latest_term, name)
 
     @property
     def teacher_id_list(self):
@@ -380,6 +377,70 @@ class Course(db.Model):
     @property
     def term_ids(self):
         return [ t.term for t in self.terms ]
+
+    # sqlalchemy uses __getattr__, so we cannot use it
+    # copy properties from latest_term
+    @property
+    def courseries(self):
+        return self.latest_term.courseries
+    @property
+    def kcid(self):
+        return self.latest_term.kcid
+    @property
+    def course_major(self):
+        return self.latest_term.course_major
+    @property
+    def course_type(self):
+        return self.latest_term.course_type
+    @property
+    def course_level(self):
+        return self.latest_term.course_level
+    @property
+    def grading_type(self):
+        return self.latest_term.grading_type
+    @property
+    def teaching_material(self):
+        return self.latest_term.teaching_material
+    @property
+    def reference_material(self):
+        return self.latest_term.reference_material
+    @property
+    def student_requirements(self):
+        return self.latest_term.student_requirements
+    @property
+    def description(self):
+        return self.latest_term.description
+    @property
+    def description_eng(self):
+        return self.latest_term.description_eng
+    @property
+    def introduction(self):
+        return self.latest_term.introduction
+    @property
+    def homepage(self):
+        return self.latest_term.homepage
+    @property
+    def credit(self):
+        return self.latest_term.credit
+    @property
+    def hours(self):
+        return self.latest_term.hours
+    @property
+    def hours_per_week(self):
+        return self.latest_term.hours_per_week
+    @property
+    def class_numbers(self):
+        return self.latest_term.class_numbers
+    @property
+    def campus(self):
+        return self.latest_term.campus
+    @property
+    def start_week(self):
+        return self.latest_term.start_week
+    @property
+    def end_week(self):
+        return self.latest_term.end_week
+    # end of property from latest_term
 
 
 
