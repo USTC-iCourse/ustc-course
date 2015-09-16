@@ -28,7 +28,7 @@ depts_map = dict()
 depts_code_map = dict()
 
 def load_depts():
-    existing_depts = Course.query.all()
+    existing_depts = Dept.query.all()
     for dept in existing_depts:
         depts_map[dept.id] = dept
 
@@ -43,10 +43,11 @@ def load_depts():
         dept.name_eng = c['YWMC']
         dept.code = c['DWBH']
 
-        if not dept in db.session:
+        if not dept.id in depts_map:
             db.session.add(dept)
+            depts_map[dept.id] = dept
+
         count+=1
-        depts_map[dept.id] = dept
         depts_code_map[dept.code] = dept
 
     db.session.commit()
@@ -220,16 +221,18 @@ def load_teachers():
         t.office_phone = c['OFFICEPHONE']
         t.description = c['INTRODUCTION']
 
-        if not t in db.session:
+        if not t.id in teachers_map:
             db.session.add(t)
+            teachers_map[t.id] = t
         count+=1
-        teachers_map[t.id] = t
 
     db.session.commit()
     print('%d teachers loaded' % count)
 
 # We should load all existing courses, because SQLAlchemy does not support .merge on non-primary-key,
 # and we want to preserve course ID (primary key) for each (cno, term) pair.
+course_classes_map = dict()
+course_terms_map = dict()
 courses_map = dict()
 
 def load_courses(insert=True):
@@ -297,8 +300,15 @@ def load_courses(insert=True):
     
     existing_courses = Course.query.all()
     for c in existing_courses:
-        unique_key = c.cno + '|' + c.term
-        courses_map[unique_key] = c
+        courses_map[str(c)] = c
+
+    existing_course_classes = CourseClass.query.all()
+    for c in existing_course_classes:
+        course_classes_map[str(c)] = c
+
+    existing_course_terms = CourseClass.query.all()
+    for c in existing_course_terms:
+        course_terms_map[str(c)] = c
 
     int_allow_empty = lambda string: int(string) if string.strip() else 0
     course_kcbh = {}
@@ -321,50 +331,83 @@ def load_courses(insert=True):
             grading_type = grading_type_dict[int_allow_empty(c['PFZ'])],
         )
 
-    count = 0
+    new_course_count = 0
+    new_term_count = 0
+    new_class_count = 0
     for c in parse_file('MV_PK_PKJGXS.txt'):
         if not c['KCBH'] in course_kcbh:
             print('Course ' + c['KCBH'] + ' exists in MV_PK_PKJGXS but not in JH_KC_ZK: ' + str(c))
             continue
 
-        unique_key = c['KCBJH'].upper() + '|' + c['XQ']
-        if unique_key in courses_map:
-            course = courses_map[unique_key]
+        teacher_ids = []
+        if c['JS']:
+            for tid in c['JS'].split(','):
+                if int(tid) in teachers_map:
+                    teacher_ids.append(int(tid))
+
+        # course
+        name = course_kcbh[c['KCBH']]['name']
+        course_key = name + '(' + ','.join(map(str, teacher_ids)) + ')'
+        if course_key in courses_map:
+            course = courses_map[course_key]
         else:
             course = Course()
-            course.term = c['XQ']
-            course.cno = c['KCBJH'].upper()
-            db.session.add(course)
+            course.name = name
+            if c['DWBH'] in depts_code_map:
+                print(course.name, c['DWBH'], depts_code_map[c['DWBH']].id)
+                course.dept_id = depts_code_map[c['DWBH']].id
+            else:
+                print('Department code ' + c['DWBH'] + ' not found in ' + str(c))
+            for t in teacher_ids:
+                course.teachers.append(teachers_map[t])
 
+            db.session.add(course)
+            courses_map[course_key] = course
+
+            # course rate 
             course_rate = CourseRate()
             course_rate.course = course
             db.session.add(course_rate)
+            new_course_count+=1
 
-        course.courseries = c['KCBH']
-        if c['DWBH'] in depts_code_map:
-            course.dept_id = depts_code_map[c['DWBH']].id
+        # course term
+        term = c['XQ']
+        term_key = course_key + '@' + term
+        if term_key in course_terms_map:
+            course_term = course_terms_map[term_key]
         else:
-            print('Department code ' + c['DWBH'] + ' not found in ' + str(c))
-        course.class_numbers = c['SKBJH']
-        course.start_week = c['QSZ']
-        course.end_week = c['JZZ']
-        course.course_level = course_level_dict[int_allow_empty(c['KCCCDM'])]
+            course_term = CourseTerm()
+            course_term.course_id = course.id
+            course_term.courseries = c['KCBH']
+            course_term.class_numbers = c['SKBJH']
+            course_term.start_week = c['QSZ']
+            course_term.end_week = c['JZZ']
+            course_term.course_level = course_level_dict[int_allow_empty(c['KCCCDM'])]
 
-        for key in course_kcbh[c['KCBH']]:
-            setattr(course, key, course_kcbh[c['KCBH']][key])
+            for key in course_kcbh[c['KCBH']]:
+                setattr(course_term, key, course_kcbh[c['KCBH']][key])
 
-        teacher_ids = [ int(tid) for tid in c['JS'].split(',') ] if c['JS'] else []
-        for teacher_id in teacher_ids:
-            if not teacher_id in teachers_map:
-                print('Teacher ID ' + str(teacher_id) + ' not found for course ' + str(c))
-                continue
-            course.teachers.append(teachers_map[teacher_id])
+            db.session.add(course_term)
+            course_terms_map[term_key] = course_term
+            new_term_count+=1
 
-        courses_map[unique_key] = course
-        count+=1
+        # course class
+        unique_key = c['KCBJH'].upper() + '@' + c['XQ']
+        if unique_key in course_classes_map:
+            course_class = course_classes_map[unique_key]
+        else:
+            course_class = CourseClass()
+            course_class.course_id = course.id
+            course_class.term = c['XQ']
+            course_class.cno = c['KCBJH'].upper()
+            db.session.add(course_class)
+            course_classes_map[unique_key] = course_class
+            new_class_count+=1
 
     db.session.commit()
-    print('%d courses loaded' % count)
+    print('%d new courses loaded' % new_course_count)
+    print('%d new terms loaded' % new_term_count)
+    print('%d new classes loaded' % new_class_count)
 
 course_locations_map = dict()
 
@@ -390,11 +433,11 @@ def load_course_locations():
 
     count = 0
     for c in parse_file('PK_PKJGB.txt'):
-        unique_key = c['KCBJH'].upper() + '|' + c['ND'] + c['XQ']
-        if not unique_key in courses_map:
+        unique_key = c['KCBJH'].upper() + '@' + c['ND'] + c['XQ']
+        if not unique_key in course_classes_map:
             print('Course not found: ' + str(c))
             continue
-        course = courses_map[unique_key]
+        course = course_classes_map[unique_key]
 
         loc = CourseTimeLocation()
         loc.course = course
@@ -413,25 +456,17 @@ def load_course_locations():
     print('%d course locations loaded' % count)
 
 def load_join_course():
-    courses_id_map = {}
-
     existing_students = Student.query.all()
     for stu in existing_students:
         students_map[stu.sno] = stu
 
-    existing_courses = Course.query.all()
-    for c in existing_courses:
-        unique_key = c.cno + '|' + c.term
-        courses_map[unique_key] = c
-        courses_id_map[str(c.kcid) + '|' + c.term] = c
-
     count = 0
     for c in parse_file('XK_XKJGB.txt'):
-        unique_key = c['KCBJH'].upper() + '|' + c['XNXQ']
-        if not unique_key in courses_map:
+        unique_key = c['KCBJH'].upper() + '@' + c['XNXQ']
+        if not unique_key in course_classes_map:
             print('Course not found:' + str(c))
             continue
-        course = courses_map[unique_key]
+        course = course_classes_map[unique_key]
         if c['XH'] not in students_map:
             print('Student id ' + c['XH'] + ' not found: ' + str(c))
             continue
@@ -446,14 +481,11 @@ def load_join_course():
             continue
         if float(c['CJ']) > 100: # 二等级或五等级制课程，正常录入
             pass
-        cno_key = c['KCBJH'].upper() + '|' + c['XQ']
-        id_key = str(c['KCID']) + '|' + c['XQ']
-        if cno_key in courses_map:
-            course = courses_map[cno_key]
-        elif id_key in courses_id_map:
-            course = courses_id_map[id_key]
+        cno_key = c['KCBJH'].upper() + '@' + c['XQ']
+        if cno_key in course_classes_map:
+            course = course_classes_map[cno_key]
         else:
-            print('Course ID key ' + id_key + ' and CNO key ' + cno_key + ' not found:' + str(c))
+            print('Course CNO key ' + cno_key + ' not found:' + str(c))
             continue
 
         if c['SNO'] not in students_map:
@@ -497,11 +529,11 @@ def load_grad_students(insert=True):
 def load_grad_join_course():
     count = 0
     for c in parse_file('GRAD_XK_GCB.txt'):
-        unique_key = c['KCBJH'].upper() + '|' + c['XNXQ']
+        unique_key = c['KCBJH'].upper() + '@' + c['XNXQ']
         if not unique_key in courses_map:
             print('Course not found:' + str(c))
             continue
-        course = courses_map[unique_key]
+        course = course_classes_map[unique_key]
         if c['SNO'] not in students_map:
             print('Student id ' + c['SNO'] + ' not found: ' + str(c))
             continue
@@ -510,11 +542,11 @@ def load_grad_join_course():
         count+=1
 
     for c in parse_file('GRAD_XK_JGB.txt'):
-        unique_key = c['KCBJH'].upper() + '|' + c['XNXQ']
-        if not unique_key in courses_map:
+        unique_key = c['KCBJH'].upper() + '@' + c['XNXQ']
+        if not unique_key in course_classes_map:
             print('Course not found:' + str(c))
             continue
-        course = courses_map[unique_key]
+        course = course_classes_map[unique_key]
         if c['SNO'] not in students_map:
             print('Student id ' + c['SNO'] + ' not found: ' + str(c))
             continue
