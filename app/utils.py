@@ -82,7 +82,7 @@ def handle_upload(file,type):
 
 def sanitize(text):
     if text.strip():
-        cleaner = Cleaner(safe_attrs_only=False)
+        cleaner = Cleaner(safe_attrs_only=False, style=True)
         return cleaner.clean_html(text)
     else:
         return text

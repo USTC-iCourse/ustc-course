@@ -127,7 +127,7 @@
         <div class="ud-pd-md"></div>
         {% else %}
         {% for review in course.reviews %}
-        <div class="ud-pd-md dashed" id="review-{{review.id}}">
+        <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
             <a href={{ url_for('user.view_profile', user_id=review.author.id) }}><span class="right-pd-sm px16">{{ review.author.username }}</span></a>
             <span class="glyphicon glyphicon-star" aria-hidden="true"></span>

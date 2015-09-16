@@ -415,3 +415,7 @@ a.nounderline, a.nounderline:hover, a.nounderline:active {
 .notice-number-box {
     background-color: #d23524;
 }
+
+.review img {
+    max-width: 100%;
+}
