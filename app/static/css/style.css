@@ -22,8 +22,10 @@ html, body { height: 100%; }
 #footer {
     margin-bottom: 20px;
 }
+.navbar {
+    margin-bottom: 5px;
+}
 /* -------------------------------------------------- */
-
 @media (max-width:768px){
     .desktop {
         display: none;
@@ -35,13 +37,19 @@ html, body { height: 100%; }
     }
 }
 @media (min-width:992px){
-	.container{
-		width:970px;
+	.container {
+	    width:960px;
 	}
+	.banner {
+	    width: 930px;
+	}	
 }
 @media (min-width:1200px){
-	.container{
-		width: 77%;
+	.container {
+	    width: 1000px;
+	}
+	.banner {
+	    width: 970px;
 	}
 }
 @media (max-width:768px) {

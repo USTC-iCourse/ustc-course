@@ -264,3 +264,9 @@ def report_bug():
 def not_found():
     '''返回404页面'''
     return render_template('404.html')
+
+@home.route('/songshu/')
+def songshu():
+    '''Test'''
+
+    return render_template('songshu.html')
