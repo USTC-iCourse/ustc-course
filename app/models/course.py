@@ -85,6 +85,13 @@ class CourseClass(db.Model):
     def kcid(self):
         return self.course.kcid
 
+    @property
+    def reviewed(self):
+        return self.course.reviewed_by(current_user)
+
+    def reviewed_by(self, user):
+        return self.course.reviewed_by(user)
+
 
 # CourseTerm: distinct (name, set of teachers, term)
 class CourseTerm(db.Model):
