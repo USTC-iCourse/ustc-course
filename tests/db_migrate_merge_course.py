@@ -51,7 +51,7 @@ cursor.execute("INSERT INTO new_course_rates (id, %s) SELECT new_courses.id, %s 
 
 # course_terms
 print("migrating course_terms...")
-_term_properties = [ 'term', 'cno', 'kcid',
+_term_properties = [ 'term', 'courseries', 'kcid',
     'course_major', 'course_type', 'course_level', 'grading_type',
     'teaching_material', 'reference_material', 'student_requirements',
     'description', 'description_eng', 'introduction', 'homepage',
