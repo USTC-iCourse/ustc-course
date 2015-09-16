@@ -22,8 +22,10 @@ html, body { height: 100%; }
 #footer {
     margin-bottom: 20px;
 }
+.banner {
+    width: 100%
+}
 /* -------------------------------------------------- */
-
 @media (max-width:768px){
     .desktop {
         display: none;
@@ -35,25 +37,31 @@ html, body { height: 100%; }
     }
 }
 @media (min-width:992px){
-	.container{
-		width:970px;
-	}
+    .container {
+	width:970px;
+    }
 }
 @media (min-width:1200px){
-	.container{
-		width: 77%;
-	}
+    .container {
+	width: 77%;
+    }
 }
 @media (max-width:768px) {
     .float-element {
         padding: 15px;
         margin-bottom: 15px;
     }
+    .navbar {
+	margin-bottom: 0
+    }
 }
 @media (min-width:769px) {
     .float-element {
         padding: 30px;
         margin: 5px 0 20px 0;
+    }
+    .navbar {
+	margin-bottom: 5px;
     }
 }
 @media (min-width:769px) {
