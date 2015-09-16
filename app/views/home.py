@@ -6,7 +6,7 @@ from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask.ext.babel import gettext as _
 from datetime import datetime
 from sqlalchemy import union, or_
-from .course import termlist, deptlist, QUERY_ORDER
+from .course import deptlist, QUERY_ORDER
 
 home = Blueprint('home',__name__)
 
@@ -196,14 +196,10 @@ def search():
     if not keyword:
         return redirect(url_for('home.index'))
 
-    term = request.args.get('term',None,type=str)
     course_type = request.args.get('type',None,type=int)
     department = request.args.get('dept',None,type=int)
     campus = request.args.get('campus',None,type=str)
     course_query = Course.query
-    if term:
-        # 学期
-        course_query = course_query.filter(Course.term==term)
     if course_type:
         # 课程类型
         course_query = course_query.filter(Course.course_type==course_type)
@@ -234,8 +230,7 @@ def search():
     courses_paged = courses.paginate(page=page, per_page=per_page)
 
     return render_template('search.html', keyword=keyword, courses=courses_paged,
-            dept=department, term=term,
-            deptlist=deptlist, termlist=termlist, this_module='home.search')
+            dept=department, deptlist=deptlist, this_module='home.search')
 
 
 

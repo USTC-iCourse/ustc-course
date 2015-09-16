@@ -5,6 +5,7 @@ from wtforms.validators import (InputRequired,NumberRange)
 from app.models import Review
 
 class ReviewForm(Form):
+    term = IntegerField('term',validators=[InputRequired()])
     difficulty = IntegerField('grading',validators=[InputRequired(),NumberRange(1,3)])
     homework = IntegerField('homework',validators=[InputRequired(),NumberRange(1,3)])
     grading = IntegerField('grading',validators=[InputRequired(),NumberRange(1,3)])

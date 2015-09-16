@@ -10,27 +10,8 @@ course = Blueprint('course',__name__)
 QUERY_ORDER = [
     CourseRate.upvote_count.desc(),
     CourseRate.review_count.desc(),
-    Course.term.desc(),
 ]
 
-termlist = [
-    ['20151', '2015秋'],
-    ['20143', '2015夏'],
-    ['20142', '2015春'],
-    ['20141', '2014秋'],
-    ['20133', '2014夏'],
-    ['20132', '2014春'],
-    ['20131', '2013秋'],
-    ['20123', '2013夏'],
-    ['20122', '2013春'],
-    ['20121', '2012秋'],
-    ['20113', '2012夏'],
-    ['20112', '2012春'],
-    ['20111', '2011秋'],
-    ['20103', '2011夏'],
-    ['20102', '2011春'],
-    ['20101', '2010秋'],
-]
 deptlist = [
     [27, '体育'],
     [73, '外语'],
@@ -60,14 +41,10 @@ deptlist = [
 def index():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    term = request.args.get('term',None,type=str)
     course_type = request.args.get('type',None,type=int)
     department = request.args.get('dept',None,type=int)
     campus = request.args.get('campus',None,type=str)
     course_query = Course.query
-    if term:
-        # 学期
-        course_query = course_query.filter(Course.term==term)
     if course_type:
         # 课程类型
         course_query = course_query.filter(Course.course_type==course_type)
@@ -80,8 +57,7 @@ def index():
 
     courses_page = course_query.join(CourseRate).order_by(*QUERY_ORDER).paginate(page,per_page=per_page)
     return render_template('course-index.html', courses=courses_page,
-            dept=department, term=term,
-            deptlist=deptlist, termlist=termlist, this_module='course.index')
+            dept=department, deptlist=deptlist, this_module='course.index')
 
 @course.route('/<int:course_id>/')
 def view_course(course_id):

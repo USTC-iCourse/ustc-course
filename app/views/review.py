@@ -30,11 +30,16 @@ def new_review(course_id):
     form = ReviewForm(request.form)
     if request.method == 'POST':
         if form.validate_on_submit():
+            # check validity of term
+            if str(form.term.data) not in course.term_ids:
+                abort(404)
+
             if form.is_mobile.data:
                 form.content.data = markdown.markdown(form.content.data)
             form.content.data, mentioned_users = editor_parse_at(form.content.data)
             form.content.data = sanitize(form.content.data)
             form.populate_obj(review)
+
             if is_new:
                 review.add()
                 for user in set(current_user.followers + course.followers + course.joined_users):
