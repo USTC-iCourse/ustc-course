@@ -24,6 +24,8 @@ cursor.execute("DROP TABLE IF EXISTS old_courses")
 cursor.execute("CREATE TABLE old_courses LIKE courses")
 cursor.execute("ALTER TABLE old_courses ADD COLUMN teacher_list VARCHAR(200)")
 cursor.execute("INSERT INTO old_courses SELECT courses.*, GROUP_CONCAT(DISTINCT teacher_id ORDER BY teacher_id SEPARATOR ' ') AS teacher_list FROM courses LEFT JOIN course_teachers ON courses.id=course_teachers.course_id GROUP BY courses.id")
+# NULL does not compare equal to NULL, so replace it with empty string
+cursor.execute("UPDATE old_courses SET teacher_list='' WHERE teacher_list IS NULL")
 
 cursor.execute("DROP TABLE IF EXISTS new_courses")
 cursor.execute('''CREATE TABLE new_courses (
