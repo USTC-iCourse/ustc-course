@@ -13,7 +13,7 @@
 
       {% for course in user.classes_joined %}
       <div class="ud-pd-md dashed">
-        <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}
+        <a href="{{ url_for('course.view_course', course_id=course.course_id) }}">{{ course.name }}
         {% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}
         </a>
         {% if user != current_user and course.reviewed_by(user) %}

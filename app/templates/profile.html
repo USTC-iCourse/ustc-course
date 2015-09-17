@@ -89,7 +89,7 @@
         {% for course in user.classes_joined[0:6] %}
         <!-- 学过课程最多显示6门 -->
         <div class="ud-pd-md dashed">
-          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
+          <a href="{{ url_for('course.view_course', course_id=course.course_id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
           {% if user != current_user and course.reviewed_by(user) %}
           <span class="label label-success">TA已点评</span>
           {% endif %}
