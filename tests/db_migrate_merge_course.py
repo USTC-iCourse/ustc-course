@@ -37,6 +37,12 @@ cursor.execute('''CREATE TABLE new_courses (
 )''')
 cursor.execute("INSERT INTO new_courses (name, teacher_list, dept_id, _image) SELECT name, teacher_list, dept_id, _image FROM old_courses GROUP BY name, teacher_list")
 
+# course_teachers
+print("migrating course_teachers...")
+cursor.execute("DROP TABLE IF EXISTS new_course_teachers")
+cursor.execute("CREATE TABLE new_course_teachers LIKE course_teachers")
+cursor.execute("INSERT INTO new_course_teachers SELECT DISTINCT new_courses.id AS course_id, course_teachers.teacher_id FROM new_courses JOIN old_courses ON new_courses.teacher_list=old_courses.teacher_list AND new_courses.name=old_courses.name JOIN course_teachers ON old_courses.id=course_teachers.course_id")
+
 # course_rates
 print("migrating course_rates...")
 cursor.execute("DROP TABLE IF EXISTS new_course_rates")
@@ -145,7 +151,7 @@ cursor.execute("INSERT INTO new_notes (course_id, term, id, author_id, title, co
 # rename all new tables
 print("renaming new tables...")
 
-tables = ['courses', 'course_rates', 'course_time_locations', 'follow_course', 'join_course', 'upvote_course', 'downvote_course', 'review_course', 'reviews', 'notes']
+tables = ['courses', 'course_teachers', 'course_rates', 'course_time_locations', 'follow_course', 'join_course', 'upvote_course', 'downvote_course', 'review_course', 'reviews', 'notes']
 for table in tables:
     cursor.execute("DROP TABLE IF EXISTS backup_%s" % (table, ))
     cursor.execute("RENAME TABLE %s TO backup_%s, new_%s TO %s" % (table, table, table, table))
