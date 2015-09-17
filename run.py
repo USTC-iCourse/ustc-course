@@ -9,7 +9,9 @@ debug = True
 def start():
     if debug:
         db.create_all()
-    app.run(port=8080)
+        app.run(port=3000)
+    else:
+        app.run(port=8080)
 
 
 
