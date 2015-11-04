@@ -22,6 +22,7 @@ server {
 	listen [::]:80 default_server ipv6only=on;
 
 	server_name localhost;
+	client_max_body_size 100m;
 
     error_page 403 /static/error-pages/403.html;
     error_page 404 /static/error-pages/404.html;
