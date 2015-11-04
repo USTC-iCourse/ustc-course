@@ -83,7 +83,7 @@
         {% if user.classes_joined_count == 0 %}
         <p class="text-muted">还没有学过的课程呢。</p>
         {% endif %}
-        {% if not current_user.is_authenticated() %}
+        {% if not current_user.is_authenticated %}
         <p class="text-muted">为保护隐私，您需要 <a data-toggle="modal" data-target="#signin">登录</a> 才能查看已学课程。</p>
         {% else %}
         {% for course in user.classes_joined[0:6] %}
@@ -149,7 +149,7 @@
 {% block script %}
 <script>
 $(function() {
-    {% if current_user.is_authenticated() and current_user.following(user) %}
+    {% if current_user.is_authenticated and current_user.following(user) %}
     $('.btn-unfollow').show();
     {% else %}
     $('.btn-follow').show();

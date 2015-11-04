@@ -5,7 +5,7 @@
                   <a href="{{ url_for('user.view_profile', user_id=comment.author.id) }}">{{ comment.author.username }}</a>：
                   <span>{{ comment.content|safe }}</span>
                   <span class="text-muted small float-right">
-                    {% if user.is_authenticated() %}
+                    {% if user.is_authenticated %}
                     <span class="glyphicon glyphicon-share-alt grey left-pd-md" aria-hidden="true"></span>
                     <a href="javascript: reply_comment({{review.id}}, '{{ comment.author.username }}');">回复</a>
                     {% endif %}
@@ -17,7 +17,7 @@
                   </span>
               </div>
               {% endfor %}
-              {% if user.is_authenticated() %}
+              {% if user.is_authenticated %}
               <textarea type="text" class="form-control" rows="2" id="review-comment-input-{{ review.id }}" placeholder="你的评论" autocomplete="off"></textarea>
               <div class="ud-pd-sm"><button class="btn btn-sm btn-white float-right" onclick="submit_comment({{review.id}});">评论</button></div>
               {% else %}
