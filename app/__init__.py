@@ -34,7 +34,6 @@ def get_locale():
 def log_login(app,user):
     '''update the last login time of the user'''
     user.last_login_time = datetime.utcnow()
-    db.session.add(user)
     db.session.commit()
 
 user_logged_in.connect(log_login)
