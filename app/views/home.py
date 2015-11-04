@@ -20,7 +20,7 @@ def index():
 @home.route('/signin/',methods=['POST','GET'])
 def signin():
     next_url = request.args.get('next') or url_for('home.index')
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         return redirect(next_url)
     form = LoginForm()
     error = ''
@@ -69,7 +69,7 @@ def switch_user(user_id):
 
 @home.route('/signup/',methods=['GET','POST'])
 def signup():
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         return redirect(request.args.get('next') or url_for('home.index'))
     form = RegisterForm()
     if form.validate_on_submit():
@@ -100,7 +100,7 @@ def signup():
 
 @home.route('/confirm-email/')
 def confirm_email():
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         #logout_user()
         return redirect(request.args.get('next') or url_for('home.index'))
     action = request.args.get('action')
@@ -142,7 +142,7 @@ def logout():
 @home.route('/change-password/', methods=['GET'])
 def change_password():
     '''在控制面板里发邮件修改密码，另一个修改密码在user.py里面'''
-    if not current_user.is_authenticated():
+    if not current_user.is_authenticated:
         return redirect(url_for('home.signin'))
     send_reset_password_mail(current_user.email)
     return render_template('feedback.html', status=True, message=_('密码重置邮件已经发送。'))
@@ -151,7 +151,7 @@ def change_password():
 @home.route('/reset-password/', methods=['GET','POST'])
 def forgot_password():
     ''' 忘记密码'''
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         return redirect(request.args.get('next') or url_for('home.index'))
     form = ForgotPasswordForm()
     if form.validate_on_submit():

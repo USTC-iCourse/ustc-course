@@ -33,7 +33,7 @@
 
         
         <ul class="nav navbar-nav navbar-right">
-          {% if current_user.is_authenticated() %}
+          {% if current_user.is_authenticated %}
           <li id="dropdown-notice">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" onclick="read_notification({{ current_user.unread_notification_count }})">消息
               {% if current_user.unread_notification_count > 0 %}
