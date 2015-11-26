@@ -86,17 +86,17 @@
         {% if not current_user.is_authenticated %}
         <p class="text-muted">为保护隐私，您需要 <a data-toggle="modal" data-target="#signin">登录</a> 才能查看已学课程。</p>
         {% else %}
-        {% for course in user.classes_joined[0:6] %}
+        {% for course_class in user.classes_joined[0:6] %}
         <!-- 学过课程最多显示6门 -->
         <div class="ud-pd-md dashed">
-          <a href="{{ url_for('course.view_course', course_id=course.course_id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
-          {% if user != current_user and course.reviewed_by(user) %}
+          <a href="{{ url_for('course.view_course', course_id=course_class.course_id) }}">{{ course_class.course.name }}{% if course_class.course.teachers %}（{{ course_class.course.teacher_names_display }}）{% endif %}</a>
+          {% if user != current_user and course_class.course.reviewed_by(user) %}
           <span class="label label-success">TA已点评</span>
           {% endif %}
-          {% if course.reviewed_by(current_user) %}
+          {% if course_class.course.reviewed_by(current_user) %}
           <span class="label label-success">我已点评</span>
           {% endif %}
-          <span class="small grey align-bottom  float-right">{{ course.term|term_display }}</span>
+          <span class="small grey align-bottom  float-right">{{ course_class.term|term_display }}</span>
         </div>
         {% endfor %}
         {% endif %}

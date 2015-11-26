@@ -11,18 +11,18 @@
         （{{ user.classes_joined_count }}门）
       </div>
 
-      {% for course in user.classes_joined %}
+      {% for course_class in user.classes_joined %}
       <div class="ud-pd-md dashed">
         <a href="{{ url_for('course.view_course', course_id=course.course_id) }}">{{ course.name }}
-        {% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}
+        {% if course_class.course.teachers %}（{{ course_class.course.teacher_names_display }}）{% endif %}
         </a>
-        {% if user != current_user and course.reviewed_by(user) %}
+        {% if user != current_user and course_class.course.reviewed_by(user) %}
         <span class="label label-success">TA已点评</span>
         {% endif %}
-        {% if course.reviewed_by(current_user) %}
+        {% if course_class.course.reviewed_by(current_user) %}
         <span class="label label-success">我已点评</span>
         {% endif %}
-        <span class="small grey align-bottom  float-right">{{ course.term_ids|term_display }}</span>
+        <span class="small grey align-bottom  float-right">{{ course_class.term|term_display }}</span>
       </div>
       {% endfor %}
 

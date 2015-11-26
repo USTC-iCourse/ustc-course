@@ -77,12 +77,6 @@ class CourseClass(db.Model):
             if row.time_location_display is not None ])
 
     # sqlalchemy uses __getattr__, so we cannot use it
-    # this WILL cause problem when creating new CourseClass!
-    def __getattr__(self, name):
-        try:
-            return object.__getattr__(self, name)
-        except:
-            return getattr(self.course, name)
 
 
 # CourseTerm: distinct (name, set of teachers, term)
