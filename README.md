@@ -60,7 +60,9 @@ character-set-server = utf8
 1. ```cp tests/conf/nginx-config /etc/nginx/sites-available/default```
 2. ```sudo service mysql restart```
 
-运行 ```./run.py```，访问 ```http://localhost:8080``` 即可以 debug 模式开始运行此系统。
+运行 ```./run.py```，访问 ```http://localhost``` 即可以 debug 模式开始运行此系统。
+
+如果出现问题，请首先看 ```./run.py``` 的终端有无输出，如果没有，则是 nginx 的问题，可以访问 ```http://localhost:8080``` 来测试；如果 Python 有报异常，则可根据异常信息排查。
 
 在生产服务器上，需要把 nginx 配置文件（```/etc/nginx/sites-available/default```）中的 8080 替换成 3000，把 ```config/default.py``` 和 ```run.py``` 中的 ```DEBUG=True``` 改为 ```DEBUG=False```。
 
