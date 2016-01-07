@@ -306,7 +306,7 @@ def load_courses(insert=True):
     for c in existing_course_classes:
         course_classes_map[str(c)] = c
 
-    existing_course_terms = CourseClass.query.all()
+    existing_course_terms = CourseTerm.query.all()
     for c in existing_course_terms:
         course_terms_map[str(c)] = c
 
@@ -567,14 +567,14 @@ def load_grad_join_course():
 # we have merge now, do not drop existing data
 #db.drop_all()
 db.create_all()
-load_depts()
-load_classes()
-load_majors()
-load_titles()
-load_teachers()
+#load_depts()
+#load_classes()
+#load_majors()
+#load_titles()
+#load_teachers()
 load_courses()
-load_students()
-load_course_locations()
-load_join_course()
-load_grad_students()
-load_grad_join_course()
+#load_students()
+#load_course_locations()
+#load_join_course()
+#load_grad_students()
+#load_grad_join_course()
