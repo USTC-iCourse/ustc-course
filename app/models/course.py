@@ -113,7 +113,10 @@ class CourseTerm(db.Model):
     #course: backref to Course
 
     def __repr__(self):
-        return self.course.name + '(' + ','.join(map(str, self.course.teacher_id_list)) + ')' + '@' + self.term
+        try:
+            return self.course.name + '(' + ','.join(map(str, self.course.teacher_id_list)) + ')' + '@' + self.term
+        except:
+            return ""
 
     def save(self):
         db.session.add(self)
