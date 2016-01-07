@@ -367,7 +367,10 @@ class Course(db.Model):
 
     @property
     def latest_term(self):
-        return self.terms[0]
+        try:
+            return self.terms[0]
+        except:
+            return None
 
     @property
     def term_ids(self):
