@@ -382,7 +382,7 @@ def load_courses(insert=True):
             course_term = course_terms_map[term_key]
         else:
             course_term = CourseTerm()
-            course_term.course_id = course.id
+            course_term.course = course
             course_term.courseries = c['KCBH']
             course_term.class_numbers = c['SKBJH']
             course_term.start_week = c['QSZ']
@@ -402,7 +402,7 @@ def load_courses(insert=True):
             course_class = course_classes_map[unique_key]
         else:
             course_class = CourseClass()
-            course_class.course_id = course.id
+            course_class.course = course
             course_class.term = c['XQ']
             course_class.cno = c['KCBJH'].upper()
             db.session.add(course_class)
