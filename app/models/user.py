@@ -339,6 +339,7 @@ class Student(db.Model):
     dept_class = db.relationship('DeptClass', backref='students')
     major = db.relationship('Major')
     classes_joined = db.relationship('CourseClass', secondary = join_course, order_by='desc(CourseClass.term)', backref='students')
+    courses_joined = db.relationship('CourseClass', secondary = join_course, order_by='desc(CourseClass.term)')
     
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
@@ -379,11 +380,6 @@ class Student(db.Model):
         db.session.add(self)
         db.session.commit()
         return self
-
-    @property
-    def courses_joined(self):
-        from .course import CourseClass, Course
-        return Course.query.join(CourseClass).join(join_course).filter(join_course.c.student_id == self.sno).all()
 
 
 class Teacher(db.Model):
