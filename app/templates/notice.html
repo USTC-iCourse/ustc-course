@@ -15,7 +15,7 @@
         {% for notification in notifications %}
         {% if notification.display_text %}
         <div class="ud-pd-md dashed">
-            {{ notification.display_text }}
+            {{ notification.display_text|safe }}
             <span class="small grey align-bottom  float-right">{{ notification.time|localtime }}</span>
         </div>
         {% endif %}
