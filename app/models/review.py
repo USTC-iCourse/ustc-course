@@ -69,23 +69,19 @@ class Review(db.Model):
         self.course.review_users.remove(self.author)
         db.session.commit()
 
-    def update(self,new):
+    # self and old must have the same course_id
+    def update_course_rate(self,old):
         course_rate = self.course.course_rate
-        course_rate.subtract(self.difficulty,
+        course_rate.subtract(old.difficulty,
+                old.homework,
+                old.grading,
+                old.gain,
+                old.rate)
+        course_rate.add(self.difficulty,
                 self.homework,
                 self.grading,
                 self.gain,
                 self.rate)
-        self.difficulty = new.difficulty
-        self.homework = new.homework
-        self.grading = new.grading
-        self.gain = new.gain
-        self.rate = new.rate
-        self.content = new.content
-        self.update_time = datetime.utcnow()
-#TODO: add a try block to mantain data consistency
-        course_rate.add(new.difficulty,new.homework,new.grading,new.gain,new.rate)
-        db.session.add(self)
         db.session.commit()
 
     def upvote(self,author=current_user):
@@ -93,7 +89,7 @@ class Review(db.Model):
             return False,"The user has upvoted!"
         self.upvote_users.append(author)
         self.upvote_count +=1
-        self.save()
+        self.__save()
         return True,"Success!"
 
     def cancel_upvote(self,author=current_user):
@@ -101,13 +97,14 @@ class Review(db.Model):
             return (False,"The user has not upvoted!")
         self.upvote_users.remove(author)
         self.upvote_count -=1
-        self.save()
+        self.__save()
         return (True,"Success!")
 
     def is_upvoted(self, user=current_user):
         return user in self.upvote_users
 
-    def save(self):
+    # this will create a new object, do not use it for update
+    def __save(self):
         db.session.add(self)
         db.session.commit()
 
@@ -122,7 +119,7 @@ class Review(db.Model):
             author = User.query.get(author_id)
             kwargs['author'] = author
         review = cls(**kwargs)
-        review.save()
+        review.__save()
 
     @property
     def url(self):
