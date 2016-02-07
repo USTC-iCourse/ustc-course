@@ -1,6 +1,11 @@
+import sys
+
 # Server config
 SERVER_NAME = None
-DEBUG = True
+DEBUG = False
+for arg in sys.argv:
+    if arg == '-d':
+        DEBUG = True
 SECRET_KEY = 'secret-key'
 
 
