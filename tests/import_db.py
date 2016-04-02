@@ -345,7 +345,8 @@ def load_courses(insert=True):
                 if int(tid) in teachers_map:
                     teacher_ids.append(int(tid))
         # remove duplicates
-        teacher_ids = list(set(teacher_ids)).sort()
+        teacher_ids = list(set(teacher_ids))
+        teacher_ids.sort()
 
         # course
         name = course_kcbh[c['KCBH']]['name']
@@ -358,10 +359,6 @@ def load_courses(insert=True):
         else:
             course = Course()
             course.name = name
-            if c['DWBH'] in depts_code_map:
-                course.dept_id = depts_code_map[c['DWBH']].id
-            else:
-                print('Department code ' + c['DWBH'] + ' not found in ' + str(c))
             if teacher_ids:
                 for t in teacher_ids:
                     course.teachers.append(teachers_map[t])
@@ -375,6 +372,12 @@ def load_courses(insert=True):
             db.session.add(course_rate)
             new_course_count+=1
 
+        # update course info
+        if c['DWBH'] in depts_code_map:
+            course.dept_id = depts_code_map[c['DWBH']].id
+        else:
+            print('Department code ' + c['DWBH'] + ' not found in ' + str(c))
+
         # course term
         term = c['XQ']
         term_key = course_key + '@' + term
@@ -382,32 +385,36 @@ def load_courses(insert=True):
             course_term = course_terms_map[term_key]
         else:
             course_term = CourseTerm()
-            course_term.course = course
-            course_term.courseries = c['KCBH']
-            course_term.class_numbers = c['SKBJH']
-            course_term.start_week = c['QSZ']
-            course_term.end_week = c['JZZ']
-            course_term.course_level = course_level_dict[int_allow_empty(c['KCCCDM'])]
-
-            for key in course_kcbh[c['KCBH']]:
-                setattr(course_term, key, course_kcbh[c['KCBH']][key])
-
             db.session.add(course_term)
             course_terms_map[term_key] = course_term
             new_term_count+=1
+
+        # update course term info
+        course_term.course = course
+        course_term.courseries = c['KCBH']
+        course_term.class_numbers = c['SKBJH']
+        course_term.start_week = c['QSZ']
+        course_term.end_week = c['JZZ']
+        course_term.course_level = course_level_dict[int_allow_empty(c['KCCCDM'])]
+
+        for key in course_kcbh[c['KCBH']]:
+            setattr(course_term, key, course_kcbh[c['KCBH']][key])
 
         # course class
         unique_key = c['KCBJH'].upper() + '@' + c['XQ']
         if unique_key in course_classes_map:
             course_class = course_classes_map[unique_key]
+            course_class.course = course # update course mapping
         else:
             course_class = CourseClass()
-            course_class.course = course
-            course_class.term = c['XQ']
-            course_class.cno = c['KCBJH'].upper()
             db.session.add(course_class)
             course_classes_map[unique_key] = course_class
             new_class_count+=1
+
+        # update course class info
+        course_class.course = course
+        course_class.term = c['XQ']
+        course_class.cno = c['KCBJH'].upper()
 
     db.session.commit()
     print('%d new courses loaded' % new_course_count)
