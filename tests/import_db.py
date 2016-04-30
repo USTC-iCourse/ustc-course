@@ -391,6 +391,7 @@ def load_courses(insert=True):
 
         # update course term info
         course_term.course = course
+        course_term.term = term
         course_term.courseries = c['KCBH']
         course_term.class_numbers = c['SKBJH']
         course_term.start_week = c['QSZ']
