@@ -22,6 +22,7 @@ class Notification(db.Model):
     ref_class = db.Column(db.String(50))
     ref_obj_id = db.Column(db.Integer)
     ref_display_class = db.Column(db.String(50))
+    display_text = db.Column(db.Text)
 
     to_user = db.relationship('User', foreign_keys=to_user_id, backref=db.backref('notifications', order_by='desc(Notification.id)'))
     from_user = db.relationship('User', foreign_keys=from_user_id)
@@ -37,6 +38,7 @@ class Notification(db.Model):
         self.ref_obj_id = ref_obj.id
 
     def save(self):
+        self.display_text = self.__display_text
         db.session.add(self)
         db.session.commit()
 
@@ -108,8 +110,11 @@ class Notification(db.Model):
             return 'doge'
 
     @property
-    def display_text(self):
-        return self.from_user.link + ' ' + self.operation_text
+    def __display_text(self):
+        try:
+            return self.from_user.link + ' ' + self.operation_text
+        except:
+            return ""
 
     @property
     def url(self):

@@ -3,8 +3,12 @@ from app import app
 from app import db
 from random import randint
 from app.models import Review, Course, Student, User
+import sys
 
-debug = True
+debug = False
+for arg in sys.argv:
+    if arg == '-d':
+        debug = True
 
 def start():
     if debug:

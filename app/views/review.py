@@ -18,13 +18,20 @@ def new_review(course_id):
         abort(404)
     user = current_user
     review = Review.query.filter_by(course=course, author=user).first()
+    old_review = None
     if not review:
+        is_new = True
         review = Review()
         review.course = course
         review.author = user
-        is_new = True
     else:
         is_new = False
+        old_review = Review()
+        old_review.difficulty = review.difficulty
+        old_review.homework = review.homework
+        old_review.grading = review.grading
+        old_review.gain = review.gain
+        old_review.rate = review.rate
 
     message = ''
     form = ReviewForm(request.form)
@@ -48,7 +55,7 @@ def new_review(course_id):
                 for user in mentioned_users:
                     user.notify('mention', review)
             else:
-                review.save()
+                review.update_course_rate(old_review)
             return redirect(url_for('course.view_course',course_id=course_id))
         else: # invalid submission, try again
             if form.content.data:

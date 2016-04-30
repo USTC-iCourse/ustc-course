@@ -366,7 +366,8 @@ class Course(db.Model):
 
     @property
     def joined_users(self):
-        return User.query.join(Student).filter(Student.user_id == User.id).join(CourseClass).filter(self.id == CourseClass.course_id).join(join_course).filter(join_course.c.class_id == CourseClass.id, join_course.c.student_id == Student.sno).all()
+        from .user import User, Student, join_course
+        return User.query.join(Student).join(join_course).join(CourseClass).filter(CourseClass.course_id == self.id).all()
 
     @property
     def latest_term(self):

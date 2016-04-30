@@ -46,7 +46,7 @@
               {% endif %}
               {% for notification_text in current_user.latest_notifications_text %}
               <li class="ud-pd-sm dashed">
-                <div class="notice">{{ notification_text }}</div>
+                <div class="notice">{{ notification_text|safe }}</div>
               </li>
               {% endfor %}
               <li class="ud-pd-sm pull-right"><a class="blue" href="{{ url_for('user.notice')}}">查看全部</a></li>
