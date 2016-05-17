@@ -217,7 +217,26 @@ def same_name_courses(name):
     else:
         return render_template('list-courses.html',course_name=name,courses=courses_page,message=_("No course called %(name)s found!",name=name))
 
+@course.route('/goto/<string:cno>')
+def course_redirect_cno(cno):
+    cno = cno.strip()
+    course_class = CourseClass.query.filter_by(cno=cno).order_by(CourseClass.term.desc()).all()
+    if len(course_class) > 0:
+        print(course_class)
+        return redirect(url_for('course.view_course', course_id=course_class[0].course_id))
+    else:
+        abort(404)
 
+@course.route('/goto/<string:cno>/<int:term>')
+def course_redirect_cno_term(cno, term):
+    cno = cno.strip()
+    term = int(term)
+    course_class = CourseClass.query.filter_by(cno=cno, term=term).all()
+    if len(course_class) > 0:
+        print(course_class)
+        return redirect(url_for('course.view_course', course_id=course_class[0].course_id))
+    else:
+        abort(404)
 
 
 
