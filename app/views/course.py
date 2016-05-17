@@ -222,7 +222,6 @@ def course_redirect_cno(cno):
     cno = cno.strip()
     course_class = CourseClass.query.filter_by(cno=cno).order_by(CourseClass.term.desc()).all()
     if len(course_class) > 0:
-        print(course_class)
         return redirect(url_for('course.view_course', course_id=course_class[0].course_id))
     else:
         abort(404)
@@ -233,7 +232,6 @@ def course_redirect_cno_term(cno, term):
     term = int(term)
     course_class = CourseClass.query.filter_by(cno=cno, term=term).all()
     if len(course_class) > 0:
-        print(course_class)
         return redirect(url_for('course.view_course', course_id=course_class[0].course_id))
     else:
         abort(404)
