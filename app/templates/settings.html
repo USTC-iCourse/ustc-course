@@ -7,6 +7,9 @@
     <div class="bm-pd-lg">
       <h3 class="blue">账户设置</h3>
       <hr>
+      {% for error in errors %}
+        <div class="alert alert-danger">{{ error }}</div>
+      {% endfor %}
       <form class="form-horizontal" method="post" enctype="multipart/form-data">
         {{ form.csrf_token }}
         <div class="form-group">
@@ -24,7 +27,7 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">用户名</label>
           <div class="col-sm-5">
-            <input type="text" class="form-control" value="{{ user.username }}" name="username" disabled>
+            <input type="text" class="form-control" value="{{ user.username }}" name="username">
           </div>
         </div>
 

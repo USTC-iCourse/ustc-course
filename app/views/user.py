@@ -71,9 +71,16 @@ def account_settings():
     '''账户设置,包括改密码等'''
     user = current_user
     form = ProfileForm(request.form, user)
+    errors = []
     if form.validate_on_submit():
-        #user.username = form['username'].data
-        #user.gender = form['gender'].data
+        username = form['username'].data.strip()
+        if username == user.username:
+            pass
+        elif User.query.filter_by(username=username).all():
+            errors.append(_("Sorry, the username " + username + " has been taken!"))
+        else:
+            user.username = username
+
         user.homepage = form['homepage'].data.strip()
         if not user.homepage.startswith('http'):
             user.homepage = 'http://' + user.homepage
@@ -86,7 +93,7 @@ def account_settings():
             else:
                 errors.append(_("Avatar upload failed"))
         user.save()
-    return render_template('settings.html', user=user, form=form)
+    return render_template('settings.html', user=user, form=form, errors=errors)
 
 @user.route('/settings/bind/',methods=['GET','POST'])
 @login_required
