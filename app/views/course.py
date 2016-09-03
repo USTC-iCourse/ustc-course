@@ -8,7 +8,7 @@ from app.utils import sanitize
 
 course = Blueprint('course',__name__)
 QUERY_ORDER = [
-    CourseRate.upvote_count.desc(),
+    CourseRate._rate_average.desc(),
     CourseRate.review_count.desc(),
 ]
 
