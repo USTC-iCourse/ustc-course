@@ -450,16 +450,17 @@ class CourseRate(db.Model):
     __tablename__ = 'course_rates'
 
     id = db.Column(db.Integer, db.ForeignKey('courses.id'), primary_key=True)
-    _difficulty_total = db.Column(db.Integer,default=0)
-    _homework_total = db.Column(db.Integer,default=0)
-    _grading_total = db.Column(db.Integer,default=0)
-    _gain_total = db.Column(db.Integer,default=0)
-    _rate_total = db.Column(db.Integer,default=0)
-    review_count = db.Column(db.Integer,default=0) #点评数
-    upvote_count = db.Column(db.Integer,default=0) #推荐人数
-    downvote_count = db.Column(db.Integer,default=0) #不推荐人数
-    follow_count = db.Column(db.Integer,default=0) #关注人数
-    join_count = db.Column(db.Integer,default=0) #加入课程人数
+    _difficulty_total = db.Column(db.Integer,default=0,index=True)
+    _homework_total = db.Column(db.Integer,default=0,index=True)
+    _grading_total = db.Column(db.Integer,default=0,index=True)
+    _gain_total = db.Column(db.Integer,default=0,index=True)
+    _rate_total = db.Column(db.Integer,default=0,index=True)
+    _rate_average = db.Column(db.Float,default=0,index=True)
+    review_count = db.Column(db.Integer,default=0,index=True) #点评数
+    upvote_count = db.Column(db.Integer,default=0,index=True) #推荐人数
+    downvote_count = db.Column(db.Integer,default=0,index=True) #不推荐人数
+    follow_count = db.Column(db.Integer,default=0,index=True) #关注人数
+    join_count = db.Column(db.Integer,default=0,index=True) #加入课程人数
 
     @property
     def difficulty(self):
@@ -507,11 +508,18 @@ class CourseRate(db.Model):
     @property
     def average_rate(self):
         if self.review_count:
-            res = Decimal("%.1f" % (self._rate_total/self.review_count))
+            res = Decimal("%.1f" % (self._rate_average))
             return res
         return None
 
+    def _update_average():
+        if self.review_count != 0:
+            self._rate_average = 1.0 * self._rate_total / self.review_count
+        else:
+            self._rate_average = 0
+
     def save(self):
+        self._update_average()
         db.session.add(self)
         db.session.commit()
 
