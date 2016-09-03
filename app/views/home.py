@@ -210,18 +210,16 @@ def search():
         # 开课地点
         course_query = course_query.filter(Course.campus==campus)
 
-    def ordering(query_obj):
-        return query_obj.join(CourseRate).order_by(*QUERY_ORDER).subquery().select()
-    def match_courses(filter):
-        return ordering(course_query.filter(filter))
-
-    teacher_match = ordering(course_query.join(Course.teachers).filter(Teacher.name == keyword))
-    exact_match = match_courses(Course.name == keyword)
+    teacher_match = course_query.join(Course.teachers).filter(Teacher.name == keyword)
+    exact_match = course_query.filter(Course.name == keyword)
     fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
-    include_match = match_courses(Course.name.like('%' + fuzzy_keyword + '%'))
-    fuzzy_match = match_courses(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
+    include_match = course_query.filter(Course.name.like('%' + fuzzy_keyword + '%'))
+    fuzzy_match = course_query.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
-    courses = Course.query.select_entity_from(union(teacher_match, exact_match, include_match, fuzzy_match))
+    def ordering(query_obj):
+        return query_obj.join(CourseRate).order_by(*QUERY_ORDER)
+
+    courses = ordering(teacher_match.union(exact_match).union(include_match).union(fuzzy_match))
     if not courses:
         abort(404)
 
