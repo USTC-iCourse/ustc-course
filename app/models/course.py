@@ -346,7 +346,8 @@ class Course(db.Model):
 
         classes = CourseClass.query.filter(CourseClass.course_id == self.id).join(join_course).join(Student).filter(Student.sno == user.student_id).all()
         for each_class in classes:
-            db.session.execute(join_course.delete().where(join_course.c.class_id == each_class.id and join_course.c.student_id == user.student_id))
+            print(each_class.id, user.student_id)
+            db.session.execute(join_course.delete().where(join_course.c.student_id == user.student_id).where(join_course.c.class_id == each_class.id))
         db.session.commit()
         return True
 
