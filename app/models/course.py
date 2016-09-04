@@ -329,21 +329,24 @@ class Course(db.Model):
         from .user import Student, join_course
         return Student.query.join(join_course).join(CourseClass).filter(CourseClass.course_id == self.id).all()
 
-    @property
-    def student_count(self):
-        return len(self.students)
-
     def join(self, user=current_user):
+        from .user import join_course
         if not user.is_student or user.info in self.students:
             return False
-        self.students.append(user.info)
+
+        last_class = CourseClass.query.filter(CourseClass.course_id == self.id).order_by(CourseClass.term.desc()).first()
+        db.session.execute(join_course.insert().values(class_id = last_class.id, student_id = user.student_id))
         db.session.commit()
         return True
 
     def quit(self, user=current_user):
+        from .user import join_course, Student
         if not user.is_student or not user.info in self.students:
             return False
-        self.students.remove(user.info)
+
+        classes = CourseClass.query.filter(CourseClass.course_id == self.id).join(join_course).join(Student).filter(Student.sno == user.student_id).all()
+        for each_class in classes:
+            db.session.execute(join_course.delete().where(join_course.c.class_id == each_class.id and join_course.c.student_id == user.student_id))
         db.session.commit()
         return True
 
@@ -368,6 +371,19 @@ class Course(db.Model):
     def joined_users(self):
         from .user import User, Student, join_course
         return User.query.join(Student).join(join_course).join(CourseClass).filter(CourseClass.course_id == self.id).all()
+
+    @property
+    def join_count(self):
+        from .user import Student, join_course
+        return Student.query.join(join_course).join(CourseClass).filter(CourseClass.course_id == self.id).count()
+
+    @property
+    def student_count(self):
+        return self.join_count
+
+    @property
+    def joined(self, user=current_user):
+        return user.is_student and user.info in self.students
 
     @property
     def latest_term(self):

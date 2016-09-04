@@ -92,6 +92,12 @@
 
           <button class="btn btn-white btn-flat btn-downvote btn-do"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 不推荐 <small>(<span class="count"></span>)</small></button>
           <button class="btn btn-blue btn-flat btn-downvote btn-undo"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 取消不推荐 <small>(<span class="count"></span>)</small></button>
+
+          {% if user.is_student %}
+          <button class="btn btn-white btn-flat btn-join btn-do"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 没学过 <small>(<span class="count"></span>)</small></button>
+          <button class="btn btn-blue btn-flat btn-join btn-undo"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small>(<span class="count"></span>)</small></button>
+          {% endif %}
+
           <span class="float-right" style="display: none" target="_blank"><a>查看{{ course.join_count }}位同班同学</a></span>
         </div>
 
@@ -300,6 +306,8 @@
          $.post(url, null, function(o) {
            if (o.count)
              update_count(o.count);
+           if (!o.ok)
+             alert('Operation failed, please try again later!');
          }, 'json');
        }
 

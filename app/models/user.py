@@ -178,6 +178,13 @@ class User(db.Model, UserMixin):
         return self.identity == 'Student'
 
     @property
+    def student_id(self):
+        if self.is_student:
+            return self.info.sno
+        else:
+            return None
+
+    @property
     def is_teacher(self):
         return self.identity == 'Teacher'
 
