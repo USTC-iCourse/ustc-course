@@ -15,3 +15,6 @@ flask-debugtoolbar
 html2text
 markdown
 pytz
+# don't know why these dependencies fail...
+click
+wtforms
