@@ -2,8 +2,8 @@ from flask_wtf import Form
 from wtforms import (StringField, PasswordField, BooleanField, ValidationError, TextAreaField, FileField, SelectField)
 from wtforms.validators import (DataRequired,NumberRange, Email, EqualTo, Length, Optional, AnyOf)
 from app.models import User
-from flask.ext.login import current_user
-from flask.ext.babel import gettext as _
+from flask_login import current_user
+from flask_babel import gettext as _
 from app.utils import validate_username, validate_email
 import re
 

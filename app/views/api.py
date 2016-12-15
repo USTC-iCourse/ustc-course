@@ -1,5 +1,5 @@
 from flask import Blueprint,jsonify,request, Markup
-from flask.ext.login import login_required,current_user
+from flask_login import login_required,current_user
 from app.models import Review, ReviewComment , User, Course, ImageStore
 from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKeyConstraint
 from datetime import datetime
 from app import db, login_manager as lm
 from random import randint
-from flask.ext.login import UserMixin, current_user
+from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, \
      check_password_hash
-from flask.ext.babel import gettext as _
+from flask_babel import gettext as _
 
 class Notification(db.Model):
     __tablename__ = 'notifications'

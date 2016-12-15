@@ -1,9 +1,9 @@
 from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify
-from flask.ext.security import current_user,login_required
+from flask_security import current_user,login_required
 from app.models import Course, Review
 from app.forms import ReviewForm
 from app.utils import sanitize, editor_parse_at
-from flask.ext.babel import gettext as _
+from flask_babel import gettext as _
 from .course import course
 import markdown
 

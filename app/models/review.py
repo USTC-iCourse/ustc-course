@@ -3,7 +3,7 @@ from datetime import datetime
 from app import db
 import html2text
 try:
-    from flask.ext.login import current_user
+    from flask_login import current_user
 except:
     current_user=None
 

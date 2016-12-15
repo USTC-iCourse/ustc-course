@@ -7,10 +7,10 @@
 
 import os
 from flask import Flask,request
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.login import LoginManager,current_user,user_logged_in,user_loaded_from_cookie
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager,current_user,user_logged_in,user_loaded_from_cookie
 from flask_wtf.csrf import CsrfProtect
-from flask.ext.babel import Babel
+from flask_babel import Babel
 from datetime import datetime
 from flask_debugtoolbar import DebugToolbarExtension
 

@@ -1,9 +1,9 @@
 from flask import Blueprint,request, redirect,url_for,render_template,flash, abort, jsonify
-from flask.ext.login import login_user, login_required, current_user, logout_user
+from flask_login import login_user, login_required, current_user, logout_user
 from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
-from flask.ext.babel import gettext as _
+from flask_babel import gettext as _
 from datetime import datetime
 from sqlalchemy import union, or_
 from .course import deptlist, QUERY_ORDER
