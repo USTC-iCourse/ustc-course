@@ -9,7 +9,7 @@
                     <span class="glyphicon glyphicon-share-alt grey left-pd-md" aria-hidden="true"></span>
                     <a href="javascript: reply_comment({{review.id}}, '{{ comment.author.username }}');">回复</a>
                     {% endif %}
-                    {% if user == comment.author %}
+                    {% if user == comment.author or user.is_admin %}
                     <span class="glyphicon glyphicon-trash grey left-pd-md" aria-hidden="true"></span>
                     <a href="javascript: delete_comment({{review.id}}, {{comment.id}});">删除</a>
                     {% endif %}

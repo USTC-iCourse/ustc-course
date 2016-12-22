@@ -20,6 +20,7 @@
         {% endif %}
 
         {% for review in user.reviews[0:3] %}
+          {% if not review.is_hidden or current_user.is_admin or current_user == user %}
         <!-- profile页面最多显示3条点评 -->
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
@@ -28,10 +29,12 @@
             <span class="small grey align-bottom left-pd-sm">{{ review.term_display }}</span>
             <span class="text-muted small float-right desktop">{{ review.update_time|localtime }}</span>
           </div>
+          {% include 'review-hidden.html' %}
           <p class="dark-grey">{{ review.content|abstract }}
             <a href="{{ url_for('course.view_course', course_id=course.id) }}#review-{{ review.id }}"> >>{{ _('更多') }}</a>
           </p>
         </div>
+          {% endif %}
         {% endfor %}
       </div><!-- end bm-pd-lg -->
 

@@ -93,7 +93,7 @@
           <button class="btn btn-white btn-flat btn-downvote btn-do"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 不推荐 <small>(<span class="count"></span>)</small></button>
           <button class="btn btn-blue btn-flat btn-downvote btn-undo"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 取消不推荐 <small>(<span class="count"></span>)</small></button>
 
-          {% if user.is_student %}
+          {% if current_user.is_student %}
           <button class="btn btn-white btn-flat btn-join btn-do"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small>(<span class="count"></span>)</small></button>
           <button class="btn btn-blue btn-flat btn-join btn-undo"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small>(<span class="count"></span>)</small></button>
           {% endif %}
@@ -133,6 +133,7 @@
         <div class="ud-pd-md"></div>
         {% else %}
         {% for review in course.reviews %}
+	  {% if not review.is_hidden or current_user.is_admin or review.author == current_user %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
             <a href={{ url_for('user.view_profile', user_id=review.author.id) }}><span class="right-pd-sm px16">{{ review.author.username }}</span></a>
@@ -160,6 +161,7 @@
 
             <span class="left-pd-md">{{ review.term|term_display }}</span>
           </div>
+          {% include 'review-hidden.html' %}
           <div>
             <p>{{ review.content|safe }}</p>
           </div>
@@ -187,11 +189,20 @@
                 删除
               </a>
               {% endif %}
+              {% if user.is_admin %}
+              <span class="glyphicon glyphicon-ban-circle grey left-pd-md" aria-hidden="true"></span>
+                {% if review.is_hidden %}
+                <a href="javascript: unhide_review({{review.id}});">解除屏蔽</a>
+                {% else %}
+                <a href="javascript: hide_review({{review.id}});">屏蔽</a>
+                {% endif %}
+              {% endif %}
             </span>
           </div>
 
           {% include 'review-comments.html' %}
         </div>
+	  {% endif %}
         {% endfor %}
         {% endif %}
       </div>
@@ -460,6 +471,30 @@
      var elem = $('#review-comment-input-' + review_id);
      elem.val('回复 @' + reply_to + ': ');
      elem.focus();
+ }
+
+ function hide_review(review_id)
+ {
+     $.post("{{ url_for('api.hide_review') }}", { review_id: review_id },
+         function(o) {
+            if (o.ok) {
+               alert('屏蔽成功，请刷新页面');
+            } else {
+               alert(o.message);
+            }
+     }, 'json');
+ }
+
+ function unhide_review(review_id)
+ {
+     $.post("{{ url_for('api.unhide_review') }}", { review_id: review_id },
+         function(o) {
+            if (o.ok) {
+               alert('解除屏蔽成功，请刷新页面');
+            } else {
+               alert(o.message);
+            }
+     }, 'json');
  }
 
 </script>

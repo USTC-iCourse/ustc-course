@@ -36,6 +36,8 @@ class Review(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     term = db.Column(db.String(10), index=True)
+
+    is_hidden = db.Column(db.Boolean, default=False)
     #course: Course
 
     def add(self):
@@ -102,6 +104,16 @@ class Review(db.Model):
 
     def is_upvoted(self, user=current_user):
         return user in self.upvote_users
+
+    def hide(self):
+        self.is_hidden = True
+        self.__save()
+        return (True,"Success!")
+
+    def unhide(self):
+        self.is_hidden = False
+        self.__save()
+        return (True,"Success!")
 
     # this will create a new object, do not use it for update
     def __save(self):

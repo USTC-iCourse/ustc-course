@@ -17,7 +17,8 @@ LANGUAGES = {
 
 
 # SQL config
-SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://ustc_course:ustc_course@localhost/icourse?charset=utf8'
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://icourse:eDuTieudXcfk@localhost/icourse?charset=utf8'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Flask mail
 MAIL_SERVER = 'localhost'
@@ -27,13 +28,13 @@ MAIL_USE_SSL = False
 MAIL_DEBUG = DEBUG
 MAIL_USERNAME = None
 MAIL_PASSWORD = None
-MAIL_DEFAULT_SENDER = 'support@icourse.freeshell.ustc.edu.cn'
+MAIL_DEFAULT_SENDER = 'support@icourse.club'
 MAIL_MAX_EMAILS = None
 #MAIL_SUPPRESS_SEND =
 MAIL_ASCII_ATTACHMENTS = False
 
 # Upload config
-UPLOAD_FOLDER = '/tmp/uploads'
+UPLOAD_FOLDER = '/srv/ustc-course/uploads'
 # Alowed extentsions for a filetype
 # for example 'image': set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = {

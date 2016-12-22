@@ -116,6 +116,39 @@ def delete_comment():
     else:
         return jsonify(ok=False,message="A id must be given")
 
+@api.route('/review/hide/', methods=['POST'])
+@login_required
+def hide_review():
+    review_id = request.values.get('review_id')
+    if review_id:
+        review = Review.query.get(review_id)
+        if review:
+            if current_user.is_admin:
+                ok,message = review.hide()
+                return jsonify(ok=ok,message=message)
+            else:
+                return jsonify(ok=False,message="Forbidden")
+        else:
+            return jsonify(ok=False,message="The review doesn't exist.")
+    else:
+        return jsonify(ok=False,message="A id must be given")
+
+@api.route('/review/unhide/', methods=['POST'])
+@login_required
+def unhide_review():
+    review_id = request.values.get('review_id')
+    if review_id:
+        review = Review.query.get(review_id)
+        if review:
+            if current_user.is_admin:
+                ok,message = review.unhide()
+                return jsonify(ok=ok,message=message)
+            else:
+                return jsonify(ok=False,message="Forbidden")
+        else:
+            return jsonify(ok=False,message="The review doesn't exist.")
+    else:
+        return jsonify(ok=False,message="A id must be given")
 
 @api.route('/user/follow/', methods=['POST'])
 @login_required
