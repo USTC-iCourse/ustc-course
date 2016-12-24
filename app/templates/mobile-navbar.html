@@ -9,9 +9,9 @@
       {% endif %}
       <ul class="nav nav-tabs mobile">
           {% if current_user.is_authenticated %}
-          <li {% if type and type=='follow' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
+          <li {% if type and type=='follow' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">我的关注</a></li>
           {% endif %}
-          <li {% if type and type=='latest' %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">最新</a></li>
+          <li {% if type and type=='latest' %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">最新点评</a></li>
           <li {% if this_module and (this_module=='course.index' or this_module=='home.search') %}class="active"{% endif %}><a href="{{ url_for('course.index') }}">课程</a></li>
           <li style="display: none"><a href="#">讨论区</a></li>
       </ul>
