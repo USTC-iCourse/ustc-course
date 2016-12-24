@@ -1,6 +1,6 @@
 from flask import Blueprint,request, redirect,url_for,render_template,flash, abort, jsonify
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review
+from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -12,10 +12,27 @@ home = Blueprint('home',__name__)
 
 @home.route('/')
 def index():
+    if current_user.is_authenticated:
+        return follow_reviews()
+    else:
+        return latest_reviews()
+
+@home.route('/latest_reviews')
+def latest_reviews():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     reviews_paged = Review.query.order_by(Review.id.desc()).paginate(page=page, per_page=per_page)
-    return render_template('index.html', reviews=reviews_paged)
+    return render_template('latest-reviews.html', reviews=reviews_paged, title='全站最新点评')
+
+@home.route('/follow_reviews')
+def follow_reviews():
+    if not current_user.is_authenticated:
+        return redirect(url_for('home.latest_reviews'))
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    reviews_to_show = Review.query.join(Notification, Review.id == Notification.ref_obj_id).filter(Notification.to_user_id == current_user.id).filter(Notification.ref_class == 'Review').order_by(Review.id.desc())
+    reviews_paged = reviews_to_show.paginate(page=page, per_page=per_page)
+    return render_template('latest-reviews.html', reviews=reviews_paged, title='我关注的点评')
 
 @home.route('/signin/',methods=['POST','GET'])
 def signin():
