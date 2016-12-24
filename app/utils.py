@@ -151,6 +151,17 @@ def term_display(term):
     except:
         return '未知'
 
+@app.template_filter('term_display_short')
+def term_display_short(term):
+    if isinstance(term, list):
+        NUM_DISPLAY_TERMS = 3
+        str = ' '.join([ term_display(t) for t in term[0:NUM_DISPLAY_TERMS] ])
+        if len(term) > NUM_DISPLAY_TERMS:
+            return str + '...'
+        else:
+            return str
+    return term_display(term)
+
 
 RESERVED_USERNAME = set(['管理员', 'admin', 'root',
     'Administrator', 'example', 'test'])

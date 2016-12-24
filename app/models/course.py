@@ -3,6 +3,7 @@ from flask import url_for, Markup
 from app import db
 from decimal import Decimal
 from sqlalchemy import orm
+from .user import Teacher
 try:
     from flask_login import current_user
 except:
@@ -212,12 +213,28 @@ class Course(db.Model):
     @property
     def related_courses(self):
         '''return the courses that are the same name'''
-        return self.query.filter_by(name=self.name).all()
+        QUERY_ORDER = [
+            CourseRate._rate_average.desc(),
+            CourseRate.review_count.desc(),
+        ]
+        return self.query.filter_by(name=self.name).join(CourseRate).order_by(*QUERY_ORDER).all()
 
     @property
     def history_courses(self):
         '''returns the courses having the same course number'''
-        return self.query.filter_by(courseries=self.courseries).all()
+        QUERY_ORDER = [
+            CourseRate._rate_average.desc(),
+            CourseRate.review_count.desc(),
+        ]
+        return self.query.filter_by(courseries=self.courseries).join(CourseRate).order_by(*QUERY_ORDER).all()
+
+    def same_teacher_courses(self, teacher_obj):
+        '''returns the courses having the same teacher'''
+        QUERY_ORDER = [
+            CourseRate._rate_average.desc(),
+            CourseRate.review_count.desc(),
+        ]
+        return self.query.join(course_teachers).join(Teacher).filter(Teacher.id == teacher_obj.id).join(CourseRate).order_by(*QUERY_ORDER).all()
 
     @property
     def course_major_display(self):

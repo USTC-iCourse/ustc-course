@@ -235,23 +235,33 @@
         </div>
         {% endif %}
 
-        {% if course.teachers_count == 1 %}
-        <div class="ud-pd-md dashed" style="display: none">
-          <h3 class="blue">更多{{ course.teachers[0].name }} 老师课程</h5>
-        </div>
-        {% endif %}
-
-        <div class="ud-pd-md dashed" style="display:none">
-          <h4 class="blue">更多「{{ course.name }}」</h5>
-          {% for rel_course in course.related_courses[0:10] %}
+        <div class="ud-pd-md dashed">
+          <h4 class="blue">其他老师的「{{ course.name }}」课</h5>
+          {% for rel_course in course.related_courses %}
           {% if rel_course != course %}
           <div class="ud-pd-sm">
             <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.teacher_names_display }}</a>
-            <span class="small grey align-bottom  float-right">{{ rel_course.term_ids|term_display }}</span>
+            <span>{{ rel_course.course_rate.average_rate or '' }}</span>
+            <span class="small grey align-bottom  float-right">{{ rel_course.term_ids|term_display_short }}</span>
           </div>
           {% endif %}
           {% endfor %}
         </div>
+
+        {% for teacher in course.teachers %}
+        <div class="ud-pd-md dashed">
+          <h4 class="blue">{{ teacher.name }}老师的其他课</h5>
+          {% for rel_course in course.same_teacher_courses(teacher) %}
+          {% if rel_course != course %}
+          <div class="ud-pd-sm">
+            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.name }}</a>
+            <span>{{ rel_course.course_rate.average_rate or '' }}</span>
+            <span class="small grey align-bottom  float-right">{{ rel_course.term_ids|term_display_short }}</span>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endfor %}
       </div>
     </div> <!-- row -->
   </div>  <!-- float-element  -->
