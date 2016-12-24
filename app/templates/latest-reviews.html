@@ -3,16 +3,10 @@
 
 <div class="container">
   <div class="row float-element">
-    
-    <form class="ud-pd-sm mobile" action="search" method="get">
-      <div class="form-group">
-        <input type="text" name="q" class="form-control input-lg" placeholder="搜索你感兴趣的课程">
-      </div>
-    </form>
-
     <div class="bm-pd-md">
-      <h4 class="blue">{{ title }}</h4>
-      <span class="text-muted">共 {{ reviews.total }} 个点评（当前第 {{ reviews.page }} 页）</span>
+      {% include 'mobile-navbar.html' %}
+    
+      <div class="ud-pd-sm"><span class="text-muted">共 {{ reviews.total }} 个点评（当前第 {{ reviews.page }} 页）</span></div>
 
       {% for review in reviews.items %}
           {% if not review.is_hidden or current_user.is_admin or current_user == review.author %}
