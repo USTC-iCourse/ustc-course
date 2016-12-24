@@ -69,6 +69,9 @@
       </ul>
     </nav>
 
+    {% if type == 'follow' %}
+    <div>仅显示了关注的课程和用户的点评。<a href="{{ url_for('home.latest_reviews') }}">戳这里看全站所有点评</a>（最上面导航栏的 “最新” 也行哦）</div>
+    {% endif %}
 
     </div>
 
