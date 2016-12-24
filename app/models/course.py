@@ -516,7 +516,8 @@ class CourseRate(db.Model):
                 3:'很多'}
         if self.review_count:
             rank = round(self._homework_total/self.review_count)
-            return mapper[rank]
+            if rank in mapper:
+                return mapper[rank]
         return None
 
     @property
@@ -526,7 +527,8 @@ class CourseRate(db.Model):
                 3:'杀手',}
         if self.review_count:
             rank = round(self._grading_total/self.review_count)
-            return mapper[rank]
+            if rank in mapper:
+                return mapper[rank]
         return None
 
     @property
@@ -536,7 +538,8 @@ class CourseRate(db.Model):
                 3:'没有'}
         if self.review_count:
             rank = round(self._gain_total/self.review_count)
-            return mapper[rank]
+            if rank in mapper:
+                return mapper[rank]
         return None
 
     @property
