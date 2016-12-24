@@ -140,8 +140,8 @@ class Course(db.Model):
     _dept = db.relationship('Dept', backref='courses', lazy='joined')
 
     teachers = db.relationship('Teacher', secondary=course_teachers, backref=db.backref('courses', lazy='dynamic'), order_by='Teacher.id', lazy="joined")
-    reviews = db.relationship('Review', backref='course', order_by='desc(Review.upvote_count), desc(Review.id)', lazy='dynamic')
-    notes = db.relationship('Note', backref='course', order_by='desc(Note.upvote_count), desc(Note.id)', lazy='dynamic')
+    reviews = db.relationship('Review', backref=db.backref('course', lazy='joined'), order_by='desc(Review.upvote_count), desc(Review.id)', lazy='dynamic')
+    notes = db.relationship('Note', backref=db.backref('course', lazy='joined'), order_by='desc(Note.upvote_count), desc(Note.id)', lazy='dynamic')
     forum_threads = db.relationship('ForumThread', backref='course', order_by='desc(ForumThread.id)', lazy='dynamic')
     shares = db.relationship('Share', backref='course', order_by='desc(Share.upvote_count), desc(Share.id)', lazy='dynamic')
 
