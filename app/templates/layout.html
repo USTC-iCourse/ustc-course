@@ -18,7 +18,10 @@
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li style="display: none"><a href="{{ url_for('home.index') }}">主页</a></li>
+          {% if current_user.is_authenticated %}
+          <li><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
+          {% endif %}
+          <li><a href="{{ url_for('home.latest_reviews') }}">最新</a></li>
           <li><a href="{{ url_for('course.index') }}">课程</a></li>
           <li style="display: none"><a href="#">讨论区</a></li>
         </ul>
