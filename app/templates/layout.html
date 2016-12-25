@@ -6,12 +6,13 @@
     <div class="container">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
+        {% if current_user.is_authenticated %}
+        <button type="button" class="mobile btn btn-default navbar-btn pull-right right-mg-md" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          {{ current_user.username }} <span class="caret"></span>
         </button>
+        {% else %}
+        <button type="button" class="mobile btn btn-default navbar-btn pull-right right-mg-md" data-toggle="modal" data-target="#signin">登录</button>
+        {% endif %}
         <a class="navbar-brand" href="{{ url_for('home.index') }}">USTC评课社区</a>
       </div>
 
@@ -34,8 +35,7 @@
           <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search grey"></span></button>
         </form>
 
-        
-        <ul class="nav navbar-nav navbar-right">
+        <ul class="nav navbar-nav navbar-right desktop">
           {% if current_user.is_authenticated %}
           <li id="dropdown-notice">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" onclick="read_notification({{ current_user.unread_notification_count }})">消息
@@ -54,6 +54,7 @@
               {% endfor %}
               <li class="ud-pd-sm pull-right"><a class="blue" href="{{ url_for('user.notice')}}">查看全部</a></li>
             </ul>
+          </li>
 
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
@@ -66,41 +67,54 @@
           </li>
           {% else %}
           <li><button type="button" class="btn btn-default navbar-btn left-mg-md" data-toggle="modal" data-target="#signin">登录</button></li>
-
-          <div class="modal fade" id="signin" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-signin">
-              <div class="modal-content">
-                <form id="signin-form" class="form-signin">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                  <div class="form-signin-heading">
-                    <span class="h2">请登录</span>
-                    <a class="btn btn-default float-right" href="/signup">注册</a>
-                  </div>
-                  <div id="signin-alert" role="alert" class="display: none"></div>
-                  <label for="inputEmail" class="sr-only">用户名</label>
-                  <input type="text" name="username" id="inputEmail" class="form-control" placeholder="用户名或邮箱" required autofocus>
-                  <label for="inputPassword" class="sr-only">密码</label>
-                  <input type="password" name="password" id="inputPassword" class="form-control" placeholder="密码" required>
-                  <div class="checkbox">
-                    <label>
-                      <input type="checkbox" name="remember">记住我
-                    </label>
-                    <a class="float-right" href="{{ url_for('home.forgot_password') }}">忘记密码</a>
-                  </div>
-                  <button class="btn btn-lg btn-blue btn-block" type="submit">登录</button>
-                </form>
-
-              </div>
-            </div>
-          </div>
-
           {% endif %}
         </ul>
-        
+
+        {% if current_user.is_authenticated %}
+        <ul class="nav navbar-nav navbar-right mobile">
+          <li class="mobile"><a href="{{ url_for('user.notice') }}">消息
+	    {% if current_user.unread_notification_count %}
+	    <span class="badge notice-number-box">{{ current_user.unread_notification_count }}</span>
+            {% endif %}
+            </a></li>
+          <li><a href="{{ url_for('user.view_profile', user_id=current_user.id) }}">个人主页</a></li>
+          <li><a href="{{ url_for('user.account_settings', user_id=current_user.id) }}">设置</a></li>
+          <li class="divider"></li>
+          <li><a href="{{ url_for('home.logout') }}">退出</a></li>
+        </ul>
+        {% endif %}
       </div><!--/.nav-collapse -->
     </div>
   </nav>
 
+  {% if not current_user.is_authenticated %}
+  <div class="modal fade" id="signin" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-signin">
+      <div class="modal-content">
+        <form id="signin-form" class="form-signin">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="form-signin-heading">
+            <span class="h2">请登录</span>
+            <a class="btn btn-default float-right" href="/signup">注册</a>
+          </div>
+          <div id="signin-alert" role="alert" class="display: none"></div>
+          <label for="inputEmail" class="sr-only">用户名</label>
+          <input type="text" name="username" id="inputEmail" class="form-control" placeholder="用户名或邮箱" required autofocus>
+          <label for="inputPassword" class="sr-only">密码</label>
+          <input type="password" name="password" id="inputPassword" class="form-control" placeholder="密码" required>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="remember">记住我
+            </label>
+            <a class="float-right" href="{{ url_for('home.forgot_password') }}">忘记密码</a>
+          </div>
+          <button class="btn btn-lg btn-blue btn-block" type="submit">登录</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+ 
   {% block content %}
   {% endblock %}
   <div id="push"></div>
