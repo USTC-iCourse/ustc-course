@@ -73,7 +73,7 @@ def new_review(course_id):
     polls = [
         {'name': 'difficulty', 'display': '课程难度', 'options': ['简单', '中等', '困难'] },
         {'name': 'homework', 'display': '作业多少', 'options': ['不多', '中等', '超多'] },
-        {'name': 'grading', 'display': '给分好坏', 'options': ['超好', '厚道', '杀手'] },
+        {'name': 'grading', 'display': '给分好坏', 'options': ['超好', '一般', '杀手'] },
         {'name': 'gain', 'display': '收获多少', 'options': ['很多', '一般', '没有'] },
     ]
     return render_template('new-review.html', form=form, course=course, review=review, polls=polls, message=message, is_new=is_new)

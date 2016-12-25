@@ -523,7 +523,7 @@ class CourseRate(db.Model):
     @property
     def grading(self):
         mapper = {1:'超好',
-                2:'厚道',
+                2:'一般',
                 3:'杀手',}
         if self.review_count:
             rank = round(self._grading_total/self.review_count)
