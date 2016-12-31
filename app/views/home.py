@@ -12,10 +12,7 @@ home = Blueprint('home',__name__)
 
 @home.route('/')
 def index():
-    if current_user.is_authenticated:
-        return follow_reviews()
-    else:
-        return latest_reviews()
+    return latest_reviews()
 
 @home.route('/latest_reviews')
 def latest_reviews():

@@ -19,10 +19,10 @@
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav desktop">
+          <li {% if this_module and this_module=='home.latest_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">最新点评</a></li>
           {% if current_user.is_authenticated %}
           <li {% if this_module and this_module=='home.follow_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">我的关注</a></li>
           {% endif %}
-          <li {% if this_module and this_module=='home.latest_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">最新点评</a></li>
           <li {% if this_module and this_module=='course.index' %}class="active"{% endif %}><a href="{{ url_for('course.index') }}">热门课程</a></li>
           <li style="display: none"><a href="#">讨论区</a></li>
         </ul>
