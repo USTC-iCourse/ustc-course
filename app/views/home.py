@@ -6,7 +6,7 @@ from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
 from datetime import datetime
 from sqlalchemy import union, or_
-import sqlalchemy
+from sqlalchemy.sql.expression import literal_column
 from app import db
 from .course import deptlist, QUERY_ORDER
 
@@ -259,7 +259,7 @@ def search():
     #    course_query = course_query.filter(Course.campus==campus)
 
     def course_query_with_meta(meta):
-        return db.session.query(Course, sqlalchemy.sql.expression.literal_column(str(meta)).label("_meta"))
+        return db.session.query(Course, literal_column(str(meta)).label("_meta"))
 
     def teacher_match(q):
         return q.join(Course.teachers).filter(Teacher.name == keyword)
