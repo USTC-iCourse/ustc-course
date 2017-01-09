@@ -6,6 +6,8 @@ from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
 from datetime import datetime
 from sqlalchemy import union, or_
+import sqlalchemy
+from app import db
 from .course import deptlist, QUERY_ORDER
 
 home = Blueprint('home',__name__)
@@ -202,6 +204,38 @@ def reset_password(token):
     return render_template('reset-password.html',form=form)
 
 
+class MyPagination(object):
+
+    def __init__(self, page, per_page, total, items):
+        self.page = page
+        self.per_page = per_page
+        self.total = total
+        self.items = items
+
+    @property
+    def pages(self):
+        return int((self.total + self.per_page - 1) / self.per_page)
+
+    @property
+    def has_prev(self):
+        return self.page > 1
+
+    @property
+    def has_next(self):
+        return self.page < self.pages
+
+    def iter_pages(self, left_edge=2, left_current=2,
+                   right_current=5, right_edge=2):
+        last = 0
+        for num in range(1, self.pages + 1):
+            if num <= left_edge or \
+               (num > self.page - left_current - 1 and \
+                num < self.page + right_current) or \
+               num > self.pages - right_edge:
+                if last + 1 != num:
+                    yield None
+                yield num
+                last = num
 
 @home.route('/search/')
 def search():
@@ -213,36 +247,58 @@ def search():
     course_type = request.args.get('type',None,type=int)
     department = request.args.get('dept',None,type=int)
     campus = request.args.get('campus',None,type=str)
-    course_query = Course.query
-    if course_type:
-        # 课程类型
-        course_query = course_query.filter(Course.course_type==course_type)
-    if department:
-        # 开课院系
-        course_query = course_query.filter(Course.dept_id==department)
-    if campus:
-        # 开课地点
-        course_query = course_query.filter(Course.campus==campus)
+    #course_query = Course.query
+    #if course_type:
+    #    # 课程类型
+    #    course_query = course_query.filter(Course.course_type==course_type)
+    #if department:
+    #    # 开课院系
+    #    course_query = course_query.filter(Course.dept_id==department)
+    #if campus:
+    #    # 开课地点
+    #    course_query = course_query.filter(Course.campus==campus)
 
-    teacher_match = course_query.join(Course.teachers).filter(Teacher.name == keyword)
-    exact_match = course_query.filter(Course.name == keyword)
+    def course_query_with_meta(meta):
+        return db.session.query(Course, sqlalchemy.sql.expression.literal_column(str(meta)).label("_meta"))
+
+    def teacher_match(q):
+        return q.join(Course.teachers).filter(Teacher.name == keyword)
+
+    def exact_match(q):
+        return q.filter(Course.name == keyword)
+
     fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
-    include_match = course_query.filter(Course.name.like('%' + fuzzy_keyword + '%'))
-    fuzzy_match = course_query.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
+
+    def include_match(q):
+        return q.filter(Course.name.like('%' + fuzzy_keyword + '%'))
+
+    def fuzzy_match(q):
+        return q.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
     def ordering(query_obj):
-        return query_obj.join(CourseRate).order_by(*QUERY_ORDER)
+        return query_obj.join(CourseRate).order_by('anon_2_anon_3_anon_4__meta', *QUERY_ORDER)
 
-    courses = ordering(teacher_match.union(exact_match).union(include_match).union(fuzzy_match))
-    if not courses:
-        abort(404)
+    union_courses = teacher_match(course_query_with_meta(1)) \
+                    .union(exact_match(course_query_with_meta(2))) \
+                    .union(include_match(course_query_with_meta(3))) \
+                    .union(fuzzy_match(course_query_with_meta(4)))
+    ordered_courses = ordering(union_courses).group_by(Course.id)
+
+    courses_count = teacher_match(Course.query).union(fuzzy_match(Course.query)).count()
 
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
-    courses_paged = courses.paginate(page=page, per_page=per_page)
+    #per_page = request.args.get('per_page', 10, type=int)
+    per_page = 10
+    if page <= 1:
+        page = 1
+    selections = ordered_courses.offset((page - 1) * per_page).limit(per_page).all()
+    course_objs = [ s[0] for s in selections ]
 
-    return render_template('search.html', keyword=keyword, courses=courses_paged,
-            dept=department, deptlist=deptlist, this_module='home.search')
+    #courses_paged = courses.paginate(page=page, per_page=per_page)
+    pagination = MyPagination(page=page, per_page=per_page, total=courses_count, items=course_objs)
+
+    return render_template('search.html', keyword=keyword, courses=pagination,
+                dept=department, deptlist=deptlist, this_module='home.search')
 
 
 
