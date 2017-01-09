@@ -298,7 +298,9 @@ def search():
     pagination = MyPagination(page=page, per_page=per_page, total=courses_count, items=course_objs)
 
     return render_template('search.html', keyword=keyword, courses=pagination,
-                dept=department, deptlist=deptlist, this_module='home.search')
+                dept=department, deptlist=deptlist,
+                title='搜索「' + keyword + '」',
+                this_module='home.search')
 
 
 
