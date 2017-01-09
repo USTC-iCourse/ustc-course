@@ -152,15 +152,18 @@ def term_display(term):
         return '未知'
 
 @app.template_filter('term_display_short')
-def term_display_short(term):
+def term_display_short(term, NUM_DISPLAY_TERMS=3):
     if isinstance(term, list):
-        NUM_DISPLAY_TERMS = 3
         str = ' '.join([ term_display(t) for t in term[0:NUM_DISPLAY_TERMS] ])
         if len(term) > NUM_DISPLAY_TERMS:
             return str + '...'
         else:
             return str
     return term_display(term)
+
+@app.template_filter('term_display_one')
+def term_display_one(term):
+    return term_display_short(term, 1)
 
 _word_split_re = re.compile(r'''([<>\s]+)''')
 _punctuation_re = re.compile(

@@ -17,7 +17,7 @@
       <span class="label label-success">已点评</span>
       {% endif %}
 
-      <span class="small text-muted">{{ course.latest_term.term|term_display }}</span>
+      <span class="small text-muted">{{ course.term_ids|term_display_one }}</span>
 
       {% if course.review_count %}
       <div class="ud-pd-sm blue">
