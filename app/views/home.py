@@ -6,7 +6,7 @@ from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
 from datetime import datetime
 from sqlalchemy import union, or_
-from sqlalchemy.sql.expression import literal_column
+from sqlalchemy.sql.expression import literal_column, text
 from app import db
 from .course import deptlist, QUERY_ORDER
 
@@ -276,7 +276,7 @@ def search():
         return q.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
     def ordering(query_obj):
-        return query_obj.join(CourseRate).order_by('anon_2_anon_3_anon_4__meta', *QUERY_ORDER)
+        return query_obj.join(CourseRate).order_by(text('anon_2_anon_3_anon_4__meta'), *QUERY_ORDER)
 
     union_courses = teacher_match(course_query_with_meta(1)) \
                     .union(exact_match(course_query_with_meta(2))) \
