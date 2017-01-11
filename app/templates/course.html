@@ -130,7 +130,11 @@
 	  {% if not review.is_hidden or current_user.is_admin or review.author == current_user %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
-            <a href={{ url_for('user.view_profile', user_id=review.author.id) }}><span class="right-pd-sm px16">{{ review.author.username }}</span></a>
+            <span class="right-pd-sm px16">
+              <a href={{ url_for('user.view_profile', user_id=review.author.id) }}>{{ review.author.username }}</a>
+              {% if review.author.is_admin %}<span class="label label-success">管理员</span>{% endif %}
+              {% if review.author.is_teacher %}<span class="label label-success">老师</span>{% endif %}
+            </span>
             <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
             {% if review.rate > 2 %}
             <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
