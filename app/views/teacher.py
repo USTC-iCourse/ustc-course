@@ -27,7 +27,7 @@ def edit_profile(teacher_id):
     if not current_user.is_admin:
        abort(403)
     teacher = Teacher.query.get(teacher_id)
-    form = TeacherProfileForm(request.form, teacher)
+    form = TeacherProfileForm(formdata=request.form, obj=teacher)
     errors = []
     if form.validate_on_submit():
         #teacher.gender = form['gender'].data

@@ -1,10 +1,10 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import (StringField, IntegerField, RadioField, TextAreaField)
 from wtforms.validators import (InputRequired,NumberRange, Length)
 
 from app.models import Course
 
-class CourseForm(Form):
+class CourseForm(FlaskForm):
     #cno = StringField('cno',validators=[InputRequired(), Length(max=20)])
     #term = StringField('term', validators=[InputRequired(), Length(max=20)])
     #name = StringField('name',validators=[InputRequired(), Length(max=80)])

@@ -1,4 +1,4 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, BooleanField, ValidationError, TextAreaField, FileField, SelectField)
 from wtforms.validators import (DataRequired,NumberRange, Email, EqualTo, Length, Optional, AnyOf)
 from app.models import User
@@ -19,13 +19,13 @@ class UsernameField(StringField):
         else:
             self.data = value
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     username = UsernameField('Username',validators=[DataRequired(), Length(max=30,message='The length must unser 30')])
     password = PasswordField('Password',validators=[DataRequired()])
     remember = BooleanField('Remember me',default=False)
 
 
-class RegisterForm(Form):
+class RegisterForm(FlaskForm):
     username = UsernameField('Username', validators=[DataRequired(), Length(max=30,message='The length must unser 30')])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('password', validators=[DataRequired(),
@@ -46,7 +46,7 @@ class RegisterForm(Form):
         else:
             raise ValidationError(res)
 
-class PasswordForm(Form):
+class PasswordForm(FlaskForm):
     old_password = PasswordField('Old password',validators=[DataRequired()])
     password = PasswordField('password', validators=[DataRequired(),
         EqualTo('confirm_password', message='passwords must match')])
@@ -56,16 +56,16 @@ class PasswordForm(Form):
             raise ValidationError('Verify password failed')
 
 
-class ForgotPasswordForm(Form):
+class ForgotPasswordForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired('必须输入邮箱地址'),
         Email()])
 
-class ResetPasswordForm(Form):
+class ResetPasswordForm(FlaskForm):
     password = PasswordField('password', validators=[DataRequired(),
         EqualTo('confirm_password', message='passwords must match')])
     confirm_password = PasswordField('confirm password')
 
-class ProfileForm(Form):
+class ProfileForm(FlaskForm):
     username = UsernameField('Username', validators=[DataRequired(),Length(max=30,message='The length must unser 30')])
     #gender = SelectField('Gender',choices=[('male',_('male')),('female',_('female')),('unkown',_('unkown'))],validators=[DataRequired()])
     description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])
@@ -80,7 +80,7 @@ class ProfileForm(Form):
             raise ValidationError('The username is reserved!')
         '''
 
-class TeacherProfileForm(Form):
+class TeacherProfileForm(FlaskForm):
     description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])
     homepage = StringField('Homepage', validators=[Optional(),Length(max=200,message="长度不大于200")])
     research_interest = StringField('Research_Interest', validators=[Optional(), Length(max=200, message="长度不大于200")])

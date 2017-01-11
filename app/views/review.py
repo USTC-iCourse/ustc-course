@@ -34,7 +34,7 @@ def new_review(course_id):
         old_review.rate = review.rate
 
     message = ''
-    form = ReviewForm(request.form)
+    form = ReviewForm(formdata=request.form, obj=review)
     if request.method == 'POST':
         if form.validate_on_submit():
             # check validity of term

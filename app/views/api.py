@@ -75,7 +75,7 @@ def review_cancel_upvote():
 @api.route('/review/new_comment/',methods=['POST'])
 @login_required
 def review_new_comment():
-    form = ReviewCommentForm(request.form)
+    form = ReviewCommentForm(formdata=request.form)
     if form.validate_on_submit():
         review_id = request.form.get('review_id')
         if review_id:

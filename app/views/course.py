@@ -254,7 +254,7 @@ def edit_course(course_id=None):
     latest_term = course.latest_term
     if not latest_term:
         abort(404)
-    course_form = CourseForm(request.form, course)
+    course_form = CourseForm(formdata=request.form, obj=course)
     if course_form.validate_on_submit():
         course_form.introduction.data = sanitize(course_form.introduction.data)
         course_form.populate_obj(latest_term)

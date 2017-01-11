@@ -9,7 +9,7 @@ import os
 from flask import Flask,request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager,current_user,user_logged_in,user_loaded_from_cookie
-from flask_wtf.csrf import CsrfProtect
+from flask_wtf.csrf import CSRFProtect
 from flask_babel import Babel
 from datetime import datetime
 from flask_debugtoolbar import DebugToolbarExtension
@@ -21,7 +21,7 @@ app.config.from_object('config.default')
 toolbar = DebugToolbarExtension(app)
 
 db = SQLAlchemy(app)
-app.csrf = CsrfProtect(app)
+app.csrf = CSRFProtect(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'home.signin'

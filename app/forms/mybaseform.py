@@ -1,7 +1,7 @@
 from wtforms.csrf.session import SessionCSRF
 
 
-class MyBaseForm(Form):
+class MyBaseForm(FlaskForm):
     class Meta:
         csrf = True
         csrf_class = SessionCSRF

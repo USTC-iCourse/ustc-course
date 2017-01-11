@@ -1,8 +1,8 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField,TextAreaField, BooleanField, ValidationError)
 from wtforms.validators import (InputRequired,NumberRange, Email, EqualTo)
 
-class ReportBugForm(Form):
+class ReportBugForm(FlaskForm):
     url = StringField('Url',[InputRequired()])
     description = TextAreaField('Description')
     browser = StringField('Browser')

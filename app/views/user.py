@@ -70,7 +70,7 @@ def join_course(user_id):
 def account_settings():
     '''账户设置,包括改密码等'''
     user = current_user
-    form = ProfileForm(request.form, user)
+    form = ProfileForm(formdata=request.form, obj=user)
     errors = []
     if form.validate_on_submit():
         username = form['username'].data.strip()
@@ -100,7 +100,7 @@ def account_settings():
 def bind_identity():
     user = current_user
     identity = current_user.identity
-    form = ProfileForm(request.form,user)
+    form = ProfileForm(formdata=request.form, obj=user)
     if identity == 'Student':
         if request.method == "POST":
             sno = request.form.get('sno')
