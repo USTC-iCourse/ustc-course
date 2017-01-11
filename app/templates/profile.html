@@ -7,8 +7,9 @@
     <div class="col-md-8">
       <div class="bm-pd-lg">
         <div class="inline-h3">
-          <span class="blue h4"><strong>点评</strong></span>
-          <a href="{{ url_for('user.reviews', user_id=user.id) }}">（{{ user.reviews_count }}门）</a>
+          <a href="{{ url_for('user.reviews', user_id=user.id) }}">
+             <span class="blue h4"><strong>点评</strong></span>
+              （{{ user.reviews_count }}门）</a>
 
           {% if user.reviews_count > 3 %}
           <span class="float-right"><a href="{{ url_for('user.reviews', user_id=user.id) }}">查看更多 &raquo;</a></span>
@@ -40,8 +41,9 @@
 
       <div class="bm-pd-lg">
         <div class="inline-h3">
-          <span class="blue h4"><strong>关注</strong></span>
-          <a href="{{ url_for('user.follow_course', user_id=user.id) }}">（{{ user.courses_following_count }}门）</a>
+          <a href="{{ url_for('user.follow_course', user_id=user.id) }}">
+             <span class="blue h4"><strong>关注</strong></span>
+              （{{ user.courses_following_count }}门）</a>
 
           {% if user.courses_following_count > 6 %}
           <span class="float-right"><a href="{{ url_for('user.follow_course', user_id=user.id) }}">查看更多 &raquo;</a></span>
@@ -71,11 +73,13 @@
       {% if user.is_student and user.info %}
       <div class="bm-pd-lg">
         <div class="inline-h3">
-          <span class="blue h4"><strong>学过</strong></span>
 
           {% if user.info.sno %}
-          <a href="{{ url_for('user.join_course', user_id=user.id) }}">（{{ user.classes_joined_count }}门）</a>
+          <a href="{{ url_for('user.join_course', user_id=user.id) }}">
+            <span class="blue h4"><strong>学过</strong></span>
+              （{{ user.classes_joined_count }}门）</a>
           {% else %}
+          <span class="blue h4"><strong>学过</strong></span>
           <span class="text-muted">（绑定学号才能显示学过课程）</span>
           {% endif %}
           {% if user.classes_joined_count > 6 %}
