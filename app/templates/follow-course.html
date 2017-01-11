@@ -7,7 +7,7 @@
 
     <div class="bm-pd-lg">
       <div class="inline-h3">
-        <span class="blue h3">{{ user.username }} 关注</span>
+        <span class="blue h3"><a href="{{ url_for('user.view_profile', user_id=user.id) }}">{{ user.username }}</a> 关注</span>
         （{{ user.courses_following_count }}门）
       </div>
 

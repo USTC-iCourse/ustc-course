@@ -7,7 +7,7 @@
 
     <div class="bm-pd-lg">
       <div class="inline-h3">
-        <span class="blue h3">{{ user.username }} 学过</span>
+          <span class="blue h3"><a href="{{ url_for('user.view_profile', user_id=user.id) }}">{{ user.username }}</a> 学过</span>
         （{{ user.classes_joined_count }}门）
       </div>
 
