@@ -36,6 +36,11 @@ html, body { height: 100%; }
         display: none;
     }
 }
+@media (min-width:992px){
+    .mobile-wide {
+        display: none;
+    }
+}
 @media (min-width:768px){
     .mobile {
         display: none;
