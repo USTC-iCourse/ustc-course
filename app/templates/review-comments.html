@@ -3,7 +3,7 @@
               {% for comment in review.comments %}
               <div class="solid ud-pd-sm">
                   <a href="{{ url_for('user.view_profile', user_id=comment.author.id) }}">{{ comment.author.username }}</a>：
-                  <span>{{ comment.content|striptags|urlize(nofollow=true) }}</span>
+                  <span>{{ comment.content|safe|urlize(nofollow=true) }}</span>
                   <span class="text-muted small float-right">
                     {% if user.is_authenticated %}
                     <span class="glyphicon glyphicon-share-alt grey left-pd-md" aria-hidden="true"></span>
