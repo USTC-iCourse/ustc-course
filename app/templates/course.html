@@ -132,8 +132,6 @@
           <div class="blue ud-pd-sm">
             <span class="right-pd-sm px16">
               <a href={{ url_for('user.view_profile', user_id=review.author.id) }}>{{ review.author.username }}</a>
-              {% if review.author.is_admin %}<span class="label label-success">管理员</span>{% endif %}
-              {% if review.author.is_teacher %}<span class="label label-success">老师</span>{% endif %}
             </span>
             <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
             {% if review.rate > 2 %}
