@@ -95,22 +95,22 @@ def editor_parse_at(text):
     if not text.endswith('\n'):
         text = text + '\n' # the parse function will not work with @somebody
     mentioned_users = []
-    matches = re.finditer('(@|＠)([^＠@<>"\'\s]+)', text)
+    matches = re.finditer('@([^@<>"\'\s]+)', text)
     if not matches:
         return text, set(mentioned_users)
-    for username in set([match.group(2) for match in matches]):
+    for username in set([match.group(1) for match in matches]):
         if len(username) > 30:
             continue
         user = User.query.filter_by(username=username).first()
         if user:
             url = url_for('user.view_profile', user_id=user.id)
             # replace @ to Unicode char ＠ to avoid further substitution when review is edited
-            atstring = '<a href="' + url + '">' + '@' + username + '</a>'
+            atstring = '<a href="' + url + '">' + '＠' + username + '</a>'
             # warn: simple str.replace is wrong.
             # consider the following case: @boj @bojjenny42
             #   @boj is first matched and replaced, then the string becomes <a href="">@boj</a> <a href="">@boj</a>jenny42
             # the following regexp would do the trick.
-            text = re.sub("(@|＠)" + re.escape(username) + '([＠@<>"\'\s])',
+            text = re.sub("@" + re.escape(username) + '([@<>"\'\s])',
                           atstring + '\\2', text)
             mentioned_users.append(user)
     return text, set(mentioned_users)
@@ -228,7 +228,7 @@ RESERVED_USERNAME = set(['管理员', 'admin', 'root',
     'Administrator', 'example', 'test'])
 
 def validate_username(username, check_db=True):
-    if re.search('[＠@&<>"\'\s]', username):
+    if re.search('[@&<>"\'\s]', username):
         return ('此用户名含有非法字符，不能注册！')
     if username in RESERVED_USERNAME:
         return ('此用户名已被保留，不能注册！')
