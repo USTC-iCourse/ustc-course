@@ -228,10 +228,8 @@ RESERVED_USERNAME = set(['管理员', 'admin', 'root',
     'Administrator', 'example', 'test'])
 
 def validate_username(username, check_db=True):
-    if re.search('[@&<>"\':;?+=,\s]', username):
+    if re.search('[＠@&<>"\'\s]', username):
         return ('此用户名含有非法字符，不能注册！')
-    if re.match('[a-zA-Z0-9-]+\.[a-zA-Z]+$', username):
-        return ('此用户名看起来像域名，不能注册！')
     if username in RESERVED_USERNAME:
         return ('此用户名已被保留，不能注册！')
     if check_db and User.query.filter_by(username=username).first():
