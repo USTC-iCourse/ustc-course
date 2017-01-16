@@ -403,6 +403,24 @@ class Course(db.Model):
     def joined(self, user=current_user):
         return user.is_student and user.info in self.students
 
+    def joined_classes(self, user=current_user):
+        if user.is_student:
+            from .user import join_course
+            return CourseClass.query.filter(CourseClass.course_id == self.id).join(join_course).filter(join_course.c.student_id == user.student_id).all()
+        else:
+            return []
+
+    def joined_class(self, user=current_user):
+        classes = self.joined_classes(user)
+        if len(classes) > 0:
+            return classes[0]
+        else:
+            return None
+
+    def joined_term(self, user=current_user):
+        cls = self.joined_class(user)
+        return cls.term if cls else None
+
     @property
     def latest_term(self):
         try:

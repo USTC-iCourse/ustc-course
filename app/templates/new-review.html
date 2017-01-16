@@ -19,8 +19,11 @@
           <span class="right-pd-sm weight-heavy">学　　期</span>
 
           <select name="term">
+            {% set joined_term = course.joined_term() %}
             {% for term in course.term_ids %}
-            <option value="{{ term }}" {% if review.term == term %}selected="selected"{% endif %}>{{ term|term_display }}</option>
+              <option value="{{ term }}" {% if review.term == term or joined_term == term %}selected="selected"{% endif %}>{{ term|term_display }}
+              {% if joined_term == term %}(学过){% endif %}
+              </option>
             {% endfor %}
           </select>
           <span class="clearfix"></span>
