@@ -163,6 +163,9 @@ def avatar(user_id):
 @user.route('/notifications/')
 @login_required
 def notice():
+    # accessing notice page clears unread notifications
+    current_user.unread_notification_count = 0
+    current_user.save()
     return render_template('notice.html', notifications=current_user.notifications)
 
 
