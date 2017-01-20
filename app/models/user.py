@@ -179,7 +179,7 @@ class User(db.Model, UserMixin):
 
     @property
     def student_id(self):
-        if self.is_student:
+        if self.is_student and self.info:
             return self.info.sno
         else:
             return None
