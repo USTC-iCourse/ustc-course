@@ -111,7 +111,7 @@ def editor_parse_at(text):
             #   @boj is first matched and replaced, then the string becomes <a href="">@boj</a> <a href="">@boj</a>jenny42
             # the following regexp would do the trick.
             text = re.sub("@" + re.escape(username) + '([@<>"\'\s])',
-                          atstring + '\\2', text)
+                          atstring + '\\1', text)
             mentioned_users.append(user)
     return text, set(mentioned_users)
 
