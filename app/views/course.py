@@ -240,11 +240,9 @@ def course_redirect_cno_term(cno, term):
 
 
 @course.route('/new/',methods=['GET','POST'])
-@course.route('/<int:course_id>/edit/',methods=['GET','POSt'])
+@course.route('/<int:course_id>/edit/',methods=['GET','POST'])
 @login_required
 def edit_course(course_id=None):
-    if not current_user.is_admin:
-        abort(403)
     if course_id:
         course = Course.query.get(course_id)
     else:
