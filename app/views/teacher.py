@@ -24,8 +24,6 @@ def view_profile(teacher_id):
 @teacher.route('/<int:teacher_id>/edit_profile/', methods=['GET','POST'])
 @login_required
 def edit_profile(teacher_id):
-    if not current_user.is_admin:
-       abort(403)
     teacher = Teacher.query.get(teacher_id)
     form = TeacherProfileForm(formdata=request.form, obj=teacher)
     errors = []
