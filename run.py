@@ -13,9 +13,9 @@ for arg in sys.argv:
 def start():
     if debug:
         db.create_all()
-        app.run(port=8080, processes=16)
+        app.run(port=8080, processes=4)
     else:
-        app.run(port=3000, processes=16)
+        app.run(port=3000, processes=4)
 
 
 
