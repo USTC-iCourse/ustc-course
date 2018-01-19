@@ -405,6 +405,8 @@ class TeacherInfoHistory(db.Model):
     description = db.Column(db.Text)
     research_interest = db.Column(db.Text)
 
+    author_user = db.relationship('User')
+
     def save(self, teacher, author=current_user):
         self.teacher = teacher
         self.author = author.id
@@ -446,7 +448,7 @@ class Teacher(db.Model):
     dept = db.relationship('Dept', backref='teachers')
     #courses: backref to Course
 
-    _info_history = db.relationship('TeacherInfoHistory', order_by='desc(id)', backref='teacher', lazy='dynamic')
+    _info_history = db.relationship('TeacherInfoHistory', order_by='desc(TeacherInfoHistory.id)', backref='teacher', lazy='dynamic')
 
     def __repr__(self):
         return '<Teacher {}: {}'.format(self.id, self.name)
@@ -485,3 +487,8 @@ class Teacher(db.Model):
     @property
     def info_history(self):
         return self._info_history.all()
+
+    @property
+    def info_history_count(self):
+        return len(self.info_history)
+

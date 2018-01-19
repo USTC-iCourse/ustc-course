@@ -31,7 +31,7 @@
           -->
           </tbody>
         </table>
-        <p><a href="{{ url_for('course.profile_history', course) }}">查看编辑历史（共 {{ len(course.info_history) }} 次）</a></p>
+        <p><a href="{{ url_for('course.profile_history', course_id=course.id) }}">查看编辑历史（共 {{ course.info_history_count }} 次）</a></p>
 
         <form method="post" enctype="multipart/form-data">
           {{ form.csrf_token }}

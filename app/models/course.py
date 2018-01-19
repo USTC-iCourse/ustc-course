@@ -136,12 +136,14 @@ class CourseInfoHistory(db.Model):
     introduction = db.Column(db.Text) # 老师提交的课程简介
     homepage = db.Column(db.Text) # 课程主页
 
+    author_user = db.relationship('User')
+
     def save(self, course, author=current_user):
         self.course = course
         self.author = author.id
         self.update_time = datetime.utcnow()
-        self.introduction = teacher.introduction
-        self.homepage = teacher.homepage
+        self.introduction = course.introduction
+        self.homepage = course.homepage
 
         db.session.add(self)
         db.session.commit()
@@ -177,11 +179,15 @@ class Course(db.Model):
 
     _course_rate = db.relationship('CourseRate', backref='course', uselist=False, lazy='joined')
 
-    _info_history = db.relationship('CourseInfoHistory', order_by='desc(id)', backref='course', lazy='dynamic')
+    _info_history = db.relationship('CourseInfoHistory', order_by='desc(CourseInfoHistory.id)', backref='course', lazy='dynamic')
 
     @property
     def info_history(self):
         return self._info_history.all()
+
+    @property
+    def info_history_count(self):
+        return len(self.info_history)
 
     @property
     def teacher_id_list(self):
