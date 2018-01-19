@@ -100,8 +100,6 @@ class CourseTerm(db.Model):
     student_requirements = db.Column(db.Text) # 预修课程
     description = db.Column(db.Text()) # 教务处课程简介
     description_eng = db.Column(db.Text()) # 教务处英文简介
-    introduction = db.Column(db.Text()) # 老师提交的课程简介
-    homepage = db.Column(db.Text) # 课程主页
 
     credit = db.Column(db.Integer) # 学分
     hours = db.Column(db.Integer)  # 学时
@@ -125,6 +123,30 @@ class CourseTerm(db.Model):
         return self
 
 
+# course introduction and homepage history
+class CourseInfoHistory(db.Model):
+    __tablename__ = 'course_info_history'
+
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+
+    author = db.Column(db.Integer, db.ForeignKey('users.id'))
+    update_time = db.Column(db.DateTime)
+
+    introduction = db.Column(db.Text) # 老师提交的课程简介
+    homepage = db.Column(db.Text) # 课程主页
+
+    def save(self, course, author=current_user):
+        self.course = course
+        self.author = author.id
+        self.update_time = datetime.utcnow()
+        self.introduction = teacher.introduction
+        self.homepage = teacher.homepage
+
+        db.session.add(self)
+        db.session.commit()
+
+
 # course: distinct (name, set of teachers)
 class Course(db.Model):
     __tablename__ = 'courses'
@@ -132,6 +154,9 @@ class Course(db.Model):
     id = db.Column(db.Integer,unique=True,primary_key=True)
     name = db.Column(db.String(80), index=True) # 课程名称
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
+
+    introduction = db.Column(db.Text) # 老师提交的课程简介
+    homepage = db.Column(db.Text) # 课程主页
 
     _image = db.Column(db.String(100))
 
@@ -151,6 +176,12 @@ class Course(db.Model):
     #review_users: backref to User
 
     _course_rate = db.relationship('CourseRate', backref='course', uselist=False, lazy='joined')
+
+    _info_history = db.relationship('CourseInfoHistory', order_by='desc(id)', backref='course', lazy='dynamic')
+
+    @property
+    def info_history(self):
+        return self._info_history.all()
 
     @property
     def teacher_id_list(self):
@@ -467,12 +498,6 @@ class Course(db.Model):
     @property
     def description_eng(self):
         return self.latest_term.description_eng
-    @property
-    def introduction(self):
-        return self.latest_term.introduction
-    @property
-    def homepage(self):
-        return self.latest_term.homepage
     @property
     def credit(self):
         return self.latest_term.credit

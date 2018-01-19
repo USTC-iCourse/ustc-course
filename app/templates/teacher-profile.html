@@ -77,7 +77,7 @@
     <div class="col-md-4 right-col">
       <div class="ud-pd-md dashed">
 	<img class="avatar-lg cicle" src="{{ teacher.image }}"/>
-	{% if current_user.is_admin %}
+	{% if current_user.is_authenticated %}
 	<btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
 	{% endif %}
 	<h3 class="blue">{{ teacher.name }}</h3>

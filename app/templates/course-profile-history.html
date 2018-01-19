@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+    <div class="col-md-8">
+      <div class="bm-pd-lg">
+	<div class="inline-h3">
+          <span class="blue h3">课程信息编辑历史</span>
+	  {% if len(course.info_history) == 0 %}
+          <span class="text-muted small">还没有被人工编辑过哦！</span>
+          {% else %}
+          <span class="text-muted">(共 {{ len(course.info_history) }} 次)</span>
+          {% endif %}
+	</div>
+
+	{% for history in course.info_history %}
+      	<div class="ud-pd-md dashed">
+    	  <p>课程主页：
+      	    {% if history.homepage and history.homepage != 'http://' %}
+      	    {{ history.homepage }}
+      	    {% else %}暂无{% endif %}
+      	  </p>
+          <p>课程简介：{{ history.introduction or '暂无' }}</p>
+          <p class="small">贡献者：
+<a href="{{ url_for('user.view_profile', user_id=history.author.id) }}">{{ history.author.username }}</a>
+编辑时间：{{ history.update_time }}</p>
+      	</div>
+	{% endfor %}
+      </div><!-- bm-pd-lg -->
+    </div><!-- end col-md-8 -->
+
+    <div class="col-md-4 right-col">
+      <div class="ud-pd-md dashed">
+	<h3 class="blue">{{ course.name }}</h3>
+	{% if current_user.is_authenticated %}
+	<btn class="btn btn-link float-right"><a href="{{ url_for('course.edit_profile', course_id=course.id) }}">编辑课程信息</a></btn>
+	{% endif %}
+        <p>教师：{{ course.teacher_names_display }}</p>
+      </div>
+    </div><!-- end col-md-4 -->
+  </div><!-- end float-element -->
+</div><!-- end container -->
+
+{% endblock %}

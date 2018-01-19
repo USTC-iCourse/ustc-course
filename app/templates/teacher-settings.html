@@ -5,8 +5,10 @@
   <div class="row float-element">
 
     <div class="bm-pd-lg">
-      <h3 class="blue">账户设置</h3>
+      <h3 class="blue">编辑教师信息</h3>
       <hr>
+      <p><a href="{{ url_for('teacher.profile_history', teacher) }}">查看编辑历史（共 {{ len(teacher.info_history) }} 次）</a></p>
+
       <form class="form-horizontal" method="post" enctype="multipart/form-data">
         {{ form.csrf_token }}
         <div class="form-group">

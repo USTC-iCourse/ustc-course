@@ -21,6 +21,14 @@ def view_profile(teacher_id):
     courses_paged = courses.paginate(page=page, per_page=per_page)
     return render_template('teacher-profile.html', teacher=teacher, courses=courses_paged)
 
+@teacher.route('/<int:teacher_id>/profile_history/', methods=['GET'])
+@login_required
+def profile_history(teacher_id):
+    teacher = Teacher.query.get(teacher_id)
+    if not teacher:
+        abort(404)
+    return render_template('teacher-profile-history.html', teacher=teacher)
+
 @teacher.route('/<int:teacher_id>/edit_profile/', methods=['GET','POST'])
 @login_required
 def edit_profile(teacher_id):
@@ -43,7 +51,10 @@ def edit_profile(teacher_id):
             else:
                 errors.append(_("Avatar upload failed"))
         teacher.save()
-        db.session.commit()
+
+        info_history = TeacherInfoHistory()
+        info_history.save(teacher, current_user) 
+
         return redirect(url_for('teacher.view_profile', teacher_id=teacher.id))
     return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form)
 

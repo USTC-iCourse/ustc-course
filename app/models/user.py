@@ -389,6 +389,41 @@ class Student(db.Model):
         return self
 
 
+
+# teacher information history
+class TeacherInfoHistory(db.Model):
+    __tablename__ = 'teacher_info_history'
+
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'))
+
+    author = db.Column(db.Integer, db.ForeignKey('users.id'))
+    update_time = db.Column(db.DateTime)
+
+    _image = db.Column(db.String(100))
+    homepage = db.Column(db.Text)
+    description = db.Column(db.Text)
+    research_interest = db.Column(db.Text)
+
+    def save(self, teacher, author=current_user):
+        self.teacher = teacher
+        self.author = author.id
+        self.update_time = datetime.utcnow()
+        self._image = teacher._image
+        self.homepage = teacher.homepage
+        self.description = teacher.description
+        self.research_interest = teacher.research_interest
+
+        db.session.add(self)
+        db.session.commit()
+
+    @property
+    def image(self):
+        if self._image:
+            return '/uploads/images/' + self._image
+        return '/static/image/teacher.jpg'
+
+
 class Teacher(db.Model):
     __tablename__ = 'teachers'
 
@@ -401,7 +436,7 @@ class Teacher(db.Model):
     title = db.Column(db.String(80))
     office_phone = db.Column(db.String(80))
     gender = db.Column(db.Enum('male','female','unknown'),default='unknown')
-    description = db.Column(db.Text())
+    description = db.Column(db.Text)
     homepage = db.Column(db.Text)
     research_interest = db.Column(db.Text)
     _image = db.Column(db.String(100))
@@ -410,6 +445,8 @@ class Teacher(db.Model):
 
     dept = db.relationship('Dept', backref='teachers')
     #courses: backref to Course
+
+    _info_history = db.relationship('TeacherInfoHistory', order_by='desc(id)', backref='teacher', lazy='dynamic')
 
     def __repr__(self):
         return '<Teacher {}: {}'.format(self.id, self.name)
@@ -444,3 +481,7 @@ class Teacher(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+    @property
+    def info_history(self):
+        return self._info_history.all()

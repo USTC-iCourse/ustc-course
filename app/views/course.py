@@ -239,6 +239,15 @@ def course_redirect_cno_term(cno, term):
 
 
 
+@course.route('/<int:course_id>/profile_history/', methods=['GET'])
+@login_required
+def profile_history(course_id):
+    course = Course.query.get(course_id)
+    if not course:
+        abort(404)
+    return render_template('course-profile-history.html', course=course)
+
+
 @course.route('/new/',methods=['GET','POST'])
 @course.route('/<int:course_id>/edit/',methods=['GET','POST'])
 @login_required
@@ -249,16 +258,17 @@ def edit_course(course_id=None):
         course = Course()
     if not course:
         abort(404)
-    latest_term = course.latest_term
-    if not latest_term:
-        abort(404)
     course_form = CourseForm(formdata=request.form, obj=course)
     if course_form.validate_on_submit():
         course_form.introduction.data = sanitize(course_form.introduction.data)
-        course_form.populate_obj(latest_term)
-        if not latest_term.homepage.startswith('http'):
-            latest_term.homepage = 'http://' + course.homepage
-        latest_term.save()
+        course_form.populate_obj(course)
+        if not course.homepage.startswith('http'):
+            course.homepage = 'http://' + course.homepage
+        course.save()
+
+        info_history = CourseInfoHistory()
+        info_history.save(course, current_user) 
+
         db.session.commit()
         return redirect(url_for('course.view_course', course_id=course.id))
     return render_template('course-edit.html', form=course_form, course=course)
