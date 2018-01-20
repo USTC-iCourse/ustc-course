@@ -442,6 +442,7 @@ class Teacher(db.Model):
     homepage = db.Column(db.Text)
     research_interest = db.Column(db.Text)
     _image = db.Column(db.String(100))
+    last_edit_time = db.Column(db.DateTime)
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
@@ -481,6 +482,7 @@ class Teacher(db.Model):
         self._image = image
 
     def save(self):
+        self.last_edit_time = datetime.utcnow()
         db.session.add(self)
         db.session.commit()
 

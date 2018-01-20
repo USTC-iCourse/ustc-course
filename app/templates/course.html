@@ -74,7 +74,7 @@
           <strong>课程主页</strong>：<a href="{{ course.homepage }}">{{ course.homepage }}</a>
           {% else %}
           <strong>课程主页</strong>：暂无（如果你知道，劳烦告诉我们！）
-        {% endif %}
+          {% endif %}
         </div>
 
         <div id="action-btn-group" class="ud-pd-md" style="display:none">
@@ -96,14 +96,23 @@
         </div>
 
 	{% if course.introduction %}
-	<div class="solid ud-pd-md inline-h3">
-          <span class="blue h3">简介</span>
-	</div>
-
-	<div  class="ud-pd-sm">
-	  <p>
-	    {{ course.introduction|safe }}
-	  </p>
+	<div class="ud-pd-md">
+	  <div class="solid ud-pd-sm inline-h3">
+            <span class="blue h3">简介</span>
+	  </div>
+          <div>
+	  {{ course.introduction|safe }}
+          </div>
+          <p class="text-muted pull-right small">
+             {% if user.is_authenticated %}
+             <span class="glyphicon glyphicon-pencil grey left-pd-sm" aria-hidden="true" ></span>
+             <a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程简介</a>
+             {% endif %}
+             {% if course.last_edit_time %}
+             <span class="glyphicon glyphicon-time grey left-pd-sm" aria-hidden="true" ></span>
+             最后更新：{{ course.last_edit_time|localtime }}
+             {% endif %}
+          </p>
 	</div>
 	{% endif %}
 

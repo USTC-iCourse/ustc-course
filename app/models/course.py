@@ -159,6 +159,7 @@ class Course(db.Model):
 
     introduction = db.Column(db.Text) # 老师提交的课程简介
     homepage = db.Column(db.Text) # 课程主页
+    last_edit_time = db.Column(db.DateTime)
 
     _image = db.Column(db.String(100))
 
@@ -236,6 +237,7 @@ class Course(db.Model):
         return self.course_rate
 
     def save(self):
+        self.last_edit_time = datetime.utcnow()
         db.session.add(self)
         db.session.commit()
         return self
