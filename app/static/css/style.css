@@ -430,3 +430,20 @@ a.nounderline, a.nounderline:hover, a.nounderline:active {
 .review img {
     max-width: 100%;
 }
+
+/* half-empty star in ratings */
+.glyphicon-star-half {
+    position: relative
+}
+.glyphicon-star-half:after {
+    content: "\e007";
+    position: absolute;
+    top:0;
+    left:0
+}
+.glyphicon-star-half:before {
+    content: "\e006";
+    width: 47%;
+    display: block;
+    overflow: hidden
+}

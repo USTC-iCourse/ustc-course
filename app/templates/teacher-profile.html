@@ -31,44 +31,29 @@
 	  {% endif %}
 	  <span class="small grey align-bottom float-right">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
       <span class="clearfix"></span>
-
-	  {% if course.review_count %}
-	  <div class="ud-pd-sm blue">
-	    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-	    {% if course.rate.average_rate > 2 %}
-	    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-	    {% else %}
-	    <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-	    {% endif %}
-	    {% if course.rate.average_rate > 4 %}
-	    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-	    {% else %}
-	    <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-	    {% endif %}
-	    {% if course.rate.average_rate > 6 %}
-	    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-	    {% else %}
-	    <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-	    {% endif %}
-	    {% if course.rate.average_rate > 8 %}
-	    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-	    {% else %}
-	    <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-	    {% endif %}
-	    <span class="rl-pd-sm h4">{{ course.rate.average_rate }}</span><span class="text-muted px12">({{ course.review_count }} 人评价)</span>
-	  </div>
-	  {% else %}
-	  <div class="ud-pd-sm blue">
-	    <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-	    <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-	    <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-	    <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-	    <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-	    <span class="rl-pd-sm h4"><span class="text-muted px12">暂无评价</span>
-	  </div>
-	  {% endif %}
+          {% if course.review_count %}
+          <div class="ud-pd-sm blue">
+            {% for star in range(0,5) %}
+              {% if course.rate.average_rate >= 1.5 + star * 2 %}
+              <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+              {% elif course.rate.average_rate >= 0.5 + star * 2 %}
+              <span class="glyphicon glyphicon-star-half" aria-hidden="true"></span>
+              {% else %}
+              <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+              {% endif %}
+            {% endfor %}
+            <span class="rl-pd-sm h4">{{ course.rate.average_rate }}</span><span class="text-muted px12">({{ course.review_count }} 人评价)</span>
+          </div>
+          {% else %}
+          <div class="ud-pd-sm blue">
+            {% for star in range(0,5) %}
+              <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+            {% endfor %}
+            <span class="rl-pd-sm h4"><span class="text-muted px12">暂无评价</span>
+          </div>
+          {% endif %}
 	</div> <!-- end course.item -->	
-	  {% endfor %}
+	{% endfor %}
       </div><!-- bm-pd-lg -->
     </div><!-- end col-md-8 -->
 
