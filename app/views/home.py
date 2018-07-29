@@ -127,6 +127,7 @@ def confirm_email():
         if RT.query.get(token):
             return render_template('feedback.html', status=False, message=_('此激活链接已被使用过。'))
         RT.add(token)
+        email = None
         try:
             email = ts.loads(token, salt="email-confirm-key", max_age=86400)
         except:

@@ -57,8 +57,31 @@ def index():
 
     courses_page = course_query.join(CourseRate).order_by(*QUERY_ORDER).paginate(page,per_page=per_page)
     return render_template('course-index.html', courses=courses_page,
-            dept=department, deptlist=deptlist, title='热门课程',
+            dept=department, deptlist=deptlist, title='好评课程',
             this_module='course.index')
+
+@course.route('/popular/')
+def popular():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    course_type = request.args.get('type',None,type=int)
+    department = request.args.get('dept',None,type=int)
+    campus = request.args.get('campus',None,type=str)
+    course_query = Course.query
+    #if course_type:
+    #    # 课程类型
+    #    course_query = course_query.filter(Course.course_type==course_type)
+    #if department:
+    #    # 开课院系
+    #    course_query = course_query.filter(Course.dept_id==department)
+    #if campus:
+    #    # 开课地点
+    #    course_query = course_query.filter(Course.campus==campus)
+
+    courses_page = course_query.join(CourseRate).order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc()).paginate(page,per_page=per_page)
+    return render_template('course-index.html', courses=courses_page,
+            dept=department, deptlist=deptlist, title='热门课程',
+            this_module='course.popular')
 
 @course.route('/<int:course_id>/')
 def view_course(course_id):
