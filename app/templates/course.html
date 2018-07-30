@@ -221,7 +221,10 @@
           {% if rel_course != course %}
           <div class="ud-pd-sm">
             <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.teacher_names_display }}</a>
-            <span>{{ rel_course.course_rate.average_rate or '' }}</span>
+            {% if rel_course.review_count %}
+            <span>{{ rel_course.course_rate.average_rate }}</span>
+            <span class="grey">({{ rel_course.review_count }})</span>
+            {% endif %}
             <span class="small grey align-bottom  float-right">{{ rel_course.term_ids|term_display_short }}</span>
           </div>
           {% endif %}
@@ -235,7 +238,10 @@
           {% if rel_course != course %}
           <div class="ud-pd-sm">
             <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.name }}</a>
-            <span>{{ rel_course.course_rate.average_rate or '' }}</span>
+            {% if rel_course.review_count %}
+            <span>{{ rel_course.course_rate.average_rate }}</span>
+            <span class="grey">({{ rel_course.review_count }})</span>
+            {% endif %}
             <span class="small grey align-bottom  float-right">{{ rel_course.term_ids|term_display_short }}</span>
           </div>
           {% endif %}
