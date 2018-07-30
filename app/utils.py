@@ -150,7 +150,7 @@ def term_display(term):
         return '未知'
 
 @app.template_filter('term_display_short')
-def term_display_short(term, NUM_DISPLAY_TERMS=3):
+def term_display_short(term, NUM_DISPLAY_TERMS=2):
     if isinstance(term, list):
         str = ' '.join([ term_display(t) for t in term[0:NUM_DISPLAY_TERMS] ])
         if len(term) > NUM_DISPLAY_TERMS:
