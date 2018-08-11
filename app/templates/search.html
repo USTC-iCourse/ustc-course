@@ -13,7 +13,7 @@
       <ul class="pagination">
         {% if courses.has_prev %} 
         <li>
-            <a href="{{ url_for('home.search', q=keyword, page=courses.prev_num, term=term, dept=dept) }}" aria-label="Previous">
+            <a href="{{ url_for('home.search', q=keyword, page=courses.page-1, term=term, dept=dept) }}" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
@@ -33,7 +33,7 @@
 
         {% if courses.has_next %}
         <li>
-          <a href="{{ url_for('home.search', q=keyword, page=courses.next_num, term=term, dept=dept) }}" aria-label="Next">
+          <a href="{{ url_for('home.search', q=keyword, page=courses.page+1, term=term, dept=dept) }}" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>
