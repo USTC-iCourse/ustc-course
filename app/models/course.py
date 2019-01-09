@@ -414,7 +414,7 @@ class Course(db.Model):
     @property
     def teacher_names_display(self):
         if self.teachers_count == 0:
-            return 'Unknown'
+            return '未知'
         else:
             return ', '.join([teacher.name for teacher in self.teachers])
 
