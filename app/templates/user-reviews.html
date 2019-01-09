@@ -15,7 +15,7 @@
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
             {% set course = review.course %}
-            <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('Unknown') }}）</a>
+            <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('未知') }}）</a>
             <span class="small grey align-bottom left-pd-sm">学期：{{ review.term|term_display }}</span>
             <span class="text-muted small float-right desktop">{{ review.update_time|localtime }}</span>
           </div>
