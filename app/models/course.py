@@ -391,6 +391,8 @@ class Course(db.Model):
             return False
 
         last_class = CourseClass.query.filter(CourseClass.course_id == self.id).order_by(CourseClass.term.desc()).first()
+        if last_class is None:
+            return False
         db.session.execute(join_course.insert().values(class_id = last_class.id, student_id = user.student_id))
         db.session.commit()
         return True
