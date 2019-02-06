@@ -12,6 +12,7 @@
 
         {% for review in user.reviews %}
           {% if not review.is_hidden or current_user.is_admin or current_user == user %}
+          {% if review.course %}
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
             {% set course = review.course %}
@@ -24,6 +25,7 @@
             <a href="{{ url_for('course.view_course', course_id=course.id) }}#review-{{ review.id }}"> >>{{ _('more') }}</a>
           </p>
         </div>
+          {% endif %}
           {% endif %}
         {% endfor %}
       </div><!-- end bm-pd-lg -->
