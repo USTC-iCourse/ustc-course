@@ -113,7 +113,7 @@ class CourseTerm(db.Model):
 
     def __repr__(self):
         try:
-            return self.course.name + '(' + ','.join(map(str, self.course.teacher_id_list)) + ')' + '@' + self.term
+            return str(self.course) + '@' + self.term
         except:
             return ""
 
@@ -194,8 +194,12 @@ class Course(db.Model):
     def teacher_id_list(self):
         return [ teacher.id for teacher in self.teachers ]
 
+    @property
+    def teacher_name_list(self):
+        return [ teacher.name for teacher in self.teachers ]
+
     def __repr__(self):
-        return self.name + '(' + ','.join(map(str, self.teacher_id_list)) + ')'
+        return self.name + '(' + ','.join(sorted(self.teacher_name_list)) + ')'
 
     @classmethod
     def create(cls,cno,term,**kwargs):
