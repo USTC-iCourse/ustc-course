@@ -21,7 +21,7 @@
           <select name="term">
             {% set joined_term = course.joined_term() %}
             {% for term in course.term_ids %}
-              <option value="{{ term }}" {% if review.term == term or joined_term == term %}selected="selected"{% endif %}>{{ term|term_display }}
+              <option value="{{ term }}" {% if review.term == term or ((not review.term or review.term not in course.term_ids) and joined_term == term) %}selected="selected"{% endif %}>{{ term|term_display }}
               {% if joined_term == term %}(学过){% endif %}
               </option>
             {% endfor %}
