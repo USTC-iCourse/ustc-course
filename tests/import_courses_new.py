@@ -98,17 +98,24 @@ def load_courses(insert=True):
             else:
                 t = Teacher()
             t.name = teacher_name
-            if teacher['person']['gender']['nameEn'] == 'Male':
-                t.gender = 'male'
-            elif teacher['person']['gender']['nameEn'] == 'Female':
-                t.gender = 'female'
-            else:
+            try:
+                if teacher['person']['gender']['nameEn'] == 'Male':
+                    t.gender = 'male'
+                elif teacher['person']['gender']['nameEn'] == 'Female':
+                    t.gender = 'female'
+                else:
+                    t.gender = 'unknown'
+            except:
                 t.gender = 'unknown'
-            DWDM = teacher['department']['code']
-            if DWDM in depts_code_map:
-                t._dept = depts_code_map[DWDM]
-            else:
-                print('Teacher department not found ' + DWDM + ': ' + str(teacher))
+
+            try:
+                DWDM = teacher['department']['code']
+                if DWDM in depts_code_map:
+                    t._dept = depts_code_map[DWDM]
+                else:
+                    print('Teacher department not found ' + DWDM + ': ' + str(teacher))
+            except:
+                pass
 
             if not t.name in teachers_map:
                 db.session.add(t)
