@@ -10,6 +10,7 @@ import os
 from lxml.html.clean import Cleaner
 import pytz
 import re
+from PIL import Image
 
 
 mail = Mail(app)
@@ -18,7 +19,7 @@ ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
 def rand_str():
     random_num = randint(100000,999999)
-    raw_str = str(datetime.utcnow()) + str(randint(100000,999999))
+    raw_str = str(datetime.utcnow()) + str(randint(100000,999999)) + str(randint(100000,999999))
     hash_fac = hashlib.new('ripemd160')
     hash_fac.update(raw_str.encode('utf-8'))
     return hash_fac.hexdigest()
@@ -79,6 +80,24 @@ def handle_upload(file,type):
         return True,new_filename
     return False,"File type disallowd!"
 
+def resize_avatar(old_file):
+    upload_base = os.path.join(app.config['UPLOAD_FOLDER'],'image'+'s/')
+    with Image.open(os.path.join(upload_base, old_file)) as img:
+        image_width, image_height = img.size
+        thumbnail_width = 192
+        thumbnail_height = 192
+        if image_width <= thumbnail_width and image_height <= thumbnail_height:
+            return old_file
+        # generate thumbnail if the avatar is too large
+        new_filename = rand_str() + '.png'
+        try:
+            img.thumbnail((thumbnail_width, thumbnail_height), Image.ANTIALIAS)
+            img.save(os.path.join(upload_base, new_filename), "PNG")
+        except IOError:
+            print("Failed to create thumbnail from '" + old_file + "' to '" + new_filename + "'")
+            return old_file
+        return new_filename
+    return old_file
 
 def sanitize(text):
     if text.strip():

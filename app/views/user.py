@@ -2,7 +2,7 @@ from flask import Blueprint,render_template,abort,redirect,url_for,request, abor
 from app.models import *
 from app.forms import LoginForm, ProfileForm,PasswordForm
 from flask_login import login_user, current_user, login_required
-from app.utils import handle_upload, sanitize
+from app.utils import handle_upload, resize_avatar, sanitize
 from flask_babel import gettext as _
 import re
 
@@ -89,7 +89,7 @@ def account_settings():
             avatar = request.files['avatar']
             ok,info = handle_upload(avatar,'image')
             if ok:
-                user.set_avatar(info)
+                user.set_avatar(resize_avatar(info))
             else:
                 errors.append(_("Avatar upload failed"))
         user.save()
