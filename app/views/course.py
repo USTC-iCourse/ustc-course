@@ -176,7 +176,7 @@ def join(course_id):
     if not course or course.joined:
         return jsonify(ok=False)
     ok = course.join()
-    return jsonify(ok=ok, count=course.join_count)
+    return jsonify(ok=ok)
 
 @course.route('/<int:course_id>/quit/',
 methods=['POST'])
@@ -186,7 +186,7 @@ def quit(course_id):
     if not course or not course.joined:
         return jsonify(ok=False)
     ok = course.quit()
-    return jsonify(ok=ok, count=course.join_count)
+    return jsonify(ok=ok)
 
 @course.route('/<int:course_id>/reviews/')
 def reviews(course_id):

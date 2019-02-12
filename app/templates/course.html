@@ -73,11 +73,9 @@
           <button class="btn btn-blue btn-flat btn-downvote btn-undo"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 取消不推荐 <small>(<span class="count"></span>)</small></button>
 
           {% if current_user.is_student %}
-          <button class="btn btn-white btn-flat btn-join btn-do"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small>(<span class="count"></span>)</small></button>
-          <button class="btn btn-blue btn-flat btn-join btn-undo"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small>(<span class="count"></span>)</small></button>
+          <button class="btn btn-white btn-flat btn-join btn-do"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small></small></button>
+          <button class="btn btn-blue btn-flat btn-join btn-undo"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small></small></button>
           {% endif %}
-
-          <span class="float-right" style="display: none" target="_blank"><a>查看{{ course.join_count }}位同班同学</a></span>
         </div>
 
 	{% if course.introduction %}
@@ -286,7 +284,6 @@
    },
    'join': {
      'enabled': {{ 'true' if course.joined else 'false' }},
-     'count': {{ course.join_count or 0 }},
      'do_url': "{{ url_for('course.join', course_id=course.id) }}",
      'undo_url': "{{ url_for('course.quit', course_id=course.id) }}",
    },
