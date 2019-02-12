@@ -363,7 +363,6 @@ def load_courses(insert=True):
                 for t in teacher_ids:
                     course.teachers.append(teachers_map[t])
 
-            db.session.add(course)
             courses_map[course_key] = course
 
             # course rate 
@@ -377,6 +376,7 @@ def load_courses(insert=True):
             course.dept_id = depts_code_map[c['DWBH']].id
         else:
             print('Department code ' + c['DWBH'] + ' not found in ' + str(c))
+        db.session.add(course)
 
         # course term
         term = c['XQ']
@@ -385,7 +385,6 @@ def load_courses(insert=True):
             course_term = course_terms_map[term_key]
         else:
             course_term = CourseTerm()
-            db.session.add(course_term)
             course_terms_map[term_key] = course_term
             new_term_count+=1
 
@@ -400,6 +399,8 @@ def load_courses(insert=True):
 
         for key in course_kcbh[c['KCBH']]:
             setattr(course_term, key, course_kcbh[c['KCBH']][key])
+        print(course_term.kcbh, course_term.kcid)
+        db.session.add(course_term)
 
         # course class
         unique_key = c['KCBJH'].upper() + '@' + c['XQ']
@@ -408,7 +409,6 @@ def load_courses(insert=True):
             course_class.course = course # update course mapping
         else:
             course_class = CourseClass()
-            db.session.add(course_class)
             course_classes_map[unique_key] = course_class
             new_class_count+=1
 
@@ -416,6 +416,7 @@ def load_courses(insert=True):
         course_class.course = course
         course_class.term = c['XQ']
         course_class.cno = c['KCBJH'].upper()
+        db.session.add(course_class)
 
     db.session.commit()
     print('%d new courses loaded' % new_course_count)
