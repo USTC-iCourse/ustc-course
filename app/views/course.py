@@ -83,6 +83,27 @@ def popular():
             dept=department, deptlist=deptlist, title='热门课程',
             this_module='course.popular')
 
+@course.route('/public/')
+def public_courses():
+    # large enough per_page to disable pagination effectively
+    courses_page = Course.query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(*QUERY_ORDER).paginate(1, per_page=10000)
+
+    #courses = course_query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(*QUERY_ORDER).all()
+    #class my_pagination():
+    #    def __init__(self, courses):
+    #        self.items = courses
+    #        self.total = len(courses)
+    #        self.page = 1
+    #        self.has_prev = False
+    #        self.has_next = False
+    #    def iter_pages(self, left_edge, right_edge):
+    #        return [1]
+
+    #courses_page = my_pagination(courses)
+    return render_template('course-index.html', courses=courses_page,
+            title='公选课程',
+            this_module='course.public_courses')
+
 @course.route('/<int:course_id>/')
 def view_course(course_id):
     course = Course.query.get(course_id)
