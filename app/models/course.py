@@ -94,6 +94,8 @@ class CourseTerm(db.Model):
     course_major = db.Column(db.String(20)) # 学科类别
     course_type = db.Column(db.String(20)) # 课程类别，计划内，公选课……
     course_level = db.Column(db.String(20)) # 课程层次
+    join_type = db.Column(db.String(20)) # 选课类别
+    teaching_type = db.Column(db.String(20)) # 教学类型
     grading_type = db.Column(db.String(20)) # 评分制
     teaching_material = db.Column(db.Text) # 教材
     reference_material = db.Column(db.Text) # 参考书
@@ -163,8 +165,8 @@ class Course(db.Model):
 
     _image = db.Column(db.String(100))
 
-    terms = db.relationship('CourseTerm', backref='course', order_by='desc(CourseTerm.term)', lazy='joined')
-    classes = db.relationship('CourseClass', backref='course', lazy='joined')
+    terms = db.relationship('CourseTerm', backref='course', order_by='desc(CourseTerm.term)', lazy='dynamic')
+    classes = db.relationship('CourseClass', backref='course', lazy='dynamic')
     _dept = db.relationship('Dept', backref='courses', lazy='joined')
 
     teachers = db.relationship('Teacher', secondary=course_teachers, backref=db.backref('courses', lazy='dynamic'), order_by='Teacher.id', lazy="joined")
@@ -497,6 +499,12 @@ class Course(db.Model):
     @property
     def grading_type(self):
         return self.latest_term.grading_type
+    @property
+    def join_type(self):
+        return self.latest_term.join_type
+    @property
+    def teaching_type(self):
+        return self.latest_term.teaching_type
     @property
     def teaching_material(self):
         return self.latest_term.teaching_material
