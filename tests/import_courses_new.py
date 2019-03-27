@@ -83,13 +83,17 @@ def load_courses(insert=True):
             kcbh = course['code'],
             name = course['nameZh'],
             name_eng = course['nameEn'],
-            credit = course['credits']
+            credit = course['credits'],
+            course_type = c['courseCategory']['nameZh'],
+            course_level = c['courseGradation']['nameZh'] if c['courseGradation'] else None,
+            join_type = c['classType']['nameZh'] if c['classType'] else None,
+            teaching_type = c['courseType']['nameZh'] if c['courseType'] else None
         )
 
         if 'PeriodInfo' in course:
             course_kcbh[code]['hours'] = course['PeriodInfo']['total']
             course_kcbh[code]['hours_per_week'] = course['PeriodInfo']['periodsPerWeek']
-
+        
         for _t in c['teacherAssignmentList']:
             teacher = _t['teacher']
             teacher_name = teacher['person']['nameZh']
