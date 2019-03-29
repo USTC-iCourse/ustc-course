@@ -14,7 +14,7 @@
           {% endif %}
           <li {% if this_module and (this_module=='course.index' or this_module=='home.search') %}class="active"{% endif %}><a href="{{ url_for('course.index') }}">好评</a></li>
           <li {% if this_module and (this_module=='course.popular') %}class="active"{% endif %}><a href="{{ url_for('course.popular') }}">热门</a></li>
-          <li style="display: none"><a href="#">讨论区</a></li>
+          <li {% if this_module and this_module=='course.public_courses' %}class="active"{% endif %}><a href="{{ url_for('course.public_courses') }}">公选</a></li>
       </ul>
 
 
