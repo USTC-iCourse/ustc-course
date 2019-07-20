@@ -135,7 +135,7 @@ def upvote(course_id):
     if course.downvoted:
         course.un_downvote()
     ok = course.upvote()
-    for user in set(current_user.followers + course.followers + course.joined_users):
+    for user in set(current_user.followers + course.followers):
         user.notify('upvote', course)
     return jsonify(ok=ok, count=course.upvote_count)
 
@@ -157,7 +157,7 @@ def downvote(course_id):
     if course.upvoted:
         course.un_upvote()
     ok = course.downvote()
-    for user in set(current_user.followers + course.followers + course.joined_users):
+    for user in set(current_user.followers + course.followers):
         user.notify('downvote', course)
     return jsonify(ok=ok, count=course.downvote_count)
 
