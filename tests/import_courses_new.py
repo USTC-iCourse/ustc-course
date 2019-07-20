@@ -23,7 +23,7 @@ def parse_file(filename):
     return data
 
 def parse_json(filename):
-    with open(filename) as f:
+    with open(filename, encoding='utf-8') as f:
         import json
         return json.load(f)
 
@@ -74,8 +74,10 @@ def load_courses(insert=True):
     term = int(sys.argv[1])
     print('Term ' + str(term))
     json = parse_json(sys.argv[2])
-    print('Data loaded with %d courses' % len(json['data']))
-    for c in json['data']:
+    if 'data' in json:
+        json = json['data']
+    print('Data loaded with %d courses' % len(json))
+    for c in json:
         course = c['course']
         code = course['code']
         course_kcbh[course['code']] = dict(
@@ -94,9 +96,20 @@ def load_courses(insert=True):
             course_kcbh[code]['hours'] = course['PeriodInfo']['total']
             course_kcbh[code]['hours_per_week'] = course['PeriodInfo']['periodsPerWeek']
         
-        for _t in c['teacherAssignmentList']:
-            teacher = _t['teacher']
-            teacher_name = teacher['person']['nameZh']
+        teachers = []
+        teacher_names = []
+        if 'teachers' in c:
+            teachers = c['teachers']
+        elif 'teacherAssignmentList' in c:
+            teachers = c['teacherAssignmentList']
+        for _t in teachers:
+            if 'teacher' in _t:
+                teacher = _t['teacher']
+                teacher_name = teacher['person']['nameZh']
+            else:
+                teacher = _t
+                teacher_name = teacher['nameZh']
+            teacher_names.append(teacher_name)
             if teacher_name in teachers_map:
                 t = teachers_map[teacher_name]
             else:
@@ -126,7 +139,7 @@ def load_courses(insert=True):
                 teachers_map[t.name] = t
                 new_teacher_count += 1
 
-        course_key = course['nameZh'] + '(' + ','.join(sorted([ t['teacher']['person']['nameZh'] for t in c['teacherAssignmentList'] ])) + ')'
+        course_key = course['nameZh'] + '(' + ','.join(sorted(teacher_names)) + ')'
         print('Course ' + course_key)
         if course_key in courses_map:
             course = courses_map[course_key]
@@ -134,8 +147,8 @@ def load_courses(insert=True):
             course_name = course['nameZh']
             course = Course()
             course.name = course_name
-            for t in c['teacherAssignmentList']:
-                course.teachers.append(teachers_map[t['teacher']['person']['nameZh']])
+            for t in teacher_names:
+                course.teachers.append(teachers_map[t])
 
             db.session.add(course)
             courses_map[course_key] = course
