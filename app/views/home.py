@@ -1,4 +1,4 @@
-from flask import Blueprint,request, redirect,url_for,render_template,flash, abort, jsonify
+from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
 from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
@@ -26,7 +26,10 @@ def latest_reviews():
 @home.route('/feed.xml')
 def latest_reviews_rss():
     reviews_paged = Review.query.order_by(Review.id.desc()).paginate(page=1, per_page=50)
-    return render_template('feed.xml', reviews=reviews_paged)
+    rss_content = render_template('feed.xml', reviews=reviews_paged)
+    response = make_response(rss_content)
+    response.headers['Content-Type'] = 'application/rss+xml'
+    return response
 
 @home.route('/follow_reviews')
 def follow_reviews():
