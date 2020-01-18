@@ -7,10 +7,6 @@ from app import db
 from app.utils import sanitize
 
 course = Blueprint('course',__name__)
-QUERY_ORDER = [
-    CourseRate._rate_average.desc(),
-    CourseRate.review_count.desc(),
-]
 
 deptlist = [
     [27, '体育'],
@@ -55,7 +51,7 @@ def index():
     #    # 开课地点
     #    course_query = course_query.filter(Course.campus==campus)
 
-    courses_page = course_query.join(CourseRate).order_by(*QUERY_ORDER).paginate(page,per_page=per_page)
+    courses_page = course_query.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page,per_page=per_page)
     return render_template('course-index.html', courses=courses_page,
             dept=department, deptlist=deptlist, title='好评课程',
             this_module='course.index')
@@ -86,9 +82,9 @@ def popular():
 @course.route('/public/')
 def public_courses():
     # large enough per_page to disable pagination effectively
-    courses_page = Course.query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(*QUERY_ORDER).paginate(1, per_page=10000)
+    courses_page = Course.query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(1, per_page=10000)
 
-    #courses = course_query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(*QUERY_ORDER).all()
+    #courses = course_query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(Course.QUERY_ORDER()).all()
     #class my_pagination():
     #    def __init__(self, courses):
     #        self.items = courses
@@ -235,7 +231,7 @@ def student_courses(id):
     if student:
         page = request.args.get('page',1,type=int)
         per_page = request.args.get('perpage',15,type=int)
-        courses_page = student.courses_joined.join(CourseRate).order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
+        courses_page = student.courses_joined.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page=page,per_page=per_page)
         return render_template('list-courses.html',student=student,courses=courses_page)
     else:
         return render_template('feedback.html',status=False,message=_('We cant\'t find the User!'))
@@ -246,7 +242,7 @@ def teacher_courses(id):
     if teacher:
         page = request.args.get('page',1,type=int)
         per_page = request.args.get('perpage',15,type=int)
-        courses_page = teacher.courses.join(CourseRate).order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
+        courses_page = teacher.courses.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page=page,per_page=per_page)
         return render_template('list-courses.html',teacher=teacher,courses=courses_page)
     else:
         return render_template('feedback.html',status=False,message=_('We cant\'t find the User!'))
@@ -256,7 +252,7 @@ def same_name_courses(name):
     name = name.strip()
     page = request.args.get('page',1,type=int)
     per_page = request.args.get('perpage',15,type=int)
-    courses_page = Course.query.filter_by(name=name).join(CourseRate).order_by(*QUERY_ORDER).paginate(page=page,per_page=per_page)
+    courses_page = Course.query.filter_by(name=name).join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page=page,per_page=per_page)
     if courses_page.items:
         return render_template('list-courses.html',course_name=name,courses=courses_page)
     else:

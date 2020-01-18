@@ -3,6 +3,7 @@ from flask import url_for, Markup
 from app import db
 from decimal import Decimal
 from sqlalchemy import orm
+from .review import Review
 from .user import Teacher
 try:
     from flask_login import current_user
@@ -255,14 +256,16 @@ class Course(db.Model):
         else:
             return None
 
+    @classmethod
+    def QUERY_ORDER(self=None):
+        avg_rate = db.session.query(db.func.avg(Review.rate)).as_scalar()
+        avg_rate_count = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).as_scalar()
+        return ((CourseRate._rate_total + avg_rate * avg_rate_count) / (CourseRate.review_count + avg_rate_count)).desc()
+
     @property
     def related_courses(self):
         '''return the courses that are the same name'''
-        QUERY_ORDER = [
-            CourseRate._rate_average.desc(),
-            CourseRate.review_count.desc(),
-        ]
-        return self.query.filter_by(name=self.name).join(CourseRate).order_by(*QUERY_ORDER).all()
+        return self.query.filter_by(name=self.name).join(CourseRate).order_by(self.QUERY_ORDER()).all()
 
     @property
     def history_courses(self):
@@ -271,7 +274,7 @@ class Course(db.Model):
             CourseRate._rate_average.desc(),
             CourseRate.review_count.desc(),
         ]
-        return self.query.filter_by(courseries=self.courseries).join(CourseRate).order_by(*QUERY_ORDER).all()
+        return self.query.filter_by(courseries=self.courseries).join(CourseRate).order_by(self.QUERY_ORDER()).all()
 
     def same_teacher_courses(self, teacher_obj):
         '''returns the courses having the same teacher'''
@@ -279,7 +282,7 @@ class Course(db.Model):
             CourseRate._rate_average.desc(),
             CourseRate.review_count.desc(),
         ]
-        return self.query.join(course_teachers).join(Teacher).filter(Teacher.id == teacher_obj.id).join(CourseRate).order_by(*QUERY_ORDER).all()
+        return self.query.join(course_teachers).join(Teacher).filter(Teacher.id == teacher_obj.id).join(CourseRate).order_by(self.QUERY_ORDER()).all()
 
     @property
     def course_major_display(self):

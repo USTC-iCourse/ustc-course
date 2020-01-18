@@ -4,7 +4,6 @@ from app.forms import TeacherProfileForm
 from flask_login import login_user, current_user, login_required
 from app.utils import handle_upload, sanitize
 from flask_babel import gettext as _
-from .course import QUERY_ORDER
 import re
 
 teacher = Blueprint('teacher', __name__)
@@ -17,7 +16,7 @@ def view_profile(teacher_id):
         abort(404)
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    courses = teacher.courses.join(CourseRate).order_by(*QUERY_ORDER)
+    courses = teacher.courses.join(CourseRate).order_by(Course.QUERY_ORDER())
     courses_paged = courses.paginate(page=page, per_page=per_page)
     return render_template('teacher-profile.html', teacher=teacher, courses=courses_paged)
 
