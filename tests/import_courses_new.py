@@ -140,13 +140,16 @@ def load_courses(insert=True):
                 new_teacher_count += 1
 
         course_key = course['nameZh'] + '(' + ','.join(sorted(teacher_names)) + ')'
-        print('Course ' + course_key)
         if course_key in courses_map:
             course = courses_map[course_key]
+            print('Existing course ' + course_key)
         else:
             course_name = course['nameZh']
             course = Course()
             course.name = course_name
+            course.teachers = []
+            db.session.add(course)
+
             for t in teacher_names:
                 course.teachers.append(teachers_map[t])
 
@@ -157,6 +160,7 @@ def load_courses(insert=True):
             course_rate = CourseRate()
             course_rate.course = course
             db.session.add(course_rate)
+            print('New course ' + course_key)
             new_course_count+=1
 
         # update course info
@@ -167,13 +171,14 @@ def load_courses(insert=True):
 
         # course term
         term_key = course_key + '@' + str(term)
-        print('Course term ' + term_key)
         if term_key in course_terms_map:
             course_term = course_terms_map[term_key]
+            print('Existing course term ' + term_key)
         else:
             course_term = CourseTerm()
             db.session.add(course_term)
             course_terms_map[term_key] = course_term
+            print('New course term ' + term_key)
             new_term_count+=1
 
         # update course term info
@@ -189,14 +194,15 @@ def load_courses(insert=True):
 
         # course class
         unique_key = class_code + '@' + str(term)
-        print('Course class ' + unique_key)
         if unique_key in course_classes_map:
             course_class = course_classes_map[unique_key]
             course_class.course = course # update course mapping
+            print('Existing course class ' + unique_key)
         else:
             course_class = CourseClass()
             db.session.add(course_class)
             course_classes_map[unique_key] = course_class
+            print('New course class ' + unique_key)
             new_class_count+=1
 
         # update course class info
