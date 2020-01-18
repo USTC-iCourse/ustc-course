@@ -1,0 +1,11 @@
+#!/bin/sh
+# Usage: put this script into /etc/cron.weekly/
+
+GIT_DIR="/srv/ustc-course/data/uploads-backup"
+UPLOAD_DIR="/srv/ustc-course/uploads"
+
+sudo -u icourse -- rsync -a $UPLOAD_DIR/ $GIT_DIR/ || exit 1
+cd $GIT_DIR || exit 2
+sudo -u icourse -- git add .
+sudo -u icourse -- git commit -m "icourse upload backup"
+sudo -u icourse -- git push

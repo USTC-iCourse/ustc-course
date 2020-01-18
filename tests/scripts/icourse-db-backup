@@ -1,0 +1,16 @@
+#!/bin/sh
+# Usage: put this script into /etc/cron.weekly/
+# Assume that automysqlbackup is installed and set up.
+
+GIT_DIR="/srv/ustc-course/data"
+SQL_DIR="/var/lib/automysqlbackup/daily/icourse"
+
+SQL_GZ=$(ls -c $SQL_DIR | head -n 1)
+cd $GIT_DIR || exit 255
+cp $SQL_DIR/$SQL_GZ ./icourse.sql.gz || exit 1
+rm -f icourse.sql
+gunzip icourse.sql.gz || exit 2
+chown icourse icourse.sql || exit 3
+sudo -u icourse -- git add icourse.sql
+sudo -u icourse -- git commit -m "icourse sql backup"
+sudo -u icourse -- git push
