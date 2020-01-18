@@ -18,3 +18,4 @@ pytz
 # don't know why these dependencies fail...
 click
 wtforms
+pillow
