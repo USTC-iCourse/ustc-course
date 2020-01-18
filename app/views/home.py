@@ -23,6 +23,11 @@ def latest_reviews():
     reviews_paged = Review.query.order_by(Review.id.desc()).paginate(page=page, per_page=per_page)
     return render_template('latest-reviews.html', reviews=reviews_paged, title='全站最新点评', this_module='home.latest_reviews')
 
+@home.route('/feed.xml')
+def latest_reviews_rss():
+    reviews_paged = Review.query.order_by(Review.id.desc()).paginate(page=1, per_page=50)
+    return render_template('feed.xml', reviews=reviews_paged)
+
 @home.route('/follow_reviews')
 def follow_reviews():
     if not current_user.is_authenticated:

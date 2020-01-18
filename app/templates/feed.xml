@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+<channel>
+  <title>USTC 评课社区 - 全站最新点评</title>
+  <link>https://icourse.club</link>
+  <description>评课是为了更好地选课！</description>
+  {% for review in reviews.items %}
+    {% if not review.is_hidden %}
+    <item>
+        <title>{{ review.author.username }} 点评了 {{ review.course.name }}{% if review.course.teachers %}（{{ review.course.teacher_names_display }}）{% endif %}</title>
+        <link>{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}</link>
+        <description>{{ review.content|abstract }}<a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></description>
+    </item>
+    {% endif %}
+  {% endfor %}
+</channel>
+</rss>
