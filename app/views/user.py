@@ -1,8 +1,8 @@
-from flask import Blueprint,render_template,abort,redirect,url_for,request, abort, flash
+from flask import Blueprint,render_template,abort,redirect,url_for,request, abort, flash, make_response
 from app.models import *
 from app.forms import LoginForm, ProfileForm,PasswordForm
 from flask_login import login_user, current_user, login_required
-from app.utils import handle_upload, resize_avatar, sanitize
+from app.utils import handle_upload, resize_avatar, sanitize, cal_validation_code
 from flask_babel import gettext as _
 import re
 
@@ -166,7 +166,8 @@ def notice():
     # accessing notice page clears unread notifications
     current_user.unread_notification_count = 0
     current_user.save()
-    return render_template('notice.html', notifications=current_user.notifications)
+    rss_url = url_for('user.notice_rss', user_id=current_user.id, validation_code=cal_validation_code(current_user))
+    return render_template('notice.html', rss_url=rss_url, notifications=current_user.notifications)
 
 
 @user.route('/<int:user_id>/followers')
@@ -191,3 +192,14 @@ def followings(user_id):
 
     return render_template('followings.html',
                            user=user)
+
+@user.route('/<int:user_id>/feed/<string:validation_code>')
+def notice_rss(user_id, validation_code):
+    user = User.query.get(user_id)
+    expected = cal_validation_code(user)
+    if expected != validation_code:
+        abort(403)
+    rss_content = render_template('notice.xml', notifications=user.notifications)
+    response = make_response(rss_content)
+    response.headers['Content-Type'] = 'application/rss+xml'
+    return response

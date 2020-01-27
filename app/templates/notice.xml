@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>USTC 评课社区 - 通知</title>
+  <link>https://icourse.club</link>
+  <description>评课是为了更好地选课！</description>
+  {% for notification in notifications %}
+    {% if notification.display_text %}
+    <item>
+        <title>{{ notification.display_text|text }}</title>
+        <link>https://icourse.club/user/notifications/</link>
+        <pubDate>{{ notification.time|rfc822time }}</pubDate>
+        <description>{{ notification.display_text|link_absolute }}</description>
+    </item>
+    {% endif %}
+  {% endfor %}
+</channel>
+</rss>
