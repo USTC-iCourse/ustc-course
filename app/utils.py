@@ -11,6 +11,7 @@ from lxml.html.clean import Cleaner
 import pytz
 import re
 from PIL import Image
+from email.utils import format_datetime
 
 
 mail = Mail(app)
@@ -138,6 +139,11 @@ def editor_parse_at(text):
 def localtime_minute(date):
     local = pytz.utc.localize(date, is_dst=False).astimezone(pytz.timezone('Asia/Shanghai'))
     return local.strftime('%Y-%m-%d %H:%M')
+
+@app.template_filter('rfc822time')
+def rfc822time(date):
+    # used for RSS <pubDate>
+    return format_datetime(date)
 
 @app.template_filter('updatetime')
 def updatetime_minute(date):
