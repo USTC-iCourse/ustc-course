@@ -11,6 +11,9 @@ from lxml.html.clean import Cleaner
 import pytz
 import re
 from PIL import Image
+from email.utils import format_datetime
+import lxml.html
+from hashlib import sha256
 
 
 mail = Mail(app)
@@ -139,6 +142,11 @@ def localtime_minute(date):
     local = pytz.utc.localize(date, is_dst=False).astimezone(pytz.timezone('Asia/Shanghai'))
     return local.strftime('%Y-%m-%d %H:%M')
 
+@app.template_filter('rfc822time')
+def rfc822time(date):
+    # used for RSS <pubDate>
+    return format_datetime(date)
+
 @app.template_filter('updatetime')
 def updatetime_minute(date):
     local = pytz.utc.localize(date, is_dst=False).astimezone(pytz.timezone('Asia/Shanghai'))
@@ -262,3 +270,16 @@ def validate_email(email):
     if User.query.filter_by(email=email).first():
         return ('此邮件地址已被注册！')
     return 'OK'
+
+@app.template_filter('text')
+def text(html_string):
+    document = lxml.html.document_fromstring(html_string)
+    return document.text_content()
+
+@app.template_filter('link_absolute')
+def absolute(html_string):
+    return lxml.html.make_links_absolute(html_string, base_url="https://icourse.club")
+
+def cal_validation_code(user):
+    expected = user.email + user.password
+    return sha256(expected.encode('utf-8')).hexdigest()

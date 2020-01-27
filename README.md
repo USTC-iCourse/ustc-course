@@ -30,7 +30,14 @@ character-set-server = utf8
 ```CREATE DATABASE icourse;```
 创建数据库成功的话，会提示 Query OK...
 
+对于 MySQL 版本 < 8.0:
 ```GRANT ALL ON icourse.* to 'ustc_course'@'localhost' identified by 'ustc_course';```
+
+对于 MySQL 版本 >= 8.0:
+```
+CREATE USER 'ustc_course'@'localhost' identified by 'ustc_course';
+GRANT ALL ON icourse.* to 'ustc_course'@'localhost';
+```
 这一步是创建数据库用户 ustc_course 并授予访问 icourse 数据库的权限。该用户密码是 ustc_course，生产环境上请换用强密码。
 
 ### Python 依赖及系统设置
