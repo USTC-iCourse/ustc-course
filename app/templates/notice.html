@@ -9,7 +9,7 @@
         <h3 class="blue">全部消息</h3>
         <a hidden href="{{ rss_url }}">RSS</a>
         {% if notifications|length == 0 %}
-        <p>还没有消息哦！</a>
+        <p>还没有消息哦！</p>
         {% endif %}
 
         {% for notification in notifications %}
