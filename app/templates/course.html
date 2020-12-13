@@ -154,7 +154,7 @@
                 <span id="review-upvote-count-{{review.id}}">{{ review.upvote_count }}</span>
             </a>
             <a class="nounderline" href="javascript: show_review_comments({{ review.id }})">
-              <span class="glyphicon glyphicon-comment grey left-pd-md" aria-hidden="true"></span>
+              <span class="glyphicon glyphicon-comment {{ 'blue' if review.comments else 'grey' }} left-pd-md" aria-hidden="true"></span>
               <span id="review-comment-count-{{review.id}}">{{ review.comment_count }}</span>
             </a>
             <span class="pull-right">

@@ -1,4 +1,4 @@
-          <div id="review-{{ review.id }}-comments" class="panel panel-default" style="display:none">
+          <div id="review-{{ review.id }}-comments" class="panel panel-default" style="display:{{ 'block' if review.comments else 'none' }}">
             <div class="panel-body">
               {% for comment in review.comments %}
               <div class="solid ud-pd-sm">
