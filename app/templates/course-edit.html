@@ -77,6 +77,17 @@
           <h3 class="blue">老师甲</h3>
         </div>
         {% endif %}
+
+        {% if current_user.is_admin %}
+        <div class="ud-pd-md dashed">
+          <h4 class="blue">添加教师</h4>
+          <form method="post" enctype="multipart/form-data" action="{{ url_for('course.add_teacher', course_id=course.id) }}" target="_blank">
+            {{ form.csrf_token }}
+            <input class="form-control" type="text" name="teacher_id" placeholder="教师ID，即教师页面URL的最后一个数字">
+            <button type="submit" class="btn btn-sm btn-default">添加教师</button>
+          </form>
+        </div>
+        {% endif %}
       </div>
 
     </div> <!-- row -->

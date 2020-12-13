@@ -339,3 +339,23 @@ def remove_teacher(course_id):
     db.session.commit()
     return jsonify(ok=True)
 
+
+@course.route('/<int:course_id>/add_teacher/', methods=['POST'])
+@login_required
+def add_teacher(course_id):
+    if not current_user.is_admin:
+        abort(403)
+    teacher_id = request.form.get('teacher_id')
+    if not teacher_id:
+        return jsonify(ok=False, message=_('Teacher ID Not Specified'))
+    course = Course.query.get(course_id)
+    if not course:
+        return jsonify(ok=False, message=_('Course Not Found'))
+    teacher = Teacher.query.get(teacher_id)
+    if not teacher:
+        return jsonify(ok=False, message=_('Teacher ID Not Found'))
+    if teacher in course.teachers:
+        return jsonify(ok=False, message=_('Teacher Already Exists In Course'))
+    course.teachers.append(teacher)
+    db.session.commit()
+    return jsonify(ok=True)
