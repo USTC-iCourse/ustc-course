@@ -312,3 +312,30 @@ def edit_course(course_id=None):
         db.session.commit()
         return redirect(url_for('course.view_course', course_id=course.id))
     return render_template('course-edit.html', form=course_form, course=course)
+
+
+@course.route('/<int:course_id>/remove_teacher/', methods=['POST'])
+@login_required
+def remove_teacher(course_id):
+    if not current_user.is_admin:
+        abort(403)
+    teacher_id = request.form.get('teacher_id')
+    if not teacher_id:
+        return jsonify(ok=False, message=_('Teacher ID Not Specified'))
+    course = Course.query.get(course_id)
+    if not course:
+        return jsonify(ok=False, message=_('Course Not Found'))
+    ok = False
+    new_teachers = []
+    for teacher in course.teachers:
+        if str(teacher.id) == teacher_id:
+            ok = True
+        else:
+            new_teachers.append(teacher)
+
+    if not ok:
+        return jsonify(ok=False, message=_('Teacher Not Found In Course'))
+    course.teachers = new_teachers
+    db.session.commit()
+    return jsonify(ok=True)
+

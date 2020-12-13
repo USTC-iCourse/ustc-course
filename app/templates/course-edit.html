@@ -50,6 +50,35 @@
 
       </div>
 
+      <!-- 右边栏 -->
+
+      <div class="col-md-4 rl-pd-lg">
+        {% for teacher in course.teachers %}
+        <div class="ud-pd-md dashed">
+          <img class="avatar-lg cicle" src="{{ teacher.image }}"/>
+          {% if current_user.is_authenticated %}
+          <btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
+          {% if current_user.is_admin %}
+          <btn class="btn btn-link float-right"><a href="javascript: remove_teacher({{ teacher.id }});">从课程中删除教师</a></btn>
+          {% endif %}
+          {% endif %}
+          <h3 class="blue"><a href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}">{{ teacher.name }}</a></h3>
+          <p>{{ teacher.dept.name }}</p>
+          <p>教师主页：
+            {% if teacher.homepage and teacher.homepage != 'http://' %}
+            <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>
+            {% else %}暂无{% endif %}
+          </p>
+        </div>
+        {% endfor %}
+        {% if course.teachers_count == 0 %}
+        <div class="ud-pd-md dashed">
+          <img class="avatar-lg cicle" src="/static/image/teacher.jpg"/>
+          <h3 class="blue">老师甲</h3>
+        </div>
+        {% endif %}
+      </div>
+
     </div> <!-- row -->
   </div>  <!-- float-element  -->
 </div>  <!-- container -->
@@ -59,5 +88,20 @@
 
 
 {% block script %}
+<script>
+ function remove_teacher(teacher_id)
+ {
+     if (!confirm('你真的要从课程中删除此教师吗？')) {
+         return;
+     }
+     $.post("{{ url_for('course.remove_teacher', course_id=course.id) }}", { teacher_id: teacher_id }, function(o) {
+         if (o.ok)
+            window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
+         else
+            alert(o.message);
+     }, 'json');
+ }
+</script>
+
 {% include 'ckeditor.html' %}
 {% endblock %}

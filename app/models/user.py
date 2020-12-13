@@ -452,7 +452,7 @@ class Teacher(db.Model):
     _info_history = db.relationship('TeacherInfoHistory', order_by='desc(TeacherInfoHistory.id)', backref='teacher', lazy='dynamic')
 
     def __repr__(self):
-        return '<Teacher {}: {}'.format(self.id, self.name)
+        return '<Teacher {}: {}>'.format(self.id, self.name)
 
     @classmethod
     def create(cls, tno, name, dept=None,email=None,description=None):
