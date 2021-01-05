@@ -317,12 +317,13 @@ def search():
 def about():
     '''关于我们，网站介绍、联系方式'''
 
-    first_review = Review.query.order_by(Review.publish_time).limit(1).first()
+    first_user = User.query.order_by(User.register_time).limit(1).first()
     today = datetime.now()
-    running_days = (today - first_review.publish_time).days
+    running_days = (today - first_user.register_time).days
+    num_users = User.query.count()
     review_count = Review.query.count()
     course_count = CourseRate.query.filter(CourseRate.review_count > 0).count()
-    return render_template('about.html', running_days=running_days, review_count=review_count, course_count=course_count)
+    return render_template('about.html', running_days=running_days, num_users=num_users, review_count=review_count, course_count=course_count)
 
 
 @home.route('/community-rules/')
