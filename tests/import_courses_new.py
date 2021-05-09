@@ -71,16 +71,16 @@ def load_courses(insert=True):
 
     int_allow_empty = lambda string: int(string) if string.strip() else 0
     course_kcbh = {}
-    term = int(sys.argv[1])
-    print('Term ' + str(term))
-    json = parse_json(sys.argv[2])
+    json = parse_json(sys.argv[1])
     if 'data' in json:
         json = json['data']
     print('Data loaded with %d courses' % len(json))
     for c in json:
         course = c['course']
         code = course['code']
-        course_kcbh[course['code']] = dict(
+        semester = c['semester']
+        term = int(semester['code'])
+        course_kcbh[code] = dict(
             kcid = int(course['id']),
             kcbh = course['code'],
             name = course['nameZh'],
