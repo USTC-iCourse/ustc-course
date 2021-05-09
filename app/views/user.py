@@ -14,7 +14,7 @@ def view_profile(user_id):
     '''用户的个人主页,展示用户在站点的活跃情况'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry. But we could not find the user!')
+        message = _('Sorry, the user does not seem to exist!')
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('profile.html',
@@ -27,7 +27,7 @@ def reviews(user_id):
     '''用户点评过的所有课程'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry. But we could not find the user!')
+        message = _('Sorry, the user does not seem to exist!')
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('user-reviews.html',
@@ -40,7 +40,7 @@ def follow_course(user_id):
     '''用户关注过的所有课程'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry. But we could not find the user!')
+        message = _('Sorry, the user does not seem to exist!')
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('follow-course.html',
@@ -55,7 +55,7 @@ def join_course(user_id):
     '''用户学过的所有课程'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry. But we could not find the user!')
+        message = _('Sorry, the user does not seem to exist!')
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('join-course.html',
@@ -175,7 +175,7 @@ def followers(user_id):
     '''被关注的人页面'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry. But we could not find the user!')
+        message = _('Sorry, the user does not seem to exist!')
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('followers.html',
@@ -187,7 +187,7 @@ def followings(user_id):
     '''关注的人页面'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry. But we could not find the user!')
+        message = _('Sorry, the user does not seem to exist!')
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('followings.html',
