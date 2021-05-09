@@ -41,11 +41,11 @@ def new_review(course_id):
             if str(form.term.data) not in course.term_ids:
                 abort(404)
 
-            if form.is_mobile.data:
-                form.content.data = markdown.markdown(form.content.data)
-            form.content.data, mentioned_users = editor_parse_at(form.content.data)
-            form.content.data = sanitize(form.content.data)
             form.populate_obj(review)
+            if form.is_mobile.data:
+                review.content = markdown.markdown(review.content)
+            review.content, mentioned_users = editor_parse_at(review.content)
+            review.content = sanitize(review.content)
 
             if is_new:
                 review.add()
