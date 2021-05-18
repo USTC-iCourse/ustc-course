@@ -195,7 +195,7 @@
       <div class="col-md-4 rl-pd-lg">
         {% for teacher in course.teachers %}
         <div class="ud-pd-md dashed">
-          <img class="avatar-lg cicle" src="{{ teacher.image }}"/>
+          <img class="avatar-lg circle" src="{{ teacher.image }}"/>
           {% if current_user.is_authenticated %}
           <btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
           {% endif %}
@@ -210,7 +210,7 @@
         {% endfor %}
         {% if course.teachers_count == 0 %}
         <div class="ud-pd-md dashed">
-          <img class="avatar-lg cicle" src="/static/image/teacher.jpg"/>
+          <img class="avatar-lg circle" src="/static/image/teacher.jpg"/>
           <h3 class="blue">老师甲</h3>
         </div>
         {% endif %}

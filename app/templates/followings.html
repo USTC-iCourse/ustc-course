@@ -13,7 +13,7 @@
 
       {% for user in user.users_following %}
       <div class="ud-pd-md dashed">
-	<img class="avatar-md cicle" src="{{ user.avatar }}"/>
+	<img class="avatar-md circle" src="{{ user.avatar }}"/>
 	<a href={{ url_for('user.view_profile', user_id=user.id) }}><span class="right-pd-sm px16">{{ user.username }}</span></a>
       </div>
       {% endfor %}
