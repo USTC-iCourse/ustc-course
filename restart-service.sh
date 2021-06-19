@@ -2,7 +2,7 @@
 
 getpid()
 {
-  PID=$(ps aux | grep gunicorn | awk '{print $2}' | sort | head -n 1)
+  PID=$(ps aux | grep gunicorn | grep -v grep | awk '{print $2}' | sort | head -n 1)
 }
 
 getpid
