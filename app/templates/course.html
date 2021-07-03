@@ -97,7 +97,7 @@
              {% endif %}
              {% if course.last_edit_time %}
              <span class="glyphicon glyphicon-time grey left-pd-sm" aria-hidden="true" ></span>
-             最后更新：<span class="localtime" style="display: none;">{{ course.last_edit_time }}</span>
+             最后更新：<span class="localtime" style="display: none;">{{ course.last_edit_time|utctime }}</span>
              {% endif %}
           </p>
 	</div>
@@ -148,7 +148,7 @@
           </div>
 
           <div class="bm-pd-md grey" id="review-{{ review.id }}">
-            <span class="small localtime" style="display: none;">{{ review.publish_time }}</span>
+            <span class="small localtime" style="display: none;">{{ review.publish_time|utctime }}</span>
             {% if current_user.is_authenticated %}
             <a class="nounderline" href="javascript: {{ 'cancel_' if review.is_upvoted() }}upvote_review({{ review.id }})">
             {% else %}

@@ -30,6 +30,11 @@
  $('.localtime').each(function(index) {
    var utcTime = $(this).text();
    var pubTime = new Date(utcTime + ' UTC');
+   if (!pubTime) {
+     $(this).text(pubTime);
+     $(this).show();
+     return;
+   }
    var now = new Date();
    if (pubTime.getFullYear() == now.getFullYear() && pubTime.getMonth() == now.getMonth() && pubTime.getDate() == now.getDate()) {
      $(this).text('今天 ' + toHourMinutes(pubTime));

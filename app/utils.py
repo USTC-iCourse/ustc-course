@@ -137,6 +137,11 @@ def editor_parse_at(text):
             mentioned_users.append(user)
     return text, set(mentioned_users)
 
+@app.template_filter('utctime')
+def utctime(date):
+    local = pytz.utc.localize(date, is_dst=False)
+    return local.strftime('%m/%d/%Y %H:%M:%S')
+
 @app.template_filter('localtime')
 def localtime_minute(date):
     local = pytz.utc.localize(date, is_dst=False).astimezone(pytz.timezone('Asia/Shanghai'))

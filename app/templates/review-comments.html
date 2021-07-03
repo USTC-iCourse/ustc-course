@@ -13,7 +13,7 @@
                     <span class="glyphicon glyphicon-trash grey left-pd-md" aria-hidden="true"></span>
                     <a href="javascript: delete_comment({{review.id}}, {{comment.id}});">删除</a>
                     {% endif %}
-                    <span class="localtime" style="display: none;">{{ comment.publish_time }}</span>
+                    <span class="localtime" style="display: none;">{{ comment.publish_time|utctime }}</span>
                   </span>
               </div>
               {% endfor %}
