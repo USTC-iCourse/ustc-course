@@ -18,7 +18,7 @@
             {% set course = review.course %}
             <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('未知') }}）</a>
             <span class="small grey align-bottom left-pd-sm">学期：{{ review.term|term_display }}</span>
-            <span class="text-muted small float-right desktop">{{ review.update_time|localtime }}</span>
+            <span class="text-muted small float-right desktop localtime" style="display: none;">{{ review.update_time }}</span>
           </div>
           {% include 'review-hidden.html' %}
           <p class="dark-grey">{{ review.content|abstract }}

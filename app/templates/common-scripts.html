@@ -1,9 +1,47 @@
-    <script>
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}")
-            }
-        }
-    })
-    </script>
+<script>
+ $.ajaxSetup({
+     beforeSend: function(xhr, settings) {
+         if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}")
+         }
+     }
+ });
+
+ // display local time
+ function toHourMinutes(pubTime) {
+   var hours = pubTime.getHours().toString();
+   if (hours.length == 1) {
+     hours = '0' + hours;
+   }
+   var minutes = pubTime.getMinutes().toString();
+   if (minutes.length == 1) {
+     minutes = '0' + minutes;
+   }
+   return hours + ':' + minutes;
+ }
+
+ function toYearMonthDate(pubTime) {
+   var year = pubTime.getFullYear().toString();
+   var month = (pubTime.getMonth() + 1).toString();
+   var day = pubTime.getDate().toString();
+   return year + '/' + month + '/' + day;
+ }
+
+ $('.localtime').each(function(index) {
+   var utcTime = $(this).text();
+   var pubTime = new Date(utcTime + ' UTC');
+   var now = new Date();
+   if (pubTime.getFullYear() == now.getFullYear() && pubTime.getMonth() == now.getMonth() && pubTime.getDate() == now.getDate()) {
+     $(this).text('今天 ' + toHourMinutes(pubTime));
+   } else {
+     var yesterday = new Date();
+     yesterday.setDate(yesterday.getDate() - 1); // JavaScript can handle date roll overs
+     if (pubTime.getFullYear() == yesterday.getFullYear() && pubTime.getMonth() == yesterday.getMonth() && pubTime.getDate() == yesterday.getDate()) {
+       $(this).text('昨天 ' + toHourMinutes(pubTime));
+     } else {
+       $(this).text(toYearMonthDate(pubTime) + ' ' + toHourMinutes(pubTime));
+     }
+   }
+   $(this).show();
+ });
+</script>

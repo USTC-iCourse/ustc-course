@@ -29,7 +29,7 @@
       	    </p>
             <div>
               <span class="text-muted">贡献者：<a href="{{ url_for('user.view_profile', user_id=history.author) }}">{{ history.author_user.username }}</a></span>
-              <span class="text-muted pull-right">编辑时间：{{ history.update_time|localtime }}</span>
+              <span class="text-muted pull-right">编辑时间：<span class="localtime" style="display: none;">{{ history.update_time }}</span></span>
             </div>
       	  </div>
 	  {% endfor %}
