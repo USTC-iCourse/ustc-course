@@ -318,6 +318,7 @@
              update_count(o.count);
            if (!o.ok)
              alert('Operation failed, please try again later!');
+           d.in_progress = false;
          }, 'json');
        }
 
@@ -325,6 +326,11 @@
          {% if user.is_authenticated %}
          if (d.enabled)
            return;
+         if (d.in_progress) {
+           alert('Operation in progress, please try again later!');
+           return;
+         }
+         d.in_progress = true;
          do_btn.hide();
          undo_btn.show();
          d.enabled = true;
@@ -342,6 +348,11 @@
          {% if user.is_authenticated %}
          if (!d.enabled)
            return;
+         if (d.in_progress) {
+           alert('Operation in progress, please try again later!');
+           return;
+         }
+         d.in_progress = true;
          undo_btn.hide();
          do_btn.show();
          d.enabled = false;
@@ -380,31 +391,49 @@
    }
  }
 
+ function get_upvote_review_elem(review_id)
+ {
+     var elem = $('#review-upvote-count-' + review_id);
+     if (!elem) return null;
+     if (elem.hasClass('in_progress')) {
+       alert('Operation in progress, please try again later');
+       return null;
+     }
+     elem.addClass('in_progress');
+     return elem;
+ }
+
  function upvote_review(review_id)
  {
-     elem = $('#review-upvote-count-' + review_id);
-     //elem.text(parseInt(elem.text()) + 1);
+     var elem = get_upvote_review_elem(review_id);
+     if (!elem) return;
+     elem.text(parseInt(elem.text()) + 1);
+     elem.parent().attr('href', 'javascript:cancel_upvote_review("' + review_id + '")');
+     elem.parent().find('span.glyphicon').removeClass('grey');
+     elem.parent().find('span.glyphicon').addClass('blue');
+
      $.post("{{ url_for('api.review_upvote') }}", { review_id: review_id }, function(o) {
        if (typeof o.count != "undefined") {
          elem.text(o.count);
-         elem.parent().attr('href', 'javascript:cancel_upvote_review("' + review_id + '")');
-         elem.parent().find('span.glyphicon').removeClass('grey');
-         elem.parent().find('span.glyphicon').addClass('blue');
        }
+       elem.removeClass('in_progress');
      }, 'json');
  }
  
  function cancel_upvote_review(review_id)
  {
-     elem = $('#review-upvote-count-' + review_id);
-     //elem.text(parseInt(elem.text()) - 1);
+     var elem = get_upvote_review_elem(review_id);
+     if (!elem) return;
+     elem.text(parseInt(elem.text()) - 1);
+     elem.parent().attr('href', 'javascript:upvote_review("' + review_id + '")');
+     elem.parent().find('span.glyphicon').removeClass('blue');
+     elem.parent().find('span.glyphicon').addClass('grey');
+
      $.post("{{ url_for('api.review_cancel_upvote') }}", { review_id: review_id }, function(o) {
        if (typeof o.count != "undefined") {
          elem.text(o.count);
-         elem.parent().attr('href', 'javascript:upvote_review("' + review_id + '")');
-         elem.parent().find('span.glyphicon').removeClass('blue');
-         elem.parent().find('span.glyphicon').addClass('grey');
        }
+       elem.removeClass('in_progress');
      }, 'json');
  }
 
