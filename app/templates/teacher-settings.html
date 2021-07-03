@@ -15,11 +15,21 @@
           <label class="col-sm-2 control-label">上传照片</label>
           <div class="col-sm-5">
             <img class="avatar-lg circle rl-mg-md" src="{{ teacher.image }}"/>
+            {% if not teacher.image_locked %}
             <label class="btn btn-grey radius4 fileupload">
               <input type="file" name="avatar" onchange="$('#avatar-upload-btn').html('选择'); $('#avatar-upload-msg').show()"/>
               <span id="avatar-upload-btn">选择</span>
             </label>
             <button id="avatar-upload-msg" type="submit" class="btn btn-blue" style="display:none">上传</button>
+            {% if current_user.is_admin %}
+            <a class="btn btn-danger float-right" href="{{ url_for('teacher.lock_avatar', teacher_id=teacher.id) }}">锁定教师照片</a>
+            {% endif %}
+            {% else %}
+            <a class="btn btn-grey">教师照片已被锁定</a>
+            {% if current_user.is_admin %}
+            <a class="btn btn-danger float-right" href="{{ url_for('teacher.unlock_avatar', teacher_id=teacher.id) }}">解锁教师照片</a>
+            {% endif %}
+            {% endif %}
           </div>
         </div>
 
@@ -47,7 +57,20 @@
 
         <div class="form-group">
           <div class="col-sm-offset-2 col-sm-2">
+            {% if not teacher.info_locked %}
             <button type="submit" class="btn btn-blue btn-block">提交</button>
+            {% else %}
+            <a class="btn btn-grey">教师信息已被锁定</a>
+            {% endif %}
+          </div>
+          <div class="col-sm-3">
+            {% if current_user.is_admin %}
+            {% if not teacher.info_locked %}
+            <a class="btn btn-danger float-right" href="{{ url_for('teacher.lock_profile', teacher_id=teacher.id) }}">锁定教师信息</a>
+            {% else %}
+            <a class="btn btn-danger float-right" href="{{ url_for('teacher.unlock_profile', teacher_id=teacher.id) }}">解锁教师信息</a>
+            {% endif %}
+            {% endif %}
           </div>
         </div>
       </form>

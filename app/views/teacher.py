@@ -34,7 +34,9 @@ def edit_profile(teacher_id):
     teacher = Teacher.query.get(teacher_id)
     form = TeacherProfileForm(formdata=request.form, obj=teacher)
     errors = []
-    if form.validate_on_submit():
+    if teacher.info_locked:
+        errors.append(_("Teacher info is locked, please contact administrator to unlock"))
+    elif form.validate_on_submit():
         #teacher.gender = form['gender'].data
         form['homepage'].data = form['homepage'].data.strip()
         if not form['homepage'].data.startswith('http'):
@@ -43,12 +45,15 @@ def edit_profile(teacher_id):
         teacher.description = form['description'].data.strip()
         teacher.research_interest = form['research_interest'].data.strip()
         if request.files.get('avatar'):
-            avatar = request.files['avatar']
-            ok,info = handle_upload(avatar,'image')
-            if ok:
-                teacher.set_image(info)
+            if teacher.image_locked:
+                errors.append(_("Teacher photo is locked, please contact administrator to unlock"))
             else:
-                errors.append(_("Avatar upload failed"))
+                avatar = request.files['avatar']
+                ok,info = handle_upload(avatar,'image')
+                if ok:
+                    teacher.set_image(info)
+                else:
+                    errors.append(_("Avatar upload failed"))
         teacher.save()
 
         info_history = TeacherInfoHistory()
@@ -57,4 +62,45 @@ def edit_profile(teacher_id):
         return redirect(url_for('teacher.view_profile', teacher_id=teacher.id))
     return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form)
 
+def save_teacher_and_render_template(teacher):
+    teacher.save()
+    form = TeacherProfileForm(formdata=request.form, obj=teacher)
+    errors = []
+    return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form)
+
+@teacher.route('/<int:teacher_id>/lock_profile/', methods=['GET','POST'])
+@login_required
+def lock_profile(teacher_id):
+    if not current_user.is_admin:
+        abort(403)
+    teacher = Teacher.query.get(teacher_id)
+    teacher.info_locked = True
+    return save_teacher_and_render_template(teacher)
+
+@teacher.route('/<int:teacher_id>/unlock_profile/', methods=['GET','POST'])
+@login_required
+def unlock_profile(teacher_id):
+    if not current_user.is_admin:
+        abort(403)
+    teacher = Teacher.query.get(teacher_id)
+    teacher.info_locked = False
+    return save_teacher_and_render_template(teacher)
+
+@teacher.route('/<int:teacher_id>/lock_avatar/', methods=['GET','POST'])
+@login_required
+def lock_avatar(teacher_id):
+    if not current_user.is_admin:
+        abort(403)
+    teacher = Teacher.query.get(teacher_id)
+    teacher.image_locked = True
+    return save_teacher_and_render_template(teacher)
+
+@teacher.route('/<int:teacher_id>/unlock_avatar/', methods=['GET','POST'])
+@login_required
+def unlock_avatar(teacher_id):
+    if not current_user.is_admin:
+        abort(403)
+    teacher = Teacher.query.get(teacher_id)
+    teacher.image_locked = False
+    return save_teacher_and_render_template(teacher)
 

@@ -201,7 +201,14 @@
         <div class="ud-pd-md dashed">
           <img class="avatar-lg circle" src="{{ teacher.image }}"/>
           {% if current_user.is_authenticated %}
+          {% if not teacher.info_locked %}
           <btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
+          {% else %}
+          <a class="btn btn-grey float-right">教师信息已被锁定</a>
+            {% if current_user.is_admin %}
+            <a class="btn btn-danger float-right" href="{{ url_for('teacher.unlock_profile', teacher_id=teacher.id) }}">解锁教师信息</a>
+            {% endif %}
+          {% endif %}
           {% endif %}
           <h3 class="blue"><a href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}">{{ teacher.name }}</a></h3>
           <p>{{ teacher.dept.name }}</p>

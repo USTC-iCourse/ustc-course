@@ -443,6 +443,8 @@ class Teacher(db.Model):
     research_interest = db.Column(db.Text)
     _image = db.Column(db.String(100))
     last_edit_time = db.Column(db.DateTime)
+    image_locked = db.Column(db.Boolean, default=False, nullable=False)
+    info_locked = db.Column(db.Boolean, default=False, nullable=False)
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
