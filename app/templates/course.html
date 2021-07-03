@@ -330,13 +330,24 @@
            alert('Operation in progress, please try again later!');
            return;
          }
+         if (d.conflict && action_data[d.conflict].in_progress) {
+           alert('A conflicting operation is in progress, please try again later!');
+           return;
+         }
          d.in_progress = true;
          do_btn.hide();
          undo_btn.show();
          d.enabled = true;
          update_count(d.count + 1);
          if (d.conflict && action_data[d.conflict].enabled) {
-           $('.btn-' + d.conflict).filter('.btn-undo').click();
+           var conflict_do_btn = $('.btn-' + d.conflict).filter('.btn-do');
+           var conflict_undo_btn = $('.btn-' + d.conflict).filter('.btn-undo');
+           var conflict_count = action_data[d.conflict].count - 1;
+           action_data[d.conflict].count = conflict_count;
+           action_data[d.conflict].enabled = false;
+           $('.btn-' + d.conflict + ' .count').text(conflict_count);
+           conflict_undo_btn.hide();
+           conflict_do_btn.show();
          }
          http_post_wrapper(d.do_url);
          {% else %}
@@ -350,6 +361,10 @@
            return;
          if (d.in_progress) {
            alert('Operation in progress, please try again later!');
+           return;
+         }
+         if (d.conflict && action_data[d.conflict].in_progress) {
+           alert('A conflicting operation is in progress, please try again later!');
            return;
          }
          d.in_progress = true;
