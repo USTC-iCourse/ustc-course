@@ -23,7 +23,11 @@ html, body { height: 100%; }
     margin-bottom: 20px;
 }
 .banner {
-    width: 100%
+    width: 100%;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 /* -------------------------------------------------- */
 @media (max-width:767px){

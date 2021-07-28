@@ -27,7 +27,6 @@
           <li {% if this_module and this_module=='course.public_courses' %}class="active"{% endif %}><a href="{{ url_for('course.public_courses') }}">公选</a></li>
         </ul>
 
-        
         <form class="navbar-form navbar-left desktop" action="{{ url_for('home.search') }}" method="get" role="search">
           <div class="form-group">
             <input type="text" name="q" class="form-control" id="search" placeholder="搜索课程、老师" style="width: 235px" value="{{ keyword or '' }}">
@@ -116,7 +115,16 @@
     </div>
   </div>
   {% endif %}
- 
+
+  <!-- banner -->
+  <div class="container">
+    <div class="text-center banner">
+      好消息, 评课社区姊妹网站 - 研究生导师评价网 <a href="https://pi-review.com/">PI Review</a> 上线！
+    </div>
+  </div>
+  <!-- end banner -->
+
+
   {% block content %}
   {% endblock %}
   <div id="push"></div>
