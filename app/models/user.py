@@ -346,7 +346,7 @@ class Student(db.Model):
     dept_class = db.relationship('DeptClass', backref='students')
     major = db.relationship('Major')
     classes_joined = db.relationship('CourseClass', secondary = join_course, order_by='desc(CourseClass.term)', backref='students')
-    courses_joined = db.relationship('CourseClass', secondary = join_course, order_by='desc(CourseClass.term)')
+    courses_joined = db.relationship('CourseClass', secondary = join_course, order_by='desc(CourseClass.term)', overlaps="classes_joined,students")
     
     def __repr__(self):
         return '<Student {} ({})>'.format(self.name, self.sno)
