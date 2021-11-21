@@ -17,6 +17,7 @@ markdown
 pytz
 werkzeug<1.0.0
 email_validator
+gunicorn
 # don't know why these dependencies fail...
 click
 wtforms
