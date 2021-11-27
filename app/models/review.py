@@ -62,13 +62,13 @@ class Review(db.Model):
     def delete(self):
         if not self.id:
             return None
+        self.course.review_users.remove(self.author)
         course_rate = self.course.course_rate
         course_rate.subtract(self.difficulty,
                 self.homework,
                 self.grading,self.gain,
                 self.rate)
         db.session.delete(self)
-        self.course.review_users.remove(self.author)
         db.session.commit()
 
     # self and old must have the same course_id
