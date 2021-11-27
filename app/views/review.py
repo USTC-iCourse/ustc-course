@@ -17,7 +17,7 @@ def new_review(course_id):
     if not course:
         abort(404)
     user = current_user
-    review = Review.query.filter_by(course=course, author=user).first()
+    review = Review.query.with_for_update().filter_by(course=course, author=user).first()
     old_review = None
     if not review:
         is_new = True
@@ -86,7 +86,7 @@ def delete_review():
     if not review_id:
         message = _('You must specify a id.')
         return jsonify(ok=ok,message=message)
-    review = Review.query.get(review_id)
+    review = Review.query.with_for_update().get(review_id)
     ok = False
     message = _('Something wrong happend.')
     if not review:

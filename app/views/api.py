@@ -46,7 +46,7 @@ def get_reviews():
 def review_upvote():
     review_id = request.values.get('review_id')
     if review_id:
-        review = Review.query.get(review_id)
+        review = Review.query.with_for_update().get(review_id)
         if review:
             ok,message = review.upvote()
             if ok:
@@ -63,7 +63,7 @@ def review_upvote():
 def review_cancel_upvote():
     review_id = request.values.get('review_id')
     if review_id:
-        review = Review.query.get(review_id)
+        review = Review.query.with_for_update().get(review_id)
         if review:
             ok,message = review.cancel_upvote()
             return jsonify(ok=ok,message=message, count=review.upvote_count)
@@ -79,7 +79,7 @@ def review_new_comment():
     if form.validate_on_submit():
         review_id = request.form.get('review_id')
         if review_id:
-            review = Review.query.get(review_id)
+            review = Review.query.with_for_update().get(review_id)
             comment = ReviewComment()
             content = request.form.get('content')
             if len(content) > 500:
@@ -104,7 +104,7 @@ def review_new_comment():
 def delete_comment():
     comment_id = request.values.get('comment_id')
     if comment_id:
-        comment = ReviewComment.query.get(comment_id)
+        comment = ReviewComment.query.with_for_update().get(comment_id)
         if comment:
             if comment.author == current_user or current_user.is_admin:
                 ok,message = comment.delete()
@@ -121,7 +121,7 @@ def delete_comment():
 def hide_review():
     review_id = request.values.get('review_id')
     if review_id:
-        review = Review.query.get(review_id)
+        review = Review.query.with_for_update().get(review_id)
         if review:
             if current_user.is_admin:
                 ok,message = review.hide()
@@ -138,7 +138,7 @@ def hide_review():
 def unhide_review():
     review_id = request.values.get('review_id')
     if review_id:
-        review = Review.query.get(review_id)
+        review = Review.query.with_for_update().get(review_id)
         if review:
             if current_user.is_admin:
                 ok,message = review.unhide()
@@ -154,7 +154,7 @@ def unhide_review():
 @login_required
 def follow_user():
     user_id = request.values.get('user_id')
-    user = User.query.get(user_id)
+    user = User.query.with_for_update().get(user_id)
     if user:
         if user == current_user:
             return jsonify(ok=False, message='Cannot follow yourself')
@@ -170,7 +170,7 @@ def follow_user():
 @login_required
 def unfollow_user():
     user_id = request.values.get('user_id')
-    user = User.query.get(user_id)
+    user = User.query.with_for_update().get(user_id)
     if user:
         if user == current_user:
             return jsonify(ok=False, message='Cannot follow yourself')
