@@ -41,7 +41,7 @@ class Review(db.Model):
     #course: Course
 
     def add(self):
-        '''crete a new review'''
+        '''create a new review'''
         if self.course and self.author:
             # Make sure that each user can only add one review for each course
             if self.author in self.course.review_users:

@@ -630,15 +630,25 @@ class CourseRate(db.Model):
         db.session.commit()
 
     def add(self,difficulty,homework,grading,gain,rate):
-        self.review_count += 1
-        self._difficulty_total += difficulty
-        self._homework_total += homework
-        self._grading_total += grading
-        self._gain_total += gain
-        self._rate_total += rate
+        if self.review_count == 0:
+            self.review_count = 1
+            self._difficulty_total = difficulty
+            self._homework_total = homework
+            self._grading_total = grading
+            self._gain_total = gain
+            self._rate_total = rate
+        else:
+            self.review_count += 1
+            self._difficulty_total += difficulty
+            self._homework_total += homework
+            self._grading_total += grading
+            self._gain_total += gain
+            self._rate_total += rate
         self.save()
 
     def subtract(self,difficulty,homework,grading,gain,rate):
+        if self.review_count == 0:
+            raise ValueError('cannot substract review count from zero')
         self.review_count -= 1
         self._difficulty_total -= difficulty
         self._homework_total -= homework
