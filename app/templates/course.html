@@ -149,6 +149,9 @@
 
           <div class="bm-pd-md grey" id="review-{{ review.id }}">
             <span class="small localtime" style="display: none;">{{ review.publish_time|utctime }}</span>
+	    {% if review.publish_time != review.update_time %}
+	    <span class="small">（最后修改于</span> <span class="small localtime" style="display: none;">{{ review.update_time|utctime }}</span><span class="small">）</span>
+	    {% endif %}
             {% if current_user.is_authenticated %}
             <a class="nounderline" href="javascript: {{ 'cancel_' if review.is_upvoted() }}upvote_review({{ review.id }})">
             {% else %}

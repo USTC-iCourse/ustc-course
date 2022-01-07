@@ -6,6 +6,7 @@ from app.utils import sanitize, editor_parse_at
 from flask_babel import gettext as _
 from .course import course
 import markdown
+from datetime import datetime
 
 review = Blueprint('review',__name__)
 
@@ -55,6 +56,7 @@ def new_review(course_id):
                 for user in mentioned_users:
                     user.notify('mention', review)
             else:
+                review.update_time = datetime.utcnow()
                 review.update_course_rate(old_review)
             return redirect(url_for('course.view_course',course_id=course_id))
         else: # invalid submission, try again
