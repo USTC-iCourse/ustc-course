@@ -104,7 +104,7 @@ class CourseTerm(db.Model):
     description = db.Column(db.Text()) # 教务处课程简介
     description_eng = db.Column(db.Text()) # 教务处英文简介
 
-    credit = db.Column(db.Integer) # 学分
+    credit = db.Column(db.Float) # 学分
     hours = db.Column(db.Integer)  # 学时
     hours_per_week = db.Column(db.Integer) # 周学时
     class_numbers = db.Column(db.String(200)) # 上课班级
