@@ -42,7 +42,6 @@ def edit_profile(teacher_id):
         if not form['homepage'].data.startswith('http'):
             form['homepage'].data = 'http://' + form['homepage'].data
         teacher.homepage = form['homepage'].data.strip()
-        teacher.description = form['description'].data.strip()
         teacher.research_interest = form['research_interest'].data.strip()
         if request.files.get('avatar'):
             if teacher.image_locked:

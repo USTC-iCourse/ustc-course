@@ -67,11 +67,12 @@
 	{% endif %}
 	<h3 class="blue">{{ teacher.name }}</h3>
 	<p>{{ teacher.dept.name }}</p>
-	<p>教师主页：
-          {% if teacher.homepage and teacher.homepage != 'http://' %}
-          <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>
-          {% else %}暂无{% endif %}
-	</p>
+        {% if teacher.homepage and teacher.homepage != 'http://' %}
+	<p>教师主页：<a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a></p>
+	{% endif %}
+	{% if teacher.research_interest %}
+	<p>研究方向：{{ teacher.research_interest }}</p>
+	{% endif %}
       </div>
     </div><!-- end col-md-4 -->
   </div><!-- end float-element -->
