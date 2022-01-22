@@ -17,7 +17,7 @@ LANGUAGES = {
 
 
 # SQL config
-SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://icourse:eDuTieudXcfk@localhost/icourse?charset=utf8'
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://icourse:your-db-password@localhost/icourse?charset=utf8mb4'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Flask mail
