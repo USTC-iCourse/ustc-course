@@ -3,14 +3,50 @@
 # Assume that automysqlbackup is installed and set up.
 
 GIT_DIR="/srv/ustc-course/data"
-SQL_DIR="/var/lib/automysqlbackup/daily/icourse"
+SQL_DIR_PREFIX="/var/lib/automysqlbackup"
+DATABASE="icourse"
+GIT_USER="icourse"
+SQL_DAILY_DIR="$SQL_DIR_PREFIX/daily/$DATABASE"
+SQL_WEEKLY_DIR="$SQL_DIR_PREFIX/weekly/$DATABASE"
+SQL_MONTHLY_DIR="$SQL_DIR_PREFIX/monthly/$DATABASE"
 
-SQL_GZ=$(ls -c $SQL_DIR | head -n 1)
+SQL_DAILY_GZ=$SQL_DAILY_DIR/$(ls -c $SQL_DAILY_DIR | head -n 1)
+SQL_WEEKLY_GZ=$SQL_WEEKLY_DIR/$(ls -c $SQL_WEEKLY_DIR | head -n 1)
+SQL_MONTHLY_GZ=$SQL_MONTHLY_DIR/$(ls -c $SQL_MONTHLY_DIR | head -n 1)
+
+SQL_DAILY_TIME=$(stat -c %Y $SQL_DAILY_GZ)
+[ -z "$SQL_DAILY_TIME" ] && SQL_DAILY_TIME=0
+SQL_WEEKLY_TIME=$(stat -c %Y $SQL_WEEKLY_GZ)
+[ -z "$SQL_WEEKLY_TIME" ] && SQL_WEEKLY_TIME=0
+SQL_MONTHLY_TIME=$(stat -c %Y $SQL_MONTHLY_GZ)
+[ -z "$SQL_MONTHLY_TIME" ] && SQL_MONTHLY_TIME=0
+
+echo $SQL_DAILY_GZ $SQL_DAILY_TIME
+echo $SQL_WEEKLY_GZ $SQL_WEEKLY_TIME
+echo $SQL_MONTHLY_GZ $SQL_MONTHLY_TIME
+
+if [ $SQL_DAILY_TIME -gt $SQL_WEEKLY_TIME ]; then
+	if [ $SQL_DAILY_TIME -gt $SQL_MONTHLY_TIME ]; then
+		SQL_GZ=$SQL_DAILY_GZ
+	else
+		SQL_GZ=$SQL_MONTHLY_GZ
+	fi
+else
+	if [ $SQL_WEEKLY_TIME -gt $SQL_MONTHLY_TIME ]; then
+		SQL_GZ=$SQL_WEEKLY_GZ
+	else
+		SQL_GZ=$SQL_MONTHLY_GZ
+	fi
+fi
+
+echo $SQL_GZ
+[ -z "$SQL_GZ" ] && exit 4
+
 cd $GIT_DIR || exit 255
-cp $SQL_DIR/$SQL_GZ ./icourse.sql.gz || exit 1
-rm -f icourse.sql
-gunzip icourse.sql.gz || exit 2
-chown icourse icourse.sql || exit 3
-sudo -u icourse -- git add icourse.sql
-sudo -u icourse -- git commit -m "icourse sql backup"
-sudo -u icourse -- git push
+cp $SQL_GZ ./${DATABASE}.sql.gz || exit 1
+rm -f ${DATABASE}.sql
+gunzip ${DATABASE}.sql.gz || exit 2
+chown ${GIT_USER} ${DATABASE}.sql || exit 3
+sudo -u ${GIT_USER} -- git add ${DATABASE}.sql
+sudo -u ${GIT_USER} -- git commit -m "${DATABASE} sql backup"
+sudo -u ${GIT_USER} -- git push
