@@ -114,8 +114,20 @@ def html_abstract(text):
     return Markup(text).striptags()[0:150]
 
 
+def find_last_occurence(haystack, needle):
+    last_index = -1
+    for substr in needle:
+        index = haystack.rfind(substr)
+        if index >= 0 and index > last_index:
+            last_index = index
+    return last_index
+
+
 @app.template_filter('abstract_by_keyword')
 def abstract_by_keyword(content, keyword):
+    abstract_len = 150
+    sentence_max_len = int(abstract_len / 2)
+
     plaintext = Markup(content).striptags()
     lower_plaintext = plaintext.lower()
     keyword = keyword.lower()
@@ -128,7 +140,12 @@ def abstract_by_keyword(content, keyword):
     if first_index == len(plaintext):
         first_index = 0
 
-    abstract_len = 150
+    last_sentence_end = find_last_occurence(plaintext[:first_index], ['。', '；', '！', '. ', ';', '!'])
+    if first_index - last_sentence_end < sentence_max_len:
+        first_index = last_sentence_end + 1
+    else:
+        first_index -= sentence_max_len
+
     if first_index + abstract_len > len(plaintext):
         first_index = len(plaintext) - abstract_len
         if first_index < 0:
