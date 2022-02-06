@@ -113,6 +113,33 @@ def sanitize(text):
 def html_abstract(text):
     return Markup(text).striptags()[0:150]
 
+
+@app.template_filter('abstract_by_keyword')
+def abstract_by_keyword(content, keyword):
+    plaintext = Markup(content).striptags()
+    lower_plaintext = plaintext.lower()
+    keyword = keyword.lower()
+    words = keyword.split()
+    first_index = len(plaintext)
+    for word in words:
+        index = lower_plaintext.find(word)
+        if index >= 0 and index < first_index:
+            first_index = index
+    if first_index == len(plaintext):
+        first_index = 0
+
+    abstract_len = 150
+    if first_index + abstract_len > len(plaintext):
+        first_index = len(plaintext) - abstract_len
+        if first_index < 0:
+            first_index = 0
+    abstract = plaintext[first_index:(abstract_len + first_index)]
+
+    for word in words:
+        abstract = re.sub(r'(' + word + ')', '<span style="color:#B22222;font-weight:bold;">\\1</span>', abstract, flags=re.IGNORECASE)
+    return abstract
+
+
 def editor_parse_at(text):
     if not text.endswith('\n'):
         text = text + '\n' # the parse function will not work with @somebody

@@ -5,6 +5,17 @@
   <div class="row float-element">
     <div class="bm-pd-md">
       {% include 'mobile-navbar.html' %}
+
+      <ul class="nav nav-tabs desktop">
+	<li><a href="{{ url_for('home.search', q=keyword) }}">搜课程</a></li>
+        <li class="active"><a href="#">搜点评</a></li>
+      </ul>
+
+      <ul class="nav nav-pills mobile">
+	<li><a href="{{ url_for('home.search', q=keyword) }}">搜课程</a></li>
+        <li class="active"><a href="#">搜点评</a></li>
+      </ul>
+
       {% include 'review-list.html' %}
     </div>
 

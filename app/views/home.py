@@ -9,6 +9,7 @@ from sqlalchemy import union, or_
 from sqlalchemy.sql.expression import literal_column, text
 from app import db
 from .course import deptlist
+import re
 
 home = Blueprint('home',__name__)
 
@@ -245,6 +246,39 @@ class MyPagination(object):
                     yield None
                 yield num
                 last = num
+
+
+@home.route('/search-reviews/')
+def search_reviews():
+    ''' 搜索点评内容 '''
+    query_str = request.args.get('q')
+    if not query_str:
+        return redirect(url_for('home.index'))
+
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+
+    keywords = re.sub(r'''[~`!@#$%^&*(){}[]|\\:";'<>?,./]''', ' ', query_str).split()
+    max_keywords_allowed = 10
+    if len(keywords) > max_keywords_allowed:
+        keywords = keywords[:max_keywords_allowed]
+
+    unioned_query = None
+    for keyword in keywords:
+        content_query = Review.query.filter(Review.content.like('%' + keyword + '%'))
+        if unioned_query is None:
+            unioned_query = content_query
+        else:
+            unioned_query = unioned_query.union(content_query)
+
+        author_query = Review.query.join(Review.author).filter(User.username.like('%' + keyword + '%'))
+        unioned_query = unioned_query.union(author_query)
+
+    reviews_paged = unioned_query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
+    return render_template('search-reviews.html', reviews=reviews_paged,
+                title='搜索「' + query_str + '」',
+                this_module='home.search_reviews', keyword=query_str)
+
 
 @home.route('/search/')
 def search():

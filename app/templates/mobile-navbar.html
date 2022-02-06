@@ -1,4 +1,8 @@
+      {% if this_module == 'home.search_reviews' %}
+      <form class="mobile ud-pd-sm" action="{{ url_for('home.search_reviews') }}" method="get">
+      {% else %}
       <form class="mobile ud-pd-sm" action="{{ url_for('home.search') }}" method="get">
+      {% endif %}
         <div class="form-group">
           <input type="text" name="q" class="form-control input" placeholder="搜索你感兴趣的课程" value="{{ keyword or '' }}">
         </div>
@@ -8,7 +12,7 @@
       <h4 class="blue desktop">{{ title }}</h4>
       {% endif %}
       <ul class="nav nav-tabs mobile">
-          <li {% if this_module and this_module=='home.latest_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">点评</a></li>
+          <li {% if this_module and (this_module=='home.latest_reviews' or this_module=='home.search_reviews') %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">点评</a></li>
           {% if current_user.is_authenticated %}
           <li {% if this_module and this_module=='home.follow_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
           {% endif %}

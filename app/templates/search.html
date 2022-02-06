@@ -6,6 +6,16 @@
     {% include 'mobile-navbar.html' %}
     {# include "course-filter.html" #}
 
+    <ul class="nav nav-tabs desktop">
+      <li class="active"><a href="#">搜课程</a></li>
+      <li><a href="{{ url_for('home.search_reviews', q=keyword) }}">搜点评</a></li>
+    </ul>
+
+    <ul class="nav nav-pills mobile">
+      <li class="active"><a href="#">搜课程</a></li>
+      <li><a href="{{ url_for('home.search_reviews', q=keyword) }}">搜点评</a></li>
+    </ul>
+
     <div class="ud-pd-sm"><span class="text-muted mobile">{{ title }}</span><span class="text-muted">共 {{ courses.total }} 门课（当前第 {{ courses.page }} 页）</span></div>
     {% include "course-list.html" %}
 
