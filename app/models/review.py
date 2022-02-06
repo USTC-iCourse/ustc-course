@@ -155,7 +155,7 @@ class Review(db.Model):
             return str(int(self.term[0:4])+1) + '夏'
         else:
             return '未知'
-    
+
 
 class ReviewComment(db.Model):
     __tablename__ = 'review_comments'
