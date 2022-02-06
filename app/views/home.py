@@ -272,7 +272,9 @@ def search_reviews():
             unioned_query = unioned_query.union(content_query)
 
         author_query = Review.query.join(Review.author).filter(User.username.like('%' + keyword + '%'))
-        unioned_query = unioned_query.union(author_query)
+        course_query = Review.query.join(Review.course).filter(Course.name.like('%' + keyword + '%'))
+        teacher_query = Review.query.join(Review.course).join(Course.teachers).filter(Teacher.name == keyword)
+        unioned_query = unioned_query.union(author_query).union(course_query).union(teacher_query)
 
     reviews_paged = unioned_query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
     return render_template('search-reviews.html', reviews=reviews_paged,
