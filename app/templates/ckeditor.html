@@ -1,9 +1,73 @@
-<script src="/static/ckeditor/ckeditor.js"></script>
-<script src="/static/ckeditor/adapters/jquery.js"></script>
-<script>
-CKEDITOR.disableAutoInline = true;
+<script src="/static/ckeditor5c/ckeditor.js"></script>
+<!--<script src="/static/ckeditor/adapters/jquery.js"></script>-->
+<!--<script>-->
+<!--CKEDITOR.disableAutoInline = true;-->
 
-$(document).ready(function(){
-    $('#content-editor').ckeditor();
-});
+<!--$(document).ready(function(){-->
+<!--    $('#content-editor').ckeditor();-->
+<!--});-->
+<!--</script>-->
+<script>
+var uploadApi = document.location.origin + "/api/upload/image";
+
+ClassicEditor.create( document.querySelector( '#content-editor' ), {
+
+                // toolbar: {
+                //     items: [
+                //         'heading',
+                //         '|',
+                //         'bold',
+                //         'italic',
+                //         'link',
+                //         'bulletedList',
+                //         'numberedList',
+                //         '|',
+                //         'indent',
+                //         'outdent',
+                //         '|',
+                //         'imageUpload',
+                //         'blockQuote',
+                //         'insertTable',
+                //         '|',
+                //         'code',
+                //         'codeBlock',
+                //         '|',
+                //         'undo',
+                //         'redo'
+                //     ]
+                // },
+                language: 'en',
+                // image: {
+                //     toolbar: [
+                //         'imageTextAlternative',
+                //         'imageStyle:full',
+                //         'imageStyle:side'
+                //     ]
+                // },
+                ckfinder: {
+                    uploadUrl: uploadApi,
+                },
+                table: {
+                    contentToolbar: [
+                        'tableColumn',
+                        'tableRow',
+                        'mergeTableCells'
+                    ]
+                },
+                licenseKey: '',
+
+            } )
+            .then( editor => {
+                window.editor = editor;
+                editor.editing.view.change( writer => {
+                    writer.setStyle( 'min-height', '300px', editor.editing.view.document.getRoot() );
+                } );
+            } )
+            .catch( error => {
+                console.error( 'Oops, something gone wrong!' );
+                console.error( 'Please, report the following error in the https://github.com/ckeditor/ckeditor5 with the build id and the error stack trace:' );
+                console.warn( 'Build id: k2i30chx32nf-8o65j7c6blw0' );
+                console.error( error );
+            } );
+
 </script>

@@ -82,36 +82,37 @@ def load_courses(insert=True):
     print('Data loaded with %d courses' % len(json))
     for c in json:
         # course = c['course'] #name str data
-        code = c['kcdm'] #CS001
-        semester = "2021-2022" #manual add?
+        code = c['kcdm']  # CS001
+        semester = "2021-2022"  # manual add?
         # https://github.com/jingning42/ustc-course/blob/66c68a9615d4f658c51d5273b7869d02ee5ddd3d/app/models/course.py#L85
-        term = '20211' #manual add
+        term = '20211'  # manual add
         course_kcbh[code] = dict(
             # kcid=c['kcid'],  #"2FCC66B429FA494A8F902D739570FCC3" #需要做个hash
             kcid=abs(hash(c['kcid'])) % (10 ** 8),  # "55932488" #需要做个hash
-            kcbh=c['kcdm'], #"CS102A",
-            name=c['kcmc'], #"计算机程序设计基础A",
+            kcbh=c['kcdm'],  # "CS102A",
+            name=c['kcmc'],  # "计算机程序设计基础A",
             name_eng=c['kcmc_en'],
             credit=c['xf'],
-            course_type=c['rwlxmc'], # "专业任务",
-            course_level=c['kclbmc'] if c['kclbmc'] else None, # '专业基础课'
+            course_type=c['kclbmc'] if c['kclbmc'] else None,  # '专业基础课'
+            course_level=c['pyccmc'] if c['pyccmc'] else None,  # '本科'
             # join_type=c['classType']['nameZh'] if c['classType'] else None,
-            join_type= None,
-            course_major=c['kkyxmc'],
+            join_type=c['rwlxmc'] if c['rwlxmc'] else None,
+            course_major=c['kkyxmc'],  # 'xx系'
             # teaching_type=c['skfs'] if c['skfs'] else None #"理论+实践"
-            teaching_type= c['skyymc'] #'英文'
+            teaching_type=c['skyymc']  # '英文'
         )
 
         if c['zxs']:
             course_kcbh[code]['hours'] = int(float(c['zxs']))
-            course_kcbh[code]['hours_per_week'] = int(float(c['zxs'])/16)
+            course_kcbh[code]['hours_per_week'] = int(float(c['zxs']) / 16)
 
-        #teachers
+        # teachers
         teachers = []
         teacher_names = []
         if 'dgjsmc' in c:
             teachers = c['dgjsmc']
-            teachers = list(set(teachers.split(','))) if teachers else ['未知教师'] # in case of null and dup like '"dgjsmc": "刘欢,刘欢",'
+            teachers = list(set(teachers.split(','))) if teachers else [
+                '未知教师']  # in case of null and dup like '"dgjsmc": "刘欢,刘欢",'
         # elif 'teacherAssignmentList' in c:
         #     teachers = c['teacherAssignmentList']
         for _t in teachers:

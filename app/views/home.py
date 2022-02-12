@@ -312,6 +312,9 @@ def search():
     def exact_match(q):
         return q.filter(Course.name == keyword)
 
+    def courseries_match(q):
+        return q.filter(Course.courseries == keyword)
+
     fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
 
     def include_match(q):
@@ -321,12 +324,13 @@ def search():
         return q.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
     def ordering(query_obj):
-        return query_obj.join(CourseRate).order_by(text('anon_2_anon_3_anon_4__meta'), Course.QUERY_ORDER())
+        return query_obj.join(CourseRate).order_by(text('anon_2_anon_3_anon_4_anon_5__meta'), Course.QUERY_ORDER())
 
     union_courses = teacher_match(course_query_with_meta(1)) \
                     .union(exact_match(course_query_with_meta(2))) \
                     .union(include_match(course_query_with_meta(3))) \
-                    .union(fuzzy_match(course_query_with_meta(4)))
+                    .union(fuzzy_match(course_query_with_meta(4))) \
+                    .union(courseries_match(course_query_with_meta(5)))
     ordered_courses = ordering(union_courses).group_by(Course.id)
 
     courses_count = teacher_match(Course.query).union(fuzzy_match(Course.query)).count()

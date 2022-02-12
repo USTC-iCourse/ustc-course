@@ -45,7 +45,7 @@
         <table class="table table-condensed no-border">
           <tr>
             <td><strong>选课类别：</strong>{{ course.join_type or '未知' }}</td>
-            <td><strong>教学类型：</strong>{{ course.teaching_type or '未知' }}</td>
+            <td><strong>教学语言：</strong>{{ course.teaching_type or '未知' }}</td>
           </tr>
           <tr>
             <td><strong>课程类别：</strong>{{ course.course_type or '未知' }}</td>
@@ -62,7 +62,7 @@
           {% if course.homepage and course.homepage != 'http://' %}
           <strong>课程主页</strong>：<a href="{{ course.homepage }}">{{ course.homepage }}</a>
           {% else %}
-          <strong>课程主页</strong>：暂无（如果你知道，劳烦告诉我们！）
+          <strong>课程主页</strong>：暂无（如果你知道，劳烦告诉我们！）课程大纲可前往 https://mirrors.sustech.edu.cn/courses/教学大纲汇总/ 查看。
           {% endif %}
         </div>
 
@@ -76,10 +76,10 @@
           <button class="btn btn-white btn-flat btn-downvote btn-do"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 不推荐 <small>(<span class="count"></span>)</small></button>
           <button class="btn btn-blue btn-flat btn-downvote btn-undo"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 取消不推荐 <small>(<span class="count"></span>)</small></button>
 
-          {% if current_user.is_student %}
-          <button class="btn btn-white btn-flat btn-join btn-do"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small></small></button>
-          <button class="btn btn-blue btn-flat btn-join btn-undo"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small></small></button>
-          {% endif %}
+<!--          {% if current_user.is_student %}-->
+<!--          <button class="btn btn-white btn-flat btn-join btn-do"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small></small></button>-->
+<!--          <button class="btn btn-blue btn-flat btn-join btn-undo"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small></small></button>-->
+<!--          {% endif %}-->
         </div>
 
 	{% if course.introduction %}

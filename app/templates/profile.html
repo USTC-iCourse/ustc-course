@@ -70,47 +70,47 @@
       </div>
 
 
-      {% if user.is_student and user.info %}
-      <div class="bm-pd-lg">
-        <div class="inline-h3">
+<!--      {% if user.is_student and user.info %}-->
+<!--      <div class="bm-pd-lg">-->
+<!--        <div class="inline-h3">-->
 
-          {% if user.info.sno %}
-          <a href="{{ url_for('user.join_course', user_id=user.id) }}">
-            <span class="blue h4"><strong>学过</strong></span>
-              （{{ user.classes_joined_count }}门）</a>
-          {% else %}
-          <span class="blue h4"><strong>学过</strong></span>
-          <span class="text-muted">（绑定学号才能显示学过课程）</span>
-          {% endif %}
-          {% if user.classes_joined_count > 6 %}
-          <span class="float-right"><a href="{{ url_for('user.join_course', user_id=user.id) }}">查看更多 &raquo;</a></span>
-          {% endif %}
-        </div>
+<!--          {% if user.info.sno %}-->
+<!--          <a href="{{ url_for('user.join_course', user_id=user.id) }}">-->
+<!--            <span class="blue h4"><strong>学过</strong></span>-->
+<!--              （{{ user.classes_joined_count }}门）</a>-->
+<!--          {% else %}-->
+<!--          <span class="blue h4"><strong>学过</strong></span>-->
+<!--          <span class="text-muted">（绑定学号才能显示学过课程）</span>-->
+<!--          {% endif %}-->
+<!--          {% if user.classes_joined_count > 6 %}-->
+<!--          <span class="float-right"><a href="{{ url_for('user.join_course', user_id=user.id) }}">查看更多 &raquo;</a></span>-->
+<!--          {% endif %}-->
+<!--        </div>-->
 
-        {% if user.classes_joined_count == 0 %}
-        <p class="text-muted">还没有学过的课程呢。</p>
-        {% endif %}
-        {% if not current_user.is_authenticated %}
-        <p class="text-muted">为保护隐私，您需要 <a data-toggle="modal" data-target="#signin">登录</a> 才能查看已学课程。</p>
-        {% else %}
-        {% for course_class in user.classes_joined[0:6] %}
-        {% if course_class.course_id %}
-        <!-- 学过课程最多显示6门 -->
-        <div class="ud-pd-md dashed">
-          <a href="{{ url_for('course.view_course', course_id=course_class.course_id) }}">{{ course_class.course.name }}{% if course_class.course.teachers %}（{{ course_class.course.teacher_names_display }}）{% endif %}</a>
-          {% if user != current_user and course_class.course.reviewed_by(user) %}
-          <span class="label label-success">TA已点评</span>
-          {% endif %}
-          {% if course_class.course.reviewed_by(current_user) %}
-          <span class="label label-success">我已点评</span>
-          {% endif %}
-          <span class="small grey align-bottom  float-right">{{ course_class.term|term_display }}</span>
-        </div>
-        {% endif %}
-        {% endfor %}
-        {% endif %}
-      </div>
-      {% endif %}
+<!--        {% if user.classes_joined_count == 0 %}-->
+<!--        <p class="text-muted">还没有学过的课程呢。</p>-->
+<!--        {% endif %}-->
+<!--        {% if not current_user.is_authenticated %}-->
+<!--        <p class="text-muted">为保护隐私，您需要 <a data-toggle="modal" data-target="#signin">登录</a> 才能查看已学课程。</p>-->
+<!--        {% else %}-->
+<!--        {% for course_class in user.classes_joined[0:6] %}-->
+<!--        {% if course_class.course_id %}-->
+<!--        &lt;!&ndash; 学过课程最多显示6门 &ndash;&gt;-->
+<!--        <div class="ud-pd-md dashed">-->
+<!--          <a href="{{ url_for('course.view_course', course_id=course_class.course_id) }}">{{ course_class.course.name }}{% if course_class.course.teachers %}（{{ course_class.course.teacher_names_display }}）{% endif %}</a>-->
+<!--          {% if user != current_user and course_class.course.reviewed_by(user) %}-->
+<!--          <span class="label label-success">TA已点评</span>-->
+<!--          {% endif %}-->
+<!--          {% if course_class.course.reviewed_by(current_user) %}-->
+<!--          <span class="label label-success">我已点评</span>-->
+<!--          {% endif %}-->
+<!--          <span class="small grey align-bottom  float-right">{{ course_class.term|term_display }}</span>-->
+<!--        </div>-->
+<!--        {% endif %}-->
+<!--        {% endfor %}-->
+<!--        {% endif %}-->
+<!--      </div>-->
+<!--      {% endif %}-->
 
 
 

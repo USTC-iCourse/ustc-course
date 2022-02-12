@@ -1,18 +1,18 @@
 <?xml version="1.0" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-  <atom:link href="https://icourse.club/feed.xml" rel="self" type="application/rss+xml" />
-  <title>USTC 评课社区 - 全站最新点评</title>
-  <link>https://icourse.club</link>
+  <atom:link href="https://nces.cra.moe/feed.xml" rel="self" type="application/rss+xml" />
+  <title>Niuwa Curriculum Evaluation System - 全站最新点评</title>
+  <link>https://nces.cra.moe</link>
   <description>评课是为了更好地选课！</description>
   {% for review in reviews.items %}
     {% if not review.is_hidden %}
     <item>
         <title>{{ review.author.username }} 点评了 {{ review.course.name }}{% if review.course.teachers %}（{{ review.course.teacher_names_display }}）{% endif %}</title>
-        <link>https://icourse.club{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}</link>
+        <link>https://nces.cra.moe{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}</link>
         <pubDate>{{ review.update_time|rfc822time }}</pubDate>
         <description>{{ review.content|abstract }}</description>
-        <guid>https://icourse.club{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}</guid>
+        <guid>https://nces.cra.moe{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}</guid>
     </item>
     {% endif %}
   {% endfor %}

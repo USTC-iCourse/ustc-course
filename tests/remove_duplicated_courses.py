@@ -2,18 +2,15 @@ import json
 import collections
 
 # Opening JSON file
-f = open('course-2021-spring.json')
+f = open('/Users/cyf/Documents/GitHub/sustc-course/course-raw-data/2020-1.json')
 
 # returns JSON object as
 # a dictionary
 data = json.load(f)
-
-# unique = { each['kcdm'] : each for each in data }.values()
-# unique_teacher = { each['dgjsmc'] : each for each in unique }.values()
 hash_list = []
 hash_list_data = []
 op_json = []
-for c in data:
+for c in data['rwList']['list']:
     teacher = sorted(c['dgjsmc'].split(',')) if c['dgjsmc'] else ['未知教师']
     no = c['kcdm']
     chash = str(teacher) + "-" + str(no)
@@ -25,7 +22,7 @@ for c in data:
         hash_list.append(chash)
         op_json.append(c)
 
-print([item for item, count in collections.Counter(hash_list_data).items() if count > 1])
+print([item for item, count in collections.Counter(hash_list_data).items() if count > 1])  # print duplicated course
 
-with open('remove_dup.json', 'w') as f:
+with open('/Users/cyf/Documents/GitHub/sustc-course/course_remove_dup_json/2020-1.json', 'w') as f:
     json.dump(op_json, f, ensure_ascii=False)

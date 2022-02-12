@@ -67,15 +67,15 @@
     {% if user.info %}
     <!-- a student's information -->
     {% if user.is_student %}
-    <p class="text-success">{{ _('你已经绑定了学号<b>%(sno)s</b>。<a href=%(url)s>有错吗</a>？',sno=user.info.sno,url=url_for('user.bind_identity') ) }}</p> 
+<!--    <p class="text-success">{{ _('你已经绑定了学号<b>%(sno)s</b>。<a href=%(url)s>有错吗</a>？',sno=user.info.sno,url=url_for('user.bind_identity') ) }}</p> -->
     <!-- a teacher's information -->
     {% elif user.is_teacher %}
-    <p class="text-success">{{ _('你已经绑定了教工信息：<b>%(name)s</b>。<a href=%(url)s>有错吗</a>？',name=user.info.name,url=url_for('user.bind_identity') ) }}</p> 
+<!--    <p class="text-success">{{ _('你已经绑定了教工信息：<b>%(name)s</b>。<a href=%(url)s>有错吗</a>？',name=user.info.name,url=url_for('user.bind_identity') ) }}</p> -->
     {% else %}
     <p class="text-danger">{{ _('唔，出错了！') }}</p>
     {% endif %}
     {% else %}
-    <p class="text-success">{{ _('你还没有绑定学号，<a  href="%(url)s">戳这里</a>绑定。', url=url_for('user.bind_identity')) }}
+<!--    <p class="text-success">{{ _('你还没有绑定学号，<a  href="%(url)s">戳这里</a>绑定。', url=url_for('user.bind_identity')) }}-->
       {% endif %}
       <p class="text-success">你可以通过发送邮件修改密码，<a href="{{ url_for('home.change_password')
                                                              }}">戳这里</a> 发邮件</p>

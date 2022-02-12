@@ -82,7 +82,7 @@ def popular():
 @course.route('/public/')
 def public_courses():
     # large enough per_page to disable pagination effectively
-    courses_page = Course.query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(1, per_page=10000)
+    courses_page = Course.query.join(CourseTerm).filter(CourseTerm.join_type == '文理通识').join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(1, per_page=10000)
 
     #courses = course_query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(Course.QUERY_ORDER()).all()
     #class my_pagination():
