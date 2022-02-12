@@ -111,7 +111,7 @@ def load_courses(insert=True):
         teacher_names = []
         if 'dgjsmc' in c:
             teachers = c['dgjsmc']
-            teachers = teachers.split(',')
+            teachers = list(set(teachers.split(','))) if teachers else ['未知教师'] # in case of null and dup like '"dgjsmc": "刘欢,刘欢",'
         # elif 'teacherAssignmentList' in c:
         #     teachers = c['teacherAssignmentList']
         for _t in teachers:
@@ -176,13 +176,13 @@ def load_courses(insert=True):
             new_course_count += 1
 
         # update course info
-        depts_hash = abs(hash(c['kkyxmc'])) % (10 ** 8)
+        depts_hash = c['kkyx']
         depts_text = c['kkyxmc']
         # depts_text = 37
         if depts_hash in depts_code_map:
             course.dept_id = depts_code_map[depts_text].id
         else:
-            print('Department code ' + c['kkyxmc'] + str(depts_hash) + ' not found in ' + str(c['kcdm']))
+            print('Department code' + c['kkyxmc'] + str(depts_hash) + ' not found in ' + str(c['kcdm']))
 
         # course term
         # https://github.com/jingning42/ustc-course/blob/66c68a9615d4f658c51d5273b7869d02ee5ddd3d/app/utils.py#L217
