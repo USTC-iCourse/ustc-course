@@ -63,8 +63,10 @@ html, body { height: 100%; }
     .desktop-width75 { width: 75%; }
 }
 
-.float-element { background-color: #ffffff; }
+.float-element { background-color: #FFF; }
+
 .container-md { width: 710px; }
+
 .dashed { border-bottom: 1px #ddd dashed; }
 .solid { border-bottom: 1px #EEE solid; }
 .hr-box {
@@ -175,10 +177,10 @@ p { line-height: 25px; word-wrap: break-word; }
 .shadow { box-shadow: 3px 3px 2px #ddd; }
 
 .btn-flat { border: 0; border-radius: 0; }
-@media (max-width:767px) {
+@media (max-width: 767px) {
     .btn-flat { padding: 5px 12px; }
 }
-@media (min-width:768px) {
+@media (min-width: 768px) {
     .btn-flat { padding: 5px 21px; }
 }
 
@@ -254,8 +256,6 @@ p { line-height: 25px; word-wrap: break-word; }
 .form-signin .form-control {
     position: relative;
     height: auto;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     padding: 10px;
     font-size: 16px;
@@ -329,15 +329,15 @@ a.nounderline:active { text-decoration: none; }
 
 /* half-empty star in ratings */
 .glyphicon-star-half { position: relative; }
+.glyphicon-star-half:before {
+    content: "\e006";
+    width: 47%;
+    display: block;
+    overflow: hidden;
+}
 .glyphicon-star-half:after {
     content: "\e007";
     position: absolute;
     top: 0;
     left: 0;
-}
-.glyphicon-star-half:before {
-    content: "\e006";
-    width: 47%;
-    display: block;
-    overflow: hidden
 }
