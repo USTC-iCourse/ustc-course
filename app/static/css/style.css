@@ -157,6 +157,11 @@ p { line-height: 25px; word-wrap: break-word; }
 .glyphicon-lg { font-size: 15px; }
 .glyphicon-sm { font-size: 12px; }
 
+.avatar-sm,
+.avatar-md,
+.avatar-lg,
+.avatar-sp { object-fit: contain; }
+
 .avatar-sm { width: 32px; height: 32px; }
 .avatar-md { width: 48px; height: 48px; }
 .avatar-lg { width: 96px; height: 96px; }
