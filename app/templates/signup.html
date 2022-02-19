@@ -14,9 +14,9 @@
 
 
       <div id="regverify-email" class="form-group">
-        <label for="reginput-email" class="col-sm-2 control-label">科大邮箱</label>
+        <label for="reginput-email" class="col-sm-2 control-label">南科大邮箱</label>
         <div class="col-sm-4">
-          <input type="email" id="reginput-email" name="email" class="form-control" placeholder="*@mail.sustech.edu.cn or *@sustech.edu.cn" onchange="regverify('email')">
+          <input type="email" id="reginput-email" name="email" class="form-control" placeholder="sid@mail.sustech.edu.cn or tid@sustech.edu.cn" onchange="regverify('email')">
           <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
           <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
           {% if form.errors.get('email') %}

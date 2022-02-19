@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification
+from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, CourseTerm
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -312,8 +312,8 @@ def search():
     def exact_match(q):
         return q.filter(Course.name == keyword)
 
-    def courseries_match(q):
-        return q.filter(Course.courseries == keyword)
+    # def courseries_match(q):
+    #     return q.filter(CourseTerm.courseries == keyword)
 
     fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
 
@@ -324,13 +324,13 @@ def search():
         return q.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
     def ordering(query_obj):
-        return query_obj.join(CourseRate).order_by(text('anon_2_anon_3_anon_4_anon_5__meta'), Course.QUERY_ORDER())
+        return query_obj.join(CourseRate).order_by(text('anon_2_anon_3_anon_4__meta'), Course.QUERY_ORDER())
 
     union_courses = teacher_match(course_query_with_meta(1)) \
                     .union(exact_match(course_query_with_meta(2))) \
                     .union(include_match(course_query_with_meta(3))) \
                     .union(fuzzy_match(course_query_with_meta(4))) \
-                    .union(courseries_match(course_query_with_meta(5)))
+                    # .union(courseries_match(course_query_with_meta(5)))
     ordered_courses = ordering(union_courses).group_by(Course.id)
 
     courses_count = teacher_match(Course.query).union(fuzzy_match(Course.query)).count()
