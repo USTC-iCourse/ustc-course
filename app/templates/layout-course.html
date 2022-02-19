@@ -1,4 +1,37 @@
-{% include 'common-header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="关于课程 {{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %} ({{ course.courseries }}) 的评价 ——南方科技大学牛蛙课程评价社区 Niuwa Curriculum Evaluation System">
+    <meta name="keywords" content="{{ course.name }},{{ course.courseries }},SUSTECH,评课,课程">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/image/favicon.ico">
+
+    <title>{{ course.name }} ({{ course.courseries }}) - NCES</title>
+
+    <link href="https://code.bdstatic.com/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/style.css?ver=20180122" rel="stylesheet">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FBM6EFBDSN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-FBM6EFBDSN');
+    </script>
+
+    {% block head %}
+    {% endblock %}
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bytedance.com/cdn/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://cdn.bytedance.com/cdn/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
 
 <body>
   <div id="wrap">
