@@ -1,5 +1,5 @@
 #!/bin/sh
-# Usage: put this script into /etc/cron.weekly/
+# Usage: invoke this script from /etc/cron.daily/automysqlbackup
 # Assume that automysqlbackup is installed and set up.
 
 GIT_DIR="/srv/ustc-course/data"
@@ -49,4 +49,6 @@ gunzip ${DATABASE}.sql.gz || exit 2
 chown ${GIT_USER} ${DATABASE}.sql || exit 3
 sudo -u ${GIT_USER} -- git add ${DATABASE}.sql
 sudo -u ${GIT_USER} -- git commit -m "${DATABASE} sql backup"
-sudo -u ${GIT_USER} -- git push
+
+# the git repo is too large to push
+#sudo -u ${GIT_USER} -- git push
