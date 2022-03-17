@@ -124,7 +124,7 @@
         {% else %}
 	{% if course.num_hidden_reviews > 0 %}
 	<div class="alert alert-warning" role="alert">
-		<span style="font-size: 1.5em;">我们近期接到任课老师的请求，删除了 {{ course.num_hidden_reviews }} 条违反<a href="/community-rules/">社区规范</a>的评论，请同学们谨慎发言。</span>
+		<span style="font-size: 1.3em;">我们近期接到任课老师的请求，删除了 {{ course.num_hidden_reviews }} 条违反<a href="/community-rules/">社区规范</a>的评论，请同学们文明点评，遵守社区规范。</span>
 	</div>
 	{% endif %}
         {% for review in course.reviews %}
