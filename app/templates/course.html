@@ -144,7 +144,7 @@
           </div>
           {% include 'review-hidden.html' %}
           <div>
-            <p>{{ review.content|my_urlize(nofollow=true)|safe }}</p>
+            <p>{{ review.content|content_filter|my_urlize(nofollow=true)|safe }}</p>
           </div>
 
           <div class="bm-pd-md grey" id="review-{{ review.id }}">

@@ -109,9 +109,16 @@ def sanitize(text):
     else:
         return text
 
+
+@app.template_filter('content_filter')
+def content_filter(text):
+    return re.sub(r'(脑瘫玩意|傻逼|我艹你妈|艹你妈)', '<span style="background:black;color:black;">请文明用语</span>', text)
+
+
 @app.template_filter('abstract')
 def html_abstract(text):
-    return Markup(text).striptags()[0:150]
+    abstract = Markup(text).striptags()[0:150]
+    return content_filter(abstract)
 
 
 def find_last_occurence(haystack, needle):
@@ -154,7 +161,7 @@ def abstract_by_keyword(content, keyword):
 
     for word in words:
         abstract = re.sub(r'(' + word + ')', '<span style="color:#B22222;font-weight:bold;">\\1</span>', abstract, flags=re.IGNORECASE)
-    return abstract
+    return content_filter(abstract)
 
 
 def editor_parse_at(text):
