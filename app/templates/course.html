@@ -122,6 +122,11 @@
         </div>
         <div class="ud-pd-md"></div>
         {% else %}
+	{% if course.num_hidden_reviews > 0 %}
+	<div class="alert alert-danger" role="alert">
+		<span style="font-size: 1.5em;">我们近期接到任课老师的请求，删除了 {{ course.num_hidden_reviews }} 条负面评论，请同学们谨慎发言。</span>
+	</div>
+	{% endif %}
         {% for review in course.reviews %}
 	  {% if not review.is_hidden or current_user.is_admin or review.author == current_user %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">

@@ -250,6 +250,14 @@ class Course(db.Model):
         return self
 
     @property
+    def num_hidden_reviews(self):
+        num = 0
+        for review in self.reviews:
+            if review.is_hidden:
+                num += 1
+        return num
+
+    @property
     def teacher(self):
         if len(self.teachers) >= 1:
             return self.teachers[0]
