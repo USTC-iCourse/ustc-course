@@ -122,7 +122,6 @@
       <div class="ud-pd-md dashed">
 	<img class="avatar-lg circle" src="{{ user.avatar }}"/>
 	<h3 class="blue">{{ user.username }}</h3>
-      {% if user.is_admin %}<span class="label label-success px14">管理员</span>{% endif %}
       {% if user.is_teacher %}<span class="label label-success px14">老师</span>{% endif %}
         <ul class="list-unstyled dark-grey">
           <li class="ud-pd-sm">简介：{{ user.description }}</li>
