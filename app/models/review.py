@@ -38,6 +38,7 @@ class Review(db.Model):
     term = db.Column(db.String(10), index=True)
 
     is_hidden = db.Column(db.Boolean, default=False)
+    filter_rule = db.Column(db.Text())
     #course: Course
 
     def add(self):
