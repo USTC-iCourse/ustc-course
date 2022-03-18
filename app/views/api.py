@@ -85,8 +85,7 @@ def review_new_comment():
             content, mentioned_users = editor_parse_at(content)
             ok,message = comment.add(review,content)
             if ok:
-                for user in set(current_user.followers + [review.author]):
-                    user.notify('comment', review)
+                review.author.notify('comment', review)
                 for user in mentioned_users:
                     user.notify('mention', comment)
             return jsonify(ok=ok,message=message,content=content)
