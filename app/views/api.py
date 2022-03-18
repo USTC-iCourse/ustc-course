@@ -49,9 +49,6 @@ def review_upvote():
         review = Review.query.with_for_update().get(review_id)
         if review:
             ok,message = review.upvote()
-            if ok:
-                for user in set(current_user.followers + [review.author]):
-                    user.notify('upvote', review)
             return jsonify(ok=ok,message=message, count=review.upvote_count)
         else:
             return jsonify(ok=False,message="The review doesn't exist.")
