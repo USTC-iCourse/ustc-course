@@ -4,7 +4,7 @@
 <div class="container">
   <div class="row float-element">
     <div class="inline-h3">
-    <span class="blue h4">{% if not is_new %}编辑{% endif %}点评 &bull; <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a></span>
+    <span class="blue h4">{% if not is_new %}编辑{% endif %}点评 &bull; <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display|name_display_short }}）{% endif %}</a></span>
     <span class="align-bottom left-pd-sm desktop">学期：{{ review.term|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
     <br><span class="align-bottom mobile">学期：{{ review.term|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
     </div>

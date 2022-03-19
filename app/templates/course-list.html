@@ -2,7 +2,7 @@
 <div class="ud-pd-md dashed">
   <div class="row">
     <div class="col-md-12 col-xs-12">
-      <a class="px16" href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</a>
+      <a class="px16" href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display|name_display_short }}）{% endif %}</a>
 
       {% if course.introduction %}
       <span class="label label-danger">课程简介</span>

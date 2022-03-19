@@ -235,16 +235,25 @@ def term_display(term):
 @app.template_filter('term_display_short')
 def term_display_short(term, NUM_DISPLAY_TERMS=2):
     if isinstance(term, list):
-        str = ' '.join([ term_display(t) for t in term[0:NUM_DISPLAY_TERMS] ])
+        term_str = ' '.join([ term_display(t) for t in term[0:NUM_DISPLAY_TERMS] ])
         if len(term) > NUM_DISPLAY_TERMS:
-            return str + '...'
+            return term_str + '...'
         else:
-            return str
+            return term_str
     return term_display(term)
 
 @app.template_filter('term_display_one')
 def term_display_one(term):
     return term_display_short(term, 1)
+
+@app.template_filter('name_display_short')
+def name_display_short(name_str, NUM_DISPLAY_NAMES=3):
+    if isinstance(name_str, str):
+        name_list = name_str.split(',')
+        if len(name_list) > NUM_DISPLAY_NAMES:
+            name_str = ', '.join(name_list[:NUM_DISPLAY_NAMES])
+            return name_str + '...'
+    return name_str
 
 _word_split_re = re.compile(r'''([<>\s]+)''')
 _punctuation_re = re.compile(

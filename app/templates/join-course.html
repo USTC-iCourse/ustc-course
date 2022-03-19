@@ -15,7 +15,7 @@
       {% if course_class.course_id %}
       <div class="ud-pd-md dashed">
         <a href="{{ url_for('course.view_course', course_id=course_class.course_id) }}">{{ course_class.course.name }}
-        {% if course_class.course.teachers %}（{{ course_class.course.teacher_names_display }}）{% endif %}
+        {% if course_class.course.teachers %}（{{ course_class.course.teacher_names_display|name_display_short }}）{% endif %}
         </a>
         {% if user != current_user and course_class.course.reviewed_by(user) %}
         <span class="label label-success">TA已点评</span>

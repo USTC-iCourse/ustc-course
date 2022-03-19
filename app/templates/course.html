@@ -6,7 +6,7 @@
   <div class="row float-element">
     <div class="row">
       <div class="col-md-8 inline-h3">
-        <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</span>
+        <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">{% if course.teachers %}（{{ course.teacher_names_display|name_display_short }}）{% endif %}</span>
         <span class="small grey align-bottom left-pd-sm desktop">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
         <br><span class="small grey align-bottom mobile">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
 
@@ -132,6 +132,7 @@
         </div>
         <div class="ud-pd-md"></div>
         {% else %}
+        
 	{% if course.num_hidden_reviews > 0 %}
 	<div class="alert alert-warning" role="alert">
 		<span style="font-weight:bold;">本页面有 {{ course.num_hidden_reviews }} 条评论因违反<a href="/community-rules/">社区规范</a>被隐藏，请同学们文明点评，遵守社区规范。</span>
@@ -148,7 +149,7 @@
 	</ul>
 	{% endif %}
 
-        {% for review in reviews %}
+    {% for review in reviews %}
 	  {% if not review.is_hidden or current_user.is_admin or review.author == current_user %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
@@ -263,7 +264,7 @@
           {% for rel_course in course.related_courses %}
           {% if rel_course != course %}
           <div class="ud-pd-sm">
-            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.teacher_names_display }}</a>
+            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.teacher_names_display|name_display_short }}</a>
             {% if rel_course.review_count %}
             <span>{{ rel_course.course_rate.average_rate }}</span>
             <span class="grey">({{ rel_course.review_count }})</span>
@@ -280,7 +281,7 @@
           {% for rel_course in course.same_teacher_courses(teacher) %}
           {% if rel_course != course %}
           <div class="ud-pd-sm">
-            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.name }}</a>
+            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.name|name_display_short }}</a>
             {% if rel_course.review_count %}
             <span>{{ rel_course.course_rate.average_rate }}</span>
             <span class="grey">({{ rel_course.review_count }})</span>
