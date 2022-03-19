@@ -100,15 +100,29 @@ def public_courses():
             title='公选课程',
             this_module='course.public_courses')
 
-@course.route('/<int:course_id>/')
-def view_course(course_id):
+def view_course_by_order(course_id, ordering):
     course = Course.query.get(course_id)
     if not course:
         abort(404)
 
     related_courses = Course.query.filter_by(name=course.name).all()
     teacher = course.teacher
-    reviews = course.reviews.all()
+
+    query = Review.query.filter_by(course_id=course.id)
+    if ordering == 'pubtime_desc':
+        query = query.order_by(Review.publish_time.desc())
+    elif ordering == 'pubtime':
+        query = query.order_by(Review.publish_time)
+    elif ordering == 'upvote':
+        query = query.order_by(Review.upvote_count.desc(), Review.publish_time.desc())
+    elif ordering == 'score_desc':
+        query = query.order_by(Review.rate.desc(), Review.publish_time.desc())
+    elif ordering == 'score':
+        query = query.order_by(Review.rate, Review.publish_time)
+    else:
+        abort(404)
+    reviews = query.all()
+
     if teacher:
         same_teacher_courses = teacher.courses
     else:
@@ -120,7 +134,17 @@ def view_course(course_id):
             related_courses=related_courses,
             teacher=teacher,
             same_teacher_courses=same_teacher_courses,
-            user=current_user)
+            user=current_user,
+            ordering=ordering)
+
+
+@course.route('/<int:course_id>/<string:ordering>/')
+def view_course_ordered(course_id, ordering):
+    return view_course_by_order(course_id, ordering)
+
+@course.route('/<int:course_id>/')
+def view_course(course_id):
+    return view_course_by_order(course_id, 'pubtime_desc')
 
 @course.route('/<int:course_id>/upvote/', methods=['POST'])
 @login_required
