@@ -298,6 +298,8 @@ def edit_course(course_id=None):
         course_form.populate_obj(course)
         if not course.homepage.startswith('http'):
             course.homepage = 'http://' + course.homepage
+        if current_user.is_admin:
+            course.admin_announcement = sanitize(course_form.admin_announcement.data)
         course.save()
 
         info_history = CourseInfoHistory()

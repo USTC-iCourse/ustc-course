@@ -161,6 +161,7 @@ class Course(db.Model):
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
 
     introduction = db.Column(db.Text) # 老师提交的课程简介
+    admin_announcement = db.Column(db.Text)
     homepage = db.Column(db.Text) # 课程主页
     last_edit_time = db.Column(db.DateTime)
 

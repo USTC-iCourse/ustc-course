@@ -43,8 +43,14 @@
             <label class="control-label">课程简介</label>
             <p>课程简介是公共编辑的，应该是尽量客观的信息（如课程大纲、教材、考试形式等）。主观评价请写在点评里。</p>
             <p>助教、课程QQ/微信群等信息建议注明学期，以免与往年的混淆。</p>
-            <textarea class="form-control" id="content-editor" name="introduction" rows="5">{{ course.introduction or ''|safe }}</textarea>
+            <textarea class="form-control content-editor" name="introduction" rows="5">{{ course.introduction or ''|safe }}</textarea>
           </div>
+          {% if current_user.is_admin %}
+	  <div class="form-group">
+	    <label class="control-label">管理员公告</label>
+	    <textarea class="form-control content-editor" name="admin_announcement" rows="5">{{ course.admin_announcement or ''|safe }}</textarea>
+	  </div>
+	  {% endif %}
           <button type="submit" class="btn btn-sm btn-default">提交</button>
         </form>
 

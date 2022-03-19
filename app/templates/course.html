@@ -102,6 +102,16 @@
           </p>
 	</div>
 	{% endif %}
+	{% if course.admin_announcement %}
+	<div class="ud-pd-md">
+	  <div class="solid ud-pd-sm inline-h3">
+            <span class="blue h3">管理员公告</span>
+	  </div>
+	  <div>
+          {{ course.admin_announcement|safe }}
+	  </div>
+	</div>
+	{% endif %}
 
 	<div class="solid ud-pd-md inline-h3">
           <span class="blue h3">点评</span>
