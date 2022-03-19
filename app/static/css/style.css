@@ -330,7 +330,7 @@ a.nounderline:active { text-decoration: none; }
 
 .notice-number-box { background-color: #d23524; }
 
-.review img { max-width: 100%; }
+.review img { max-width: 100%; object-fit: contain; }
 
 /* half-empty star in ratings */
 .glyphicon-star-half { position: relative; }
