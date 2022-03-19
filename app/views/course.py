@@ -109,12 +109,12 @@ def view_course_by_order(course_id, ordering):
     teacher = course.teacher
 
     query = Review.query.filter_by(course_id=course.id)
-    if ordering == 'pubtime_desc':
+    if ordering == 'upvote':
+        query = query.order_by(Review.upvote_count.desc(), Review.publish_time.desc())
+    elif ordering == 'pubtime_desc':
         query = query.order_by(Review.publish_time.desc())
     elif ordering == 'pubtime':
         query = query.order_by(Review.publish_time)
-    elif ordering == 'upvote':
-        query = query.order_by(Review.upvote_count.desc(), Review.publish_time.desc())
     elif ordering == 'score_desc':
         query = query.order_by(Review.rate.desc(), Review.publish_time.desc())
     elif ordering == 'score':
@@ -144,7 +144,7 @@ def view_course_ordered(course_id, ordering):
 
 @course.route('/<int:course_id>/')
 def view_course(course_id):
-    return view_course_by_order(course_id, 'pubtime_desc')
+    return view_course_by_order(course_id, 'upvote')
 
 @course.route('/<int:course_id>/upvote/', methods=['POST'])
 @login_required

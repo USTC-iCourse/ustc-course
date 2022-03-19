@@ -140,11 +140,11 @@
 
 	{% if course.review_count > 1 %}
 	<ul class="nav nav-tabs">
+	  <li{% if ordering == 'upvote' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='upvote') }}">点赞</a></li>
 	  <li{% if ordering == 'pubtime_desc' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='pubtime_desc') }}">最新</a></li>
 	  <li{% if ordering == 'pubtime' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='pubtime') }}">最老</a></li>
 	  <li{% if ordering == 'score_desc' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='score_desc') }}">好评</a></li>
 	  <li{% if ordering == 'score' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='score') }}">差评</a></li>
-	  <li{% if ordering == 'upvote' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='upvote') }}">点赞</a></li>
 	</ul>
 	{% endif %}
 
