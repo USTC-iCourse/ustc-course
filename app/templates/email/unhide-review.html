@@ -1,0 +1,12 @@
+{% include 'email/email-css.html' %}
+
+<p>您好！</p>
+
+<p>您在评课社区课程 <a href="{{ url_for('course.view_course', course_id=review.course.id, _external=True) }}">{{ review.course.name }}</a> 中的点评已被解除屏蔽。</p>
+
+<p>感谢您对评课社区的支持和爱护！</p>
+
+<p>&nbsp;</p>
+
+<p>此致，<br />
+USTC 评课社区</p>
