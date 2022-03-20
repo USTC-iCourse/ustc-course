@@ -121,6 +121,8 @@ def hide_review():
         if review:
             if current_user.is_admin:
                 ok,message = review.hide()
+                if ok:
+                    review.author.notify('hide-review', review)
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
@@ -138,6 +140,8 @@ def unhide_review():
         if review:
             if current_user.is_admin:
                 ok,message = review.unhide()
+                if ok:
+                    review.author.notify('unhide-review', review)
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
