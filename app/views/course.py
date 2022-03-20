@@ -118,7 +118,7 @@ def view_course_by_order(course_id, ordering):
     elif ordering == 'score_desc':
         query = query.order_by(Review.rate.desc(), Review.publish_time.desc())
     elif ordering == 'score':
-        query = query.order_by(Review.rate, Review.publish_time)
+        query = query.order_by(Review.rate, Review.publish_time.desc())
     else:
         abort(404)
     reviews = query.all()
