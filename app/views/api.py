@@ -4,6 +4,7 @@ from app.models import Review, ReviewComment , User, Course, ImageStore
 from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email
 from app.utils import editor_parse_at
+from app.utils import send_hide_review_email, send_unhide_review_email
 from app import app
 import re
 import os
@@ -121,6 +122,9 @@ def hide_review():
         if review:
             if current_user.is_admin:
                 ok,message = review.hide()
+                if ok:
+                    review.author.notify('hide-review', review)
+                    send_hide_review_email(review)
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
@@ -138,6 +142,9 @@ def unhide_review():
         if review:
             if current_user.is_admin:
                 ok,message = review.unhide()
+                if ok:
+                    review.author.notify('unhide-review', review)
+                    send_unhide_review_email(review)
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")

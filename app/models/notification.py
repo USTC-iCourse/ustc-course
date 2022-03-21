@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask
+from flask import Flask, Markup
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKeyConstraint
 from datetime import datetime
@@ -93,6 +93,10 @@ class Notification(db.Model):
             return 'doge'
 
     @property
+    def community_rules_link(self):
+        return Markup('<a href="/community-rules/">') + Markup.escape('社区规范') + Markup('</a>') 
+
+    @property
     def operation_text(self):
         if self.operation == 'mention':
             return '在' + self.ref_obj_name + '中提到了你'
@@ -106,13 +110,20 @@ class Notification(db.Model):
             return '点评了' + self.ref_obj_name
         elif self.operation == 'follow':
             return '关注了' + self.ref_obj_name
+        elif self.operation == 'hide-review':
+            return '您在课程「' + self.ref_obj.link + '」中的点评因违反' + self.community_rules_link + '，已被屏蔽'
+        elif self.operation == 'unhide-review':
+            return '您在课程「' + self.ref_obj.link + '」中的点评已被解除屏蔽'
         else:
             return 'doge'
 
     @property
     def __display_text(self):
         try:
-            return self.from_user.link + ' ' + self.operation_text
+            if self.operation in ['hide-review', 'unhide-review']:
+                return self.operation_text
+            else:
+                return self.from_user.link + ' ' + self.operation_text
         except:
             return ""
 

@@ -57,6 +57,19 @@ def send_reset_password_mail(email):
     msg = Message(subject=subject, html=html, recipients=[email])
     mail.send(msg)
 
+def send_hide_review_email(review):
+    email = review.author.email
+    subject = '您在课程「' + review.course.name + '」中的点评因违反社区规范，已被屏蔽'
+    html = render_template('email/hide-review.html', review=review)
+    msg = Message(subject=subject, html=html, recipients=[email])
+    mail.send(msg)
+
+def send_unhide_review_email(review):
+    email = review.author.email
+    subject = '您在课程「' + review.course.name + '」中的点评已被解除屏蔽'
+    html = render_template('email/unhide-review.html', review=review)
+    msg = Message(subject=subject, html=html, recipients=[email])
+    mail.send(msg)
 
 
 def allowed_file(filename,type):

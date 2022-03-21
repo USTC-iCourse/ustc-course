@@ -261,9 +261,6 @@ class User(db.Model, UserMixin):
         db.session.commit()
 
     def notify(self, operation, ref_obj, from_user=current_user, ref_display_class=None):
-        # my operations should not be notified to myself
-        if from_user == self:
-            return False
         notification = Notification(self, from_user, operation, ref_obj, ref_display_class)
         notification.save()
         self.unread_notification_count += 1
