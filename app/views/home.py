@@ -351,7 +351,7 @@ def search():
 
 @home.route('/about/')
 def about():
-    '''关于我们，网站介绍、联系方式'''
+    '''关于我们，网站介绍'''
 
     first_user = User.query.order_by(User.register_time).limit(1).first()
     today = datetime.now()
@@ -360,6 +360,13 @@ def about():
     review_count = Review.query.count()
     course_count = CourseRate.query.filter(CourseRate.review_count > 0).count()
     return render_template('about.html', running_days=running_days, num_users=num_users, review_count=review_count, course_count=course_count)
+
+
+@home.route('/report-review/')
+def report_review():
+    '''report inappropriate review'''
+
+    return render_template('report-review.html')
 
 
 @home.route('/community-rules/')
