@@ -82,7 +82,7 @@ def review_new_comment():
             content = request.form.get('content')
             if len(content) > 500:
                 return jsonify(ok=False,message="评论太长了，不能超过 500 字哦")
-            content = Markup(content).striptags()
+            content = Markup.escape(content)
             content, mentioned_users = editor_parse_at(content)
             ok,message = comment.add(review,content)
             if ok:
