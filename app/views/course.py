@@ -5,6 +5,7 @@ from app.models import *
 from app.forms import ReviewForm, CourseForm
 from app import db
 from app.utils import sanitize
+from sqlalchemy import or_
 
 course = Blueprint('course',__name__)
 
@@ -82,7 +83,7 @@ def popular():
 @course.route('/public/')
 def public_courses():
     # large enough per_page to disable pagination effectively
-    courses_page = Course.query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(1, per_page=10000)
+    courses_page = Course.query.join(CourseTerm).filter(or_(CourseTerm.join_type == '公选', CourseTerm.join_type == '通识')).join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(1, per_page=10000)
 
     #courses = course_query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(Course.QUERY_ORDER()).all()
     #class my_pagination():
