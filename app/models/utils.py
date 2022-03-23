@@ -10,3 +10,16 @@ class RevokedToken(db.Model):
         token = cls(value=value)
         db.session.add(token)
         db.session.commit()
+
+
+class Banner(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    desktop = db.Column(db.Text)
+    mobile = db.Column(db.Text)
+    publish_time = db.Column(db.DateTime(), default=datetime.utcnow())
+
+    def add(self):
+        self.publish_time = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+        return self

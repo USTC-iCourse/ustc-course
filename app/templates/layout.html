@@ -121,16 +121,18 @@
   {% endif %}
 
     <!-- banner -->
+    {% if banner %}
     <div class="container">
-      <div class="text-center banner mobile">
-        我们更新了<a href="community-rules">《社区规范》</a>和<a href="report-review">《投诉点评的流程》</a>
-      </div>
+      {% if banner.mobile %}
+      <div class="text-center banner mobile">{{ banner.mobile|safe }}</div>
+      {% endif %}
 
-      <div class="text-center banner desktop">
-        评课社区更新了<a href="community-rules">《社区规范》</a>和<a href="report-review">《投诉点评的流程》</a>
-      </div>
+      {% if banner.desktop %}
+      <div class="text-center banner desktop">{{ banner.desktop|safe }}</div>
+      {% endif %}
     </div>
     <!-- end banner -->
+    {% endif %}
 
   {% block content %}
   {% endblock %}

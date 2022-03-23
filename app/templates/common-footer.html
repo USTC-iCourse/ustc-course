@@ -5,6 +5,9 @@
       <a class="right-pd-md" href='/report-review/'>投诉点评</a>
       <a class="right-pd-md hidden" href='/copyright/'>版权与隐私</a>
       <a class="right-pd-md hidden" href='/report-bug/'>发现漏洞</a>
+      {% if current_user.is_admin %}
+      <a class="right-pd-md" href='{{ url_for('admin.set_banner') }}'>Banner设置</a>
+      {% endif %}
       <span class="float-right hidden">
         <a class="right-pd-sm">中文</a>
         <a class="left-pd-sm">English</a>

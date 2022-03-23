@@ -4,4 +4,5 @@ from .review import review
 from .api import api
 from .user import user
 from .teacher import teacher
+from .admin import admin
 
