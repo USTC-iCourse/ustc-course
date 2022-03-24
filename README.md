@@ -12,17 +12,17 @@ USTC 评课社区是使用 Python 3 + Flask + SQLAlchemy 开发的 Web 系统。
 
 ### 配置和创建数据库
 
-在 MySQL 配置文件（如 ```/etc/mysql/my.cnf```）末尾加入如下几行，重启数据库（如 ```service mysql restart```）。这几行是设置数据库使用 UTF-8 作为默认连接字符集和存储字符集，以免出现乱码。
+在 MySQL 配置文件（如 ```/etc/mysql/my.cnf```）末尾加入如下几行，重启数据库（如 ```service mysql restart```）。这几行是设置数据库使用 utf8mb4 作为默认连接字符集和存储字符集，以免出现乱码，并且支持 emoji。
 
 ```
 [client]
-default-character-set=utf8
+default-character-set=utf8mb4
 [mysql]
-default-character-set=utf8
+default-character-set=utf8mb4
 [mysqld]
-collation-server = utf8_unicode_ci
-init-connect='SET NAMES utf8'
-character-set-server = utf8
+collation-server = utf8mb4_unicode_ci
+init-connect='SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci'
+character-set-server = utf8mb4
 ```
 
 然后创建数据库：```mysql -u root -p``` 进入 mysql 控制台。
@@ -51,12 +51,12 @@ GRANT ALL ON icourse.* to 'ustc_course'@'localhost';
 * ```DEBUG``` 开关用于标识是否启用调试模式。
 * ```SERVER_NAME``` 设置服务器域名，若域名未确定则可设为 None。
 * ```SECRET_KEY``` 是用于验证 cookie 的加密密钥，填入一个随机字符串。
-* ```SQLALCHEMY_DATABASE_URI``` 是数据库连接信息，格式为 ```mysql+mysqldb://用户名:密码@数据库地址/数据库名?charset=utf8```
+* ```SQLALCHEMY_DATABASE_URI``` 是数据库连接信息，格式为 ```mysql+mysqldb://用户名:密码@数据库地址/数据库名?charset=utf8mb4```。
 * ```MAIL_*``` 是外发邮件的发件人信息。
 * ```UPLOAD_FOLDER``` 是头像、用户上传的附件等存储的地方。在生产服务器上需要有足够大的剩余空间，并定期备份。
 * ```MAX_CONTENT_LENGTH``` 是上传文件的最大大小。
 
-初始化数据库：```./tests/init_db.py``` 如果没有报错就初始化成功了。
+初始化数据库：```python -m tests.init_db```，如果没有报错就初始化成功了。
 
 ### 配置 Nginx
 

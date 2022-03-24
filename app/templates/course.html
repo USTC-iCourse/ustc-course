@@ -6,7 +6,7 @@
   <div class="row float-element">
     <div class="row">
       <div class="col-md-8 inline-h3">
-        <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %}</span>
+        <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">{% if course.teachers %}（{{ course.teacher_names_display|name_display_short }}）{% endif %}</span>
         <span class="small grey align-bottom left-pd-sm desktop">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
         <br><span class="small grey align-bottom mobile">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
 
@@ -102,6 +102,16 @@
           </p>
 	</div>
 	{% endif %}
+	{% if course.admin_announcement %}
+	<div class="ud-pd-md">
+	  <div class="solid ud-pd-sm inline-h3">
+            <span class="blue h3">管理员公告</span>
+	  </div>
+	  <div>
+          {{ course.admin_announcement|safe }}
+	  </div>
+	</div>
+	{% endif %}
 
 	<div class="solid ud-pd-md inline-h3">
           <span class="blue h3">点评</span>
@@ -122,7 +132,24 @@
         </div>
         <div class="ud-pd-md"></div>
         {% else %}
-        {% for review in course.reviews %}
+        
+	{% if course.num_hidden_reviews > 0 %}
+	<div class="alert alert-warning" role="alert">
+		<span style="font-weight:bold;">本页面有 {{ course.num_hidden_reviews }} 条评论因违反<a href="/community-rules/">社区规范</a>被隐藏，请同学们文明点评，遵守社区规范。</span>
+	</div>
+	{% endif %}
+
+	{% if course.review_count > 1 %}
+	<ul class="nav nav-tabs">
+	  <li{% if ordering == 'upvote' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='upvote') }}">点赞</a></li>
+	  <li{% if ordering == 'pubtime_desc' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='pubtime_desc') }}">最新</a></li>
+	  <li{% if ordering == 'pubtime' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='pubtime') }}">最老</a></li>
+	  <li{% if ordering == 'score_desc' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='score_desc') }}">好评</a></li>
+	  <li{% if ordering == 'score' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='score') }}">差评</a></li>
+	</ul>
+	{% endif %}
+
+    {% for review in reviews %}
 	  {% if not review.is_hidden or current_user.is_admin or review.author == current_user %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
@@ -143,9 +170,12 @@
             <span class="left-pd-md">{{ review.term|term_display }}</span>
           </div>
           {% include 'review-hidden.html' %}
-          <div>
+	  <div class="review-content" id="review-content-{{ review.id }}">
             <p>{{ review.content|my_urlize(nofollow=true)|safe }}</p>
           </div>
+	  {% if review.filter_rule %}
+	  <div style="display:none;" class="review-filter-rule" id="review-filter-rule-{{ review.id }}">{{ review.filter_rule }}</div>
+	  {% endif %}
 
           <div class="bm-pd-md grey" id="review-{{ review.id }}">
             <span class="small localtime" style="display: none;">{{ review.publish_time|utctime }}</span>
@@ -234,7 +264,7 @@
           {% for rel_course in course.related_courses %}
           {% if rel_course != course %}
           <div class="ud-pd-sm">
-            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.teacher_names_display }}</a>
+            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.teacher_names_display|name_display_short }}</a>
             {% if rel_course.review_count %}
             <span>{{ rel_course.course_rate.average_rate }}</span>
             <span class="grey">({{ rel_course.review_count }})</span>
@@ -251,7 +281,7 @@
           {% for rel_course in course.same_teacher_courses(teacher) %}
           {% if rel_course != course %}
           <div class="ud-pd-sm">
-            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.name }}</a>
+            <a href="{{ url_for('course.view_course', course_id=rel_course.id) }}">{{ rel_course.name|name_display_short }}</a>
             {% if rel_course.review_count %}
             <span>{{ rel_course.course_rate.average_rate }}</span>
             <span class="grey">({{ rel_course.review_count }})</span>
@@ -550,5 +580,29 @@
      }, 'json');
  }
 
+ $('.review-filter-rule').each(function (index) {
+     var id = $(this).attr('id')
+     var prefix = 'review-filter-rule-'
+     var num_id = parseInt(id.substr(prefix.length))
+     var review_id = 'review-content-' + num_id.toString()
+     var original_text = $('#' + review_id).html()
+     console.log(original_text)
+     console.log($(this).text())
+
+     var regex_str = $(this).text()
+     var regex_match_and_replace = regex_str.split('\n')
+     var regex_match = regex_match_and_replace[0]
+     var regex_replace = regex_match_and_replace.length == 2 ? regex_match_and_replace[1] : ''
+     var regex = new RegExp(regex_match, 'g')
+     var replace_text = original_text.replace(regex, regex_replace)
+     $('#' + review_id).html(replace_text)
+ })
+
+ $('.review-content').each(function(index) {
+     var regex = new RegExp('(脑瘫玩意|傻逼|我艹你妈|艹你妈)', 'g')
+     var regex_replace = '<span data-toggle="tooltip" data-placement="top" title="本点评存在违反社区规范的内容，予以部分屏蔽" style="background:black;color:black;">请文明用语</span>'
+     var replace_text = $(this).html().replace(regex, regex_replace)
+     $(this).html(replace_text)
+ })
 </script>
 {% endblock %}

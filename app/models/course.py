@@ -161,6 +161,7 @@ class Course(db.Model):
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
 
     introduction = db.Column(db.Text) # 老师提交的课程简介
+    admin_announcement = db.Column(db.Text)
     homepage = db.Column(db.Text) # 课程主页
     last_edit_time = db.Column(db.DateTime)
 
@@ -171,7 +172,7 @@ class Course(db.Model):
     _dept = db.relationship('Dept', backref='courses', lazy='joined')
 
     teachers = db.relationship('Teacher', secondary=course_teachers, backref=db.backref('courses', lazy='dynamic'), order_by='Teacher.id', lazy="joined")
-    reviews = db.relationship('Review', backref=db.backref('course', lazy='joined'), order_by='desc(Review.upvote_count), desc(Review.id)', lazy='dynamic')
+    reviews = db.relationship('Review', backref=db.backref('course', lazy='joined'), order_by='desc(Review.publish_time), desc(Review.id)', lazy='dynamic')
     notes = db.relationship('Note', backref=db.backref('course', lazy='joined'), order_by='desc(Note.upvote_count), desc(Note.id)', lazy='dynamic')
     forum_threads = db.relationship('ForumThread', backref='course', order_by='desc(ForumThread.id)', lazy='dynamic')
     shares = db.relationship('Share', backref='course', order_by='desc(Share.upvote_count), desc(Share.id)', lazy='dynamic')
@@ -248,6 +249,14 @@ class Course(db.Model):
         db.session.add(self)
         db.session.commit()
         return self
+
+    @property
+    def num_hidden_reviews(self):
+        num = 0
+        for review in self.reviews:
+            if review.is_hidden:
+                num += 1
+        return num
 
     @property
     def teacher(self):

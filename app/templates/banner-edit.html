@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+
+  <div class="row float-element">
+    <div class="row">
+      <div class="col-md-8 inline-h3">
+        <span class="blue h3">全站banner设置</span>
+        <hr>
+
+	<form method="post" enctype="multipart/form-data" action="{{ url_for('admin.set_banner_post') }}">
+          {{ form.csrf_token }}
+          <div class="form-group">
+            <label class="control-label">桌面版banner（支持HTML）</label>
+	    <textarea class="form-control" name="desktop" rows="5">{{ banner.desktop or ''|safe }}</textarea>
+          </div>
+          {% if current_user.is_admin %}
+	  <div class="form-group">
+	    <label class="control-label">移动版banner（支持HTML）</label>
+	    <textarea class="form-control" name="mobile" rows="5">{{ banner.mobile or ''|safe }}</textarea>
+	  </div>
+	  {% endif %}
+          <button type="submit" class="btn btn-middle btn-primary">提交</button>
+        </form>
+
+	<hr>
+	<span class="blue h3">banner设置历史</span>（共 {{ banner_history|length }} 次）
+	{% for banner in banner_history %}
+        <div class="ud-pd-md dashed">
+          <div class="container">
+	   <p><strong>修改时间</strong>：<span class="localtime" style="display:none;">{{ banner.publish_time|utctime }}</span></p>
+
+           {% if banner.desktop %}
+	   <p><strong>桌面版</strong></p>
+           <div class="text-center banner">{{ banner.desktop|safe }}</div>
+           {% endif %}
+
+           {% if banner.mobile %}
+	   <p><strong>移动版</strong></p>
+           <div class="text-center banner">{{ banner.mobile|safe }}</div>
+           {% endif %}
+         </div>
+	</div>
+	{% endfor %}
+      </div>
+
+    </div> <!-- row -->
+  </div>  <!-- float-element  -->
+</div>  <!-- container -->
+{% endblock %}
+

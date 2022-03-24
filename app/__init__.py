@@ -39,6 +39,15 @@ def log_login(app,user):
 user_logged_in.connect(log_login)
 user_loaded_from_cookie.connect(log_login)
 
+from app.models import Banner
+@app.context_processor
+def inject_global_banner():
+    banner = Banner.query.order_by(Banner.publish_time.desc()).first()
+    if banner:
+        return {'banner': banner}
+    else:
+        return {}
+
 
 from app.views import *
 app.register_blueprint(home,url_prefix='')
@@ -47,3 +56,4 @@ app.register_blueprint(review, url_prefix='/review')
 app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(user, url_prefix='/user')
 app.register_blueprint(teacher, url_prefix='/teacher')
+app.register_blueprint(admin, url_prefix='/admin')

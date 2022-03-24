@@ -17,5 +17,5 @@ class CourseForm(FlaskForm):
     #default_classes = StringField('classes',validators=[Length(max=200)])
     #start_end_week = StringField('start_end_week',validators=[Length(max=100)])
     #time_location = StringField('time_location', validators=[Length(max=100)])
-
+    admin_announcement = TextAreaField('admin_announcement')
 

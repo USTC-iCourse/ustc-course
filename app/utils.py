@@ -57,6 +57,19 @@ def send_reset_password_mail(email):
     msg = Message(subject=subject, html=html, recipients=[email])
     mail.send(msg)
 
+def send_hide_review_email(review):
+    email = review.author.email
+    subject = '您在课程「' + review.course.name + '」中的点评因违反社区规范，已被屏蔽'
+    html = render_template('email/hide-review.html', review=review)
+    msg = Message(subject=subject, html=html, recipients=[email])
+    mail.send(msg)
+
+def send_unhide_review_email(review):
+    email = review.author.email
+    subject = '您在课程「' + review.course.name + '」中的点评已被解除屏蔽'
+    html = render_template('email/unhide-review.html', review=review)
+    msg = Message(subject=subject, html=html, recipients=[email])
+    mail.send(msg)
 
 
 def allowed_file(filename,type):
@@ -109,9 +122,16 @@ def sanitize(text):
     else:
         return text
 
+
+@app.template_filter('content_filter')
+def content_filter(text):
+    return re.sub(r'(脑瘫玩意|傻逼|我艹你妈|艹你妈)', '<span style="background:black;color:black;">请文明用语</span>', text)
+
+
 @app.template_filter('abstract')
 def html_abstract(text):
-    return Markup(text).striptags()[0:150]
+    abstract = Markup(text).striptags()[0:150]
+    return content_filter(abstract)
 
 
 def find_last_occurence(haystack, needle):
@@ -154,7 +174,7 @@ def abstract_by_keyword(content, keyword):
 
     for word in words:
         abstract = re.sub(r'(' + word + ')', '<span style="color:#B22222;font-weight:bold;">\\1</span>', abstract, flags=re.IGNORECASE)
-    return abstract
+    return content_filter(abstract)
 
 
 def editor_parse_at(text):
@@ -228,16 +248,25 @@ def term_display(term):
 @app.template_filter('term_display_short')
 def term_display_short(term, NUM_DISPLAY_TERMS=2):
     if isinstance(term, list):
-        str = ' '.join([ term_display(t) for t in term[0:NUM_DISPLAY_TERMS] ])
+        term_str = ' '.join([ term_display(t) for t in term[0:NUM_DISPLAY_TERMS] ])
         if len(term) > NUM_DISPLAY_TERMS:
-            return str + '...'
+            return term_str + '...'
         else:
-            return str
+            return term_str
     return term_display(term)
 
 @app.template_filter('term_display_one')
 def term_display_one(term):
     return term_display_short(term, 1)
+
+@app.template_filter('name_display_short')
+def name_display_short(name_str, NUM_DISPLAY_NAMES=3):
+    if isinstance(name_str, str):
+        name_list = name_str.split(',')
+        if len(name_list) > NUM_DISPLAY_NAMES:
+            name_str = ', '.join(name_list[:NUM_DISPLAY_NAMES])
+            return name_str + '...'
+    return name_str
 
 _word_split_re = re.compile(r'''([<>\s]+)''')
 _punctuation_re = re.compile(

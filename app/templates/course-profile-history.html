@@ -38,7 +38,7 @@
 	{% if current_user.is_authenticated %}
 	<btn class="btn btn-link float-right"><a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程信息</a></btn>
 	{% endif %}
-        <p>教师：{{ course.teacher_names_display }}</p>
+        <p>教师：{{ course.teacher_names_display|name_display_short }}</p>
       </div>
     </div><!-- end col-md-4 -->
   </div><!-- end float-element -->

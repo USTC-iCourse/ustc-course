@@ -2,6 +2,25 @@
 
 本来打算写一个脚本搞定从登录到获取课程信息JSON，但发现这个过程有点复杂（特别是选择学期这块），就用文档方式写下来，手动操作。
 
+## 从公共查询导入
+
+网址：<https://catalog.ustc.edu.cn/query/lesson>。
+
+1. 打开开发者工具，在 Network 中筛选 XHR 请求；
+2. 刷新页面，选择需要导入的学期；
+3. 此时应当能够从 Network 中看到两个 JSON 文件的请求，复制 URL 可以直接下载。
+  - 第一个是学期（semester）列表信息（`semester/list`）；
+  - 第二个是该学期的所有课程信息（`lesson/list-for-teach/<id>`），请记住下载时 URL 中的 id 的值。
+4. 运行导入脚本：
+
+```
+$ python ./import_courses_catalog.py --id=241 --semester=path/to/semester.json --lesson=path/to/lesson.json
+```
+
+请将 `id` 设置为 URL 中显示的值。
+
+## 从教务系统导入
+
 1. 使用Chrome浏览器
 2. 用统一身份认证账号密码（本科学号/密码）登录综合教务系统 https://jw.ustc.edu.cn/
 3. 打开浏览器Developer Tools（F12）中的Network选项卡

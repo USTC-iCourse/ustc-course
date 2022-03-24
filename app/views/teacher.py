@@ -26,6 +26,8 @@ def profile_history(teacher_id):
     teacher = Teacher.query.get(teacher_id)
     if not teacher:
         abort(404)
+    if not current_user.is_admin and teacher.info_locked:
+        abort(403)
     return render_template('teacher-profile-history.html', teacher=teacher)
 
 @teacher.route('/<int:teacher_id>/edit_profile/', methods=['GET','POST'])

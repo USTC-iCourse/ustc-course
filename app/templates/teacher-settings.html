@@ -7,7 +7,9 @@
     <div class="bm-pd-lg">
       <h3 class="blue">编辑教师信息</h3>
       <hr>
+      {% if current_user.is_admin or not teacher.info_locked %}
       <p><a href="{{ url_for('teacher.profile_history', teacher_id=teacher.id) }}">查看编辑历史（共 {{ teacher.info_history_count }} 次）</a></p>
+      {% endif %}
 
       <form class="form-horizontal" method="post" enctype="multipart/form-data">
         {{ form.csrf_token }}

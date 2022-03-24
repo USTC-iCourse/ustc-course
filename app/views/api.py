@@ -4,6 +4,7 @@ from app.models import Review, ReviewComment , User, Course, ImageStore
 from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email
 from app.utils import editor_parse_at
+from app.utils import send_hide_review_email, send_unhide_review_email
 from app import app
 import re
 import os
@@ -49,9 +50,6 @@ def review_upvote():
         review = Review.query.with_for_update().get(review_id)
         if review:
             ok,message = review.upvote()
-            if ok:
-                for user in set(current_user.followers + [review.author]):
-                    user.notify('upvote', review)
             return jsonify(ok=ok,message=message, count=review.upvote_count)
         else:
             return jsonify(ok=False,message="The review doesn't exist.")
@@ -84,12 +82,11 @@ def review_new_comment():
             content = request.form.get('content')
             if len(content) > 500:
                 return jsonify(ok=False,message="评论太长了，不能超过 500 字哦")
-            content = Markup(content).striptags()
+            content = Markup.escape(content)
             content, mentioned_users = editor_parse_at(content)
             ok,message = comment.add(review,content)
             if ok:
-                for user in set(current_user.followers + [review.author]):
-                    user.notify('comment', review)
+                review.author.notify('comment', review)
                 for user in mentioned_users:
                     user.notify('mention', comment)
             return jsonify(ok=ok,message=message,content=content)
@@ -125,6 +122,9 @@ def hide_review():
         if review:
             if current_user.is_admin:
                 ok,message = review.hide()
+                if ok:
+                    review.author.notify('hide-review', review)
+                    send_hide_review_email(review)
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
@@ -142,6 +142,9 @@ def unhide_review():
         if review:
             if current_user.is_admin:
                 ok,message = review.unhide()
+                if ok:
+                    review.author.notify('unhide-review', review)
+                    send_unhide_review_email(review)
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
