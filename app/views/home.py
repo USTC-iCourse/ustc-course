@@ -38,7 +38,7 @@ def follow_reviews():
         return redirect(url_for('home.latest_reviews'))
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    reviews_to_show = Review.query.join(Notification, Review.id == Notification.ref_obj_id).filter(Notification.to_user_id == current_user.id).filter(Notification.ref_class == 'Review').order_by(Review.id.desc())
+    reviews_to_show = Review.query.join(Notification, Review.id == Notification.ref_obj_id).filter(Notification.to_user_id == current_user.id).filter(Notification.ref_display_class == 'Course').order_by(Review.id.desc())
     reviews_paged = reviews_to_show.paginate(page=page, per_page=per_page)
     return render_template('latest-reviews.html', reviews=reviews_paged, title='我关注的点评', this_module='home.follow_reviews')
 
