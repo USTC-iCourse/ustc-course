@@ -57,7 +57,7 @@ def index():
 
     # 课程类型
     if course_type in course_type_dict.keys():
-        course_query = Course.query.distinct().join(CourseTerm).filter(CourseTerm.course_type.in_(course_type_dict[course_type]))
+        course_query = Course.query.distinct().join(CourseTerm).filter(or_(CourseTerm.course_type.in_(course_type_dict[course_type]), CourseTerm.join_type.in_(course_type_dict[course_type])))
 
     # 排序方式
     if sort_by == 'popular':
