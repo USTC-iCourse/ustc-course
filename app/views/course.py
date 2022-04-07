@@ -34,72 +34,39 @@ deptlist = [
     [23, '天文'],
 ]
 
+course_type_dict = {
+    'public': ['公选课', '一般通识', '核心通识', '综合素质类课程'],
+    'graduate': ['研究生课程', '专业硕士', '研究生课'],
+    'english': ['英语拓展', '英语拓展课程'],
+    'physical': ['体育选项'],
+    'dual-degree': ['双学位课程', '双学位'],
+    }
+
+
 @course.route('/')
 def index():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    course_type = request.args.get('type',None,type=int)
-    department = request.args.get('dept',None,type=int)
-    campus = request.args.get('campus',None,type=str)
+    sort_by = request.args.get('sort_by', None, type=str)
+    course_type = request.args.get('course_type', None, type=str)
     course_query = Course.query
-    #if course_type:
-    #    # 课程类型
-    #    course_query = course_query.filter(Course.course_type==course_type)
-    #if department:
-    #    # 开课院系
-    #    course_query = course_query.filter(Course.dept_id==department)
-    #if campus:
-    #    # 开课地点
-    #    course_query = course_query.filter(Course.campus==campus)
 
-    courses_page = course_query.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page,per_page=per_page)
+    # 课程类型
+    if course_type in course_type_dict.keys():
+        course_query = Course.query.join(CourseTerm).filter(CourseTerm.course_type.in_(course_type_dict[course_type]))
+
+    # 排序方式
+    if sort_by == 'rating':
+        courses_page = course_query.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page,per_page=per_page)
+    else:
+        # sort by review_count
+        courses_page = course_query.join(CourseRate).order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc()).paginate(page,per_page=per_page)
+
+
     return render_template('course-index.html', courses=courses_page,
-            dept=department, deptlist=deptlist, title='好评课程',
-            this_module='course.index')
+            course_type=course_type, course_type_dict=course_type_dict, sort_by=sort_by,
+            title='课程列表', deptlist=deptlist, this_module='course.index')
 
-@course.route('/popular/')
-def popular():
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
-    course_type = request.args.get('type',None,type=int)
-    department = request.args.get('dept',None,type=int)
-    campus = request.args.get('campus',None,type=str)
-    course_query = Course.query
-    #if course_type:
-    #    # 课程类型
-    #    course_query = course_query.filter(Course.course_type==course_type)
-    #if department:
-    #    # 开课院系
-    #    course_query = course_query.filter(Course.dept_id==department)
-    #if campus:
-    #    # 开课地点
-    #    course_query = course_query.filter(Course.campus==campus)
-
-    courses_page = course_query.join(CourseRate).order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc()).paginate(page,per_page=per_page)
-    return render_template('course-index.html', courses=courses_page,
-            dept=department, deptlist=deptlist, title='热门课程',
-            this_module='course.popular')
-
-@course.route('/public/')
-def public_courses():
-    # large enough per_page to disable pagination effectively
-    courses_page = Course.query.join(CourseTerm).filter(or_(CourseTerm.join_type == '公选', CourseTerm.join_type == '通识')).join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(1, per_page=10000)
-
-    #courses = course_query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(Course.QUERY_ORDER()).all()
-    #class my_pagination():
-    #    def __init__(self, courses):
-    #        self.items = courses
-    #        self.total = len(courses)
-    #        self.page = 1
-    #        self.has_prev = False
-    #        self.has_next = False
-    #    def iter_pages(self, left_edge, right_edge):
-    #        return [1]
-
-    #courses_page = my_pagination(courses)
-    return render_template('course-index.html', courses=courses_page,
-            title='公选课程',
-            this_module='course.public_courses')
 
 def view_course_by_order(course_id, ordering):
     course = Course.query.get(course_id)
