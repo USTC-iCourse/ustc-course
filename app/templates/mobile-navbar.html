@@ -16,7 +16,9 @@
           {% if current_user.is_authenticated %}
           <li {% if this_module and this_module=='home.follow_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
           {% endif %}
-          <li {% if this_module and (this_module=='course.index' or this_module=='home.search') %}class="active"{% endif %}><a href="{{ url_for('course.index') }}">课程</a></li>
+          <li {% if this_module and this_module=='course.index' and sort_by=='rating' %}class="active"{% endif %}><a href="{{ url_for('course.index', sort_by='rating') }}">好评</a></li>
+          <li {% if this_module and this_module=='course.index' and sort_by=='popular' %}class="active"{% endif %}><a href="{{ url_for('course.index', sort_by='popular') }}">热门</a></li>
+          <li {% if this_module and this_module=='course.index' and course_type=='public' %}class="active"{% endif %}><a href="{{ url_for('course.index', course_type='public') }}">公选</a></li>
       </ul>
 
 
