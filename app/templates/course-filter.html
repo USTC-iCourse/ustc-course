@@ -1,40 +1,14 @@
     <div class="select-box desktop">
       <ul class="list-unstyled list-inline">
-        <span><strong>院系：</strong></span>
-        <li class="item {% if not dept %}active{% endif %}">
+        <span><strong>课程类别：</strong></span>
+        <li class="item {% if not course_type %}active{% endif %}">
           <a href="{{ url_for(this_module, q=keyword) }}">全部</a>
         </li>
-        {% for dno, dname in deptlist[0:12] %}
-        <li class="item {% if dept == dno %}active{% endif %}">
-          <a href="{{ url_for(this_module, q=keyword, dept=dno) }}">{{ dname }}</a>
+        {% for course_type, course_type_label in course_type_dict.items() %}
+        <li class="item {% if course_type==course_type %}active{% endif %}">
+          <a href="{{ url_for(this_module, q=keyword, course_type=course_type) }}">{{ course_type_label[0] }}</a>
         </li>
         {% endfor %}
-        <li>
-          <div class="dropdown">
-            <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-              {% for dno, dname in deptlist[12:] %}
-              <li class="item" role="presentation"><a href="{{ url_for(this_module, q=keyword, dept=dno) }}" role="menuitem" tabindex="-1">{{ dname }}</a></li>
-              {% endfor %}
-            </ul>
-          </div>
-        </li>
       </ul>
-
-<!--
-      <ul class="list-unstyled list-inline">
-        <span><strong>地点：</strong></span>
-        <li>全部</li>
-        <li>东区</li>
-        <li>西区</li>
-        <li>南区</li>
-        <li>北区</li>
-        <li>MOOC</li>
-      </ul>
--->
 
     </div><!-- end elect-box -->
-
-
