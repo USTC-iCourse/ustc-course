@@ -3,16 +3,27 @@
       {% else %}
       <form class="mobile ud-pd-sm" action="{{ url_for('home.search') }}" method="get">
       {% endif %}
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom: 3px;">
           <input type="text" name="q" class="form-control input" placeholder="搜索你感兴趣的课程" value="{{ keyword or '' }}">
         </div>
       </form>
 
       {% if title %}
-      <h4 class="blue desktop">{{ title }}</h4>
+      <div class="inline-h4 desktop">
+	{% if this_module and this_module=='home.search' %}
+        <span class="blue h4">{{ title }}课程</span>
+	<a class="btn btn-white float-right" href="{{ url_for('home.search_reviews', q=keyword) }}">搜点评</a>
+	{% elif this_module and this_module=='home.search_reviews' %}
+        <span class="blue h4">{{ title }}点评</span>
+	<a class="btn btn-white float-right" href="{{ url_for('home.search', q=keyword) }}">搜课程</a>
+	{% else %}
+        <span class="blue h4">{{ title }}</span>
+	{% endif %}
+      </div>
       {% endif %}
+      {% if this_module and this_module!='home.search' and this_module!='home.search_reviews' %}
       <ul class="nav nav-tabs mobile">
-          <li {% if this_module and (this_module=='home.latest_reviews' or this_module=='home.search_reviews') %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">点评</a></li>
+          <li {% if this_module and this_module=='home.latest_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">点评</a></li>
           {% if current_user.is_authenticated %}
           <li {% if this_module and this_module=='home.follow_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
           {% endif %}
@@ -20,5 +31,6 @@
           <li {% if this_module and this_module=='course.index' and sort_by=='popular' %}class="active"{% endif %}><a href="{{ url_for('course.index', sort_by='popular') }}">热门</a></li>
           <li {% if this_module and this_module=='course.index' and course_type=='liberal' %}class="active"{% endif %}><a href="{{ url_for('course.index', course_type='liberal') }}">通识</a></li>
       </ul>
+      {% endif %}
 
 
