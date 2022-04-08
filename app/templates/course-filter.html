@@ -1,4 +1,5 @@
     <div class="select-box desktop" style="padding-bottom: 5px;">
+      {% if course_type_dict %}
       <ul class="list-unstyled list-inline">
         <span><strong>课程类别：</strong></span>
         <li class="item {% if not course_type %}active{% endif %}">
@@ -10,6 +11,7 @@
         </li>
         {% endfor %}
       </ul>
+      {% endif %}
       <ul class="list-unstyled list-inline">
         <span><strong>排序方式：</strong></span>
 	<li class="item {% if sort_by!='popular' %}active{% endif %}">
