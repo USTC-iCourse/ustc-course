@@ -18,7 +18,7 @@
           {% endif %}
           <li {% if this_module and this_module=='course.index' and sort_by=='rating' %}class="active"{% endif %}><a href="{{ url_for('course.index', sort_by='rating') }}">好评</a></li>
           <li {% if this_module and this_module=='course.index' and sort_by=='popular' %}class="active"{% endif %}><a href="{{ url_for('course.index', sort_by='popular') }}">热门</a></li>
-          <li {% if this_module and this_module=='course.index' and course_type=='public' %}class="active"{% endif %}><a href="{{ url_for('course.index', course_type='public') }}">公选</a></li>
+          <li {% if this_module and this_module=='course.index' and course_type=='liberal' %}class="active"{% endif %}><a href="{{ url_for('course.index', course_type='liberal') }}">通识</a></li>
       </ul>
 
 
