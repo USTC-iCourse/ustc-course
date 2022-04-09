@@ -226,7 +226,20 @@ class User(db.Model, UserMixin):
         user = cls.query.filter(db.or_(User.username == login,
                                        User.email == login)).first()
 
-        if user and user.confirmed:
+        if user:
+            authenticated = user.check_password(password)
+        else:
+            authenticated = False
+        return user, authenticated, user.confirmed if user else False
+
+    @classmethod
+    def authenticate_email(cls, email, password):
+        expanded_email_student = email + '@mail.ustc.edu.cn'
+        expanded_email_teacher = email + '@ustc.edu.cn'
+        user = cls.query.filter(db.or_(User.email == email,
+                                       User.email == expanded_email_student,
+                                       User.email == expanded_email_teacher)).first()
+        if user:
             authenticated = user.check_password(password)
         else:
             authenticated = False

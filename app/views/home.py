@@ -53,14 +53,14 @@ def signin():
         user, status, confirmed = User.authenticate(form['username'].data,form['password'].data)
         remember = form['remember'].data
         if user:
-            if status:
+            if status and confirmed:
                 #validate uesr
                 login_user(user, remember=remember)
                 if request.args.get('ajax'):
                     return jsonify(status=200, next=next_url)
                 else:
                     return redirect(next_url)
-            elif not confirmed:
+            elif status:
                 '''没有确认邮箱的用户'''
                 message = '请点击邮箱里的激活链接。 <a href=%s>重发激活邮件</a>'%url_for('.confirm_email',
                     email=user.email,
@@ -78,6 +78,25 @@ def signin():
         return jsonify(status=404, msg=error)
     else:
         return render_template('signin.html',form=form, error=error)
+
+
+# 3rdparty signin should have url format: https://${icourse_site_url}/signin-3rdparty/from_app=${from_app}&next_url=${next_url}&challenge=${challenge}
+# here, ${from_app} is the 3rdparty site name displayed to the user
+# here, ${next_url} is the 3rdparty login verification URL to the 3rdparty site
+# here, ${challenge} is a challenge string provided by the 3rdparty site
+@home.route('/signin-3rdparty/', methods=['GET'])
+def signin_3rdparty():
+    from_app = request.args.get('from_app')
+    if not from_app:
+        abort(400, description="from_app parameter not specified") 
+    next_url = request.args.get('next_url')
+    if not next_url:
+        abort(400, description="next_url parameter not specified")
+    challenge = request.args.get('challenge')
+    if not challenge:
+        abort(400, description="challenge parameter not specified")
+    return render_template('signin-3rdparty.html', from_app=from_app, next_url=next_url, current_user=current_user, challenge=challenge)
+
 
 @home.route('/su/<int:user_id>')
 @login_required
