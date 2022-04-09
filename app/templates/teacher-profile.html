@@ -29,7 +29,7 @@
 	  {% if course.reviewed %}
 	  <span class="label label-success">已点评</span>
 	  {% endif %}
-	  <span class="small grey align-bottom float-right">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
+	  <span class="small grey align-bottom float-right">{{ course.term_ids|term_display_short(5) }} &nbsp;课程号：{{ course.courseries }}</span>
       <span class="clearfix"></span>
           {% if course.review_count %}
           <div class="ud-pd-sm blue">
