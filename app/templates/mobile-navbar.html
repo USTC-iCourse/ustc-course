@@ -18,6 +18,16 @@
 	<a class="btn btn-white float-right" href="{{ url_for('home.search', q=keyword) }}">搜课程</a>
 	{% else %}
         <span class="blue h4">{{ title }}</span>
+	  {% if this_module and this_module=='home.follow_reviews' and follow_type=='course' %}
+	  <a class="btn btn-white float-right" href="{{ url_for('home.follow_reviews', follow_type='user') }}">
+		  <span class="glyphicon glyphicon glyphicon-arrow-right" aria-hidden="true"></span> 关注的人
+	  </a>
+	  {% endif %}
+	  {% if this_module and this_module=='home.follow_reviews' and follow_type=='user' %}
+	  <a class="btn btn-white float-right" href="{{ url_for('home.follow_reviews', follow_type='course') }}">
+		  <span class="glyphicon glyphicon glyphicon-arrow-right" aria-hidden="true"></span> 关注的课程
+	  </a>
+	  {% endif %}
 	{% endif %}
       </div>
       {% endif %}

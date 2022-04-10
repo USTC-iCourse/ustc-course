@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification
+from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, follow_course, follow_user
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -38,9 +38,21 @@ def follow_reviews():
         return redirect(url_for('home.latest_reviews'))
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    reviews_to_show = Review.query.join(Notification, Review.id == Notification.ref_obj_id).filter(Notification.to_user_id == current_user.id).filter(Notification.ref_class == 'Review').order_by(Review.id.desc())
+    follow_type = request.args.get('follow_type', 'course', type=str)
+
+    if follow_type == 'user':
+        # show reviews for followed users
+        reviews = Review.query.join(follow_user, Review.author_id == follow_user.c.followed_id).filter(follow_user.c.follower_id == current_user.id)
+        title = '「我关注的人」最新点评'
+    else:
+        # show reviews for followed courses
+        reviews = Review.query.join(follow_course, Review.course_id == follow_course.c.course_id).filter(follow_course.c.user_id == current_user.id)
+        title = '「我关注的课程」最新点评'
+
+    reviews_to_show = reviews.filter(Review.author_id != current_user.id).order_by(Review.publish_time.desc())
     reviews_paged = reviews_to_show.paginate(page=page, per_page=per_page)
-    return render_template('latest-reviews.html', reviews=reviews_paged, title='我关注的点评', this_module='home.follow_reviews')
+
+    return render_template('latest-reviews.html', reviews=reviews_paged, follow_type=follow_type, title=title, this_module='home.follow_reviews')
 
 @home.route('/signin/',methods=['POST','GET'])
 def signin():
