@@ -39,7 +39,7 @@
       <ul class="pagination">
         {% if reviews.has_prev %} 
         <li>
-            <a href="{{ url_for(this_module, page=reviews.prev_num, q=keyword) }}" aria-label="Previous">
+            <a href="{{ url_for(this_module, page=reviews.prev_num, q=keyword, follow_type=follow_type) }}" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
@@ -51,7 +51,7 @@
             {% if page == reviews.page %}
             <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
             {% elif page %}
-            <li><a href="{{ url_for(this_module, page=page, q=keyword) }}">{{ page }}</a></li>
+            <li><a href="{{ url_for(this_module, page=page, q=keyword, follow_type=follow_type) }}">{{ page }}</a></li>
             {% else %}
             <li><a>...</a></li>
             {% endif %}
@@ -59,7 +59,7 @@
 
         {% if reviews.has_next %}
         <li>
-          <a href="{{ url_for(this_module, page=reviews.next_num, q=keyword) }}" aria-label="Next">
+          <a href="{{ url_for(this_module, page=reviews.next_num, q=keyword, follow_type=follow_type) }}" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>
