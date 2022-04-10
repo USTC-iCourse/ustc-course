@@ -14,7 +14,7 @@
           <li {% if this_module and this_module=='course.index' %}class="active"{% endif %}><a href="{{ url_for('course.index') }}">课程</a></li>
 	  {% if this_module and this_module=='course.index' %}
 	  <li role="presentation" class="dropdown">
-	    <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for('course.index') }}" role="button">
+	    <a class="dropdown-toggle" data-toggle="dropdown" role="button">
 		     筛选课程 <span class="caret"></span>
 	    </a>
 	    <ul class="dropdown-menu">
