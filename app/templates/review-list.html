@@ -1,8 +1,5 @@
       <div class="ud-pd-sm">
-	  {% if this_module and this_module=='home.search_reviews' %}
-	      <span class="text-muted mobile">{{ title }}</span>
-	  {% endif %}
-	      <span class="text-muted">共 {{ reviews.total }} 个点评（当前第 {{ reviews.page }} 页）</span>
+	<span class="text-muted">共 {{ reviews.total }} 个点评（当前第 {{ reviews.page }} 页）</span>
       </div>
 
       {% for review in reviews.items %}

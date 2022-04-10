@@ -5,7 +5,9 @@
   <div class="row float-element">
     {% include 'mobile-navbar.html' %}
 
-    <div class="ud-pd-sm"><span class="text-muted mobile">{{ title }}</span><span class="text-muted">共 {{ courses.total }} 门课（当前第 {{ courses.page }} 页）</span></div>
+    <div class="ud-pd-sm">
+      <span class="text-muted">共 {{ courses.total }} 门课（当前第 {{ courses.page }} 页）</span>
+    </div>
     {% include "course-list.html" %}
 
     <nav>
