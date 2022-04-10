@@ -19,8 +19,8 @@
 	    </a>
 	    <ul class="dropdown-menu">
 	      <li class="disabled"><a href="#">排序方式</a></li>
-	      <li {% if sort_by!='popular' %}class="active"{% endif %}><a href="{{ url_for('course.index', sort_by='rating') }}">课程评分</a></li>
-              <li {% if sort_by=='popular' %}class="active"{% endif %}><a href="{{ url_for('course.index', sort_by='popular') }}">点评数量</a></li>
+	      <li {% if sort_by!='popular' %}class="active"{% endif %}><a href="{{ url_for('course.index', sort_by='rating', course_type=course_type) }}">课程评分</a></li>
+              <li {% if sort_by=='popular' %}class="active"{% endif %}><a href="{{ url_for('course.index', sort_by='popular', course_type=course_type) }}">点评数量</a></li>
               <li role="separator" class="divider"></li>
 	      <li class="disabled"><a href="#">课程类别</a></li>
               <li class="item {% if not course_type %}active{% endif %}"><a href="{{ url_for(this_module, q=keyword, sort_by=sort_by) }}">全部</a></li>
