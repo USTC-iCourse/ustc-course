@@ -60,16 +60,6 @@ def new_review(course_id):
                 review.update_course_rate(old_review)
             return redirect(url_for('course.view_course',course_id=course_id))
         else: # invalid submission, try again
-            if form.content.data:
-                review.content = sanitize(form.content.data)
-            if form.difficulty.data:
-                review.difficulty = form.difficulty.data
-            if form.homework.data:
-                review.homework = form.homework.data
-            if form.gain.data:
-                review.gain = form.gain.data
-            if form.rate.data:
-                review.rate = form.rate.data
             message = '提交失败，请编辑后重新提交！'
 
     polls = [

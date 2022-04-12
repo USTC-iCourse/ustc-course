@@ -6,7 +6,7 @@
 
   <div class="row float-element">
     {% include "mobile-navbar.html" %}
-    {# include "course-filter.html" #}
+    {% include "course-filter.html" %}
 
     <div class="row">
       <div class="col-lg-12">
@@ -18,7 +18,7 @@
       <ul class="pagination">
         {% if courses.has_prev %} 
         <li>
-            <a href="{{ url_for(this_module, page=courses.prev_num, dept=dept) }}" aria-label="Previous">
+            <a href="{{ url_for(this_module, page=courses.prev_num, sort_by=sort_by, course_type=course_type) }}" aria-label="Previous">
             <span aria-hidden="true">&laquo;</span>
           </a>
         </li>
@@ -30,7 +30,7 @@
             {% if page == courses.page %}
             <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
             {% elif page %}
-            <li><a href="{{ url_for(this_module, page=page, dept=dept) }}">{{ page }}</a></li>
+            <li><a href="{{ url_for(this_module, page=page, sort_by=sort_by, course_type=course_type) }}">{{ page }}</a></li>
             {% else %}
             <li><a>...</a></li>
             {% endif %}
@@ -38,7 +38,7 @@
 
         {% if courses.has_next %}
         <li>
-          <a href="{{ url_for(this_module, page=courses.next_num, dept=dept) }}" aria-label="Next">
+          <a href="{{ url_for(this_module, page=courses.next_num, sort_by=sort_by, course_type=course_type) }}" aria-label="Next">
             <span aria-hidden="true">&raquo;</span>
           </a>
         </li>

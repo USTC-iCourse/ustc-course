@@ -101,6 +101,11 @@ p { line-height: 25px; word-wrap: break-word; }
     word-wrap: break-word;
 }
 
+.top-pd-sm { padding-top: 8px; }
+.top-pd-md { padding-top: 15px; }
+.top-pd-lg { padding-top: 30px; }
+
+.bm-pd-sm { padding-bottom: 8px; }
 .bm-pd-md { padding-bottom: 15px; }
 .bm-pd-lg { padding-bottom: 30px; }
 

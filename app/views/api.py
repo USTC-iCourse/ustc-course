@@ -1,13 +1,17 @@
-from flask import Blueprint,jsonify,request, Markup
-from flask_login import login_required,current_user
-from app.models import Review, ReviewComment , User, Course, ImageStore
+from flask import Blueprint, jsonify, request, Markup, redirect, render_template, abort
+from flask_login import login_required, current_user
+from app.models import Review, ReviewComment, User, Course, ImageStore
 from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email
 from app.utils import editor_parse_at
 from app.utils import send_hide_review_email, send_unhide_review_email
+from flask_babel import gettext as _
 from app import app
+import hashlib
+import urllib
 import re
 import os
+from datetime import datetime
 
 api = Blueprint('api',__name__)
 
@@ -233,3 +237,49 @@ def read_notifications():
     current_user.save()
     return jsonify(ok=True)
 
+
+# successful 3rdparty signin will redirect to ${next_url}?challenge=${challenge}&date=${date}&email=${email}&status=200&sign=${sign}
+# here, ${date} is in %Y-%m-%d %H:%M:%S format of server time.
+# here, ${sign} is sha256("auth_token={auth_token}&challenge=${challenge}&date=${date}&email=${email}&status=200")
+# here, ${auth_token} is taken from app.config['LOGIN_3RDPARTY_SECRET_KEY'], and it should be kept secret in the 3rdparty site and this site.
+# The 3rdparty site should verify ${sign} according to the same sha256 algorithm using its secret key, to make sure that it is a valid login.
+# The 3rdparty site should also verify the date that it is not too early, and optionally verify the challenge.
+@api.route('/signin-3rdparty/', methods=['POST'])
+def signin_3rdparty():
+    if 'next_url' in request.form:
+        next_url = request.form['next_url']
+    else:
+        abort(400, description='next_url parameter not specified')
+    if 'from_app' in request.form:
+        from_app = request.form['from_app']
+    else:
+        abort(400, description='from_app parameter not specified')
+    if 'challenge' in request.form:
+        challenge = request.form['challenge']
+    else:
+        abort(400, description='challenge parameter not specified')
+
+    if current_user.is_authenticated:
+        user = current_user
+        status = True
+        confirmed = True
+    else:
+        user, status, confirmed = User.authenticate_email(request.form['email'], request.form['password'])
+    if status and confirmed:
+        date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        quoted_date = urllib.parse.quote(date)
+        if 'LOGIN_3RDPARTY_SECRET_KEY' not in app.config:
+            abort(500, description='please configure LOGIN_3RDPARTY_SECRET_KEY in config')
+        quoted_email = urllib.parse.quote(user.email)
+        auth_str = 'challenge=' + urllib.parse.quote(challenge) + '&date=' + quoted_date + '&email=' + quoted_email + '&status=200'
+
+        auth_token = app.config['LOGIN_3RDPARTY_SECRET_KEY']
+        str_to_sign = 'auth_token=' + urllib.parse.quote(auth_token) + '&' + auth_str
+        sign = hashlib.sha256(str_to_sign.encode('utf-8')).hexdigest()
+        return redirect(next_url + '?' + auth_str + '&sign=' + sign)
+    else:
+        if not status:
+            error = _('邮箱地址或密码错误！')
+        else:
+            error = _('账户未激活，请先点击邮箱里的激活链接激活账号')
+        return render_template('signin-3rdparty.html', form=request.form, error=error, from_app=from_app, next_url=next_url, challenge=challenge)
