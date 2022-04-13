@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+    <div class="col-md-12">
+        <div class="inline-h3">
+             <span class="blue h3"><strong>USTC评课社区排行榜</strong></span>
+        </div>
+      </div>
+
+    <div class="col-md-6">
+        <div class="inline-h3">
+             <span class="blue h4"><strong>最受欢迎的老师</strong></span>
+        </div>
+        <div class="inline-h3">
+             <span class="blue h4"><strong>贡献最多的用户</strong></span>
+        </div>
+	<table class="table">
+  <tr>
+    <th>Username</th>
+    <th>Review Count</th>
+  </tr>
+{% for user in users %}
+  <tr>
+    <td>{{ user.username }}</td>
+    <td>{{ user.reviews_count }}</td>
+  </tr>
+{% endfor %}
+	</table>
+        <div class="inline-h3">
+             <span class="blue h4"><strong>最有帮助的点评</strong></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="inline-h3">
+             <span class="blue h4"><strong>最不受欢迎的课程</strong></span>
+        </div>
+        <div class="inline-h3">
+             <span class="blue h4"><strong>最受欢迎的课程</strong></span>
+        </div>
+        <div class="inline-h3">
+             <span class="blue h4"><strong>点评最多的课程</strong></span>
+        </div>
+    </div>
+<ul>
+<li></li>
+</ul>
+  </div><!-- end float-element -->
+</div><!-- end container -->
+{% endblock %}
+{% block script %}>
+{% endblock %}
