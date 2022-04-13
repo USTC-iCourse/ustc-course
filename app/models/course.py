@@ -5,6 +5,7 @@ from decimal import Decimal
 from sqlalchemy import orm
 from .review import Review
 from .user import Teacher
+from collections import Counter
 try:
     from flask_login import current_user
 except:
@@ -431,6 +432,23 @@ class Course(db.Model):
     @property
     def teachers_count(self):
         return len(self.teachers)
+
+    @property
+    def terms_count(self):
+        return self.terms.count()
+
+    @property
+    def review_term_list(self):
+        review_term_list = list(set([review.term for review in self.reviews]))
+        return sorted(review_term_list, reverse=True)
+
+    @property
+    def review_term_dist(self):
+        return Counter([review.term for review in self.reviews])
+
+    @property
+    def review_rate_dist(self):
+        return Counter([review.rate for review in self.reviews])
 
     @property
     def teacher_names_display(self):
