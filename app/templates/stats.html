@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+    <div class="col-md-12">
+        <div class="inline-h3">
+             <span class="blue h3"><strong>USTC评课社区统计信息</strong></span>
+        </div>
+      </div>
+
+    <div class="col-md-6">
+        <div class="inline-h3">
+             <span class="blue h4"><strong>统计信息</strong></span>
+        </div>
+	<table class="table">
+          <tr>
+	    <td>用户数</td>
+            <td>{{ site_stat['user_count'] }}</td>
+          </tr>
+          <tr>
+	    <td>课程数</td>
+            <td>{{ site_stat['course_count'] }}</td>
+          </tr>
+          <tr>
+	    <td>点评数</td>
+            <td>{{ site_stat['review_count'] }}</td>
+          </tr>
+          <tr>
+	    <td>注册教师数</td>
+            <td>{{ site_stat['registered_teacher_count'] }}</td>
+          </tr>
+	</table>
+
+        <div class="inline-h3">
+             <span class="blue h4"><strong>课程点评数量分布</strong></span>
+        </div>
+	<table class="table">
+          <tr>
+            <th>点评数量</th>
+	    <th>课程数量</th>
+          </tr>
+        {% for tuple in review_count_dist %}
+          <tr>
+	    <td>{{ tuple[0] }}</td>
+            <td>{{ tuple[1] }}</td>
+          </tr>
+        {% endfor %}
+	</table>
+
+    </div>
+    <div class="col-md-6">
+    </div>
+<ul>
+<li></li>
+</ul>
+  </div><!-- end float-element -->
+</div><!-- end container -->
+{% endblock %}
+{% block script %}
+{% endblock %}

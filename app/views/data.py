@@ -97,3 +97,16 @@ def review_ranking():
 @data.route('/history')
 def view_history():
     return render_template('data.html')
+
+@data.route('/stats/')
+def view_stats():
+    site_stat = dict()
+    site_stat['user_count'] = User.query.count()
+    site_stat['course_count'] = Course.query.count()
+    site_stat['review_count'] = Review.query.count()
+    site_stat['teacher_count'] = Teacher.query.count()
+    site_stat['registered_teacher_count'] = User.query.filter(User.identity == 'Teacher').count()
+
+    review_counts = db.session.query(func.count(Review.id).label('review_count')).group_by(Review.course_id).subquery()
+    review_count_dist = db.session.query(db.text('review_count'), func.count().label('course_count')).select_from(review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
+    return render_template('stats.html', site_stat=site_stat, review_count_dist=review_count_dist)
