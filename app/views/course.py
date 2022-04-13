@@ -5,7 +5,7 @@ from app.models import *
 from app.forms import ReviewForm, CourseForm
 from app import db
 from app.utils import sanitize
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 course = Blueprint('course',__name__)
 
@@ -72,7 +72,9 @@ def index():
             title='课程列表', deptlist=deptlist, this_module='course.index')
 
 
-def view_course_by_order(course_id, ordering):
+@course.route('/<int:course_id>/')
+def view_course(course_id):
+
     course = Course.query.get(course_id)
     if not course:
         abort(404)
@@ -80,10 +82,39 @@ def view_course_by_order(course_id, ordering):
     related_courses = Course.query.filter_by(name=course.name).all()
     teacher = course.teacher
 
+    if teacher:
+        same_teacher_courses = teacher.courses
+    else:
+        same_teacher_courses = None
+
+    # sort and filter review by url parameters
+    ordering = request.args.get('sort_by', 'upvote', type=str)
+    term = request.args.get('term', None, type=str)
+    rating = request.args.get('rating', None, type=int)
+
+    sort_dict = {
+            'upvote': '点赞最多',
+            'pubtime_desc': '最新点评',
+            'pubtime': '最旧点评',
+            'score_desc': '评分: 高-低',
+            'score': '评分: 低-高',
+            }
+
     query = Review.query.filter_by(course_id=course.id)
-    if ordering == 'upvote':
-        query = query.order_by(Review.upvote_count.desc(), Review.publish_time.desc())
-    elif ordering == 'pubtime_desc':
+
+    # get terms list which have review
+    review_term_list = course.review_term_list
+
+    # filter review by term
+    if term in review_term_list:
+        query = query.filter(Review.term==term)
+
+    # filter review by rating star
+    if rating and 1 <= rating <= 5:
+        query = query.filter(or_(Review.rate==2*rating-1, Review.rate==2*rating))
+
+    # sort review by keyword
+    if ordering == 'pubtime_desc':
         query = query.order_by(Review.publish_time.desc())
     elif ordering == 'pubtime':
         query = query.order_by(Review.publish_time)
@@ -92,31 +123,18 @@ def view_course_by_order(course_id, ordering):
     elif ordering == 'score':
         query = query.order_by(Review.rate, Review.publish_time.desc())
     else:
-        abort(404)
+        # default sort_by upvote number
+        query = query.order_by(Review.upvote_count.desc(), Review.publish_time.desc())
+
     reviews = query.all()
+    review_num = len(reviews)
 
-    if teacher:
-        same_teacher_courses = teacher.courses
-    else:
-        same_teacher_courses = None
-    return render_template('course.html',
-            course=course,
-            course_rate = course.course_rate,
-            reviews=reviews,
-            related_courses=related_courses,
-            teacher=teacher,
-            same_teacher_courses=same_teacher_courses,
-            user=current_user,
-            ordering=ordering)
+    return render_template('course.html', course=course, course_rate = course.course_rate, reviews=reviews,
+            related_courses=related_courses, teacher=teacher, same_teacher_courses=same_teacher_courses,
+            user=current_user, sort_by=ordering, term=term, rating=rating, sort_dict=sort_dict,
+            review_num=review_num, _anchor='my_anchor')
 
 
-@course.route('/<int:course_id>/<string:ordering>/')
-def view_course_ordered(course_id, ordering):
-    return view_course_by_order(course_id, ordering)
-
-@course.route('/<int:course_id>/')
-def view_course(course_id):
-    return view_course_by_order(course_id, 'upvote')
 
 @course.route('/<int:course_id>/upvote/', methods=['POST'])
 @login_required
