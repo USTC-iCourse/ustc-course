@@ -267,11 +267,24 @@ class Course(db.Model):
             return None
 
     @classmethod
-    def QUERY_ORDER(self=None):
+    def generic_query_order(self, rate_total, review_count):
         avg_rate = db.session.query(db.func.avg(Review.rate)).as_scalar()
         avg_rate_count = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).as_scalar()
-        normalized_rate = (CourseRate._rate_total + avg_rate * avg_rate_count) / (CourseRate.review_count + avg_rate_count)
-        return (db.func.IF(CourseRate.review_count > 0, normalized_rate, 0)).desc()
+        normalized_rate = (rate_total + avg_rate * avg_rate_count) / (review_count + avg_rate_count)
+        return normalized_rate
+
+    @classmethod
+    def _QUERY_ORDER(self=None):
+        normalized_rate = Course.generic_query_order(CourseRate._rate_total, CourseRate.review_count)
+        return (db.func.IF(CourseRate.review_count > 0, normalized_rate, 0))
+
+    @classmethod
+    def QUERY_ORDER(self=None):
+        return Course._QUERY_ORDER().desc()
+
+    @classmethod
+    def REVERSE_QUERY_ORDER(self=None):
+        return Course._QUERY_ORDER()
 
     @property
     def related_courses(self):
