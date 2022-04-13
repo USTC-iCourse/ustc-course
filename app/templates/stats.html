@@ -67,6 +67,39 @@
         {% endfor %}
 	</table>
 
+        <div class="inline-h3">
+             <span class="blue h4"><strong>每月新增点评数</strong></span>
+        </div>
+	<table class="table">
+          <tr>
+            <th>年月</th>
+	    <th>新增点评数</th>
+          </tr>
+        {% for tuple in review_dates %}
+          <tr>
+	    <td>{{ tuple.publish_year }} 年 {{ tuple.publish_month }} 月</td>
+            <td>{{ tuple.review_count }}</td>
+          </tr>
+        {% endfor %}
+	</table>
+
+        <div class="inline-h3">
+             <span class="blue h4"><strong>每月新增用户数</strong></span>
+        </div>
+	<table class="table">
+          <tr>
+            <th>年月</th>
+	    <th>新增用户数</th>
+          </tr>
+        {% for tuple in user_reg_dates %}
+          <tr>
+	    <td>{{ tuple.reg_year }} 年 {{ tuple.reg_month }} 月</td>
+            <td>{{ tuple.user_count }}</td>
+          </tr>
+        {% endfor %}
+	</table>
+
+
     </div>
     <div class="col-md-6">
     </div>

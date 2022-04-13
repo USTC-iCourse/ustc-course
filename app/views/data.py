@@ -113,4 +113,8 @@ def view_stats():
     user_review_counts = db.session.query(func.count(func.distinct(Review.id)).label('review_count'), func.count().label('review_upvote_count')).select_from(sql.join(Review, review_upvotes, Review.author_id == review_upvotes.c.author_id)).group_by(Review.author_id).subquery()
     user_review_count_dist = db.session.query(db.text('review_count'), db.text('review_upvote_count'), func.count().label('user_count')).select_from(user_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
 
-    return render_template('stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist)
+    review_dates = db.session.query(func.year(Review.publish_time).label('publish_year'), func.month(Review.publish_time).label('publish_month'), func.count().label('review_count')).group_by(db.text('publish_year'), db.text('publish_month')).order_by(db.text('publish_year'), db.text('publish_month')).all()
+
+    user_reg_dates = db.session.query(func.year(User.register_time).label('reg_year'), func.month(User.register_time).label('reg_month'), func.count().label('user_count')).group_by(db.text('reg_year'), db.text('reg_month')).order_by(db.text('reg_year'), db.text('reg_month')).all()
+
+    return render_template('stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates)
