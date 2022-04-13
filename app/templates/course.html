@@ -158,7 +158,9 @@
 			</option>
 			{% endfor %}
 		</select>
-		<span class="left-pd-sm right-pd-sm weight-heavy">评分</span>
+		<br class="mobile">
+		<span class="right-pd-sm weight-heavy mobile">评分</span>
+		<span class="left-pd-sm right-pd-sm weight-heavy desktop">评分</span>
 		<select name="rating" onchange="location=this.value">
 			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, term=term, _anchor='review-anchor') }}" {% if not term %}selected{% endif %}>全部</option>
 			{% for n in range(5, 0, -1) %}
