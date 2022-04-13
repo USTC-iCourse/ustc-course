@@ -506,3 +506,10 @@ class Teacher(db.Model):
     def info_history_count(self):
         return len(self.info_history)
 
+    @classmethod
+    def QUERY_ORDER(self, teacher_rate):
+        avg_rate = db.session.query(db.func.avg(Review.rate)).as_scalar()
+        avg_rate_count = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).as_scalar()
+        normalized_rate = (teacher_rate + avg_rate * avg_rate_count) / (CourseRate.review_count + avg_rate_count)
+        return normalized_rate
+

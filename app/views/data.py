@@ -4,15 +4,79 @@ from flask_babel import gettext as _
 from app.models import *
 from app import db
 from app.utils import sanitize
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, sql
 
 data = Blueprint('data',__name__)
 
 
 @data.route('/')
 def index():
-    user_rank = User.query.limit(5).all()
-    return render_template('data.html', users=user_rank)
+    teacher_rank_join = sql.join(Teacher, sql.join(course_teachers, sql.join(Course, Review, Course.id == Review.course_id), course_teachers.c.course_id == Course.id), course_teachers.c.teacher_id == Teacher.id)
+    filter_teacher_with_any_low_rating_course = Teacher.id.not_in(sql.select(Teacher.id).join(course_teachers).join(Course).join(CourseRate).filter(CourseRate._rate_average < 8))
+    teacher_query_with_high_rating_course = sql.select(Teacher.id.label('teacher_id'), func.count(CourseRate.id).label('course_count')).select_from(sql.join(Teacher, sql.join(course_teachers, CourseRate, course_teachers.c.course_id == CourseRate.id), Teacher.id == course_teachers.c.teacher_id)).filter(CourseRate._rate_average > 9).group_by(Teacher.id)
+    teachers_with_high_rating_course = db.session.query(db.text('teacher_id')).select_from(teacher_query_with_high_rating_course).filter(db.text('course_count >= 3')).all()
+    teachers_with_high_rating_course = [teacher[0] for teacher in teachers_with_high_rating_course]
+    teacher_rank_unordered = (db.session.query(Teacher.id.label('teacher_id'),
+                                               Teacher.name.label('teacher_name'),
+                                               func.count(func.distinct(Course.id)).label('course_count'),
+                                               func.count(Review.id).label('review_count'),
+                                               func.avg(Review.rate).label('avg_review_rate'),
+                                               func.sum(Review.rate).label('total_review_rate'))
+                              .select_from(teacher_rank_join)
+                              .filter(filter_teacher_with_any_low_rating_course)
+                              .filter(Teacher.id.in_(teachers_with_high_rating_course))
+                              .group_by(Teacher.id)
+                              .subquery())
+    teacher_rank = (db.session.query(db.text('teacher_id'), db.text('teacher_name'), db.text('course_count'), db.text('review_count'), db.text('avg_review_rate'), db.text('total_review_rate'))
+                              .select_from(teacher_rank_unordered)
+                              .order_by(Course.generic_query_order(db.text('total_review_rate'), db.text('review_count')).desc())
+                              .limit(10).all())
+
+    teachers_with_most_high_rated_courses = (
+                              db.session.query(Teacher.id.label('teacher_id'),
+                                               Teacher.name.label('teacher_name'),
+                                               func.count(func.distinct(Course.id)).label('course_count'),
+                                               func.count(Review.id).label('review_count'),
+                                               func.avg(Review.rate).label('avg_review_rate'),
+                                               func.sum(Review.rate).label('total_review_rate'))
+                              .select_from(teacher_rank_join)
+                              .filter(filter_teacher_with_any_low_rating_course)
+                              .filter(Teacher.id.in_(teachers_with_high_rating_course))
+                              .group_by(Teacher.id)
+                              .order_by(db.text('course_count desc'), db.text('avg_review_rate desc'))
+                              .limit(10).all())
+
+    user_rank = (db.session.query(User.id, User.username, func.count(Review.id).label('reviews_count'))
+                           .join(User)
+                           .group_by(Review.author_id)
+                           .order_by(db.text('reviews_count desc'))
+                           .limit(10).all())
+
+    review_rank_join = sql.join(User, sql.join(Course, sql.join(review_upvotes, Review, review_upvotes.c.review_id == Review.id), Course.id == Review.course_id), User.id == Review.author_id)
+    review_rank_query = db.session.query(Course.id.label('course_id'),
+                                         Course.name.label('course_name'),
+                                         Review.id.label('review_id'),
+                                         User.id.label('author_id'),
+                                         User.username.label('author_username'),
+                                         func.count(review_upvotes.c.author_id).label('review_upvotes_count'))
+    review_rank = (review_rank_query.select_from(review_rank_join)
+                                    .filter(func.length(Review.content) >= 100 * 2)
+                                    .group_by(review_upvotes.c.review_id)
+                                    .order_by(db.text('review_upvotes_count desc'))
+                                    .limit(10).all())
+
+    top_rated_courses = (Course.query.join(CourseRate)
+                               .filter(CourseRate.review_count >= 20)
+                               .order_by(Course.QUERY_ORDER())
+                               .limit(10).all())
+    worst_rated_courses = (Course.query.join(CourseRate)
+                                 .filter(CourseRate.review_count >= 10)
+                                 .order_by(Course.REVERSE_QUERY_ORDER())
+                                 .limit(10).all())
+    popular_courses = (Course.query.join(CourseRate)
+                             .order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc())
+                             .limit(10).all())
+    return render_template('data.html', teachers_with_most_high_rated_courses=teachers_with_most_high_rated_courses, teachers=teacher_rank, users=user_rank, reviews=review_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses)
 
 
 @data.route('/teachers')
