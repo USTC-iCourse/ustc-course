@@ -107,6 +107,10 @@ def view_stats():
     site_stat['teacher_count'] = Teacher.query.count()
     site_stat['registered_teacher_count'] = User.query.filter(User.identity == 'Teacher').count()
 
-    review_counts = db.session.query(func.count(Review.id).label('review_count')).group_by(Review.course_id).subquery()
-    review_count_dist = db.session.query(db.text('review_count'), func.count().label('course_count')).select_from(review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
-    return render_template('stats.html', site_stat=site_stat, review_count_dist=review_count_dist)
+    course_review_counts = db.session.query(func.count(Review.id).label('review_count')).group_by(Review.course_id).subquery()
+    course_review_count_dist = db.session.query(db.text('review_count'), func.count().label('course_count')).select_from(course_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
+
+    user_review_counts = db.session.query(func.count(Review.id).label('review_count')).group_by(Review.author_id).subquery()
+    user_review_count_dist = db.session.query(db.text('review_count'), func.count().label('user_count')).select_from(user_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
+
+    return render_template('stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist)

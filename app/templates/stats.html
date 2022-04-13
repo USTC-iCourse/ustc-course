@@ -41,7 +41,23 @@
             <th>点评数量</th>
 	    <th>课程数量</th>
           </tr>
-        {% for tuple in review_count_dist %}
+        {% for tuple in course_review_count_dist %}
+          <tr>
+	    <td>{{ tuple[0] }}</td>
+            <td>{{ tuple[1] }}</td>
+          </tr>
+        {% endfor %}
+	</table>
+
+        <div class="inline-h3">
+             <span class="blue h4"><strong>用户写点评数量分布</strong></span>
+        </div>
+	<table class="table">
+          <tr>
+            <th>写点评数量</th>
+	    <th>用户数量</th>
+          </tr>
+        {% for tuple in user_review_count_dist %}
           <tr>
 	    <td>{{ tuple[0] }}</td>
             <td>{{ tuple[1] }}</td>
