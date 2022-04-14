@@ -15,7 +15,7 @@ def view_profile(teacher_id):
     if not teacher:
         abort(404)
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
+    per_page = request.args.get('per_page', 10000, type=int)
     courses = teacher.courses.join(CourseRate).order_by(Course.QUERY_ORDER())
     courses_paged = courses.paginate(page=page, per_page=per_page)
     return render_template('teacher-profile.html', teacher=teacher, courses=courses_paged)
