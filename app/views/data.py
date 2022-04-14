@@ -11,13 +11,14 @@ data = Blueprint('data',__name__)
 
 @data.route('/')
 def index():
-    teacher_rank_join = sql.join(Teacher, sql.join(course_teachers, sql.join(Course, Review, Course.id == Review.course_id), course_teachers.c.course_id == Course.id), course_teachers.c.teacher_id == Teacher.id)
+    teacher_rank_join = sql.outerjoin(sql.join(Teacher, sql.join(course_teachers, sql.join(Course, Review, Course.id == Review.course_id), course_teachers.c.course_id == Course.id), course_teachers.c.teacher_id == Teacher.id), Dept, Dept.id == Course.dept_id)
     filter_teacher_with_any_low_rating_course = Teacher.id.not_in(sql.select(Teacher.id).join(course_teachers).join(Course).join(CourseRate).filter(CourseRate._rate_average < 8))
     teacher_query_with_high_rating_course = sql.select(Teacher.id.label('teacher_id'), func.count(CourseRate.id).label('course_count')).select_from(sql.join(Teacher, sql.join(course_teachers, CourseRate, course_teachers.c.course_id == CourseRate.id), Teacher.id == course_teachers.c.teacher_id)).filter(CourseRate._rate_average > 9).group_by(Teacher.id)
     teachers_with_high_rating_course = db.session.query(db.text('teacher_id')).select_from(teacher_query_with_high_rating_course).filter(db.text('course_count >= 3')).all()
     teachers_with_high_rating_course = [teacher[0] for teacher in teachers_with_high_rating_course]
     teacher_rank_unordered = (db.session.query(Teacher.id.label('teacher_id'),
                                                Teacher.name.label('teacher_name'),
+                                               Dept.name.label('dept_id'),
                                                func.count(func.distinct(Course.id)).label('course_count'),
                                                func.count(Review.id).label('review_count'),
                                                func.avg(Review.rate).label('avg_review_rate'),
@@ -27,7 +28,7 @@ def index():
                               .filter(Teacher.id.in_(teachers_with_high_rating_course))
                               .group_by(Teacher.id)
                               .subquery())
-    teacher_rank = (db.session.query(db.text('teacher_id'), db.text('teacher_name'), db.text('course_count'), db.text('review_count'), db.text('avg_review_rate'), db.text('total_review_rate'))
+    teacher_rank = (db.session.query(db.text('teacher_id'), db.text('teacher_name'), db.text('dept_id'), db.text('course_count'), db.text('review_count'), db.text('avg_review_rate'), db.text('total_review_rate'))
                               .select_from(teacher_rank_unordered)
                               .order_by(Course.generic_query_order(db.text('total_review_rate'), db.text('review_count')).desc())
                               .limit(10).all())
@@ -35,6 +36,7 @@ def index():
     teachers_with_most_high_rated_courses = (
                               db.session.query(Teacher.id.label('teacher_id'),
                                                Teacher.name.label('teacher_name'),
+                                               Dept.name.label('dept_id'),
                                                func.count(func.distinct(Course.id)).label('course_count'),
                                                func.count(Review.id).label('review_count'),
                                                func.avg(Review.rate).label('avg_review_rate'),
