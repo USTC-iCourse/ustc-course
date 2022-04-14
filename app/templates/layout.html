@@ -21,6 +21,7 @@
         <ul class="nav navbar-nav desktop">
           <li {% if this_module and (this_module=='home.latest_reviews' or this_module=='home.search_reviews') %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">点评</a></li>
 	  <li {% if this_module and (this_module=='course.index' or this_module=='home.search') %}class="active"{% endif %}><a href="{{ url_for('course.index') }}">课程</a></li>
+	  <li {% if this_module and this_module=='stats.view_ranking' %}class="active"{% endif %}><a href="{{ url_for('stats.view_ranking') }}">排行榜</a></li>
           {% if current_user.is_authenticated %}
           <li {% if this_module and this_module=='home.follow_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
           {% endif %}
