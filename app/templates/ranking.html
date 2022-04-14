@@ -24,6 +24,7 @@
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">老师</th>
+            <th class="text-center">学院</th>
             <th class="text-center">课程数</th>
             <th class="text-center">点评数</th>
             <th class="text-center">平均评分</th>
@@ -34,7 +35,8 @@
             <td><a href="{{ url_for('teacher.view_profile', teacher_id=teacher[0]) }}" target="_blank">{{ teacher[1] }}</a></td>
             <td>{{ teacher[2] }}</td>
             <td>{{ teacher[3] }}</td>
-            <td>{{ '%0.2f' % teacher[4]|float }}</td>
+            <td>{{ teacher[4] }}</td>
+            <td>{{ '%0.2f' % teacher[5]|float }}</td>
           </tr>
           {% endfor %}
         </table>
@@ -49,6 +51,7 @@
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">老师</th>
+            <th class="text-center">学院</th>
             <th class="text-center">好评课程</th>
             <th class="text-center">点评数</th>
             <th class="text-center">平均评分</th>
@@ -59,7 +62,8 @@
             <td><a href="{{ url_for('teacher.view_profile', teacher_id=teacher[0]) }}" target="_blank">{{ teacher[1] }}</a></td>
             <td>{{ teacher[2] }}</td>
             <td>{{ teacher[3] }}</td>
-            <td>{{ '%0.2f' % teacher[4]|float }}</td>
+            <td>{{ teacher[4] }}</td>
+            <td>{{ '%0.2f' % teacher[5]|float }}</td>
           </tr>
           {% endfor %}
         </table>
@@ -176,7 +180,7 @@
             <td><a href="{{ url_for('user.view_profile', user_id=user.id) }}" target="_blank">{{ user.username }}</a>
             </td>
             <td>{{ user.reviews_count }}</td>
-            <td>{{ current_user.reviews_upvote_count }}</td>
+            <td>{{ user.review_upvotes_count }}</td>
           </tr>
           {% endfor %}
         </table>
