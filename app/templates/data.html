@@ -58,11 +58,13 @@
           <tr>
             <th>用户名</th>
             <th>点评数量</th>
+	    <th>点赞总数</th>
           </tr>
         {% for user in users %}
           <tr>
             <td><a href="{{ url_for('user.view_profile', user_id=user.id) }}" target="_blank">{{ user.username }}</a></td>
             <td>{{ user.reviews_count }}</td>
+	    <td>{{ user.review_upvotes_count }}</td>
           </tr>
         {% endfor %}
 	</table>
