@@ -18,13 +18,13 @@
       <div class="bm-pd-sm">
         <div class="bm-pd-sm">
           <span class="h4"><span class="glyphicon glyphicon-thumbs-up"></span> 最受欢迎的老师</span>
-          <span>（按归一化平均评分排序）</span>
+          <span>（按归一化平均评分排序)</span>
         </div>
         <table class="table table-bordered text-center table-hover">
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">老师</th>
-            <th class="text-center desktop">学院</th>
+            <th class="text-center">学院</th>
             <th class="text-center">课程数</th>
             <th class="text-center">点评数</th>
             <th class="text-center">平均评分</th>
@@ -33,7 +33,7 @@
           <tr>
             <th class="text-center">#{{ loop.index }}</th>
             <td><a href="{{ url_for('teacher.view_profile', teacher_id=teacher[0]) }}" target="_blank">{{ teacher[1] }}</a></td>
-            <td class="text-center desktop">{{ teacher[2] }}</td>
+            <td>{{ teacher[2] }}</td>
             <td>{{ teacher[3] }}</td>
             <td>{{ teacher[4] }}</td>
             <td>{{ '%0.2f' % teacher[5]|float }}</td>
@@ -45,13 +45,13 @@
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
           <span class="h4"><span class="glyphicon glyphicon-heart"></span> 好评课程最多的老师</span>
-          <span>（课程评分大于8且点评人数大于3）</span>
+          <span>（课程评分大于8且点评人数大于3)</span>
         </div>
         <table class="table table-bordered text-center table-hover">
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">老师</th>
-            <th class="text-center desktop">学院</th>
+            <th class="text-center">学院</th>
             <th class="text-center">好评课程</th>
             <th class="text-center">点评数</th>
             <th class="text-center">平均评分</th>
@@ -60,7 +60,7 @@
           <tr>
             <th class="text-center">#{{ loop.index }}</th>
             <td><a href="{{ url_for('teacher.view_profile', teacher_id=teacher[0]) }}" target="_blank">{{ teacher[1] }}</a></td>
-            <td class="text-center desktop">{{ teacher[2] }}</td>
+            <td>{{ teacher[2] }}</td>
             <td>{{ teacher[3] }}</td>
             <td>{{ teacher[4] }}</td>
             <td>{{ '%0.2f' % teacher[5]|float }}</td>
@@ -72,7 +72,7 @@
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
           <span class="h4"><span class="glyphicon glyphicon-thumbs-up"></span> 最受欢迎的课程</span>
-          <span>（点评数量大于20）</span>
+          <span>（点评数量大于20)</span>
         </div>
         <table class="table table-bordered text-center table-hover">
           <tr>
@@ -95,7 +95,7 @@
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
           <span class="h4"><span class="glyphicon glyphicon-thumbs-down"></span> 最不受欢迎的课程</span>
-          <span>（点评数量大于10）</span>
+          <span>（点评数量大于10)</span>
         </div>
         <table class="table table-bordered text-center table-hover">
           <tr>
@@ -140,7 +140,7 @@
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
           <span class="h4"><span class="glyphicon glyphicon-thumbs-up"></span> 最有帮助的点评</span>
-          <span>（点赞最多且字数大于200字）</span>
+          <span>（点赞最多且字数大于200字)</span>
         </div>
         <table class="table table-bordered text-center table-hover">
           <tr>
@@ -165,7 +165,7 @@
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
           <span class="h4"><span class="glyphicon glyphicon-user"></span> 贡献最多的用户</span>
-          <span>（点评最多）</span>
+          <span>（点评最多)</span>
         </div>
         <table class="table table-bordered text-center table-hover">
           <tr>
