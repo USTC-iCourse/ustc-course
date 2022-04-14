@@ -110,8 +110,8 @@ def view_stats():
     course_review_counts = db.session.query(func.count(Review.id).label('review_count')).group_by(Review.course_id).subquery()
     course_review_count_dist = db.session.query(db.text('review_count'), func.count().label('course_count')).select_from(course_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
 
-    user_review_counts = db.session.query(func.count(func.distinct(Review.id)).label('review_count'), func.count().label('review_upvote_count')).select_from(sql.join(Review, review_upvotes, Review.author_id == review_upvotes.c.author_id)).group_by(Review.author_id).subquery()
-    user_review_count_dist = db.session.query(db.text('review_count'), db.text('review_upvote_count'), func.count().label('user_count')).select_from(user_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
+    user_review_counts = db.session.query(func.count(Review.id).label('review_count')).group_by(Review.author_id).subquery()
+    user_review_count_dist = db.session.query(db.text('review_count'), func.count().label('user_count')).select_from(user_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
 
     review_dates = db.session.query(func.year(Review.publish_time).label('publish_year'), func.month(Review.publish_time).label('publish_month'), func.count().label('review_count')).group_by(db.text('publish_year'), db.text('publish_month')).order_by(db.text('publish_year'), db.text('publish_month')).all()
 

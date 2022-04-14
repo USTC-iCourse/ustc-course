@@ -56,13 +56,11 @@
           <tr>
             <th>写点评数量</th>
 	    <th>用户数量</th>
-	    <th>点赞总数</th>
           </tr>
         {% for tuple in user_review_count_dist %}
           <tr>
 	    <td>{{ tuple[0] }}</td>
             <td>{{ tuple[1] }}</td>
-            <td>{{ tuple[2] }}</td>
           </tr>
         {% endfor %}
 	</table>
