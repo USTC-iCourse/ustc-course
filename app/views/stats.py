@@ -5,6 +5,7 @@ from app.models import *
 from app import db
 from app.utils import sanitize
 from sqlalchemy import or_, func, sql
+from datetime import datetime
 
 stats = Blueprint('stats',__name__)
 
@@ -34,6 +35,8 @@ def index():
 
 @stats.route('/rankings')
 def view_ranking():
+    '''view rankings'''
+    today = datetime.now().strftime("%Y/%m/%d")
     teacher_rank_join = sql.join(Teacher, sql.join(course_teachers, sql.join(Course, Review, Course.id == Review.course_id), course_teachers.c.course_id == Course.id), course_teachers.c.teacher_id == Teacher.id)
     filter_teacher_with_any_low_rating_course = Teacher.id.not_in(sql.select(Teacher.id).join(course_teachers).join(Course).join(CourseRate).filter(CourseRate._rate_average < 8))
     teacher_query_with_high_rating_course = sql.select(Teacher.id.label('teacher_id'), func.count(CourseRate.id).label('course_count')).select_from(sql.join(Teacher, sql.join(course_teachers, CourseRate, course_teachers.c.course_id == CourseRate.id), Teacher.id == course_teachers.c.teacher_id)).filter(CourseRate._rate_average > 9).group_by(Teacher.id)
@@ -99,7 +102,7 @@ def view_ranking():
     popular_courses = (Course.query.join(CourseRate)
                              .order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc())
                              .limit(10).all())
-    return render_template('ranking.html', teachers_with_most_high_rated_courses=teachers_with_most_high_rated_courses, teachers=teacher_rank, users=user_rank, reviews=review_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses)
+    return render_template('ranking.html', teachers_with_most_high_rated_courses=teachers_with_most_high_rated_courses, teachers=teacher_rank, users=user_rank, reviews=review_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses, date=today, this_module='stats.view_ranking')
 
 
 @stats.route('/teachers')
