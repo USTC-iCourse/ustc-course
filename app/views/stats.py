@@ -46,7 +46,7 @@ def index():
                               .order_by(db.text('course_count desc'), db.text('avg_review_rate desc'))
                               .limit(10).all())
 
-    user_rank = (db.session.query(User.id, User.username, func.count(Review.id).label('reviews_count'))
+    user_rank = (db.session.query(User.id, User.username, func.count(Review.id).label('reviews_count'), func.sum(Review.upvote_count).label('review_upvotes_count'))
                            .join(User)
                            .group_by(Review.author_id)
                            .order_by(db.text('reviews_count desc'))
