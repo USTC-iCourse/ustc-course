@@ -21,12 +21,12 @@ def index():
 def latest_reviews():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    reviews_paged = Review.query.order_by(Review.publish_time.desc()).paginate(page=page, per_page=per_page)
+    reviews_paged = Review.query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
     return render_template('latest-reviews.html', reviews=reviews_paged, title='全站最新点评', this_module='home.latest_reviews')
 
 @home.route('/feed.xml')
 def latest_reviews_rss():
-    reviews_paged = Review.query.order_by(Review.publish_time.desc()).paginate(page=1, per_page=50)
+    reviews_paged = Review.query.order_by(Review.update_time.desc()).paginate(page=1, per_page=50)
     rss_content = render_template('feed.xml', reviews=reviews_paged)
     response = make_response(rss_content)
     response.headers['Content-Type'] = 'application/rss+xml'
@@ -49,7 +49,7 @@ def follow_reviews():
         reviews = Review.query.join(follow_course, Review.course_id == follow_course.c.course_id).filter(follow_course.c.user_id == current_user.id)
         title = '「我关注的课程」最新点评'
 
-    reviews_to_show = reviews.filter(Review.author_id != current_user.id).order_by(Review.publish_time.desc())
+    reviews_to_show = reviews.filter(Review.author_id != current_user.id).order_by(Review.update_time.desc())
     reviews_paged = reviews_to_show.paginate(page=page, per_page=per_page)
 
     return render_template('latest-reviews.html', reviews=reviews_paged, follow_type=follow_type, title=title, this_module='home.follow_reviews')
@@ -307,7 +307,7 @@ def search_reviews():
         teacher_query = Review.query.join(Review.course).join(Course.teachers).filter(Teacher.name == keyword)
         unioned_query = unioned_query.union(author_query).union(course_query).union(teacher_query)
 
-    reviews_paged = unioned_query.order_by(Review.publish_time.desc()).paginate(page=page, per_page=per_page)
+    reviews_paged = unioned_query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
     return render_template('search-reviews.html', reviews=reviews_paged,
                 title='搜索「' + query_str + '」',
                 this_module='home.search_reviews', keyword=query_str)
