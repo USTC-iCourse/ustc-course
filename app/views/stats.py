@@ -126,7 +126,7 @@ def review_ranking():
 def view_history():
     return render_template('data.html')
 
-@data.route('/stats/')
+@stats.route('/stats/')
 def view_stats():
     site_stat = dict()
     site_stat['user_count'] = User.query.count()
