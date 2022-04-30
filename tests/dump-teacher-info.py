@@ -7,11 +7,12 @@ from app.models import *
 import os
 from datetime import datetime
 import csv
+from pypinyin import lazy_pinyin
 
 def dump_teachers():
     f = open('teachers.csv', 'w')
     writer = csv.writer(f)
-    header = ['id', 'name', 'email', 'homepage', 'image', 'department']
+    header = ['id', 'name', 'name_en', 'email', 'homepage', 'image', 'department']
     writer.writerow(header)
 
     teachers = Teacher.query.all()
@@ -30,7 +31,18 @@ def dump_teachers():
             most_popular_dept = max(teacher_depts, key = teacher_depts.get)
         else:
             most_popular_dept = None
-        row = [t.id, t.name, t.email, t.homepage, t.image, most_popular_dept]
+
+        name_list = lazy_pinyin(t.name)
+        xing = name_list[0].capitalize()
+        ming = ""
+        for m in name_list[1:]:
+            ming += m
+        if ming == "":
+            name_en = xing
+        else:
+            name_en = xing + " " + ming.capitalize()
+
+        row = [t.id, t.name, name_en, t.email, t.homepage, t.image, most_popular_dept]
         writer.writerow(row)
 
     f.close()
