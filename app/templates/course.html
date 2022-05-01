@@ -244,8 +244,10 @@
 
 	  {% if review.author == current_user and review.upvote_users|length > 0 %}
 	  <div class="bm-pd-md" id="review-upvotes-{{ review.id }}">
-            <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true" ></span>
-	    {% for upvote_user in review.upvote_users %}{% if upvote_user != review.upvote_users[0] %}、{% endif %}<a href={{ url_for('user.view_profile', user_id=upvote_user.id) }}>{{ upvote_user.username }}</a>{% endfor %}
+	    <p style="line-break: loose;">
+              <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true" ></span>
+	      {% for upvote_user in review.upvote_users %}{% if upvote_user != review.upvote_users[0] %}、{% endif %}<a href={{ url_for('user.view_profile', user_id=upvote_user.id) }}>{{ upvote_user.username }}</a>{% endfor %}
+	    </p>
 	  </div>
           {% endif %}
 
