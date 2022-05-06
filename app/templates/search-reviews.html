@@ -6,7 +6,20 @@
     <div class="bm-pd-md">
       {% include 'mobile-navbar.html' %}
 
+      {% if reviews.total > 0 %}
       {% include 'review-list.html' %}
+      {% else %}
+      <div class="ud-pd-md">
+        <p>建议：</p>
+        <ul>
+          <li>如果您想搜索点评的内容，请输入内容中的任意部分；</li>
+          <li>如果您想搜索某个用户的所有点评，请输入作者的用户名；</li>
+          <li>如果您想搜索某位老师所有课程的点评，请输入老师的全名；</li>
+          <li>如果您想搜索某些课程的点评，请输入部分或全部的课程名称；</li>
+          <li>如果您想搜索课程，请点击右上角的【搜课程】按钮。</li>
+        </ul>
+      </div>
+      {% endif %}
     </div>
 
   </div><!-- /.float-element -->
