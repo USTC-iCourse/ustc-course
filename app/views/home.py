@@ -326,6 +326,7 @@ def search():
     keyword = request.args.get('q')
     if not keyword:
         return redirect(url_for('home.index'))
+    noredirect = request.args.get('noredirect')
 
     course_type = request.args.get('type',None,type=int)
     department = request.args.get('dept',None,type=int)
@@ -382,9 +383,10 @@ def search():
 
     if pagination.total > 0:
         title = '搜索课程「' + keyword + '」'
+    elif noredirect:
+        title = '您的搜索「' + keyword + '」没有匹配到任何课程或老师'
     else:
         return search_reviews()
-        #title = '您的搜索「' + keyword + '」没有匹配到任何课程或老师'
 
     return render_template('search.html', keyword=keyword, courses=pagination,
                 dept=department, deptlist=deptlist,
