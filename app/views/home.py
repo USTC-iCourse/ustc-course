@@ -382,7 +382,8 @@ def search():
     if pagination.total > 0:
         title = '搜索课程「' + keyword + '」'
     else:
-        title = '您的搜索「' + keyword + '」没有匹配到任何课程或老师'
+        return search_reviews()
+        #title = '您的搜索「' + keyword + '」没有匹配到任何课程或老师'
 
     return render_template('search.html', keyword=keyword, courses=pagination,
                 dept=department, deptlist=deptlist,
