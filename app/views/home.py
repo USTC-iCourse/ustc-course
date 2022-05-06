@@ -303,14 +303,20 @@ def search_reviews():
         else:
             unioned_query = unioned_query.union(content_query)
 
-        author_query = Review.query.join(Review.author).filter(User.username.like('%' + keyword + '%'))
+        author_query = Review.query.join(Review.author).filter(User.username == keyword)
         course_query = Review.query.join(Review.course).filter(Course.name.like('%' + keyword + '%'))
         teacher_query = Review.query.join(Review.course).join(Course.teachers).filter(Teacher.name == keyword)
         unioned_query = unioned_query.union(author_query).union(course_query).union(teacher_query)
 
     reviews_paged = unioned_query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
+
+    if reviews_paged.total > 0:
+        title = '搜索点评「' + query_str + '」'
+    else:
+        title = '您的搜索「' + query_str + '」没有匹配到任何点评'
+
     return render_template('search-reviews.html', reviews=reviews_paged,
-                title='搜索「' + query_str + '」',
+                title=title,
                 this_module='home.search_reviews', keyword=query_str)
 
 
@@ -374,9 +380,14 @@ def search():
     #courses_paged = courses.paginate(page=page, per_page=per_page)
     pagination = MyPagination(page=page, per_page=per_page, total=courses_count, items=course_objs)
 
+    if pagination.total > 0:
+        title = '搜索课程「' + keyword + '」'
+    else:
+        title = '您的搜索「' + keyword + '」没有匹配到任何课程或老师'
+
     return render_template('search.html', keyword=keyword, courses=pagination,
                 dept=department, deptlist=deptlist,
-                title='搜索「' + keyword + '」',
+                title=title,
                 this_module='home.search')
 
 
