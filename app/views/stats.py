@@ -13,6 +13,7 @@ stats = Blueprint('stats',__name__)
 @stats.route('/')
 def index():
     '''view site stats'''
+    today = datetime.now().strftime("%Y/%m/%d")
     site_stat = dict()
     site_stat['user_count'] = User.query.count()
     site_stat['course_count'] = Course.query.count()
@@ -30,7 +31,7 @@ def index():
 
     user_reg_dates = db.session.query(func.year(User.register_time).label('reg_year'), func.month(User.register_time).label('reg_month'), func.count().label('user_count')).group_by(db.text('reg_year'), db.text('reg_month')).order_by(db.text('reg_year'), db.text('reg_month')).all()
 
-    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates)
+    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, date=today)
 
 
 @stats.route('/rankings')
@@ -126,23 +127,3 @@ def review_ranking():
 def view_history():
     return render_template('data.html')
 
-@stats.route('/stats/')
-def view_stats():
-    site_stat = dict()
-    site_stat['user_count'] = User.query.count()
-    site_stat['course_count'] = Course.query.count()
-    site_stat['review_count'] = Review.query.count()
-    site_stat['teacher_count'] = Teacher.query.count()
-    site_stat['registered_teacher_count'] = User.query.filter(User.identity == 'Teacher').count()
-
-    course_review_counts = db.session.query(func.count(Review.id).label('review_count')).group_by(Review.course_id).subquery()
-    course_review_count_dist = db.session.query(db.text('review_count'), func.count().label('course_count')).select_from(course_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
-
-    user_review_counts = db.session.query(func.count(Review.id).label('review_count')).group_by(Review.author_id).subquery()
-    user_review_count_dist = db.session.query(db.text('review_count'), func.count().label('user_count')).select_from(user_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
-
-    review_dates = db.session.query(func.year(Review.publish_time).label('publish_year'), func.month(Review.publish_time).label('publish_month'), func.count().label('review_count')).group_by(db.text('publish_year'), db.text('publish_month')).order_by(db.text('publish_year'), db.text('publish_month')).all()
-
-    user_reg_dates = db.session.query(func.year(User.register_time).label('reg_year'), func.month(User.register_time).label('reg_month'), func.count().label('user_count')).group_by(db.text('reg_year'), db.text('reg_month')).order_by(db.text('reg_year'), db.text('reg_month')).all()
-
-    return render_template('stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates)
