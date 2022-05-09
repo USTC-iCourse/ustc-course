@@ -81,6 +81,12 @@ def view_ranking():
                            .order_by(db.text('reviews_count desc'))
                            .limit(10).all())
 
+    user_upvote_rank = (db.session.query(User.id, User.username, func.count(Review.id).label('reviews_count'), func.sum(Review.upvote_count).label('review_upvotes_count'))
+                                  .join(User)
+                                  .group_by(Review.author_id)
+                                  .order_by(db.text('review_upvotes_count desc'))
+                                  .limit(10).all())
+
     review_rank_join = sql.join(User, sql.join(Course, sql.join(review_upvotes, Review, review_upvotes.c.review_id == Review.id), Course.id == Review.course_id), User.id == Review.author_id)
     review_rank_query = db.session.query(Course.id.label('course_id'),
                                          Course.name.label('course_name'),
@@ -105,7 +111,7 @@ def view_ranking():
     popular_courses = (Course.query.join(CourseRate)
                              .order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc())
                              .limit(10).all())
-    return render_template('ranking.html', teachers_with_most_high_rated_courses=teachers_with_most_high_rated_courses, teachers=teacher_rank, users=user_rank, reviews=review_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses, date=today, this_module='stats.view_ranking')
+    return render_template('ranking.html', teachers_with_most_high_rated_courses=teachers_with_most_high_rated_courses, teachers=teacher_rank, users=user_rank, user_upvote_rank=user_upvote_rank, reviews=review_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses, date=today, this_module='stats.view_ranking')
 
 
 @stats.route('/teachers')
