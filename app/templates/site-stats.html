@@ -240,18 +240,19 @@ Highcharts.chart('new-reviews-per-month', {
         ],
         crosshair: true
     },
-    yAxis: {
+    yAxis: [{
         min: 0,
         title: {
-            text: '新增点评数量'
+            text: '每月新增点评数'
         }
-    },
+    }, {
+        min: 0,
+        title: {
+            text: '总点评数'
+        },
+        opposite: true
+    }],
     tooltip: {
-	headerFormat: '<table><tr><td style="padding:0"><b>{point.key}</b></td>',
-	pointFormat: '<td style="color:{series.color};padding:0">新增了 </td>' +
-            '<td style="padding:0"><b>{point.y}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 个点评</td>',
-	footerFormat: '</tr></table>',
         shared: true,
         useHTML: true
     },
@@ -262,10 +263,21 @@ Highcharts.chart('new-reviews-per-month', {
         }
     },
     series: [{
-	name: '月份',
+	name: '每月新增点评数',
+        yAxis: 0,
         data: [
         {% for tuple in review_dates %}
 	{{ tuple.review_count }},
+        {% endfor %}
+	]
+    }, {
+	name: '总点评数',
+        yAxis: 1,
+        data: [
+	{% set total = namespace(value=0) %}
+        {% for tuple in review_dates %}
+	{% set total.value = total.value + tuple.review_count %}
+	{{ total.value }},
         {% endfor %}
 	]
     }]
@@ -300,18 +312,19 @@ Highcharts.chart('num-users-per-month', {
         ],
         crosshair: true
     },
-    yAxis: {
+    yAxis: [{
         min: 0,
         title: {
-            text: '注册用户数量'
+            text: '每月新增用户数'
         }
-    },
+    }, {
+        min: 0,
+        title: {
+            text: '总用户数'
+        },
+        opposite: true
+    }],
     tooltip: {
-	headerFormat: '<table><tr><td style="padding:0"><b>{point.key}</b></td>',
-	pointFormat: '<td style="color:{series.color};padding:0">新注册了 </td>' +
-            '<td style="padding:0"><b>{point.y}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 个用户</td>',
-	footerFormat: '</tr></table>',
         shared: true,
         useHTML: true
     },
@@ -322,10 +335,21 @@ Highcharts.chart('num-users-per-month', {
         }
     },
     series: [{
-	name: '月份',
+	name: '每月新增用户数',
+        yAxis: 0,
         data: [
         {% for tuple in user_reg_dates %}
 	{{ tuple.user_count }},
+        {% endfor %}
+	]
+    }, {
+	name: '总用户数',
+        yAxis: 1,
+        data: [
+	{% set total = namespace(value=0) %}
+        {% for tuple in user_reg_dates %}
+	{% set total.value = total.value + tuple.user_count %}
+	{{ total.value }},
         {% endfor %}
 	]
     }]
