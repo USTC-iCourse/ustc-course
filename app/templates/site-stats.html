@@ -6,6 +6,8 @@
 <script src="/static/js/highcharts/export-data.js"></script>
 <script src="/static/js/highcharts/accessibility.js"></script>
 
+<link href="/static/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+
 <style>
 .highcharts-figure,
 .highcharts-data-table table {
@@ -363,7 +365,7 @@ Highcharts.chart('num-users-per-month', {
         </div>
 	<form method="get" action="{{ url_for('stats.stats_history') }}">
           <div class="input-group col-md-2">
-	    <input type="text" class="form-control" id="stats-date" name="date" value="{{ date }}">
+	    <input type="text" class="form-control" id="stats-datepicker" name="date" value="{{ date }}" required>
 	    <div class="input-group-btn">
               <button type="submit" class="btn btn-primary">Go!</button>
 	    </div>
@@ -376,4 +378,11 @@ Highcharts.chart('num-users-per-month', {
 </div><!-- end container -->
 {% endblock %}
 {% block script %}
+<script src="/static/js/bootstrap-datepicker.min.js"></script>
+<script>
+$('#stats-datepicker').datepicker({
+    format: 'yyyy/mm/dd',
+    endDate: '0d'
+});
+</script>
 {% endblock %}
