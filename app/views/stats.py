@@ -89,7 +89,7 @@ def view_ranking():
                                          User.username.label('author_username'),
                                          func.count(review_upvotes.c.author_id).label('review_upvotes_count'))
     review_rank = (review_rank_query.select_from(review_rank_join)
-                                    .filter(func.length(Review.content) >= 100 * 2)
+                                    .filter(func.length(Review.content) >= 500)
                                     .group_by(review_upvotes.c.review_id)
                                     .order_by(db.text('review_upvotes_count desc'))
                                     .limit(10).all())
