@@ -274,6 +274,7 @@ Highcharts.chart('new-reviews-per-month', {
 	]
     }, {
 	name: '总点评数',
+        color: '#fd7e14',
         yAxis: 1,
         data: [
 	{% set total = namespace(value=0) %}
@@ -347,6 +348,7 @@ Highcharts.chart('num-users-per-month', {
     }, {
 	name: '总用户数',
         yAxis: 1,
+        color: '#fd7e14',
         data: [
 	{% set total = namespace(value=0) %}
         {% for tuple in user_reg_dates %}
