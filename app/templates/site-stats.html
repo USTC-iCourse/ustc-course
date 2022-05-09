@@ -337,6 +337,20 @@ Highcharts.chart('num-users-per-month', {
 </script>
       </div>
 
+      <div class="ud-pd-sm">
+        <div class="bm-pd-sm">
+             <span class="h4"><strong>历史统计</strong></span>
+        </div>
+	<form method="get" action="{{ url_for('stats.stats_history') }}">
+          <div class="input-group col-md-2">
+	    <input type="text" class="form-control" id="stats-date" name="date" value="{{ date }}">
+	    <div class="input-group-btn">
+              <button type="submit" class="btn btn-primary">Go!</button>
+	    </div>
+	  </div>
+	</form>
+      </div>
+
     </div>
   </div><!-- end float-element -->
 </div><!-- end container -->
