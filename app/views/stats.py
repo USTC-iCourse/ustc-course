@@ -18,7 +18,6 @@ def index():
     site_stat['user_count'] = User.query.count()
     site_stat['course_count'] = Course.query.count()
     site_stat['review_count'] = Review.query.count()
-    site_stat['teacher_count'] = Teacher.query.count()
     site_stat['registered_teacher_count'] = User.query.filter(User.identity == 'Teacher').count()
 
     course_review_counts = db.session.query(func.count(Review.id).label('review_count')).group_by(Review.course_id).subquery()
@@ -34,7 +33,7 @@ def index():
     return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, date=today)
 
 
-@stats.route('/rankings')
+@stats.route('/rankings/')
 def view_ranking():
     '''view rankings'''
     today = datetime.now().strftime("%Y/%m/%d")
@@ -114,22 +113,56 @@ def view_ranking():
     return render_template('ranking.html', teachers_with_most_high_rated_courses=teachers_with_most_high_rated_courses, teachers=teacher_rank, users=user_rank, user_upvote_rank=user_upvote_rank, reviews=review_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses, date=today, this_module='stats.view_ranking')
 
 
-@stats.route('/teachers')
-def teacher_ranking():
-    return render_template('data.html')
+def date_to_term(date):
+    if date.month <= 1:
+        year = date.year - 1
+        term = 1
+    elif date.month <= 6:
+        year = date.year - 1
+        term = 2
+    elif date.month <= 8:
+        year = date.year - 1
+        term = 3
+    else:
+        year = date.year
+        term = 1
+    return str(year) + str(term)
 
+def str_to_date(date_str):
+    try:
+        return datetime.strptime(date_str, "%Y/%m/%d")
+    except:
+        try:
+            return datetime.strptime(date_str, "%Y/%m/%d %H:%M:%S")
+        except:
+            try:
+                return datetime.strptime(date_str, "%Y/%m/%d %H:%M")
+            except:
+                abort(400, "Invalid date format, accepted format: %Y/%m/%d")
+                return None
 
-@stats.route('/users')
-def user_ranking():
-    return render_template('data.html')
+@stats.route('/stats_history/')
+def stats_history():
+    '''view site stats history'''
+    date_str = request.args.get('date')
+    if not date_str:
+        return index()
+    date = str_to_date(date_str)
 
+    site_stat = dict()
+    site_stat['user_count'] = User.query.filter(User.register_time < date).count()
+    site_stat['course_count'] = Course.query.distinct(Course.id).join(CourseTerm).filter(CourseTerm.term < date_to_term(date)).count()
+    site_stat['review_count'] = Review.query.filter(Review.publish_time < date).count()
+    site_stat['registered_teacher_count'] = User.query.filter(User.identity == 'Teacher').filter(User.register_time < date).count()
 
-@stats.route('/reviews')
-def review_ranking():
-    return render_template('data.html')
+    course_review_counts = db.session.query(func.count(Review.id).label('review_count')).filter(Review.publish_time < date).group_by(Review.course_id).subquery()
+    course_review_count_dist = db.session.query(db.text('review_count'), func.count().label('course_count')).select_from(course_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
 
+    user_review_counts = db.session.query(func.count(Review.id).label('review_count')).filter(Review.publish_time < date).group_by(Review.author_id).subquery()
+    user_review_count_dist = db.session.query(db.text('review_count'), func.count().label('user_count')).select_from(user_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
 
-@stats.route('/history')
-def view_history():
-    return render_template('data.html')
+    review_dates = db.session.query(func.year(Review.publish_time).label('publish_year'), func.month(Review.publish_time).label('publish_month'), func.count().label('review_count')).group_by(db.text('publish_year'), db.text('publish_month')).filter(Review.publish_time < date).order_by(db.text('publish_year'), db.text('publish_month')).all()
 
+    user_reg_dates = db.session.query(func.year(User.register_time).label('reg_year'), func.month(User.register_time).label('reg_month'), func.count().label('user_count')).group_by(db.text('reg_year'), db.text('reg_month')).filter(User.register_time).order_by(db.text('reg_year'), db.text('reg_month')).all()
+
+    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, date=date_str)
