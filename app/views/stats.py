@@ -127,6 +127,19 @@ def view_ranking():
                              .order_by(Review.upvote_count.desc())
                              .limit(10).all())
 
+    # find top 10 longest reviews
+    review_length_rank = (db.session.query(Course.id.label('course_id'),
+                                           Course.name.label('course_name'),
+                                           Review.id.label('review_id'),
+                                           User.id.label('author_id'),
+                                           User.username.label('author_username'),
+                                           Review.upvote_count.label('review_upvotes_count'),
+                                           func.length(Review.content).label('review_length'))
+                                    .join(User).join(Course)
+                                    .filter(func.length(Review.content) >= 500)
+                                    .order_by(func.length(Review.content).desc())
+                                    .limit(10).all())
+
     # find top 10 courses with at least 20 reviews and highest normalized average rating
     top_rated_courses = (Course.query.join(CourseRate)
                                .filter(CourseRate.review_count >= 20)
@@ -144,7 +157,7 @@ def view_ranking():
                              .order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc())
                              .limit(10).all())
 
-    return render_template('ranking.html', teachers_with_most_high_rated_courses=teachers_with_most_high_rated_courses, teachers=teacher_rank, users=user_rank, user_upvote_rank=user_upvote_rank, reviews=review_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses, date=today, this_module='stats.view_ranking')
+    return render_template('ranking.html', teachers_with_most_high_rated_courses=teachers_with_most_high_rated_courses, teachers=teacher_rank, users=user_rank, user_upvote_rank=user_upvote_rank, reviews=review_rank, long_reviews=review_length_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses, date=today, this_module='stats.view_ranking')
 
 
 def date_to_term(date):
