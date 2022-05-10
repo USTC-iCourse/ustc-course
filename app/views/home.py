@@ -322,8 +322,8 @@ def search_reviews():
 @home.route('/search/')
 def search():
     ''' 搜索 '''
-    keyword = request.args.get('q')
-    if not keyword:
+    query_str = request.args.get('q')
+    if not query_str:
         return redirect(url_for('home.index'))
     noredirect = request.args.get('noredirect')
 
@@ -341,53 +341,69 @@ def search():
     #    # 开课地点
     #    course_query = course_query.filter(Course.campus==campus)
 
+    keywords = re.sub(r'''[~`!@#$%^&*(){}[]|\\:";'<>?,./]''', ' ', query_str).split()
+    max_keywords_allowed = 10
+    if len(keywords) > max_keywords_allowed:
+        keywords = keywords[:max_keywords_allowed]
+
     def course_query_with_meta(meta):
         return db.session.query(Course, literal_column(str(meta)).label("_meta"))
 
-    def teacher_match(q):
+    def teacher_match(q, keyword):
         return q.join(Course.teachers).filter(Teacher.name == keyword)
 
-    def exact_match(q):
+    def exact_match(q, keyword):
         return q.filter(Course.name == keyword)
 
-    fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
-
-    def include_match(q):
+    def include_match(q, keyword):
+        fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
         return q.filter(Course.name.like('%' + fuzzy_keyword + '%'))
 
-    def fuzzy_match(q):
+    def fuzzy_match(q, keyword):
+        fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
         return q.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
-    def ordering(query_obj):
-        return query_obj.join(CourseRate).order_by(text('anon_2_anon_3_anon_4__meta'), Course.QUERY_ORDER())
+    def ordering(query_obj, keywords):
+        ordering_field = 'anon_2_anon_3_'
+        count = 4
+        for k in keywords:
+            ordering_field += 'anon_' + str(count) + '_'
+            count += 1
+        ordering_field += '_meta'
+        return query_obj.join(CourseRate).order_by(text(ordering_field), Course.QUERY_ORDER())
 
-    union_courses = teacher_match(course_query_with_meta(1)) \
-                    .union(exact_match(course_query_with_meta(2))) \
-                    .union(include_match(course_query_with_meta(3))) \
-                    .union(fuzzy_match(course_query_with_meta(4)))
-    ordered_courses = ordering(union_courses).group_by(Course.id)
+    union_keywords = None
+    for keyword in keywords:
+        union_courses = (teacher_match(course_query_with_meta(1), keyword)
+                         .union(exact_match(course_query_with_meta(2), keyword))
+                         .union(include_match(course_query_with_meta(3), keyword))
+                         .union(fuzzy_match(course_query_with_meta(4), keyword)))
+        if union_keywords:
+            union_keywords = union_keywords.union(union_courses)
+        else:
+            union_keywords = union_courses
+    ordered_courses = ordering(union_keywords, keywords).group_by(Course.id)
 
-    courses_count = teacher_match(Course.query).union(fuzzy_match(Course.query)).count()
+    #courses_count = teacher_match(Course.query, query_str).union(fuzzy_match(Course.query, query_str)).count()
 
     page = request.args.get('page', 1, type=int)
-    #per_page = request.args.get('per_page', 10, type=int)
-    per_page = 10
+    per_page = request.args.get('per_page', 10, type=int)
     if page <= 1:
         page = 1
+    num_results = ordered_courses.count()
     selections = ordered_courses.offset((page - 1) * per_page).limit(per_page).all()
     course_objs = [ s[0] for s in selections ]
 
-    #courses_paged = courses.paginate(page=page, per_page=per_page)
-    pagination = MyPagination(page=page, per_page=per_page, total=courses_count, items=course_objs)
+    pagination = MyPagination(page=page, per_page=per_page, total=num_results, items=course_objs)
 
     if pagination.total > 0:
-        title = '搜索课程「' + keyword + '」'
+        title = '搜索课程「' + query_str + '」'
     elif noredirect:
-        title = '您的搜索「' + keyword + '」没有匹配到任何课程或老师'
+        title = '您的搜索「' + query_str + '」没有匹配到任何课程或老师'
     else:
         return search_reviews()
 
-    return render_template('search.html', keyword=keyword, courses=pagination,
+    return render_template('search.html', keyword=query_str, courses=pagination,
                 dept=department, deptlist=deptlist,
                 title=title,
                 this_module='home.search')
