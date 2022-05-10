@@ -214,6 +214,6 @@ def stats_history():
     review_dates = db.session.query(func.year(Review.publish_time).label('publish_year'), func.month(Review.publish_time).label('publish_month'), func.count().label('review_count')).group_by(db.text('publish_year'), db.text('publish_month')).filter(Review.publish_time < date).order_by(db.text('publish_year'), db.text('publish_month')).all()
 
     # find the distribution of registration dates of user (count per month)
-    user_reg_dates = db.session.query(func.year(User.register_time).label('reg_year'), func.month(User.register_time).label('reg_month'), func.count().label('user_count')).group_by(db.text('reg_year'), db.text('reg_month')).filter(User.register_time).order_by(db.text('reg_year'), db.text('reg_month')).all()
+    user_reg_dates = db.session.query(func.year(User.register_time).label('reg_year'), func.month(User.register_time).label('reg_month'), func.count().label('user_count')).group_by(db.text('reg_year'), db.text('reg_month')).filter(User.register_time < date).order_by(db.text('reg_year'), db.text('reg_month')).all()
 
     return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, date=date_str)
