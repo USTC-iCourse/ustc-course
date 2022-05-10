@@ -363,16 +363,25 @@ def search():
         fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
         return q.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
+    def teacher_and_course_match_0(q, keywords):
+        return fuzzy_match(teacher_match(q, keywords[0]), keywords[1])
+
+    def teacher_and_course_match_1(q, keywords):
+        return fuzzy_match(teacher_match(q, keywords[1]), keywords[0])
+
     def ordering(query_obj, keywords):
-        ordering_field = 'anon_2_anon_3_'
-        count = 4
-        for k in keywords:
-            ordering_field += 'anon_' + str(count) + '_'
-            count += 1
+        ordering_field = 'anon_2_anon_3_anon_4_'
+        if len(keywords) >= 3:
+            for count in range(5, len(keywords) + 3):
+                ordering_field += 'anon_' + str(count) + '_'
         ordering_field += '_meta'
         return query_obj.join(CourseRate).order_by(text(ordering_field), Course.QUERY_ORDER())
 
     union_keywords = None
+    if len(keywords) >= 2:
+        union_keywords = (teacher_and_course_match_0(course_query_with_meta(0), keywords)
+                          .union(teacher_and_course_match_1(course_query_with_meta(0), keywords)))
+
     for keyword in keywords:
         union_courses = (teacher_match(course_query_with_meta(1), keyword)
                          .union(exact_match(course_query_with_meta(2), keyword))
