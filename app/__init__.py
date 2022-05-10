@@ -6,7 +6,7 @@
 """
 
 import os
-from flask import Flask,request
+from flask import Flask,request,render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager,current_user,user_logged_in,user_loaded_from_cookie
 from flask_wtf.csrf import CSRFProtect
@@ -47,6 +47,26 @@ def inject_global_banner():
         return {'banner': banner}
     else:
         return {}
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error-page.html', code=404), 404
+
+@app.errorhandler(403)
+def page_not_found(e):
+    return render_template('error-page.html', code=403), 403
+
+@app.errorhandler(400)
+def page_not_found(e):
+    return render_template('error-page.html', code=400), 400
+
+@app.errorhandler(500)
+def page_not_found(e):
+    return render_template('error-page.html', code=500), 500
+
+@app.errorhandler(502)
+def page_not_found(e):
+    return render_template('error-page.html', code=502), 502
 
 
 from app.views import *
