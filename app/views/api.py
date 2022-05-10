@@ -274,3 +274,44 @@ def signin_3rdparty():
         else:
             error = _('账户未激活，请先点击邮箱里的激活链接激活账号')
         return render_template('signin-3rdparty.html', form=request.form, error=error, from_app=from_app, next_url=next_url, challenge=challenge)
+
+
+@api.route('/example-3rdparty/landing/', methods=['GET'])
+def example_3rdparty_landing():
+    import string
+    import random
+    challenge = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(20))
+    # here, we should store the challenge to the session, we skip for this example
+    return render_template('example-3rdparty/landing.html', challenge=challenge)
+
+@api.route('/example-3rdparty/verify/', methods=['GET'])
+def example_3rdparty_verify():
+    challenge = request.args.get('challenge')
+    # here, we should verify the challenge against the session, we skip for this example
+    date_str = request.args.get('date')
+    date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+    now = datetime.now()
+    if date > now:
+        abort(400, description="Invalid date in the future")
+    if (now - date).total_seconds() > 15 * 60:
+        abort(400, description="Date is too early")
+    email = request.args.get('email')
+    token = request.args.get('token')
+
+    from flask.helpers import url_for
+    # for external site, should replace it by the actual URL
+    verify_url = url_for('home.verify_3rdparty_signin', email=email, token=token, _external=True)
+
+    error = None
+    from urllib.request import urlopen
+    from urllib.error import URLError, HTTPError
+    try:
+        resp = urlopen(verify_url)
+    except HTTPError as e:
+        error = 'Verification HTTP error code: ' + str(e.code)
+    except URLError as e:
+        error = 'Failed to reach verification server: ' + str(e.reason)
+    except e:
+        error = 'Unknown error: ' + str(e)
+    return render_template('example-3rdparty/after_login.html', error=error)
+

@@ -1,0 +1,18 @@
+{% extends "layout-simple.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+    {% if error == None %}
+    <h3 class="blue">您已成功使用 USTC 评课社区账号登录 测试站</h3>
+    {% else %}
+    <h3 class="blue">使用 USTC 评课社区账号登录 测试站 失败</h3>
+    <p>错误信息：{{ error }}</p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+{% endblock %}
