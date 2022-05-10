@@ -43,10 +43,10 @@ from app.models import Banner
 @app.context_processor
 def inject_global_banner():
     banner = Banner.query.order_by(Banner.publish_time.desc()).first()
+    global_time = { 'date': datetime.utcnow() }
     if banner:
-        return {'banner': banner}
-    else:
-        return {}
+        global_time['banner'] = banner
+    return global_time
 
 @app.errorhandler(404)
 def page_not_found(e):
