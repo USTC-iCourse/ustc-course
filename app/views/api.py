@@ -233,12 +233,10 @@ def read_notifications():
     return jsonify(ok=True)
 
 
-# successful 3rdparty signin will redirect to ${next_url}?challenge=${challenge}&date=${date}&email=${email}&status=200&sign=${sign}
+# successful 3rdparty signin will redirect to ${next_url}?challenge=${challenge}&date=${date}&email=${email}&status=200&token=${token}
 # here, ${date} is in %Y-%m-%d %H:%M:%S format of server time.
-# here, ${sign} is sha256("auth_token={auth_token}&challenge=${challenge}&date=${date}&email=${email}&status=200")
-# here, ${auth_token} is taken from app.config['LOGIN_3RDPARTY_SECRET_KEY'], and it should be kept secret in the 3rdparty site and this site.
-# The 3rdparty site should verify ${sign} according to the same sha256 algorithm using its secret key, to make sure that it is a valid login.
-# The 3rdparty site should also verify the date that it is not too early, and optionally verify the challenge.
+# here, ${sign} is sha256("challenge=${challenge}&date=${date}&email=${email}&status=200")
+# The 3rdparty site should also verify the date that it is not too early, and verify the challenge.
 @api.route('/signin-3rdparty/', methods=['POST'])
 def signin_3rdparty():
     if 'next_url' in request.form:
@@ -263,15 +261,13 @@ def signin_3rdparty():
     if status and confirmed:
         date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         quoted_date = urllib.parse.quote(date)
-        if 'LOGIN_3RDPARTY_SECRET_KEY' not in app.config:
-            abort(500, description='please configure LOGIN_3RDPARTY_SECRET_KEY in config')
         quoted_email = urllib.parse.quote(user.email)
         auth_str = 'challenge=' + urllib.parse.quote(challenge) + '&date=' + quoted_date + '&email=' + quoted_email + '&status=200'
 
-        auth_token = app.config['LOGIN_3RDPARTY_SECRET_KEY']
-        str_to_sign = 'auth_token=' + urllib.parse.quote(auth_token) + '&' + auth_str
-        sign = hashlib.sha256(str_to_sign.encode('utf-8')).hexdigest()
-        return redirect(next_url + '?' + auth_str + '&sign=' + sign)
+        token = hashlib.sha256(auth_str.encode('utf-8')).hexdigest()
+        user.token_3rdparty = token
+        user.save()
+        return redirect(next_url + '?' + auth_str + '&token=' + token)
     else:
         if not status:
             error = _('邮箱地址或密码错误！')

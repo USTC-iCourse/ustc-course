@@ -71,6 +71,8 @@ class User(db.Model, UserMixin):
     following_count = db.Column(db.Integer, default=0)
     follower_count = db.Column(db.Integer, default=0)
 
+    token_3rdparty = db.Column(db.String(255), nullable=True)
+
     courses_following = db.relationship('Course', secondary = follow_course, backref='followers')
     courses_upvoted = db.relationship('Course', secondary = upvote_course, backref='upvote_users')
     courses_downvoted = db.relationship('Course', secondary = downvote_course, backref='downvote_users')
