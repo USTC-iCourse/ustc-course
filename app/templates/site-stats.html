@@ -433,7 +433,7 @@ Highcharts.chart('review-rate-dist', {
 <script>
 Highcharts.chart('course-rate-dist', {
     chart: {
-        type: 'line'
+        type: 'column'
     },
     title: {
         text: ''
@@ -444,7 +444,11 @@ Highcharts.chart('course-rate-dist', {
     xAxis: {
         categories: [
         {% for tuple in course_rates %}
-	{{ loop.index }},
+	{% if tuple[0] < 10 %}
+	  "{{ tuple[0]|int }}-{{ tuple[0]|int + 1}}",
+	{% else %}
+	  {{ tuple[0] }},
+	{% endif %}
         {% endfor %}
         ],
         crosshair: true
@@ -452,11 +456,19 @@ Highcharts.chart('course-rate-dist', {
     yAxis: {
         min: 0,
         title: {
-            text: '课程评分'
+            text: '课程数'
         }
     },
     tooltip: {
-        enabled: false
+	headerFormat: '<table>',
+	pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
+            '<td style="padding:0"><b>{point.y}</b></td>' +
+	    '<td style="color:{series.color};padding:0"> 门课程的平均分为 </td>',
+        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
+	    '<td style="color:{series.color};padding:0"> 分</td>' +
+	    '</tr></table>',
+        shared: true,
+        useHTML: true
     },
     plotOptions: {
         column: {
@@ -465,10 +477,10 @@ Highcharts.chart('course-rate-dist', {
         }
     },
     series: [{
-	name: '课程数',
+	name: '课程平均评分',
         data: [
         {% for tuple in course_rates %}
-	{{ tuple['rate'] }},
+	{{ tuple[1] }},
         {% endfor %}
 	]
     }]
