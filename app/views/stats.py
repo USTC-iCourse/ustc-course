@@ -34,7 +34,13 @@ def index():
     # find the distribution of registration dates of user (count per month)
     user_reg_dates = db.session.query(func.year(User.register_time).label('reg_year'), func.month(User.register_time).label('reg_month'), func.count().label('user_count')).group_by(db.text('reg_year'), db.text('reg_month')).order_by(db.text('reg_year'), db.text('reg_month')).all()
 
-    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, date=today)
+    # find the distribution of review rates
+    review_rates = db.session.query(func.count(Review.id).label('count'), Review.rate).group_by(Review.rate).order_by(Review.rate).all()
+
+    # find the distribution of course rates
+    course_rates = db.session.query(CourseRate._rate_average.label('rate')).filter(CourseRate._rate_average > 0).order_by(CourseRate._rate_average).all()
+
+    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=today)
 
 
 @stats.route('/rankings/')
@@ -216,4 +222,10 @@ def stats_history():
     # find the distribution of registration dates of user (count per month)
     user_reg_dates = db.session.query(func.year(User.register_time).label('reg_year'), func.month(User.register_time).label('reg_month'), func.count().label('user_count')).group_by(db.text('reg_year'), db.text('reg_month')).filter(User.register_time < date).order_by(db.text('reg_year'), db.text('reg_month')).all()
 
-    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, date=date_str)
+    # find the distribution of review rates
+    review_rates = db.session.query(func.count(Review.id).label('count'), Review.rate).filter(Review.publish_time < date).group_by(Review.rate).order_by(Review.rate).all()
+
+    # find the distribution of course rates
+    course_rates = db.session.query(func.avg(Review.rate).label('rate')).filter(Review.publish_time < date).group_by(Review.course_id).order_by(db.text('rate')).all()
+
+    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=date_str)
