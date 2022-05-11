@@ -91,6 +91,135 @@
       </div>
       <div class="clearfix"></div>
 
+      <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
+        <div class="bm-pd-sm">
+             <span class="h4"><strong>点评评分分布</strong></span>
+        </div>
+
+<figure class="highcharts-figure">
+    <div id="review-rate-dist"></div>
+</figure>
+<script>
+Highcharts.chart('review-rate-dist', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: ''
+    },
+    subtitle: {
+        text: ''
+    },
+    xAxis: {
+        categories: [
+        {% for tuple in review_rates %}
+	{{ tuple['rate'] }},
+        {% endfor %}
+        ],
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: '点评数量'
+        }
+    },
+    tooltip: {
+	headerFormat: '<table>',
+	pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
+            '<td style="padding:0"><b>{point.y}</b></td>' +
+	    '<td style="color:{series.color};padding:0"> 个点评的评分为 </td>',
+        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
+	    '</tr></table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: [{
+	name: '评分',
+        data: [
+        {% for tuple in review_rates %}
+	{{ tuple['count'] }},
+        {% endfor %}
+	]
+    }]
+});
+</script>
+      </div>
+
+      <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
+        <div class="bm-pd-sm">
+             <span class="h4"><strong>课程评分分布</strong></span>
+        </div>
+
+<figure class="highcharts-figure">
+    <div id="course-rate-dist"></div>
+</figure>
+<script>
+Highcharts.chart('course-rate-dist', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: ''
+    },
+    subtitle: {
+        text: ''
+    },
+    xAxis: {
+        categories: [
+        {% for tuple in course_rates %}
+	{% if tuple[0] < 10 %}
+	  "{{ tuple[0]|int }}-{{ tuple[0]|int + 1}}",
+	{% else %}
+	  {{ tuple[0] }},
+	{% endif %}
+        {% endfor %}
+        ],
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: '课程数'
+        }
+    },
+    tooltip: {
+	headerFormat: '<table>',
+	pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
+            '<td style="padding:0"><b>{point.y}</b></td>' +
+	    '<td style="color:{series.color};padding:0"> 门课程的平均分为 </td>',
+        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
+	    '<td style="color:{series.color};padding:0"> 分</td>' +
+	    '</tr></table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: [{
+	name: '课程平均评分',
+        data: [
+        {% for tuple in course_rates %}
+	{{ tuple[1] }},
+        {% endfor %}
+	]
+    }]
+});
+</script>
+      </div>
+
+      <div class="clearfix"></div>
+
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
              <span class="h4"><strong>课程点评数量分布</strong></span>
@@ -360,135 +489,6 @@ Highcharts.chart('num-users-per-month', {
 });
 </script>
       </div>
-
-      <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>点评评分分布</strong></span>
-        </div>
-
-<figure class="highcharts-figure">
-    <div id="review-rate-dist"></div>
-</figure>
-<script>
-Highcharts.chart('review-rate-dist', {
-    chart: {
-        type: 'column'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in review_rates %}
-	{{ tuple['rate'] }},
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: '点评数量'
-        }
-    },
-    tooltip: {
-	headerFormat: '<table>',
-	pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
-            '<td style="padding:0"><b>{point.y}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 个点评的评分为 </td>',
-        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
-	    '</tr></table>',
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: [{
-	name: '评分',
-        data: [
-        {% for tuple in review_rates %}
-	{{ tuple['count'] }},
-        {% endfor %}
-	]
-    }]
-});
-</script>
-      </div>
-
-      <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>课程评分分布</strong></span>
-        </div>
-
-<figure class="highcharts-figure">
-    <div id="course-rate-dist"></div>
-</figure>
-<script>
-Highcharts.chart('course-rate-dist', {
-    chart: {
-        type: 'column'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in course_rates %}
-	{% if tuple[0] < 10 %}
-	  "{{ tuple[0]|int }}-{{ tuple[0]|int + 1}}",
-	{% else %}
-	  {{ tuple[0] }},
-	{% endif %}
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: '课程数'
-        }
-    },
-    tooltip: {
-	headerFormat: '<table>',
-	pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
-            '<td style="padding:0"><b>{point.y}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 门课程的平均分为 </td>',
-        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 分</td>' +
-	    '</tr></table>',
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: [{
-	name: '课程平均评分',
-        data: [
-        {% for tuple in course_rates %}
-	{{ tuple[1] }},
-        {% endfor %}
-	]
-    }]
-});
-</script>
-      </div>
-
-      <div class="clearfix"></div>
 
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
