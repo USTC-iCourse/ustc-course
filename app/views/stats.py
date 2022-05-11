@@ -38,7 +38,7 @@ def index():
     review_rates = db.session.query(func.count(Review.id).label('count'), Review.rate).group_by(Review.rate).order_by(Review.rate).all()
 
     # find the distribution of course rates
-    course_rates = db.session.query(CourseRate._rate_average.label('rate')).filter(CourseRate._rate_average > 0).order_by(CourseRate._rate_average).all()
+    course_rates = db.session.query(func.floor(CourseRate._rate_average).label('rate'), func.count(func.floor(CourseRate._rate_average)).label('count')).filter(CourseRate._rate_average > 0).group_by(db.text('rate')).order_by(db.text('rate')).all()
 
     return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=today)
 
@@ -226,6 +226,7 @@ def stats_history():
     review_rates = db.session.query(func.count(Review.id).label('count'), Review.rate).filter(Review.publish_time < date).group_by(Review.rate).order_by(Review.rate).all()
 
     # find the distribution of course rates
-    course_rates = db.session.query(func.avg(Review.rate).label('rate')).filter(Review.publish_time < date).group_by(Review.course_id).order_by(db.text('rate')).all()
+    course_rate_subquery = db.session.query(func.floor(func.avg(Review.rate)).label('rate')).filter(Review.publish_time < date).group_by(Review.course_id)
+    course_rates = db.session.query(db.text('rate'), func.count(db.text('rate')).label('count')).select_from(course_rate_subquery).group_by(db.text('rate')).order_by(db.text('rate')).all()
 
     return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=date_str)
