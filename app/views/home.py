@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, follow_course, follow_user
+from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, follow_course, follow_user, SearchLog
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -335,6 +335,14 @@ def search_reviews():
     else:
         title = '您的搜索「' + query_str + '」没有匹配到任何点评'
 
+    search_log = SearchLog()
+    search_log.keyword = query_str
+    if current_user.is_authenticated:
+        search_log.user_id = current_user.id
+    search_log.module = 'search_reviews'
+    search_log.page = page
+    search_log.save()
+
     return render_template('search-reviews.html', reviews=reviews_paged,
                 title=title,
                 this_module='home.search_reviews', keyword=query_str)
@@ -432,6 +440,14 @@ def search():
         title = '您的搜索「' + query_str + '」没有匹配到任何课程或老师'
     else:
         return search_reviews()
+
+    search_log = SearchLog()
+    search_log.keyword = query_str
+    if current_user.is_authenticated:
+        search_log.user_id = current_user.id
+    search_log.module = 'search_course'
+    search_log.page = page
+    search_log.save()
 
     return render_template('search.html', keyword=query_str, courses=pagination,
                 dept=department, deptlist=deptlist,
