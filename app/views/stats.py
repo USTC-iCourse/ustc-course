@@ -46,6 +46,8 @@ def index():
 @stats.route('/rankings/')
 def view_ranking():
     '''view rankings'''
+    abort(404) # temp disable rankings
+
     today = datetime.now().strftime("%Y/%m/%d")
 
     # helper queries for fetching top teachers
