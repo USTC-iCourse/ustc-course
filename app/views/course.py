@@ -78,6 +78,8 @@ def view_course(course_id):
     course = Course.query.get(course_id)
     if not course:
         abort(404)
+    course.access_count += 1
+    course.save_without_edit()
 
     related_courses = Course.query.filter_by(name=course.name).all()
     teacher = course.teacher
