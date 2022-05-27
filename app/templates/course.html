@@ -192,6 +192,13 @@
             {% endfor %}
 
             <span class="left-pd-md">{{ review.term|term_display }}</span>
+	    {% if review.author.is_teacher %}
+	      {% if review.author.id in review.course.registered_teacher_id_list %}
+	      <span class="pull-right label label-success teacher-review-label" style="font-size: 100%;" data-toogle="tooltip" data-placement="top" title="该点评由本课程教师账号发表">本课程教师</span>
+	      {% else %}
+	      <span class="pull-right label label-success teacher-review-label" style="font-size: 100%;" data-toogle="tooltip" data-placement="top" title="该点评由教师账号发表">教师点评</span>
+	      {% endif %}
+	    {% endif %}
           </div>
           {% include 'review-hidden.html' %}
 	  <div class="review-content" id="review-content-{{ review.id }}">
@@ -637,5 +644,7 @@
      var replace_text = $(this).html().replace(regex, regex_replace)
      $(this).html(replace_text)
  })
+
+ $('.teacher-review-label').tooltip()
 </script>
 {% endblock %}

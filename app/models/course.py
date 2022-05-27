@@ -204,6 +204,10 @@ class Course(db.Model):
     def teacher_name_list(self):
         return [ teacher.name for teacher in self.teachers ]
 
+    @property
+    def registered_teacher_id_list(self):
+        return [ teacher.user_id for teacher in self.teachers if teacher.user_id ]
+
     def __repr__(self):
         return self.name + '(' + ','.join(sorted(self.teacher_name_list)) + ')'
 
