@@ -379,17 +379,17 @@ def search():
         return db.session.query(Course, literal_column(str(meta)).label("_meta"))
 
     def teacher_match(q, keyword):
-        return q.join(Course.teachers).filter(Teacher.name == keyword)
+        return q.join(Course.teachers).filter(Teacher.name.like('%' + keyword + '%'))
 
     def exact_match(q, keyword):
         return q.filter(Course.name == keyword)
 
     def include_match(q, keyword):
-        fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
+        fuzzy_keyword = keyword.replace('%', '')
         return q.filter(Course.name.like('%' + fuzzy_keyword + '%'))
 
     def fuzzy_match(q, keyword):
-        fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
+        fuzzy_keyword = keyword.replace('%', '')
         return q.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
     def teacher_and_course_match_0(q, keywords):
