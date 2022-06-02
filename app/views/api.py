@@ -259,7 +259,7 @@ def signin_3rdparty():
     else:
         user, status, confirmed = User.authenticate_email(request.form['email'], request.form['password'])
     if status and confirmed:
-        date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        date = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         quoted_date = urllib.parse.quote(date)
         quoted_email = urllib.parse.quote(user.email)
         auth_str = 'challenge=' + urllib.parse.quote(challenge) + '&date=' + quoted_date + '&email=' + quoted_email + '&status=200'
@@ -290,7 +290,7 @@ def example_3rdparty_verify():
     # here, we should verify the challenge against the session, we skip for this example
     date_str = request.args.get('date')
     date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-    now = datetime.now()
+    now = datetime.utcnow()
     if date > now:
         abort(400, description="Invalid date in the future")
     if (now - date).total_seconds() > 15 * 60:
