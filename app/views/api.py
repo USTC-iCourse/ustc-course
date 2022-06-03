@@ -311,7 +311,7 @@ def example_3rdparty_verify():
         error = 'Verification HTTP error code: ' + str(e.code)
     except URLError as e:
         error = 'Failed to reach verification server: ' + str(e.reason)
-    except e:
+    except Exception as e:
         error = 'Unknown error: ' + str(e)
     return render_template('example-3rdparty/after_login.html', error=error)
 
