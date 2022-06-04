@@ -46,9 +46,10 @@ def index():
 @stats.route('/rankings/')
 def view_ranking():
     '''view rankings'''
-    abort(404) # temp disable rankings
-
     today = datetime.now().strftime("%Y/%m/%d")
+
+    topk_count = 30
+    default_show_count = 10
 
     # helper queries for fetching top teachers
     # join Teacher, Course, Review, Dept classes via course_teachers intermediate table
@@ -87,40 +88,20 @@ def view_ranking():
     teacher_rank = (db.session.query(db.text('teacher_id'), db.text('teacher_name'), db.text('dept_id'), db.text('course_count'), db.text('review_count'), db.text('avg_review_rate'), db.text('total_review_rate'))
                               .select_from(teacher_rank_unordered)
                               .order_by(Course.generic_query_order(db.text('total_review_rate'), db.text('review_count')).desc())
-                              .limit(10).all())
-
-    # find top 10 teachers with the highest number of high rating courses and does not have any low rating course
-    # definition of high rating courses: average rate > 9
-    # definition of low rating course: average rate < 8
-    # order by: primary: number of high rating courses, secondary: average review rating
-    teachers_with_most_high_rated_courses = (
-                              db.session.query(Teacher.id.label('teacher_id'),
-                                               Teacher.name.label('teacher_name'),
-                                               Dept.name.label('dept_id'),
-                                               func.count(func.distinct(Course.id)).label('course_count'),
-                                               func.count(Review.id).label('review_count'),
-                                               func.avg(Review.rate).label('avg_review_rate'),
-                                               func.sum(Review.rate).label('total_review_rate'))
-                              .select_from(teacher_rank_join)
-                              .filter(Teacher.id.not_in(teachers_with_low_rating_course))
-                              .filter(Teacher.id.in_(teachers_with_high_rating_course))
-                              .group_by(Teacher.id)
-                              .order_by(db.text('course_count desc'), db.text('avg_review_rate desc'))
-                              .limit(10).all())
+                              .limit(topk_count).all())
 
     # find top 10 users who has written the most number of reviews
-    user_rank = (db.session.query(User.id, User.username, func.count(Review.id).label('reviews_count'), func.sum(Review.upvote_count).label('review_upvotes_count'))
+    avg_upvote_count_result = db.session.query(func.sum(Review.upvote_count) / func.count(Review.id)).first()
+    avg_upvote_count = avg_upvote_count_result[0]
+    user_rank = (db.session.query(User.id,
+                                  User.username,
+                                  func.count(Review.id).label('reviews_count'),
+                                  func.sum(Review.upvote_count).label('review_upvotes_count'),
+                                  (func.count(Review.id) + func.sum(Review.upvote_count) / avg_upvote_count).label('score'))
                            .join(User)
                            .group_by(Review.author_id)
-                           .order_by(db.text('reviews_count desc'))
-                           .limit(10).all())
-
-    # find top 10 users with the most number of upvotes to the reviews written by them
-    user_upvote_rank = (db.session.query(User.id, User.username, func.count(Review.id).label('reviews_count'), func.sum(Review.upvote_count).label('review_upvotes_count'))
-                                  .join(User)
-                                  .group_by(Review.author_id)
-                                  .order_by(db.text('review_upvotes_count desc'))
-                                  .limit(10).all())
+                           .order_by(db.text('score desc'))
+                           .limit(topk_count).all())
 
     # find top 10 reviews with the most number of upvotes
     review_rank_join = sql.join(User, sql.join(Course, Review, Course.id == Review.course_id), User.id == Review.author_id)
@@ -133,7 +114,7 @@ def view_ranking():
                              .join(User).join(Course)
                              .filter(func.length(Review.content) >= 500)
                              .order_by(Review.upvote_count.desc())
-                             .limit(10).all())
+                             .limit(topk_count).all())
 
     # find top 10 longest reviews
     review_length_rank = (db.session.query(Course.id.label('course_id'),
@@ -144,28 +125,27 @@ def view_ranking():
                                            Review.upvote_count.label('review_upvotes_count'),
                                            func.length(Review.content).label('review_length'))
                                     .join(User).join(Course)
-                                    .filter(func.length(Review.content) >= 500)
                                     .order_by(func.length(Review.content).desc())
-                                    .limit(10).all())
+                                    .limit(topk_count).all())
 
     # find top 10 courses with at least 20 reviews and highest normalized average rating
     top_rated_courses = (Course.query.join(CourseRate)
                                .filter(CourseRate.review_count >= 20)
                                .order_by(Course.QUERY_ORDER())
-                               .limit(10).all())
+                               .limit(topk_count).all())
 
     # find top 10 courses with at least 10 reviews and lowest normalized average rating
     worst_rated_courses = (Course.query.join(CourseRate)
                                  .filter(CourseRate.review_count >= 10)
                                  .order_by(Course.REVERSE_QUERY_ORDER())
-                                 .limit(10).all())
+                                 .limit(topk_count).all())
 
     # find top 10 courses with the highest number of reviews
     popular_courses = (Course.query.join(CourseRate)
                              .order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc())
-                             .limit(10).all())
+                             .limit(topk_count).all())
 
-    return render_template('ranking.html', teachers_with_most_high_rated_courses=teachers_with_most_high_rated_courses, teachers=teacher_rank, users=user_rank, user_upvote_rank=user_upvote_rank, reviews=review_rank, long_reviews=review_length_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses, date=today, this_module='stats.view_ranking')
+    return render_template('ranking.html', default_show_count=default_show_count, teachers=teacher_rank, users=user_rank, reviews=review_rank, long_reviews=review_length_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses, date=today, this_module='stats.view_ranking')
 
 
 def date_to_term(date):

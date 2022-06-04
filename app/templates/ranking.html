@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
 
+{% macro show_more(data_target) %}
+	<div class="float-right larger-text"><a href="#{{ data_target }}" data-toggle="collapse" data-target=".{{ data_target }}" onclick="if ($(this).text() == 'Show more') $(this).text('Show less'); else $(this).text('Show more')">Show more</a></div>
+	<div class="clearfix"></div>
+{% endmacro %}
+
 <div class="container">
   <div class="row float-element">
 
@@ -18,9 +23,9 @@
       <div class="bm-pd-sm">
         <div class="bm-pd-sm">
           <span class="h4"><span class="glyphicon glyphicon-thumbs-up"></span> 最受欢迎的老师</span>
-          <span>（至少有3门课程平均评分大于9，且没有课程平均评分小于8，然后按归一化平均评分排序）</span>
+          <span>（至少有 3 门课程平均评分大于 9，且没有课程平均评分小于 8，然后按归一化平均评分排序）</span>
         </div>
-        <table class="table table-bordered text-center table-hover">
+        <table class="table table-bordered text-center table-hover min-margin-table">
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">老师</th>
@@ -30,7 +35,7 @@
             <th class="text-center">平均评分</th>
           </tr>
           {% for teacher in teachers %}
-          <tr>
+	  <tr {% if loop.index > default_show_count %}class="collapse more-teachers"{% endif %}>
             <th class="text-center">#{{ loop.index }}</th>
             <td><a href="{{ url_for('teacher.view_profile', teacher_id=teacher[0]) }}" target="_blank">{{ teacher[1] }}</a></td>
             <td class="text-center desktop">{{ teacher[2] }}</td>
@@ -40,33 +45,7 @@
           </tr>
           {% endfor %}
         </table>
-      </div>
-
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-          <span class="h4"><span class="glyphicon glyphicon-heart"></span> 好评课程最多的老师</span>
-          <span>（好评课程的定义是平均评分大于9，且没有课程平均评分小于8）</span>
-        </div>
-        <table class="table table-bordered text-center table-hover">
-          <tr>
-            <th class="text-center">TOP</th>
-            <th class="text-center">老师</th>
-            <th class="text-center desktop">学院</th>
-            <th class="text-center">好评课程</th>
-            <th class="text-center">点评数</th>
-            <th class="text-center">平均评分</th>
-          </tr>
-          {% for teacher in teachers_with_most_high_rated_courses %}
-          <tr>
-            <th class="text-center">#{{ loop.index }}</th>
-            <td><a href="{{ url_for('teacher.view_profile', teacher_id=teacher[0]) }}" target="_blank">{{ teacher[1] }}</a></td>
-            <td class="text-center desktop">{{ teacher[2] }}</td>
-            <td>{{ teacher[3] }}</td>
-            <td>{{ teacher[4] }}</td>
-            <td>{{ '%0.2f' % teacher[5]|float }}</td>
-          </tr>
-          {% endfor %}
-        </table>
+	{{ show_more('more-teachers') }}
       </div>
 
       <div class="ud-pd-sm">
@@ -74,7 +53,7 @@
           <span class="h4"><span class="glyphicon glyphicon-thumbs-up"></span> 最受欢迎的课程</span>
           <span>（点评数量大于20，按归一化平均评分排序）</span>
         </div>
-        <table class="table table-bordered text-center table-hover">
+        <table class="table table-bordered text-center table-hover min-margin-table">
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">课程名</th>
@@ -82,14 +61,15 @@
             <th class="text-center">评分</th>
           </tr>
           {% for course in top_rated_courses %}
-          <tr>
+	  <tr {% if loop.index > default_show_count %}class="collapse more-top-rated-courses"{% endif %}>
             <th class="text-center">#{{ loop.index }}</th>
-            <td>{{ course.link }}</td>
+            <td>{{ course.short_link }}</td>
             <td>{{ course.review_count }}</td>
             <td>{{ course.rate.average_rate }}</td>
           </tr>
           {% endfor %}
         </table>
+	{{ show_more('more-top-rated-courses') }}
       </div>
 
       <div class="ud-pd-sm">
@@ -97,7 +77,7 @@
           <span class="h4"><span class="glyphicon glyphicon-thumbs-down"></span> 最不受欢迎的课程</span>
           <span>（点评数量大于10，按归一化平均评分排序）</span>
         </div>
-        <table class="table table-bordered text-center table-hover">
+        <table class="table table-bordered text-center table-hover min-margin-table">
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">课程名</th>
@@ -105,21 +85,22 @@
             <th class="text-center">评分</th>
           </tr>
           {% for course in worst_rated_courses %}
-          <tr>
+	  <tr {% if loop.index > default_show_count %}class="collapse more-worst-rated-courses"{% endif %}>
             <th class="text-center">#{{ loop.index }}</th>
-            <td>{{ course.link }}</td>
+            <td>{{ course.short_link }}</td>
             <td>{{ course.review_count }}</td>
             <td>{{ course.rate.average_rate }}</td>
           </tr>
           {% endfor %}
         </table>
+	{{ show_more('more-worst-rated-courses') }}
       </div>
 
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
           <span class="h4"><span class="glyphicon glyphicon-pencil"></span> 点评最多的课程</span>
         </div>
-        <table class="table table-bordered text-center table-hover">
+        <table class="table table-bordered text-center table-hover min-margin-table">
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">课程名</th>
@@ -127,22 +108,23 @@
             <th class="text-center">评分</th>
           </tr>
           {% for course in popular_courses %}
-          <tr>
+	  <tr {% if loop.index > default_show_count %}class="collapse more-popular-courses"{% endif %}>
             <th class="text-center">#{{ loop.index }}</th>
-            <td>{{ course.link }}</td>
+            <td>{{ course.short_link }}</td>
             <td>{{ course.review_count }}</td>
             <td>{{ course.rate.average_rate }}</td>
           </tr>
           {% endfor %}
         </table>
+	{{ show_more('more-popular-courses') }}
       </div>
 
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
           <span class="h4"><span class="glyphicon glyphicon-thumbs-up"></span> 最有帮助的点评</span>
-          <span>（点赞最多且字数大于200字）</span>
+          <span>（点赞最多且字数大于 500 字节，一个中文字算 3 个字节）</span>
         </div>
-        <table class="table table-bordered text-center table-hover">
+        <table class="table table-bordered text-center table-hover min-margin-table">
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">课程</th>
@@ -150,7 +132,7 @@
             <th class="text-center">点赞数</th>
           </tr>
           {% for review in reviews %}
-          <tr>
+	  <tr {% if loop.index > default_show_count %}class="collapse more-reviews"{% endif %}>
             <th class="text-center">#{{ loop.index }}</th>
             <td><a href="{{ url_for('course.view_course', course_id=review.course_id) }}#review-{{ review.review_id }}"
                 target="_blank">{{ review.course_name }}</a></td>
@@ -160,6 +142,7 @@
           </tr>
           {% endfor %}
         </table>
+	{{ show_more('more-reviews') }}
       </div>
 
       <div class="ud-pd-sm">
@@ -167,7 +150,7 @@
           <span class="h4"><span class="glyphicon glyphicon-pencil"></span> 最长的点评</span>
           <span>（长度按字节数计，一个中文字算 3 个字节）</span>
         </div>
-        <table class="table table-bordered text-center table-hover">
+        <table class="table table-bordered text-center table-hover min-margin-table">
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">课程</th>
@@ -176,7 +159,7 @@
             <th class="text-center">长度（字节数）</th>
           </tr>
           {% for review in long_reviews %}
-          <tr>
+	  <tr {% if loop.index > default_show_count %}class="collapse more-long-reviews"{% endif %}>
             <th class="text-center">#{{ loop.index }}</th>
             <td><a href="{{ url_for('course.view_course', course_id=review.course_id) }}#review-{{ review.review_id }}"
                 target="_blank">{{ review.course_name }}</a></td>
@@ -187,54 +170,34 @@
           </tr>
           {% endfor %}
         </table>
+	{{ show_more('more-long-reviews') }}
       </div>
 
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
           <span class="h4"><span class="glyphicon glyphicon-user"></span> 贡献最多的用户</span>
-          <span>（点评最多）</span>
+          <span>（按点评数量 + 点赞数量/全站点评的平均点赞数排序）</span>
         </div>
-        <table class="table table-bordered text-center table-hover">
+        <table class="table table-bordered text-center table-hover min-margin-table">
           <tr>
             <th class="text-center">TOP</th>
             <th class="text-center">用户名</th>
             <th class="text-center">点评数</th>
             <th class="text-center">获得点赞</th>
+            <th class="text-center">综合贡献</th>
           </tr>
           {% for user in users %}
-          <tr>
+	  <tr {% if loop.index > default_show_count %}class="collapse more-users"{% endif %}>
             <th class="text-center">#{{ loop.index }}</th>
             <td><a href="{{ url_for('user.view_profile', user_id=user.id) }}" target="_blank">{{ user.username }}</a>
             </td>
             <td>{{ user.reviews_count }}</td>
             <td>{{ user.review_upvotes_count }}</td>
+            <td>{{ '%0.2f' % user.score|float }}</td>
           </tr>
           {% endfor %}
         </table>
-      </div>
-
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-          <span class="h4"><span class="glyphicon glyphicon-user"></span> 获得点赞最多的用户</span>
-          <span>（点评的点赞数最多）</span>
-        </div>
-        <table class="table table-bordered text-center table-hover">
-          <tr>
-            <th class="text-center">TOP</th>
-            <th class="text-center">用户名</th>
-            <th class="text-center">点评数</th>
-            <th class="text-center">获得点赞</th>
-          </tr>
-          {% for user in user_upvote_rank %}
-          <tr>
-            <th class="text-center">#{{ loop.index }}</th>
-            <td><a href="{{ url_for('user.view_profile', user_id=user.id) }}" target="_blank">{{ user.username }}</a>
-            </td>
-            <td>{{ user.reviews_count }}</td>
-            <td>{{ user.review_upvotes_count }}</td>
-          </tr>
-          {% endfor %}
-        </table>
+	{{ show_more('more-users') }}
       </div>
 
     </div>
