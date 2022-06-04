@@ -123,6 +123,14 @@ def sanitize(text):
         return text
 
 
+@app.template_filter('extract_domain')
+def extract_domain_from_url(url):
+    match = re.match(r'http[s]*://[a-zA-Z0-9.:-]+/', url)
+    if not match:
+        return url
+    return match.group(0)
+
+
 @app.template_filter('content_filter')
 def content_filter(text):
     return re.sub(r'(脑瘫玩意|傻逼|我艹你妈|艹你妈)', '<span style="background:black;color:black;">请文明用语</span>', text)
