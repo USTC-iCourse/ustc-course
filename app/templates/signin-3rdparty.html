@@ -26,7 +26,7 @@
       <div class="form-group">
         <div class="col-sm-7">
 	  <p class="text-muted"><strong>您在评课社区的用户名、密码将不会分享给 {{ from_app }}。</strong></p>
-          <p class="text-muted">登录后，您将跳转到：{{ next_url }}</p>
+          <p class="text-muted">登录后，您将跳转到：{{ next_url|extract_domain }}</p>
 	</div>
       </div>
 
