@@ -351,3 +351,10 @@ a.nounderline:active { text-decoration: none; }
     top: 0;
     left: 0;
 }
+
+.min-margin-table {
+    margin-bottom: 0 !important;
+}
+.larger-text {
+    font-size: 1.2em !important;
+}

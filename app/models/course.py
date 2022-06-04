@@ -234,6 +234,14 @@ class Course(db.Model):
         return Markup('<a href="' + self.url + '">') + Markup.escape(self.name + teacher_names) + Markup('</a>')
 
     @property
+    def short_link(self):
+        if self.teachers_count > 0:
+            teacher_names = '（' + self.teacher_names_display_short + '）'
+        else:
+            teacher_names = ''
+        return Markup('<a href="' + self.url + '">') + Markup.escape(self.name + teacher_names) + Markup('</a>')
+
+    @property
     def dept(self):
         return self._dept.name
 
@@ -479,6 +487,16 @@ class Course(db.Model):
             return '未知'
         else:
             return ', '.join([teacher.name for teacher in self.teachers])
+
+    @property
+    def teacher_names_display_short(self):
+        if self.teachers_count == 0:
+            return '未知'
+        else:
+            s = ', '.join([teacher.name for teacher in self.teachers[:3]])
+            if self.teachers_count > 3:
+                s += '...'
+            return s
 
     @property
     def image(self):
