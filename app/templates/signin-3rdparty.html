@@ -14,7 +14,7 @@
     </div>
     {% endif %}
 
-    <h3 class="blue">使用 USTC 评课社区账号登录 {{ from_app }}</h3>
+    <h3 class="blue">使用评课社区账号登录 {{ from_app }}</h3>
     <hr>
 
     <form class="form-horizontal" method="post" action="{{ url_for('api.signin_3rdparty') }}">
@@ -33,7 +33,7 @@
       {% if current_user.is_authenticated %}
       <div class="form-group">
         <div class="col-sm-7">
-	  <button type="submit" class="btn btn-blue btn-block">确认以 {{ current_user.email }} 身份登录 {{ from_app }}</button>
+	  <button type="submit" class="btn btn-blue btn-block">确认用 {{ current_user.email }} 登录 {{ from_app }}</button>
         </div>
       </div>
       {% else %}
