@@ -27,7 +27,7 @@
 	      {% if review.publish_time == review.update_time %}点评了{% else %}更新了点评{% endif %}
               <a href="{{ url_for('course.view_course', course_id=review.course.id) }}">{{ review.course.name }}{% if review.course.teachers %}（{{ review.course.teacher_names_display }}）{% endif %}</a>
 
-              <span class="float-right localtime" style="display: none;">{{ review.update_time|utctime }}</span>
+              <span class="float-right localtime" style="display: none;">{{ review.publish_time|utctime }}</span>
             </div>
             {% include 'review-hidden.html' %}
             <p class="text-muted">{{ review.content|abstract }} <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>

@@ -10,7 +10,7 @@
     <item>
         <title>{{ review.author.username }} 点评了 {{ review.course.name }}{% if review.course.teachers %}（{{ review.course.teacher_names_display }}）{% endif %}</title>
         <link>https://nces.cra.moe{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}</link>
-        <pubDate>{{ review.update_time|rfc822time }}</pubDate>
+        <pubDate>{{ review.publish_time|rfc822time }}</pubDate>
         <description>{{ review.content|abstract }}</description>
         <guid>https://nces.cra.moe{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}</guid>
     </item>

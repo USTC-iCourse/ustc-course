@@ -1,6 +1,8 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
+
 from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, follow_course, follow_user, SearchLog, CourseTerm
+
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -50,6 +52,7 @@ def follow_reviews():
         title = '「我关注的课程」最新点评'
 
     reviews_to_show = reviews.filter(Review.author_id != current_user.id).order_by(Review.update_time.desc())
+
     reviews_paged = reviews_to_show.paginate(page=page, per_page=per_page)
 
     return render_template('latest-reviews.html', reviews=reviews_paged, follow_type=follow_type, title=title, this_module='home.follow_reviews')
@@ -92,7 +95,9 @@ def signin():
         return render_template('signin.html',form=form, error=error)
 
 
+
 # 3rdparty signin should have url format: https://${icourse_site_url}/signin-3rdparty/?from_app=${from_app}&next_url=${next_url}&challenge=${challenge}
+
 # here, ${from_app} is the 3rdparty site name displayed to the user
 # here, ${next_url} is the 3rdparty login verification URL to the 3rdparty site
 # here, ${challenge} is a challenge string provided by the 3rdparty site
@@ -100,7 +105,9 @@ def signin():
 def signin_3rdparty():
     from_app = request.args.get('from_app')
     if not from_app:
+
         abort(400, description="from_app parameter not specified") 
+
     next_url = request.args.get('next_url')
     if not next_url:
         abort(400, description="next_url parameter not specified")
@@ -108,6 +115,7 @@ def signin_3rdparty():
     if not challenge:
         abort(400, description="challenge parameter not specified")
     return render_template('signin-3rdparty.html', from_app=from_app, next_url=next_url, current_user=current_user, challenge=challenge)
+
 
 
 @home.route('/verify-3rdparty-signin/', methods=['GET'])
@@ -129,6 +137,7 @@ def verify_3rdparty_signin():
         return resp
     else:
         abort(403, description="user does not exist or token is invalid")
+
 
 
 @home.route('/su/<int:user_id>')
@@ -395,8 +404,10 @@ def search():
     def teacher_and_course_match_0(q, keywords):
         return fuzzy_match(teacher_match(q, keywords[0]), keywords[1])
 
+
     def teacher_and_course_match_1(q, keywords):
         return fuzzy_match(teacher_match(q, keywords[1]), keywords[0])
+
 
     def ordering(query_obj, keywords):
         ordering_field = 'anon_2_anon_3_anon_4_'

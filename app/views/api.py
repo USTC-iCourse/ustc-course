@@ -240,10 +240,12 @@ def read_notifications():
     return jsonify(ok=True)
 
 
+
 # successful 3rdparty signin will redirect to ${next_url}?challenge=${challenge}&date=${date}&email=${email}&status=200&token=${token}
 # here, ${date} is in %Y-%m-%d %H:%M:%S format of server time.
 # here, ${sign} is sha256("challenge=${challenge}&date=${date}&email=${email}&status=200")
 # The 3rdparty site should also verify the date that it is not too early, and verify the challenge.
+
 @api.route('/signin-3rdparty/', methods=['POST'])
 def signin_3rdparty():
     if 'next_url' in request.form:
@@ -266,6 +268,7 @@ def signin_3rdparty():
     else:
         user, status, confirmed = User.authenticate_email(request.form['email'], request.form['password'])
     if status and confirmed:
+
         date = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         quoted_date = urllib.parse.quote(date)
         quoted_email = urllib.parse.quote(user.email)
@@ -275,12 +278,14 @@ def signin_3rdparty():
         user.token_3rdparty = token
         user.save()
         return redirect(next_url + '?' + auth_str + '&token=' + token)
+
     else:
         if not status:
             error = _('邮箱地址或密码错误！')
         else:
             error = _('账户未激活，请先点击邮箱里的激活链接激活账号')
         return render_template('signin-3rdparty.html', form=request.form, error=error, from_app=from_app, next_url=next_url, challenge=challenge)
+
 
 
 @api.route('/example-3rdparty/landing/', methods=['GET'])
@@ -321,3 +326,4 @@ def example_3rdparty_verify():
     except Exception as e:
         error = 'Unknown error: ' + str(e)
     return render_template('example-3rdparty/after_login.html', error=error)
+

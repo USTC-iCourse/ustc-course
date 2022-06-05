@@ -33,7 +33,6 @@
           {% if current_user.is_authenticated %}
           <li {% if this_module and this_module=='home.follow_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
           {% endif %}
-          <li><a href="https://pi-review.com/universities/257" target="_blank">导师</a></li>
       </ul>
       {% endif %}
 
@@ -52,8 +51,10 @@
 	<a class="btn btn-white float-right desktop" href="{{ url_for('home.search_reviews', q=keyword) }}">搜点评</a>
 	<a class="float-right mobile" href="{{ url_for('home.search_reviews', q=keyword) }}">搜点评</a>
 	{% elif this_module and this_module=='home.search_reviews' %}
+
 	<a class="btn btn-white float-right desktop" href="{{ url_for('home.search', q=keyword, noredirect=True) }}">搜课程</a>
 	<a class="float-right mobile" href="{{ url_for('home.search', q=keyword, noredirect=True) }}">搜课程</a>
+
 	{% elif this_module and this_module=='home.follow_reviews' and follow_type=='course' %}
 	<a class="btn btn-white float-right desktop" href="{{ url_for('home.follow_reviews', follow_type='user') }}">
 	   <span class="glyphicon glyphicon glyphicon-arrow-right" aria-hidden="true"></span> 关注的人
