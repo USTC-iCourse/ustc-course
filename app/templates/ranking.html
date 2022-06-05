@@ -209,6 +209,9 @@
 	<p>注 2：<strong>贡献最多的用户</strong>：综合贡献 = 点评数量 + 点赞数量 / (5 * 全站点评平均点赞数) + 点评总长度 / (5 * 全站点评平均长度)，目前全站点评平均点赞数为 {{ stats['avg_review_upvotes'] }}，全站点评平均长度为 {{ stats['avg_review_length'] }} 字节。</p>
       </div>
 
+      <div class="ud-pd-sm larger-text">
+	<p><a href="{{ url_for('stats.rankings_history') }}">戳这里看排行榜历史</a></p>
+      </div>
     </div>
   </div><!-- end float-element -->
 </div><!-- end container -->

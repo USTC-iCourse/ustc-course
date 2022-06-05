@@ -14,6 +14,7 @@ from PIL import Image
 from email.utils import format_datetime
 import lxml.html
 from hashlib import sha256
+import pdfkit
 
 
 mail = Mail(app)
@@ -369,3 +370,38 @@ def absolute(html_string):
 def cal_validation_code(user):
     expected = user.email + user.password
     return sha256(expected.encode('utf-8')).hexdigest()
+
+def get_rankings_history_base():
+    return os.path.join(app.config['UPLOAD_FOLDER'], 'rankings-history')
+
+def utils_export_rankings_pdf():
+    date_str = datetime.now().strftime('%Y-%m-%d')
+    pdf_folder = get_rankings_history_base()
+    os.makedirs(pdf_folder, exist_ok=True)
+    pdf_filename = 'icourse-rankings-' + date_str + '.pdf'
+    pdf_path = os.path.join(pdf_folder, pdf_filename)
+
+    url = url_for('stats.view_ranking', show_all=1, _external=True)
+    return pdfkit.from_url(url, pdf_path)
+
+def get_rankings_history_file_list():
+    pdf_folder = get_rankings_history_base()
+    try:
+        files = os.listdir(pdf_folder)
+        dates = []
+        for f in files:
+            match = re.search(r'[0-9]+-[0-9]+-[0-9]+', f)
+            if match:
+                date = match.group(0)
+                dates.append((date, f))
+        dates = sorted(dates, key=lambda date: date[0])
+        year_months = {}
+        for date_tuple in dates:
+            date = date_tuple[0]
+            year_month = date.split('-')[0] + ' 年 ' + date.split('-')[1].strip('0') + ' 月'
+            if year_month not in year_months:
+                year_months[year_month] = []
+            year_months[year_month].append(date_tuple)
+        return year_months
+    except:
+        return []
