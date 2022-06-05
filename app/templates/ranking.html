@@ -3,7 +3,7 @@
 
 {% macro show_more(data_target) %}
 {% if topk_count != default_show_count %}
-	<div class="float-right larger-text"><a href="#{{ data_target }}" data-toggle="collapse" data-target=".{{ data_target }}" onclick="if ($(this).text() == 'Show more') $(this).text('Show less'); else $(this).text('Show more')">Show more</a></div>
+	<div class="float-right"><a href="#{{ data_target }}" class="btn btn-link" data-toggle="collapse" data-target=".{{ data_target }}" onclick="if ($(this).text() == '查看更多') $(this).text('收起'); else $(this).text('查看更多')">查看更多</a></div>
 	<div class="clearfix"></div>
 {% endif %}
 {% endmacro %}
