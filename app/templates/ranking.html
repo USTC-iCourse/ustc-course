@@ -66,6 +66,7 @@
             <th class="text-center">TOP</th>
             <th class="text-center">课程名</th>
             <th class="text-center">点评数</th>
+            <th class="text-center">评分</th>
             <th class="text-center">归一化平均分</th>
           </tr>
           {% for course in top_rated_courses %}
@@ -73,6 +74,7 @@
             <th class="text-center">#{{ loop.index }}</th>
             <td>{{ course.short_link }}</td>
             <td>{{ course.review_count }}</td>
+            <td>{{ course.rate.average_rate }}</td>
             <td>{{ '%0.2f' % course.normalized_rate(stats['avg_rate'], stats['avg_rate_count'])|float }}</td>
           </tr>
           {% endfor %}
@@ -82,7 +84,7 @@
 
       <div class="ud-pd-sm">
         <div class="bm-pd-sm">
-          <span class="h4"><span class="glyphicon glyphicon-thumbs-down"></span> 最不受欢迎的课程</span>
+          <span class="h4"><span class="glyphicon glyphicon-thumbs-down"></span> 不受欢迎的课程</span>
         </div>
         <p>排名规则：至少 10 个点评，按归一化平均分从低到高排序。</p>
         <table class="table table-bordered text-center table-hover min-margin-table">
@@ -90,6 +92,7 @@
             <th class="text-center">TOP</th>
             <th class="text-center">课程名</th>
             <th class="text-center">点评数</th>
+            <th class="text-center">评分</th>
             <th class="text-center">归一化平均分</th>
           </tr>
           {% for course in worst_rated_courses %}
@@ -97,6 +100,7 @@
             <th class="text-center">#{{ loop.index }}</th>
             <td>{{ course.short_link }}</td>
             <td>{{ course.review_count }}</td>
+            <td>{{ course.rate.average_rate }}</td>
             <td>{{ '%0.2f' % course.normalized_rate(stats['avg_rate'], stats['avg_rate_count'])|float }}</td>
           </tr>
           {% endfor %}
@@ -113,7 +117,7 @@
             <th class="text-center">TOP</th>
             <th class="text-center">课程名</th>
             <th class="text-center">点评数</th>
-            <th class="text-center">平均分</th>
+            <th class="text-center">评分</th>
           </tr>
           {% for course in popular_courses %}
 	  <tr {% if loop.index > default_show_count %}class="collapse more-popular-courses"{% endif %}>
