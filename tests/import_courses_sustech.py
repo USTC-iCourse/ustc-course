@@ -31,7 +31,7 @@ def parse_json(filename):
         return json.load(f)
 
 
-depts_code_map = dict()
+depts_code_map = dict() #请先运行 import_db.py 里的 load_depts() 这个函数
 classes_map = dict()
 majors_map = dict()
 titles_map = dict()
@@ -85,18 +85,18 @@ def load_courses(insert=True):
         code = c['kcdm']  # CS001
         semester = "2021-2022"  # manual add?
         # https://github.com/jingning42/ustc-course/blob/66c68a9615d4f658c51d5273b7869d02ee5ddd3d/app/models/course.py#L85
-        term = '20211'  # manual add
+        term = '20213'  # manual add 20211学期> 2021-2022秋季
         course_kcbh[code] = dict(
-            # kcid=c['kcid'],  #"2FCC66B429FA494A8F902D739570FCC3" #需要做个hash
-            kcid=abs(hash(c['kcid'])) % (10 ** 8),  # "55932488" #需要做个hash
+            kcid=c['kcid'],  #"2FCC66B429FA494A8F902D739570FCC3"
+            # kcid=abs(hash(c['kcid'])) % (10 ** 8),  # "55932488" #需要做个hash，似乎不影响实际使用，
             kcbh=c['kcdm'],  # "CS102A",
             name=c['kcmc'],  # "计算机程序设计基础A",
             name_eng=c['kcmc_en'],
             credit=c['xf'],
-            course_type=c['kclbmc'] if c['kclbmc'] else None,  # '专业基础课'
-            course_level=c['pyccmc'] if c['pyccmc'] else None,  # '本科'
+            course_type=c['kclbmc'] if c['kclbmc'] else None,  #课程类别 '专业基础课'/'通识理工基础课'/'专业选修课'  ustc这边是"核心通识"
+            course_level=c['pyccmc'] if c['pyccmc'] else None,  # 本科/研究生？
             # join_type=c['classType']['nameZh'] if c['classType'] else None,
-            join_type=c['rwlxmc'] if c['rwlxmc'] else None,
+            join_type=c['rwlxmc'] if c['rwlxmc'] else None, #文理通识/专业任务 ustc这边是"课堂类型"：（计划/预科/通识/体育啥的）
             course_major=c['kkyxmc'],  # 'xx系'
             # teaching_type=c['skfs'] if c['skfs'] else None #"理论+实践"
             teaching_type=c['skyymc']  # '英文'
@@ -180,8 +180,9 @@ def load_courses(insert=True):
         depts_hash = c['kkyx']
         depts_text = c['kkyxmc']
         # depts_text = 37
+        # department id: "kkyx": "010010",(这个是数学系)
         if depts_hash in depts_code_map:
-            course.dept_id = depts_code_map[depts_text].id
+            course.dept_id = depts_code_map[depts_hash].id
         else:
             print('Department code' + c['kkyxmc'] + str(depts_hash) + ' not found in ' + str(c['kcdm']))
 

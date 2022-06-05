@@ -2,7 +2,7 @@ import json
 import collections
 
 # Opening JSON file
-f = open('/Users/cyf/Documents/GitHub/sustc-course/course-raw-data/2019-1.json')
+f = open('/Users/cyf/Documents/GitHub/sustc-course/course-raw-data/2021-3.json')
 
 # returns JSON object as
 # a dictionary
@@ -24,5 +24,5 @@ for c in data['rwList']['list']:
 
 print([item for item, count in collections.Counter(hash_list_data).items() if count > 1])  # print duplicated course
 
-with open('/Users/cyf/Documents/GitHub/sustc-course/course_remove_dup_json/2019-1.json', 'w') as f:
+with open('/Users/cyf/Documents/GitHub/sustc-course/course_remove_dup_json/2021-3.json', 'w') as f:
     json.dump(op_json, f, ensure_ascii=False)
