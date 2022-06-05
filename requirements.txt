@@ -23,3 +23,4 @@ click==7.1.2
 wtforms==3.0.1
 pillow==9.0.0
 MarkupSafe==2.0.1
+pdfkit
