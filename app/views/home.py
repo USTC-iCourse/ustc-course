@@ -164,9 +164,9 @@ def signup():
         password = request.form.get('password')
         user = User(username=username, email=email,password=password)
         email_suffix = email.split('@')[-1]
-        if email_suffix == 'mail.ustc.edu.cn':
+        if email_suffix == 'mail.sustech.edu.cn':
             user.identity = 'Student'
-        elif email_suffix == 'ustc.edu.cn':
+        elif email_suffix == 'sustech.edu.cn':
             user.identity = 'Teacher'
             ok,message = user.bind_teacher(email)
             #TODO: deal with bind feedback
