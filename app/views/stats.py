@@ -1,9 +1,9 @@
-from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify
+from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify,send_from_directory
 from flask_login import login_required
 from flask_babel import gettext as _
 from app.models import *
 from app import db
-from app.utils import sanitize
+from app.utils import sanitize, utils_export_rankings_pdf, get_rankings_history_file_list, get_rankings_history_base
 from sqlalchemy import or_, func, sql
 from datetime import datetime
 
@@ -231,3 +231,19 @@ def stats_history():
     course_rates = db.session.query(db.text('rate'), func.count(db.text('rate')).label('count')).select_from(course_rate_subquery).group_by(db.text('rate')).order_by(db.text('rate')).all()
 
     return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=date_str)
+
+
+@stats.route('/rankings-history-list/', methods=['GET'])
+def rankings_history():
+    history_files = get_rankings_history_file_list()
+    return render_template('rankings-history.html', history_files=history_files)
+
+
+@stats.route('/rankings-history/<path:path>', methods=['GET'])
+def rankings_history_file(path):
+    return send_from_directory(get_rankings_history_base(), path)
+
+
+@stats.route('/export-rankings-pdf/', methods=['GET'])
+def export_rankings_pdf():
+    return jsonify(ok=utils_export_rankings_pdf())
