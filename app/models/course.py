@@ -304,6 +304,14 @@ class Course(db.Model):
     def REVERSE_QUERY_ORDER(self=None):
         return Course._QUERY_ORDER()
 
+    def normalized_rate(self, avg_rate=None, avg_rate_count=None):
+        if avg_rate is None:
+            avg_rate = db.session.query(db.func.avg(Review.rate)).first()[0]
+        if avg_rate_count is None:
+            avg_rate_count = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).first()[0]
+        normalized_rate = (self.rate._rate_total + avg_rate * avg_rate_count) / (self.rate.review_count + avg_rate_count)
+        return normalized_rate
+
     @property
     def related_courses(self):
         '''return the courses that are the same name'''

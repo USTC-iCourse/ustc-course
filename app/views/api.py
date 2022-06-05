@@ -321,4 +321,3 @@ def example_3rdparty_verify():
     except Exception as e:
         error = 'Unknown error: ' + str(e)
     return render_template('example-3rdparty/after_login.html', error=error)
-
