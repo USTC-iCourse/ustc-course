@@ -53,11 +53,11 @@
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav desktop">
           <li {% if this_module and (this_module=='home.latest_reviews' or this_module=='home.search_reviews') %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">点评</a></li>
+	  <li {% if this_module and (this_module=='course.index' or this_module=='home.search') %}class="active"{% endif %}><a href="{{ url_for('course.index') }}">课程</a></li>
           {% if current_user.is_authenticated %}
           <li {% if this_module and this_module=='home.follow_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
           {% endif %}
-{#          <li {% if this_module and this_module=='course.popular' %}class="active"{% endif %}><a href="{{ url_for('course.popular') }}">热门</a></li>#}
-{#          <li {% if this_module and this_module=='course.public_courses' %}class="active"{% endif %}><a href="{{ url_for('course.public_courses') }}">公选</a></li>#}
+          <li><a href="https://www.cra.moe/" target="_blank">更多服务</a></li>
         </ul>
 
 	{% if this_module == 'home.search_reviews' %}
@@ -66,7 +66,7 @@
         <form class="navbar-form navbar-left desktop" action="{{ url_for('home.search') }}" method="get" role="search">
 	{% endif %}
           <div class="form-group">
-            <input type="text" name="q" class="form-control" id="search" placeholder="搜索课程、老师" style="width: 235px" value="{{ keyword or '' }}">
+            <input type="text" name="q" class="form-control" id="search" placeholder="搜索课程名称、老师" style="width: 235px" value="{{ keyword or '' }}">
           </div>
           <span class="desktop-wide">
             <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search grey"></span></button>
