@@ -24,6 +24,7 @@
           {% if current_user.is_authenticated %}
           <li {% if this_module and this_module=='home.follow_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
           {% endif %}
+          <li><a href="https://pi-review.com/universities/257" target="_blank">导师</a></li>
         </ul>
 
 	{% if this_module == 'home.search_reviews' %}
