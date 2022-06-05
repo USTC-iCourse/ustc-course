@@ -5,6 +5,7 @@ from decimal import Decimal
 from sqlalchemy import orm
 from .review import Review
 from .user import Teacher
+from collections import Counter
 try:
     from flask_login import current_user
 except:
@@ -160,10 +161,13 @@ class Course(db.Model):
     name = db.Column(db.String(80), index=True) # 课程名称
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
 
+    course_code = db.Column(db.String(80), index=True) #CS102A
+
     introduction = db.Column(db.Text) # 老师提交的课程简介
     admin_announcement = db.Column(db.Text)
     homepage = db.Column(db.Text) # 课程主页
     last_edit_time = db.Column(db.DateTime)
+    access_count = db.Column(db.Integer, default=0)
 
     _image = db.Column(db.String(100))
 
@@ -202,6 +206,10 @@ class Course(db.Model):
     def teacher_name_list(self):
         return [ teacher.name for teacher in self.teachers ]
 
+    @property
+    def registered_teacher_id_list(self):
+        return [ teacher.user_id for teacher in self.teachers if teacher.user_id ]
+
     def __repr__(self):
         return self.name + '(' + ','.join(sorted(self.teacher_name_list)) + ')'
 
@@ -223,6 +231,14 @@ class Course(db.Model):
     def link(self):
         if self.teachers_count > 0:
             teacher_names = '（' + self.teacher_names_display + '）'
+        else:
+            teacher_names = ''
+        return Markup('<a href="' + self.url + '">') + Markup.escape(self.name + teacher_names) + Markup('</a>')
+
+    @property
+    def short_link(self):
+        if self.teachers_count > 0:
+            teacher_names = '（' + self.teacher_names_display_short + '）'
         else:
             teacher_names = ''
         return Markup('<a href="' + self.url + '">') + Markup.escape(self.name + teacher_names) + Markup('</a>')
@@ -250,6 +266,11 @@ class Course(db.Model):
         db.session.commit()
         return self
 
+    def save_without_edit(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
     @property
     def num_hidden_reviews(self):
         num = 0
@@ -266,11 +287,32 @@ class Course(db.Model):
             return None
 
     @classmethod
-    def QUERY_ORDER(self=None):
+    def generic_query_order(self, rate_total, review_count):
         avg_rate = db.session.query(db.func.avg(Review.rate)).as_scalar()
         avg_rate_count = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).as_scalar()
-        normalized_rate = (CourseRate._rate_total + avg_rate * avg_rate_count) / (CourseRate.review_count + avg_rate_count)
-        return (db.func.IF(CourseRate.review_count > 0, normalized_rate, 0)).desc()
+        normalized_rate = (rate_total + avg_rate * avg_rate_count) / (review_count + avg_rate_count)
+        return normalized_rate
+
+    @classmethod
+    def _QUERY_ORDER(self=None):
+        normalized_rate = Course.generic_query_order(CourseRate._rate_total, CourseRate.review_count)
+        return (db.func.IF(CourseRate.review_count > 0, normalized_rate, 0))
+
+    @classmethod
+    def QUERY_ORDER(self=None):
+        return Course._QUERY_ORDER().desc()
+
+    @classmethod
+    def REVERSE_QUERY_ORDER(self=None):
+        return Course._QUERY_ORDER()
+
+    def normalized_rate(self, avg_rate=None, avg_rate_count=None):
+        if avg_rate is None:
+            avg_rate = db.session.query(db.func.avg(Review.rate)).first()[0]
+        if avg_rate_count is None:
+            avg_rate_count = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).first()[0]
+        normalized_rate = (self.rate._rate_total + avg_rate * avg_rate_count) / (self.rate.review_count + avg_rate_count)
+        return normalized_rate
 
     @property
     def related_courses(self):
@@ -433,11 +475,38 @@ class Course(db.Model):
         return len(self.teachers)
 
     @property
+    def terms_count(self):
+        return self.terms.count()
+
+    @property
+    def review_term_list(self):
+        review_term_list = list(set([review.term for review in self.reviews]))
+        return sorted(review_term_list, reverse=True)
+
+    @property
+    def review_term_dist(self):
+        return Counter([review.term for review in self.reviews])
+
+    @property
+    def review_rate_dist(self):
+        return Counter([review.rate for review in self.reviews])
+
+    @property
     def teacher_names_display(self):
         if self.teachers_count == 0:
             return '未知'
         else:
             return ', '.join([teacher.name for teacher in self.teachers])
+
+    @property
+    def teacher_names_display_short(self):
+        if self.teachers_count == 0:
+            return '未知'
+        else:
+            s = ', '.join([teacher.name for teacher in self.teachers[:3]])
+            if self.teachers_count > 3:
+                s += '...'
+            return s
 
     @property
     def image(self):

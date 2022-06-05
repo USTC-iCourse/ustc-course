@@ -114,7 +114,7 @@
 	{% endif %}
 
 	<div class="solid ud-pd-md inline-h3">
-          <span class="blue h3">点评</span>
+	  <span class="blue h3" id="review-anchor">点评</span>
           {% if current_user.is_authenticated %}
           <a type="button" href="{{ url_for('course.new_review',course_id=course.id) }}" class="btn btn-white float-right blue">
             <span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>
@@ -139,14 +139,38 @@
 	</div>
 	{% endif %}
 
-	{% if course.review_count > 1 %}
-	<ul class="nav nav-tabs">
-	  <li{% if ordering == 'upvote' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='upvote') }}">点赞</a></li>
-	  <li{% if ordering == 'pubtime_desc' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='pubtime_desc') }}">最新</a></li>
-	  <li{% if ordering == 'pubtime' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='pubtime') }}">最老</a></li>
-	  <li{% if ordering == 'score_desc' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='score_desc') }}">好评</a></li>
-	  <li{% if ordering == 'score' %} class="active"{% endif %}><a href="{{ url_for('course.view_course_ordered', course_id=course.id, ordering='score') }}">差评</a></li>
-	</ul>
+	{% if course.review_count > 2 %}
+	<div class="ud-pd-sm">
+		<span class="right-pd-sm weight-heavy">排序</span>
+		<select name="sort_by" onchange="location=this.value">
+			{% for key, label in sort_dict.items() %}
+			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=key, term=term, rating=rating, _anchor='review-anchor') }}" {% if key==sort_by %}selected{% endif %}>{{ label }}</option>
+			{% endfor %}
+		</select>
+		<span class="left-pd-sm right-pd-sm weight-heavy">学期</span>
+		<select name="term" onchange="location=this.value">
+			{% if course.terms_count > 1 %}
+			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, rating=rating, _anchor='review-anchor') }}" {% if not term %}selected{% endif %}>全部</option>
+			{% endif %}
+			{% for item in course.review_term_list %}
+			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, term=item, rating=rating, _anchor='review-anchor') }}" {% if item==term %}selected{% endif %}>
+			{{ item|term_display }} ({{ course.review_term_dist[item] }})
+			</option>
+			{% endfor %}
+		</select>
+		<br class="mobile">
+		<span class="right-pd-sm weight-heavy mobile">评分</span>
+		<span class="left-pd-sm right-pd-sm weight-heavy desktop">评分</span>
+		<select name="rating" onchange="location=this.value">
+			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, term=term, _anchor='review-anchor') }}" {% if not term %}selected{% endif %}>全部</option>
+			{% for n in range(5, 0, -1) %}
+			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, term=term, rating=n, _anchor='review-anchor') }}" {% if n==rating %}selected{% endif %}>
+				{{ '★'*n }} ({{ course.review_rate_dist[2*n] + course.review_rate_dist[2*n-1] }})
+			</option>
+			{% endfor %}
+		</select>
+		<span class="rl-pd-sm text-muted">{{ review_num }}条点评</span>
+	</div>
 	{% endif %}
 
     {% for review in reviews %}
@@ -168,6 +192,13 @@
             {% endfor %}
 
             <span class="left-pd-md">{{ review.term|term_display }}</span>
+	    {% if review.author.is_teacher %}
+	      {% if review.author.id in review.course.registered_teacher_id_list %}
+	      <span class="pull-right label label-success teacher-review-label" style="font-size: 100%;" data-toogle="tooltip" data-placement="top" title="该点评由本课程教师账号发表">本课程教师</span>
+	      {% else %}
+	      <span class="pull-right label label-success teacher-review-label" style="font-size: 100%;" data-toogle="tooltip" data-placement="top" title="该点评由教师账号发表">教师点评</span>
+	      {% endif %}
+	    {% endif %}
           </div>
           {% include 'review-hidden.html' %}
 	  <div class="review-content" id="review-content-{{ review.id }}">
@@ -217,6 +248,15 @@
               {% endif %}
             </span>
           </div>
+
+	  {% if review.author == current_user and review.upvote_users|length > 0 %}
+	  <div class="bm-pd-md" id="review-upvotes-{{ review.id }}">
+	    <p style="line-break: loose;">
+              <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true" ></span>
+	      {% for upvote_user in review.upvote_users %}{% if upvote_user != review.upvote_users[0] %}、{% endif %}<a href={{ url_for('user.view_profile', user_id=upvote_user.id) }}>{{ upvote_user.username }}</a>{% endfor %}
+	    </p>
+	  </div>
+          {% endif %}
 
           {% include 'review-comments.html' %}
         </div>
@@ -604,5 +644,7 @@
      var replace_text = $(this).html().replace(regex, regex_replace)
      $(this).html(replace_text)
  })
+
+ $('.teacher-review-label').tooltip()
 </script>
 {% endblock %}

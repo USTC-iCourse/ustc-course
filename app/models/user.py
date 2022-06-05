@@ -62,6 +62,7 @@ class User(db.Model, UserMixin):
     register_time = db.Column(db.DateTime(), default=datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
     last_login_time = db.Column(db.DateTime())#TODO:login
+    last_edit_time = db.Column(db.DateTime())
     unread_notification_count = db.Column(db.Integer, default=0)
 
     homepage = db.Column(db.String(200))  # 用户博客、主页等
@@ -70,6 +71,9 @@ class User(db.Model, UserMixin):
     
     following_count = db.Column(db.Integer, default=0)
     follower_count = db.Column(db.Integer, default=0)
+    access_count = db.Column(db.Integer, default=0)
+
+    token_3rdparty = db.Column(db.String(255), nullable=True)
 
     courses_following = db.relationship('Course', secondary = follow_course, backref='followers')
     courses_upvoted = db.relationship('Course', secondary = upvote_course, backref='upvote_users')
@@ -270,6 +274,11 @@ class User(db.Model, UserMixin):
             return False,_('无法绑定教师身份。')
 
     def save(self):
+        self.last_edit_time = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def save_without_edit(self):
         db.session.add(self)
         db.session.commit()
 
@@ -458,6 +467,8 @@ class Teacher(db.Model):
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
+    access_count = db.Column(db.Integer, default=0)
+
     dept = db.relationship('Dept', backref='teachers')
     #courses: backref to Course
 
@@ -498,6 +509,10 @@ class Teacher(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def save_without_edit(self):
+        db.session.add(self)
+        db.session.commit()
+
     @property
     def info_history(self):
         return self._info_history.all()
@@ -505,4 +520,11 @@ class Teacher(db.Model):
     @property
     def info_history_count(self):
         return len(self.info_history)
+
+    @classmethod
+    def QUERY_ORDER(self, teacher_rate):
+        avg_rate = db.session.query(db.func.avg(Review.rate)).as_scalar()
+        avg_rate_count = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).as_scalar()
+        normalized_rate = (teacher_rate + avg_rate * avg_rate_count) / (CourseRate.review_count + avg_rate_count)
+        return normalized_rate
 

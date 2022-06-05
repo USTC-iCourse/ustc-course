@@ -6,7 +6,7 @@
 """
 
 import os
-from flask import Flask,request
+from flask import Flask,request,render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager,current_user,user_logged_in,user_loaded_from_cookie
 from flask_wtf.csrf import CSRFProtect
@@ -43,10 +43,30 @@ from app.models import Banner
 @app.context_processor
 def inject_global_banner():
     banner = Banner.query.order_by(Banner.publish_time.desc()).first()
+    global_time = { 'date': datetime.utcnow() }
     if banner:
-        return {'banner': banner}
-    else:
-        return {}
+        global_time['banner'] = banner
+    return global_time
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error-page.html', code=404), 404
+
+@app.errorhandler(403)
+def page_not_found(e):
+    return render_template('error-page.html', code=403), 403
+
+@app.errorhandler(400)
+def page_not_found(e):
+    return render_template('error-page.html', code=400), 400
+
+@app.errorhandler(500)
+def page_not_found(e):
+    return render_template('error-page.html', code=500), 500
+
+@app.errorhandler(502)
+def page_not_found(e):
+    return render_template('error-page.html', code=502), 502
 
 
 from app.views import *
@@ -57,3 +77,4 @@ app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(user, url_prefix='/user')
 app.register_blueprint(teacher, url_prefix='/teacher')
 app.register_blueprint(admin, url_prefix='/admin')
+app.register_blueprint(stats, url_prefix='/stats')

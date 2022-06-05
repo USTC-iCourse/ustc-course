@@ -54,6 +54,8 @@ def review_upvote():
         review = Review.query.with_for_update().get(review_id)
         if review:
             ok,message = review.upvote()
+            if ok:
+                review.author.notify('upvote', review)
             return jsonify(ok=ok,message=message, count=review.upvote_count)
         else:
             return jsonify(ok=False,message="The review doesn't exist.")
@@ -238,12 +240,12 @@ def read_notifications():
     return jsonify(ok=True)
 
 
-# successful 3rdparty signin will redirect to ${next_url}?challenge=${challenge}&date=${date}&email=${email}&status=200&sign=${sign}
+
+# successful 3rdparty signin will redirect to ${next_url}?challenge=${challenge}&date=${date}&email=${email}&status=200&token=${token}
 # here, ${date} is in %Y-%m-%d %H:%M:%S format of server time.
-# here, ${sign} is sha256("auth_token={auth_token}&challenge=${challenge}&date=${date}&email=${email}&status=200")
-# here, ${auth_token} is taken from app.config['LOGIN_3RDPARTY_SECRET_KEY'], and it should be kept secret in the 3rdparty site and this site.
-# The 3rdparty site should verify ${sign} according to the same sha256 algorithm using its secret key, to make sure that it is a valid login.
-# The 3rdparty site should also verify the date that it is not too early, and optionally verify the challenge.
+# here, ${sign} is sha256("challenge=${challenge}&date=${date}&email=${email}&status=200")
+# The 3rdparty site should also verify the date that it is not too early, and verify the challenge.
+
 @api.route('/signin-3rdparty/', methods=['POST'])
 def signin_3rdparty():
     if 'next_url' in request.form:
@@ -266,20 +268,62 @@ def signin_3rdparty():
     else:
         user, status, confirmed = User.authenticate_email(request.form['email'], request.form['password'])
     if status and confirmed:
-        date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        date = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         quoted_date = urllib.parse.quote(date)
-        if 'LOGIN_3RDPARTY_SECRET_KEY' not in app.config:
-            abort(500, description='please configure LOGIN_3RDPARTY_SECRET_KEY in config')
         quoted_email = urllib.parse.quote(user.email)
         auth_str = 'challenge=' + urllib.parse.quote(challenge) + '&date=' + quoted_date + '&email=' + quoted_email + '&status=200'
 
-        auth_token = app.config['LOGIN_3RDPARTY_SECRET_KEY']
-        str_to_sign = 'auth_token=' + urllib.parse.quote(auth_token) + '&' + auth_str
-        sign = hashlib.sha256(str_to_sign.encode('utf-8')).hexdigest()
-        return redirect(next_url + '?' + auth_str + '&sign=' + sign)
+        token = hashlib.sha256(auth_str.encode('utf-8')).hexdigest()
+        user.token_3rdparty = token
+        user.save()
+        return redirect(next_url + '?' + auth_str + '&token=' + token)
+
     else:
         if not status:
             error = _('邮箱地址或密码错误！')
         else:
             error = _('账户未激活，请先点击邮箱里的激活链接激活账号')
         return render_template('signin-3rdparty.html', form=request.form, error=error, from_app=from_app, next_url=next_url, challenge=challenge)
+
+
+
+@api.route('/example-3rdparty/landing/', methods=['GET'])
+def example_3rdparty_landing():
+    import string
+    import random
+    challenge = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(20))
+    # here, we should store the challenge to the session, we skip for this example
+    return render_template('example-3rdparty/landing.html', challenge=challenge)
+
+@api.route('/example-3rdparty/verify/', methods=['GET'])
+def example_3rdparty_verify():
+    challenge = request.args.get('challenge')
+    # here, we should verify the challenge against the session, we skip for this example
+    date_str = request.args.get('date')
+    date = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+    now = datetime.utcnow()
+    if date > now:
+        abort(400, description="Invalid date in the future")
+    if (now - date).total_seconds() > 15 * 60:
+        abort(400, description="Date is too early")
+    email = request.args.get('email')
+    token = request.args.get('token')
+
+    from flask.helpers import url_for
+    # for external site, should replace it by the actual URL
+    verify_url = url_for('home.verify_3rdparty_signin', email=email, token=token, _external=True)
+
+    error = None
+    from urllib.request import urlopen
+    from urllib.error import URLError, HTTPError
+    try:
+        resp = urlopen(verify_url)
+    except HTTPError as e:
+        error = 'Verification HTTP error code: ' + str(e.code)
+    except URLError as e:
+        error = 'Failed to reach verification server: ' + str(e.reason)
+    except Exception as e:
+        error = 'Unknown error: ' + str(e)
+    return render_template('example-3rdparty/after_login.html', error=error)
+

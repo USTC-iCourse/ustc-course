@@ -1,6 +1,8 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, CourseTerm, follow_course, follow_user
+
+from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, follow_course, follow_user, SearchLog, CourseTerm
+
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -21,12 +23,12 @@ def index():
 def latest_reviews():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    reviews_paged = Review.query.order_by(Review.publish_time.desc()).paginate(page=page, per_page=per_page)
+    reviews_paged = Review.query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
     return render_template('latest-reviews.html', reviews=reviews_paged, title='全站最新点评', this_module='home.latest_reviews')
 
 @home.route('/feed.xml')
 def latest_reviews_rss():
-    reviews_paged = Review.query.order_by(Review.publish_time.desc()).paginate(page=1, per_page=50)
+    reviews_paged = Review.query.order_by(Review.update_time.desc()).paginate(page=1, per_page=50)
     rss_content = render_template('feed.xml', reviews=reviews_paged)
     response = make_response(rss_content)
     response.headers['Content-Type'] = 'application/rss+xml'
@@ -49,7 +51,8 @@ def follow_reviews():
         reviews = Review.query.join(follow_course, Review.course_id == follow_course.c.course_id).filter(follow_course.c.user_id == current_user.id)
         title = '「我关注的课程」最新点评'
 
-    reviews_to_show = reviews.filter(Review.author_id != current_user.id).order_by(Review.publish_time.desc())
+    reviews_to_show = reviews.filter(Review.author_id != current_user.id).order_by(Review.update_time.desc())
+
     reviews_paged = reviews_to_show.paginate(page=page, per_page=per_page)
 
     return render_template('latest-reviews.html', reviews=reviews_paged, follow_type=follow_type, title=title, this_module='home.follow_reviews')
@@ -92,7 +95,9 @@ def signin():
         return render_template('signin.html',form=form, error=error)
 
 
-# 3rdparty signin should have url format: https://${icourse_site_url}/signin-3rdparty/from_app=${from_app}&next_url=${next_url}&challenge=${challenge}
+
+# 3rdparty signin should have url format: https://${icourse_site_url}/signin-3rdparty/?from_app=${from_app}&next_url=${next_url}&challenge=${challenge}
+
 # here, ${from_app} is the 3rdparty site name displayed to the user
 # here, ${next_url} is the 3rdparty login verification URL to the 3rdparty site
 # here, ${challenge} is a challenge string provided by the 3rdparty site
@@ -100,7 +105,9 @@ def signin():
 def signin_3rdparty():
     from_app = request.args.get('from_app')
     if not from_app:
-        abort(400, description="from_app parameter not specified")
+
+        abort(400, description="from_app parameter not specified") 
+
     next_url = request.args.get('next_url')
     if not next_url:
         abort(400, description="next_url parameter not specified")
@@ -108,6 +115,29 @@ def signin_3rdparty():
     if not challenge:
         abort(400, description="challenge parameter not specified")
     return render_template('signin-3rdparty.html', from_app=from_app, next_url=next_url, current_user=current_user, challenge=challenge)
+
+
+
+@home.route('/verify-3rdparty-signin/', methods=['GET'])
+def verify_3rdparty_signin():
+    email = request.args.get('email')
+    if not email:
+        abort(400, description="email parameter not specified")
+    token = request.args.get('token')
+    if not token:
+        abort(400, description="token parameter not specified")
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        abort(403, description="user does not exist or token is invalid")
+    if user.token_3rdparty == token:
+        user.token_3rdparty = None
+        user.save()
+        resp = jsonify(success=True)
+        return resp
+    else:
+        abort(403, description="user does not exist or token is invalid")
+
 
 
 @home.route('/su/<int:user_id>')
@@ -302,23 +332,38 @@ def search_reviews():
         else:
             unioned_query = unioned_query.union(content_query)
 
-        author_query = Review.query.join(Review.author).filter(User.username.like('%' + keyword + '%'))
+        author_query = Review.query.join(Review.author).filter(User.username == keyword)
         course_query = Review.query.join(Review.course).filter(Course.name.like('%' + keyword + '%'))
         teacher_query = Review.query.join(Review.course).join(Course.teachers).filter(Teacher.name == keyword)
         unioned_query = unioned_query.union(author_query).union(course_query).union(teacher_query)
 
-    reviews_paged = unioned_query.order_by(Review.publish_time.desc()).paginate(page=page, per_page=per_page)
+    reviews_paged = unioned_query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
+
+    if reviews_paged.total > 0:
+        title = '搜索点评「' + query_str + '」'
+    else:
+        title = '您的搜索「' + query_str + '」没有匹配到任何点评'
+
+    search_log = SearchLog()
+    search_log.keyword = query_str
+    if current_user.is_authenticated:
+        search_log.user_id = current_user.id
+    search_log.module = 'search_reviews'
+    search_log.page = page
+    search_log.save()
+
     return render_template('search-reviews.html', reviews=reviews_paged,
-                title='搜索「' + query_str + '」',
+                title=title,
                 this_module='home.search_reviews', keyword=query_str)
 
 
 @home.route('/search/')
 def search():
     ''' 搜索 '''
-    keyword = request.args.get('q')
-    if not keyword:
+    query_str = request.args.get('q')
+    if not query_str:
         return redirect(url_for('home.index'))
+    noredirect = request.args.get('noredirect')
 
     course_type = request.args.get('type',None,type=int)
     department = request.args.get('dept',None,type=int)
@@ -334,51 +379,90 @@ def search():
     #    # 开课地点
     #    course_query = course_query.filter(Course.campus==campus)
 
+    keywords = re.sub(r'''[~`!@#$%^&*(){}[]|\\:";'<>?,./]''', ' ', query_str).split()
+    max_keywords_allowed = 10
+    if len(keywords) > max_keywords_allowed:
+        keywords = keywords[:max_keywords_allowed]
+
     def course_query_with_meta(meta):
         return db.session.query(Course, literal_column(str(meta)).label("_meta"))
 
-    def teacher_match(q):
-        return q.join(Course.teachers).filter(Teacher.name == keyword)
+    def teacher_match(q, keyword):
+        return q.join(Course.teachers).filter(Teacher.name.like('%' + keyword + '%'))
 
-    def exact_match(q):
+    def exact_match(q, keyword):
         return q.filter(Course.name == keyword)
 
-    # def courseries_match(q):
-    #     return q.filter(CourseTerm.courseries == keyword)
-
-    fuzzy_keyword = keyword.replace(' ', '').replace('%', '')
-
-    def include_match(q):
+    def include_match(q, keyword):
+        fuzzy_keyword = keyword.replace('%', '')
         return q.filter(Course.name.like('%' + fuzzy_keyword + '%'))
 
-    def fuzzy_match(q):
+    def fuzzy_match(q, keyword):
+        fuzzy_keyword = keyword.replace('%', '')
         return q.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
-    def ordering(query_obj):
-        return query_obj.join(CourseRate).order_by(text('anon_2_anon_3_anon_4__meta'), Course.QUERY_ORDER())
+    def teacher_and_course_match_0(q, keywords):
+        return fuzzy_match(teacher_match(q, keywords[0]), keywords[1])
 
-    union_courses = teacher_match(course_query_with_meta(1)) \
-                    .union(exact_match(course_query_with_meta(2))) \
-                    .union(include_match(course_query_with_meta(3))) \
-                    .union(fuzzy_match(course_query_with_meta(4)))
-    ordered_courses = ordering(union_courses).group_by(Course.id)
 
-    courses_count = teacher_match(Course.query).union(fuzzy_match(Course.query)).count()
+    def teacher_and_course_match_1(q, keywords):
+        return fuzzy_match(teacher_match(q, keywords[1]), keywords[0])
+
+
+    def ordering(query_obj, keywords):
+        ordering_field = 'anon_2_anon_3_anon_4_'
+        if len(keywords) >= 3:
+            for count in range(5, len(keywords) + 3):
+                ordering_field += 'anon_' + str(count) + '_'
+        ordering_field += '_meta'
+        return query_obj.join(CourseRate).order_by(text(ordering_field), Course.QUERY_ORDER())
+
+    union_keywords = None
+    if len(keywords) >= 2:
+        union_keywords = (teacher_and_course_match_0(course_query_with_meta(0), keywords)
+                          .union(teacher_and_course_match_1(course_query_with_meta(0), keywords)))
+
+    for keyword in keywords:
+        union_courses = (teacher_match(course_query_with_meta(1), keyword)
+                         .union(exact_match(course_query_with_meta(2), keyword))
+                         .union(include_match(course_query_with_meta(3), keyword))
+                         .union(fuzzy_match(course_query_with_meta(4), keyword)))
+        if union_keywords:
+            union_keywords = union_keywords.union(union_courses)
+        else:
+            union_keywords = union_courses
+    ordered_courses = ordering(union_keywords, keywords).group_by(Course.id)
+
+    #courses_count = teacher_match(Course.query, query_str).union(fuzzy_match(Course.query, query_str)).count()
 
     page = request.args.get('page', 1, type=int)
-    #per_page = request.args.get('per_page', 10, type=int)
-    per_page = 10
+    per_page = request.args.get('per_page', 10, type=int)
     if page <= 1:
         page = 1
+    num_results = ordered_courses.count()
     selections = ordered_courses.offset((page - 1) * per_page).limit(per_page).all()
     course_objs = [ s[0] for s in selections ]
 
-    #courses_paged = courses.paginate(page=page, per_page=per_page)
-    pagination = MyPagination(page=page, per_page=per_page, total=courses_count, items=course_objs)
+    pagination = MyPagination(page=page, per_page=per_page, total=num_results, items=course_objs)
 
-    return render_template('search.html', keyword=keyword, courses=pagination,
+    if pagination.total > 0:
+        title = '搜索课程「' + query_str + '」'
+    elif noredirect:
+        title = '您的搜索「' + query_str + '」没有匹配到任何课程或老师'
+    else:
+        return search_reviews()
+
+    search_log = SearchLog()
+    search_log.keyword = query_str
+    if current_user.is_authenticated:
+        search_log.user_id = current_user.id
+    search_log.module = 'search_course'
+    search_log.page = page
+    search_log.save()
+
+    return render_template('search.html', keyword=query_str, courses=pagination,
                 dept=department, deptlist=deptlist,
-                title='搜索「' + keyword + '」',
+                title=title,
                 this_module='home.search')
 
 

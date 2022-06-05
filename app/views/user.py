@@ -16,6 +16,8 @@ def view_profile(user_id):
     if not user:
         message = _('Sorry, the user does not seem to exist!')
         return render_template('feedback.html', status=False, message=message)
+    user.access_count += 1
+    user.save_without_edit()
 
     return render_template('profile.html',
                            user=user,

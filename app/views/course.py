@@ -5,7 +5,7 @@ from app.models import *
 from app.forms import ReviewForm, CourseForm
 from app import db
 from app.utils import sanitize
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 course = Blueprint('course',__name__)
 
@@ -34,85 +34,89 @@ deptlist = [
     [23, '天文'],
 ]
 
+course_type_dict = {
+    'public': ['公选课','人文类','任选','国际化人才培养','社科类','艺术类'],
+    'general': ['公共课（英语，思政）', '通识必修课'],
+    'general-sci': ['通识基础课', '通识理工基础课', '通识选修课'],
+    'major': ['专业课','专业基础课','专业必修课','专业选修课','专业核心课','专业课'],
+    'practice-and-graduate':['实践与毕业论文','实践','毕业设计/论文'],
+    # 'graduate': ['研究生课程', '专业硕士', '研究生课'],
+    # 'english': ['英语拓展', '英语拓展课程'],
+    # 'physical': ['体育选项'],
+    # 'dual-degree': ['双学位课程', '双学位'],
+    }
+
+
 @course.route('/')
 def index():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    course_type = request.args.get('type',None,type=int)
-    department = request.args.get('dept',None,type=int)
-    campus = request.args.get('campus',None,type=str)
+    sort_by = request.args.get('sort_by', None, type=str)
+    course_type = request.args.get('course_type', None, type=str)
     course_query = Course.query
-    #if course_type:
-    #    # 课程类型
-    #    course_query = course_query.filter(Course.course_type==course_type)
-    #if department:
-    #    # 开课院系
-    #    course_query = course_query.filter(Course.dept_id==department)
-    #if campus:
-    #    # 开课地点
-    #    course_query = course_query.filter(Course.campus==campus)
 
-    courses_page = course_query.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page,per_page=per_page)
+    # 课程类型
+    if course_type in course_type_dict.keys():
+        course_query = Course.query.distinct().join(CourseTerm).filter(or_(CourseTerm.course_type.in_(course_type_dict[course_type]), CourseTerm.join_type.in_(course_type_dict[course_type])))
+
+    # 排序方式
+    if sort_by == 'popular':
+        # sort by review_count
+        courses_page = course_query.join(CourseRate).order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc()).paginate(page,per_page=per_page)
+    else:
+        # default sort by rating
+        courses_page = course_query.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page,per_page=per_page)
+
     return render_template('course-index.html', courses=courses_page,
-            dept=department, deptlist=deptlist, title='好评课程',
-            this_module='course.index')
+            course_type=course_type, course_type_dict=course_type_dict, sort_by=sort_by,
+            title='课程列表', deptlist=deptlist, this_module='course.index')
 
-@course.route('/popular/')
-def popular():
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
-    course_type = request.args.get('type',None,type=int)
-    department = request.args.get('dept',None,type=int)
-    campus = request.args.get('campus',None,type=str)
-    course_query = Course.query
-    #if course_type:
-    #    # 课程类型
-    #    course_query = course_query.filter(Course.course_type==course_type)
-    #if department:
-    #    # 开课院系
-    #    course_query = course_query.filter(Course.dept_id==department)
-    #if campus:
-    #    # 开课地点
-    #    course_query = course_query.filter(Course.campus==campus)
 
-    courses_page = course_query.join(CourseRate).order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc()).paginate(page,per_page=per_page)
-    return render_template('course-index.html', courses=courses_page,
-            dept=department, deptlist=deptlist, title='热门课程',
-            this_module='course.popular')
+@course.route('/<int:course_id>/')
+def view_course(course_id):
 
-@course.route('/public/')
-def public_courses():
-    # large enough per_page to disable pagination effectively
-    courses_page = Course.query.join(CourseTerm).filter(CourseTerm.join_type == '文理通识').join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(1, per_page=10000)
-
-    #courses = course_query.join(CourseTerm).filter(CourseTerm.join_type == '公选').join(CourseRate).order_by(Course.QUERY_ORDER()).all()
-    #class my_pagination():
-    #    def __init__(self, courses):
-    #        self.items = courses
-    #        self.total = len(courses)
-    #        self.page = 1
-    #        self.has_prev = False
-    #        self.has_next = False
-    #    def iter_pages(self, left_edge, right_edge):
-    #        return [1]
-
-    #courses_page = my_pagination(courses)
-    return render_template('course-index.html', courses=courses_page,
-            title='公选课程',
-            this_module='course.public_courses')
-
-def view_course_by_order(course_id, ordering):
     course = Course.query.get(course_id)
     if not course:
         abort(404)
+    course.access_count += 1
+    course.save_without_edit()
 
     related_courses = Course.query.filter_by(name=course.name).all()
     teacher = course.teacher
 
+    if teacher:
+        same_teacher_courses = teacher.courses
+    else:
+        same_teacher_courses = None
+
+    # sort and filter review by url parameters
+    ordering = request.args.get('sort_by', 'upvote', type=str)
+    term = request.args.get('term', None, type=str)
+    rating = request.args.get('rating', None, type=int)
+
+    sort_dict = {
+            'upvote': '点赞最多',
+            'pubtime_desc': '最新点评',
+            'pubtime': '最旧点评',
+            'score_desc': '评分: 高-低',
+            'score': '评分: 低-高',
+            }
+
     query = Review.query.filter_by(course_id=course.id)
-    if ordering == 'upvote':
-        query = query.order_by(Review.upvote_count.desc(), Review.publish_time.desc())
-    elif ordering == 'pubtime_desc':
+
+    # get terms list which have review
+    review_term_list = course.review_term_list
+
+    # filter review by term
+    if term in review_term_list:
+        query = query.filter(Review.term==term)
+
+    # filter review by rating star
+    if rating and 1 <= rating <= 5:
+        query = query.filter(or_(Review.rate==2*rating-1, Review.rate==2*rating))
+
+    # sort review by keyword
+    if ordering == 'pubtime_desc':
         query = query.order_by(Review.publish_time.desc())
     elif ordering == 'pubtime':
         query = query.order_by(Review.publish_time)
@@ -121,31 +125,18 @@ def view_course_by_order(course_id, ordering):
     elif ordering == 'score':
         query = query.order_by(Review.rate, Review.publish_time.desc())
     else:
-        abort(404)
+        # default sort_by upvote number
+        query = query.order_by(Review.upvote_count.desc(), Review.publish_time.desc())
+
     reviews = query.all()
+    review_num = len(reviews)
 
-    if teacher:
-        same_teacher_courses = teacher.courses
-    else:
-        same_teacher_courses = None
-    return render_template('course.html',
-            course=course,
-            course_rate = course.course_rate,
-            reviews=reviews,
-            related_courses=related_courses,
-            teacher=teacher,
-            same_teacher_courses=same_teacher_courses,
-            user=current_user,
-            ordering=ordering)
+    return render_template('course.html', course=course, course_rate = course.course_rate, reviews=reviews,
+            related_courses=related_courses, teacher=teacher, same_teacher_courses=same_teacher_courses,
+            user=current_user, sort_by=ordering, term=term, rating=rating, sort_dict=sort_dict,
+            review_num=review_num, _anchor='my_anchor')
 
 
-@course.route('/<int:course_id>/<string:ordering>/')
-def view_course_ordered(course_id, ordering):
-    return view_course_by_order(course_id, ordering)
-
-@course.route('/<int:course_id>/')
-def view_course(course_id):
-    return view_course_by_order(course_id, 'upvote')
 
 @course.route('/<int:course_id>/upvote/', methods=['POST'])
 @login_required
