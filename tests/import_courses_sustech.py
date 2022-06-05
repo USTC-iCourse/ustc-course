@@ -158,8 +158,10 @@ def load_courses(insert=True):
             print('Existing course ' + course_key)
         else:
             course_name = c['kcmc']
+
             course = Course()
             course.name = course_name
+            # course.course_code = c['kcdm'], # "CS102A",放在courses这个表里
             course.teachers = []
             db.session.add(course)
 
