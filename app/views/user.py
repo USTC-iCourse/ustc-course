@@ -22,7 +22,8 @@ def view_profile(user_id):
     return render_template('profile.html',
                            user=user,
                            info=(user.info if user.is_student else None),
-                           current_user=current_user)
+                           current_user=current_user,
+                           title=user.username)
 
 @user.route('/<int:user_id>/reviews')
 def reviews(user_id):
@@ -34,7 +35,8 @@ def reviews(user_id):
 
     return render_template('user-reviews.html',
                            user=user,
-                           info=(user.info if user.is_student else None))
+                           info=(user.info if user.is_student else None),
+                           title=user.username + ' 的点评')
 
 
 @user.route('/<int:user_id>/follow-course')
@@ -48,7 +50,8 @@ def follow_course(user_id):
     return render_template('follow-course.html',
                            user=user,
                            courses=user.courses_following,
-                           info=(user.info if user.is_student else None))
+                           info=(user.info if user.is_student else None),
+                           title=user.username + ' 的关注')
 
 
 @user.route('/<int:user_id>/join-course')
@@ -63,7 +66,8 @@ def join_course(user_id):
     return render_template('join-course.html',
                            user=user,
                            courses=user.courses_joined,
-                           info=(user.info if user.is_student else None))
+                           info=(user.info if user.is_student else None),
+                           title=user.username + ' 学过的课程')
 
 
 
@@ -95,7 +99,7 @@ def account_settings():
             else:
                 errors.append(_("Avatar upload failed"))
         user.save()
-    return render_template('settings.html', user=user, form=form, errors=errors)
+    return render_template('settings.html', user=user, form=form, errors=errors, title='用户设置')
 
 @user.route('/settings/bind/',methods=['GET','POST'])
 @login_required
@@ -115,11 +119,11 @@ def bind_identity():
                     return render_template('bind-stu.html',user=current_user,error=message)
             else:
                 error = _('必须输入一个学号!')
-                return render_template('bind-stu.html',user=current_user,error=error)
+                return render_template('bind-stu.html',user=current_user,error=error, title='绑定学号')
         else:
-            return render_template('bind-stu.html',user=current_user,error=None)
+            return render_template('bind-stu.html',user=current_user,error=None, title='绑定学号')
     elif identity == 'Teacher':
-        return render_template('feedback.html',status=False,message=_('暂时还不能用'))
+        return render_template('feedback.html',status=False,message=_('教师不能绑定学号！'), title='绑定学号')
     else:
         email_suffix = current_user.email.split('@')[-1]
         if email_suffix == 'mail.ustc.edu.cn':
@@ -152,7 +156,7 @@ def courses(user_id):
         return render_template('feedback.html',status=False,message=_('This user have not bind a ID.Click\
             <a href=%(url)s><b>here</b></a> to bind.',url=url_for('.bind_identity')))
     else:
-        return render_template('feedback.html',status=False,message=_('We cant\'t find the User!'))
+        return render_template('feedback.html',status=False,message=_('We can\'t find the User!'))
 
 
 
@@ -169,7 +173,7 @@ def notice():
     current_user.unread_notification_count = 0
     current_user.save()
     rss_url = url_for('user.notice_rss', user_id=current_user.id, validation_code=cal_validation_code(current_user))
-    return render_template('notice.html', rss_url=rss_url, notifications=current_user.notifications)
+    return render_template('notice.html', rss_url=rss_url, notifications=current_user.notifications, title='通知消息')
 
 
 @user.route('/<int:user_id>/followers')
@@ -181,7 +185,7 @@ def followers(user_id):
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('followers.html',
-                           user=user)
+                           user=user, title=user.username + ' 被关注')
 
 
 @user.route('/<int:user_id>/followings')
@@ -193,7 +197,7 @@ def followings(user_id):
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('followings.html',
-                           user=user)
+                           user=user, title=user.username + ' 关注的人')
 
 @user.route('/<int:user_id>/feed/<string:validation_code>')
 def notice_rss(user_id, validation_code):

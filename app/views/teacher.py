@@ -21,7 +21,7 @@ def view_profile(teacher_id):
     per_page = request.args.get('per_page', 10000, type=int)
     courses = teacher.courses.join(CourseRate).order_by(Course.QUERY_ORDER())
     courses_paged = courses.paginate(page=page, per_page=per_page)
-    return render_template('teacher-profile.html', teacher=teacher, courses=courses_paged)
+    return render_template('teacher-profile.html', teacher=teacher, courses=courses_paged, title=teacher.name)
 
 @teacher.route('/<int:teacher_id>/profile_history/', methods=['GET'])
 @login_required
@@ -31,7 +31,7 @@ def profile_history(teacher_id):
         abort(404)
     if not current_user.is_admin and teacher.info_locked:
         abort(403)
-    return render_template('teacher-profile-history.html', teacher=teacher)
+    return render_template('teacher-profile-history.html', teacher=teacher, title='教师信息编辑历史 - ' + teacher.name)
 
 @teacher.route('/<int:teacher_id>/edit_profile/', methods=['GET','POST'])
 @login_required
@@ -64,13 +64,13 @@ def edit_profile(teacher_id):
         info_history.save(teacher, current_user) 
 
         return redirect(url_for('teacher.view_profile', teacher_id=teacher.id))
-    return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form)
+    return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form, title='编辑教师信息 - ' + teacher.name)
 
 def save_teacher_and_render_template(teacher):
     teacher.save()
     form = TeacherProfileForm(formdata=request.form, obj=teacher)
     errors = []
-    return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form)
+    return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form, title='编辑教师信息 - ' + teacher.name)
 
 @teacher.route('/<int:teacher_id>/lock_profile/', methods=['GET','POST'])
 @login_required

@@ -89,7 +89,7 @@ def signin():
     if request.args.get('ajax'):
         return jsonify(status=404, msg=error)
     else:
-        return render_template('signin.html',form=form, error=error)
+        return render_template('signin.html',form=form, error=error, title='登录')
 
 
 # 3rdparty signin should have url format: https://${icourse_site_url}/signin-3rdparty/?from_app=${from_app}&next_url=${next_url}&challenge=${challenge}
@@ -107,7 +107,7 @@ def signin_3rdparty():
     challenge = request.args.get('challenge')
     if not challenge:
         abort(400, description="challenge parameter not specified")
-    return render_template('signin-3rdparty.html', from_app=from_app, next_url=next_url, current_user=current_user, challenge=challenge)
+    return render_template('signin-3rdparty.html', from_app=from_app, next_url=next_url, current_user=current_user, challenge=challenge, title='第三方登录')
 
 
 @home.route('/verify-3rdparty-signin/', methods=['GET'])
@@ -168,11 +168,11 @@ def signup():
         user.save()
         #login_user(user)
         '''注册完毕后显示一个需要激活的页面'''
-        return render_template('feedback.html', status=True, message=_('我们已经向您发送了激活邮件，请在邮箱中点击激活链接。如果您没有收到邮件，有可能是在垃圾箱中。'))
+        return render_template('feedback.html', status=True, message=_('我们已经向您发送了激活邮件，请在邮箱中点击激活链接。如果您没有收到邮件，有可能是在垃圾箱中。'), title='注册')
 #TODO: log error
     if form.errors:
         print(form.errors)
-    return render_template('signup.html',form=form)
+    return render_template('signup.html', form=form, title='注册')
 
 
 @home.route('/confirm-email/')
@@ -206,7 +206,7 @@ def confirm_email():
         if not user.confirmed:
             print(email)
             send_confirm_mail(email)
-        return render_template('feedback.html', status=True, message=_('邮件已经发送，请查收！'))
+        return render_template('feedback.html', status=True, message=_('邮件已经发送，请查收！'), title='发送验证邮件')
     else:
         abort(404)
 
@@ -223,7 +223,7 @@ def change_password():
     if not current_user.is_authenticated:
         return redirect(url_for('home.signin'))
     send_reset_password_mail(current_user.email)
-    return render_template('feedback.html', status=True, message=_('密码重置邮件已经发送。'))
+    return render_template('feedback.html', status=True, message=_('密码重置邮件已经发送。'), title='修改密码')
 
 
 @home.route('/reset-password/', methods=['GET','POST'])
@@ -243,7 +243,7 @@ def forgot_password():
             message = _('此邮件地址尚未被注册。')
             status = False
         return render_template('feedback.html', status=status, message=message)
-    return render_template('forgot-password.html')
+    return render_template('forgot-password.html', title='忘记密码')
 
 @home.route('/reset-password/<string:token>/', methods=['GET','POST'])
 def reset_password(token):
@@ -263,7 +263,7 @@ def reset_password(token):
         logout_user()
         flash('密码已经修改，请使用新密码登录。')
         return redirect(url_for('home.signin'))
-    return render_template('reset-password.html',form=form)
+    return render_template('reset-password.html', form=form, title='重设密码')
 
 
 class MyPagination(object):
@@ -466,34 +466,34 @@ def about():
     num_users = User.query.count()
     review_count = Review.query.count()
     course_count = CourseRate.query.filter(CourseRate.review_count > 0).count()
-    return render_template('about.html', running_days=running_days, num_users=num_users, review_count=review_count, course_count=course_count)
+    return render_template('about.html', running_days=running_days, num_users=num_users, review_count=review_count, course_count=course_count, title='关于我们')
 
 
 @home.route('/report-review/')
 def report_review():
     '''report inappropriate review'''
 
-    return render_template('report-review.html')
+    return render_template('report-review.html', title='投诉点评')
 
 
 @home.route('/community-rules/')
 def community_rules():
     '''社区规范页面'''
 
-    return render_template('community-rules.html')
+    return render_template('community-rules.html', title='社区规范')
 
 
 @home.route('/report-bug/')
 def report_bug():
     ''' 报bug表单 '''
 
-    return render_template('report-bug.html')
+    return render_template('report-bug.html', title='报 bug')
 
 
 @home.route('/not_found/')
 def not_found():
     '''返回404页面'''
-    return render_template('404.html')
+    return render_template('404.html', title='404')
 
 
 @home.route('/songshu/')

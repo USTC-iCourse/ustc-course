@@ -43,7 +43,7 @@ def index():
     # find the distribution of course rates
     course_rates = db.session.query(func.floor(CourseRate._rate_average).label('rate'), func.count(func.floor(CourseRate._rate_average)).label('count')).filter(CourseRate._rate_average > 0).group_by(db.text('rate')).order_by(db.text('rate')).all()
 
-    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=today)
+    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=today, title='站点统计')
 
 
 @stats.route('/rankings/')
@@ -162,7 +162,7 @@ def view_ranking():
                              .order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc())
                              .limit(topk_count).all())
 
-    return render_template('ranking.html', topk_count=topk_count, default_show_count=default_show_count, stats=stats, teachers=teacher_rank, users=user_rank, reviews=review_rank, long_reviews=review_length_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses, date=today, this_module='stats.view_ranking')
+    return render_template('ranking.html', topk_count=topk_count, default_show_count=default_show_count, stats=stats, teachers=teacher_rank, users=user_rank, reviews=review_rank, long_reviews=review_length_rank, top_rated_courses=top_rated_courses, worst_rated_courses=worst_rated_courses, popular_courses=popular_courses, date=today, this_module='stats.view_ranking', title='排行榜')
 
 
 def date_to_term(date):
@@ -230,13 +230,13 @@ def stats_history():
     course_rate_subquery = db.session.query(func.floor(func.avg(Review.rate)).label('rate')).filter(Review.publish_time < date).group_by(Review.course_id)
     course_rates = db.session.query(db.text('rate'), func.count(db.text('rate')).label('count')).select_from(course_rate_subquery).group_by(db.text('rate')).order_by(db.text('rate')).all()
 
-    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=date_str)
+    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=date_str, title='站点统计历史')
 
 
 @stats.route('/rankings-history-list/', methods=['GET'])
 def rankings_history():
     history_files = get_rankings_history_file_list()
-    return render_template('rankings-history.html', history_files=history_files)
+    return render_template('rankings-history.html', history_files=history_files, title='排行榜历史')
 
 
 @stats.route('/rankings-history/<path:path>', methods=['GET'])

@@ -132,7 +132,7 @@ def view_course(course_id):
     return render_template('course.html', course=course, course_rate = course.course_rate, reviews=reviews,
             related_courses=related_courses, teacher=teacher, same_teacher_courses=same_teacher_courses,
             user=current_user, sort_by=ordering, term=term, rating=rating, sort_dict=sort_dict,
-            review_num=review_num, _anchor='my_anchor')
+            review_num=review_num, _anchor='my_anchor', title=course.name_with_teachers_short)
 
 
 
@@ -242,7 +242,7 @@ def student_courses(id):
         courses_page = student.courses_joined.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page=page,per_page=per_page)
         return render_template('list-courses.html',student=student,courses=courses_page)
     else:
-        return render_template('feedback.html',status=False,message=_('We cant\'t find the User!'))
+        return render_template('feedback.html',status=False,message=_('We can\'t find the User!'))
 
 @course.route('/t/<int:id>/')
 def teacher_courses(id):
@@ -253,7 +253,7 @@ def teacher_courses(id):
         courses_page = teacher.courses.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page=page,per_page=per_page)
         return render_template('list-courses.html',teacher=teacher,courses=courses_page)
     else:
-        return render_template('feedback.html',status=False,message=_('We cant\'t find the User!'))
+        return render_template('feedback.html',status=False,message=_('We can\'t find the User!'))
 
 @course.route('/c/<string:name>/')
 def same_name_courses(name):
@@ -293,7 +293,7 @@ def profile_history(course_id):
     course = Course.query.get(course_id)
     if not course:
         abort(404)
-    return render_template('course-profile-history.html', course=course)
+    return render_template('course-profile-history.html', course=course, title='课程信息编辑历史 - ' + course.name_with_teachers_short)
 
 
 @course.route('/new/',methods=['GET','POST'])
@@ -321,7 +321,7 @@ def edit_course(course_id=None):
 
         db.session.commit()
         return redirect(url_for('course.view_course', course_id=course.id))
-    return render_template('course-edit.html', form=course_form, course=course)
+    return render_template('course-edit.html', form=course_form, course=course, title='编辑课程信息 - ' + course.name_with_teachers_short)
 
 
 @course.route('/<int:course_id>/remove_teacher/', methods=['POST'])

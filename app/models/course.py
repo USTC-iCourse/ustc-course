@@ -234,12 +234,19 @@ class Course(db.Model):
         return Markup('<a href="' + self.url + '">') + Markup.escape(self.name + teacher_names) + Markup('</a>')
 
     @property
-    def short_link(self):
+    def teacher_names_bracket_short(self):
         if self.teachers_count > 0:
-            teacher_names = '（' + self.teacher_names_display_short + '）'
+            return '（' + self.teacher_names_display_short + '）'
         else:
-            teacher_names = ''
-        return Markup('<a href="' + self.url + '">') + Markup.escape(self.name + teacher_names) + Markup('</a>')
+            return ''
+
+    @property
+    def short_link(self):
+        return Markup('<a href="' + self.url + '">') + Markup.escape(self.name + self.teacher_names_bracket_short) + Markup('</a>')
+
+    @property
+    def name_with_teachers_short(self):
+        return self.name + self.teacher_names_bracket_short
 
     @property
     def dept(self):
