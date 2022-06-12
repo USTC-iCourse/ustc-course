@@ -16,7 +16,7 @@ def restrict_to_admins():
 def set_banner():
     banner = Banner.query.order_by(Banner.publish_time.desc()).first()
     banner_history = Banner.query.order_by(Banner.publish_time.desc()).all()
-    return render_template('banner-edit.html', form=BannerForm(), banner=banner, banner_history=banner_history)
+    return render_template('banner-edit.html', form=BannerForm(), banner=banner, banner_history=banner_history, title='Banner 设置')
 
 @admin.route('/admin/set-banner-post/', methods=['POST'])
 @login_required

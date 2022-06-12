@@ -21,7 +21,8 @@ def view_profile(teacher_id):
     per_page = request.args.get('per_page', 10000, type=int)
     courses = teacher.courses.join(CourseRate).order_by(Course.QUERY_ORDER())
     courses_paged = courses.paginate(page=page, per_page=per_page)
-    return render_template('teacher-profile.html', teacher=teacher, courses=courses_paged, title=teacher.name)
+    return render_template('teacher-profile.html', teacher=teacher, courses=courses_paged, title=teacher.name,
+                           description=teacher.name + '共有 ' + str(courses_paged.total) + ' 门课程')
 
 @teacher.route('/<int:teacher_id>/profile_history/', methods=['GET'])
 @login_required

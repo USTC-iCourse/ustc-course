@@ -23,7 +23,8 @@ def view_profile(user_id):
                            user=user,
                            info=(user.info if user.is_student else None),
                            current_user=current_user,
-                           title=user.username)
+                           title=user.username,
+                           description=user.username + ' 写了 ' + str(user.reviews_count) + ' 条点评，关注了 ' + str(user.courses_following_count) + ' 门课')
 
 @user.route('/<int:user_id>/reviews')
 def reviews(user_id):
@@ -36,7 +37,8 @@ def reviews(user_id):
     return render_template('user-reviews.html',
                            user=user,
                            info=(user.info if user.is_student else None),
-                           title=user.username + ' 的点评')
+                           title=user.username + ' 的点评',
+                           description=user.username + ' 写了 ' + str(user.reviews_count) + ' 条点评')
 
 
 @user.route('/<int:user_id>/follow-course')
@@ -51,7 +53,8 @@ def follow_course(user_id):
                            user=user,
                            courses=user.courses_following,
                            info=(user.info if user.is_student else None),
-                           title=user.username + ' 的关注')
+                           title=user.username + ' 的关注',
+                           description=user.username + ' 关注了 ' + str(user.courses_following_count) + ' 门课程')
 
 
 @user.route('/<int:user_id>/join-course')
@@ -67,7 +70,8 @@ def join_course(user_id):
                            user=user,
                            courses=user.courses_joined,
                            info=(user.info if user.is_student else None),
-                           title=user.username + ' 学过的课程')
+                           title=user.username + ' 学过的课程',
+                           description=user.username + ' 学过 ' + str(len(user.courses_joined)) + ' 门课')
 
 
 
@@ -185,7 +189,8 @@ def followers(user_id):
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('followers.html',
-                           user=user, title=user.username + ' 被关注')
+                           user=user, title=user.username + ' 被关注',
+                           description=user.username + ' 被 ' + str(user.follower_count) +  ' 人关注')
 
 
 @user.route('/<int:user_id>/followings')
@@ -197,7 +202,8 @@ def followings(user_id):
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('followings.html',
-                           user=user, title=user.username + ' 关注的人')
+                           user=user, title=user.username + ' 关注的人',
+                           description=user.username + ' 关注了 ' + str(user.following_count) +  ' 人')
 
 @user.route('/<int:user_id>/feed/<string:validation_code>')
 def notice_rss(user_id, validation_code):

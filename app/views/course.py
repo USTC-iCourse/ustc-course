@@ -132,7 +132,9 @@ def view_course(course_id):
     return render_template('course.html', course=course, course_rate = course.course_rate, reviews=reviews,
             related_courses=related_courses, teacher=teacher, same_teacher_courses=same_teacher_courses,
             user=current_user, sort_by=ordering, term=term, rating=rating, sort_dict=sort_dict,
-            review_num=review_num, _anchor='my_anchor', title=course.name_with_teachers_short)
+            review_num=review_num, _anchor='my_anchor',
+            title=course.name_with_teachers_short,
+            description=str(course.rate.average_rate) + ' 分，' + str(course.rate.review_count) + ' 人评价')
 
 
 
