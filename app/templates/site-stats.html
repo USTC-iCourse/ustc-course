@@ -245,7 +245,7 @@ Highcharts.chart('course-rate-dist', {
 <script>
 Highcharts.chart('num-reviews-per-course', {
     chart: {
-        type: 'column'
+        type: 'line'
     },
     exporting: {
         filename: 'num-reviews-per-course'
@@ -264,20 +264,22 @@ Highcharts.chart('num-reviews-per-course', {
         ],
         crosshair: true
     },
-    yAxis: {
+    yAxis: [{
         min: 0,
         title: {
             text: '课程数量'
         }
-    },
+    }],
     tooltip: {
-	headerFormat: '<table>',
-	pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
-            '<td style="padding:0"><b>{point.y}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 门课程有 </td>',
-        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 个点评</td>' +
-	    '</tr></table>',
+        formatter: function() {
+            var s = [];
+            $.each(this.points, function(i, point) {
+                s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                       point.series.name.replace('N', '<strong>' + point.x + '</strong>') + ': ' +
+                       '<strong>' + point.y + '</strong><br>');
+            });
+            return s.reverse().join('');
+        },
         shared: true,
         useHTML: true
     },
@@ -288,12 +290,26 @@ Highcharts.chart('num-reviews-per-course', {
         }
     },
     series: [{
-	name: '一门课的点评数量',
+        name: '恰好有N个点评的课程数',
         data: [
         {% for tuple in course_review_count_dist %}
-	{{ tuple[1] }},
+        {{ tuple[1] }},
         {% endfor %}
-	]
+	    ]
+    }, {
+        name: '至少有N个点评的课程数',
+        color: '#fd7e14',
+        data: [
+        {% set total = namespace(value=0) %}
+        {% for tuple in course_review_count_dist %}
+        {% set total.value = total.value + tuple[1] %}
+        {% endfor %}
+
+        {% for tuple in course_review_count_dist %}
+        {{ total.value }},
+        {% set total.value = total.value - tuple[1] %}
+        {% endfor %}
+        ]
     }]
 });
 </script>
@@ -310,7 +326,7 @@ Highcharts.chart('num-reviews-per-course', {
 <script>
 Highcharts.chart('num-reviews-per-user', {
     chart: {
-        type: 'column'
+        type: 'line'
     },
     exporting: {
         filename: 'num-reviews-per-user'
@@ -329,20 +345,22 @@ Highcharts.chart('num-reviews-per-user', {
         ],
         crosshair: true
     },
-    yAxis: {
+    yAxis: [{
         min: 0,
         title: {
             text: '用户数量'
         }
-    },
+    }],
     tooltip: {
-	headerFormat: '<table>',
-	pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
-            '<td style="padding:0"><b>{point.y}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 个用户写了 </td>',
-        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 个点评</td>' +
-	    '</tr></table>',
+        formatter: function() {
+            var s = [];
+            $.each(this.points, function(i, point) {
+                s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                       point.series.name.replace('N', '<strong>' + point.x + '</strong>') + ': ' +
+                       '<strong>' + point.y + '</strong><br>');
+            });
+            return s.reverse().join('');
+        },
         shared: true,
         useHTML: true
     },
@@ -353,12 +371,26 @@ Highcharts.chart('num-reviews-per-user', {
         }
     },
     series: [{
-	name: '一个用户写的点评数量',
+        name: '恰好写了N个点评的用户数',
         data: [
         {% for tuple in user_review_count_dist %}
-	{{ tuple[1] }},
+        {{ tuple[1] }},
         {% endfor %}
-	]
+	    ]
+    }, {
+        name: '至少写了N个点评的用户数',
+        color: '#fd7e14',
+        data: [
+        {% set total = namespace(value=0) %}
+        {% for tuple in user_review_count_dist %}
+        {% set total.value = total.value + tuple[1] %}
+        {% endfor %}
+
+        {% for tuple in user_review_count_dist %}
+        {{ total.value }},
+        {% set total.value = total.value - tuple[1] %}
+        {% endfor %}
+        ]
     }]
 });
 </script>
