@@ -225,6 +225,7 @@
               <span class="glyphicon glyphicon-comment {{ 'blue' if review.comments else 'grey' }} left-pd-md" aria-hidden="true"></span>
               <span id="review-comment-count-{{review.id}}">{{ review.comment_count }}</span>
             </a>
+            <span class="left-pd-md small review-links" style="cursor:pointer;" data-clipboard-action="copy" data-clipboard-text="{{ url_for('course.view_course', course_id=course.id, _external=True) }}#review-{{ review.id }}" data-toggle="tooltip" data-trigger="click" data-placement="top" title="链接已复制">复制链接</span>
             <span class="pull-right">
               {% if review.author == user %}
               <a class="nounderline desktop" href="{{ url_for('course.new_review',course_id=course.id) }}">
@@ -232,7 +233,7 @@
                 编辑
               </a>
               {% endif %}
-              {% if review.author == user or user.is_admin %}
+              {% if review.author == user %}
               <a class="nounderline" href="javascript: delete_review({{ review.id }})">
                 <span class="glyphicon glyphicon-trash grey left-pd-md small" aria-hidden="true"></span>
                 删除
