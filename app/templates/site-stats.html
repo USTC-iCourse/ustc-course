@@ -273,12 +273,13 @@ Highcharts.chart('num-reviews-per-course', {
     tooltip: {
         formatter: function() {
             var s = [];
-            $.each(this.points, function(i, point) {
-                s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
-                       point.series.name.replace('N', '<strong>' + point.x + '</strong>') + ': ' +
-                       '<strong>' + point.y + '</strong><br>');
-            });
-            return s.reverse().join('');
+            var point = this.points[1];
+            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                   '<strong>' + point.y + '</strong> 门课程有<strong>至少 ' + point.x + '</strong> 条点评<br>');
+            point = this.points[0];
+            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                   '<strong>' + point.y + '</strong> 门课程有<strong>恰好 ' + point.x + '</strong> 条点评<br>');
+            return s.join('');
         },
         shared: true,
         useHTML: true
@@ -291,6 +292,7 @@ Highcharts.chart('num-reviews-per-course', {
     },
     series: [{
         name: '恰好有N个点评的课程数',
+        type: 'column',
         data: [
         {% for tuple in course_review_count_dist %}
         {{ tuple[1] }},
@@ -298,6 +300,7 @@ Highcharts.chart('num-reviews-per-course', {
 	    ]
     }, {
         name: '至少有N个点评的课程数',
+        type: 'spline',
         color: '#fd7e14',
         data: [
         {% set total = namespace(value=0) %}
@@ -354,12 +357,13 @@ Highcharts.chart('num-reviews-per-user', {
     tooltip: {
         formatter: function() {
             var s = [];
-            $.each(this.points, function(i, point) {
-                s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
-                       point.series.name.replace('N', '<strong>' + point.x + '</strong>') + ': ' +
-                       '<strong>' + point.y + '</strong><br>');
-            });
-            return s.reverse().join('');
+            var point = this.points[1];
+            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                   '<strong>' + point.y + '</strong> 个用户写了<strong>至少 ' + point.x + '</strong> 条点评<br>');
+            point = this.points[0];
+            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                   '<strong>' + point.y + '</strong> 个用户写了<strong>恰好 ' + point.x + '</strong> 条点评<br>');
+            return s.join('');
         },
         shared: true,
         useHTML: true
@@ -371,6 +375,7 @@ Highcharts.chart('num-reviews-per-user', {
         }
     },
     series: [{
+        type: 'column',
         name: '恰好写了N个点评的用户数',
         data: [
         {% for tuple in user_review_count_dist %}
@@ -378,6 +383,7 @@ Highcharts.chart('num-reviews-per-user', {
         {% endfor %}
 	    ]
     }, {
+        type: 'spline',
         name: '至少写了N个点评的用户数',
         color: '#fd7e14',
         data: [
