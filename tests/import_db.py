@@ -5,6 +5,7 @@ sys.path.append('..')  # fix import directory
 from app import app, db
 from app.models import *
 from datetime import datetime
+import json
 
 BASEDIR = '../data/misteach'
 
@@ -42,6 +43,42 @@ def load_depts():
         dept.name = c['DWMC']
         dept.name_eng = c['YWMC']
         dept.code = c['DWBH']
+
+        if not dept.id in depts_map:
+            db.session.add(dept)
+            depts_map[dept.id] = dept
+
+        count+=1
+        depts_code_map[dept.code] = dept
+
+    db.session.commit()
+    print('%d departments loaded' % count)
+
+def load_depts_sustech():
+    existing_depts = Dept.query.all()
+    for dept in existing_depts:
+        depts_map[dept.id] = dept
+
+    # SAMPLE
+    # {
+    #     "YXDM": "001",
+    #     "YXMC_EN": "General Education Department",
+    #     "YXMC": "通识与学科基础部"
+    # },
+
+    count = 0
+    depts_json = open('depts.json')
+    depts_json_data = json.load(depts_json)
+
+    for c in depts_json_data: #prase json
+        if int(c['YXDM']) in depts_map:
+            dept = depts_map[int(c['YXDM'])]
+        else:
+            dept = Dept()
+            dept.id = int(c['YXDM'])
+        dept.name = c['YXMC']
+        dept.name_eng = c['YXMC_EN']
+        dept.code = c['YXDM']
 
         if not dept.id in depts_map:
             db.session.add(dept)
@@ -574,15 +611,16 @@ def load_grad_join_course():
 
 
 # we have merge now, do not drop existing data
-db.create_all()
-load_depts()
-load_classes()
-load_majors()
-load_titles()
-load_teachers()
-load_courses()
-load_students()
-load_course_locations()
-load_join_course()
-load_grad_students()
-load_grad_join_course()
+# db.create_all()
+# load_depts()
+# load_classes()
+# load_majors()
+# load_titles()
+# load_teachers()
+# load_courses()
+# load_students()
+# load_course_locations()
+# load_join_course()
+# load_grad_students()
+# load_grad_join_course()
+load_depts_sustech()

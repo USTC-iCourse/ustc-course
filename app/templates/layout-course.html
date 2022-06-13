@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="关于课程 {{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display }}）{% endif %} ({{ course.courseries }}) 的评价 ——南方科技大学牛蛙课程评价社区 Niuwa Curriculum Evaluation System">
+    <meta name="keywords" content="{{ course.name }},{{ course.courseries }},SUSTECH,评课,课程">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/image/favicon.ico">
+
+    <title>{{ course.name }} ({{ course.courseries }}) - NCES</title>
+
+    <link href="https://code.bdstatic.com/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/style.css?ver=20180122" rel="stylesheet">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FBM6EFBDSN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-FBM6EFBDSN');
+    </script>
+
+    {% block head %}
+    {% endblock %}
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bytedance.com/cdn/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://cdn.bytedance.com/cdn/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+
+<body>
+  <div id="wrap">
+  <nav class="navbar navbar-default">
+    <div class="container">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        {% if current_user.is_authenticated %}
+        <button type="button" class="mobile btn btn-default navbar-btn pull-right right-mg-md" style="outline:none" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          {{ current_user.username }} <span class="caret"></span>
+        </button>
+        {% else %}
+        <button type="button" class="mobile btn btn-default navbar-btn pull-right right-mg-md" style="outline:none" data-toggle="modal" data-target="#signin">登录</button>
+        {% endif %}
+        <a class="navbar-brand" href="{{ url_for('home.index') }}">Niuwa Curriculum Evaluation System</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav desktop">
+          <li {% if this_module and (this_module=='home.latest_reviews' or this_module=='home.search_reviews') %}class="active"{% endif %}><a href="{{ url_for('home.latest_reviews') }}">点评</a></li>
+	  <li {% if this_module and (this_module=='course.index' or this_module=='home.search') %}class="active"{% endif %}><a href="{{ url_for('course.index') }}">课程</a></li>
+          {% if current_user.is_authenticated %}
+          <li {% if this_module and this_module=='home.follow_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
+          {% endif %}
+          <li><a href="https://www.cra.moe/" target="_blank">更多服务</a></li>
+        </ul>
+
+	{% if this_module == 'home.search_reviews' %}
+        <form class="navbar-form navbar-left desktop" action="{{ url_for('home.search_reviews') }}" method="get" role="search">
+	{% else %}
+        <form class="navbar-form navbar-left desktop" action="{{ url_for('home.search') }}" method="get" role="search">
+	{% endif %}
+          <div class="form-group">
+            <input type="text" name="q" class="form-control" id="search" placeholder="搜索课程名称、老师" style="width: 235px" value="{{ keyword or '' }}">
+          </div>
+          <span class="desktop-wide">
+            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search grey"></span></button>
+          </span>
+        </form>
+
+        <ul class="nav navbar-nav navbar-right desktop">
+          {% if current_user.is_authenticated %}
+          <li id="dropdown-notice">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" onclick="read_notification({{ current_user.unread_notification_count }})">消息
+              {% if current_user.unread_notification_count > 0 %}
+              <span class="badge notice-number-box">{{ current_user.unread_notification_count }}</span>
+              {% endif %}
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              {% if current_user.latest_notifications_text|length == 0 %}
+              <p>还没有消息哦！</p>
+              {% endif %}
+              {% for notification_text in current_user.latest_notifications_text %}
+              <li class="ud-pd-sm dashed">
+                <div class="notice">{{ notification_text|safe }}</div>
+              </li>
+              {% endfor %}
+              <li class="ud-pd-sm pull-right"><a class="blue" href="{{ url_for('user.notice')}}">查看全部</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="{{ url_for('user.view_profile', user_id=current_user.id) }}">个人主页</a></li>
+              <li><a href="{{ url_for('user.account_settings') }}">设置</a></li>
+              <li class="divider"></li>
+              <li><a href="{{ url_for('home.logout') }}">退出</a></li>
+            </ul>
+          </li>
+          {% else %}
+          <li><button type="button" class="btn btn-default navbar-btn left-mg-md" data-toggle="modal" data-target="#signin">登录</button></li>
+          {% endif %}
+        </ul>
+
+        {% if current_user.is_authenticated %}
+        <ul class="nav navbar-nav navbar-right mobile">
+          <li class="mobile"><a href="{{ url_for('user.notice') }}">消息
+	    {% if current_user.unread_notification_count %}
+	    <span class="badge notice-number-box">{{ current_user.unread_notification_count }}</span>
+            {% endif %}
+            </a></li>
+          <li><a href="{{ url_for('user.view_profile', user_id=current_user.id) }}">个人主页</a></li>
+          <li><a href="{{ url_for('user.account_settings', user_id=current_user.id) }}">设置</a></li>
+          <li class="divider"></li>
+          <li><a href="{{ url_for('home.logout') }}">退出</a></li>
+        </ul>
+        {% endif %}
+      </div><!--/.nav-collapse -->
+    </div>
+  </nav>
+
+  {% if not current_user.is_authenticated %}
+  <div class="modal fade" id="signin" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-signin">
+      <div class="modal-content">
+        <form id="signin-form" class="form-signin">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="form-signin-heading">
+            <span class="h2">请登录</span>
+            <a class="btn btn-default float-right" href="/signup">注册</a>
+          </div>
+          <div id="signin-alert" role="alert" class="display: none"></div>
+          <label for="inputEmail" class="sr-only">用户名</label>
+          <input type="text" name="username" id="inputEmail" class="form-control" placeholder="用户名或邮箱" required autofocus>
+          <label for="inputPassword" class="sr-only">密码</label>
+          <input type="password" name="password" id="inputPassword" class="form-control" placeholder="密码" required>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="remember">记住我
+            </label>
+            <a class="float-right" href="{{ url_for('home.forgot_password') }}">忘记密码</a>
+          </div>
+          <button class="btn btn-lg btn-blue btn-block" type="submit">登录</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+<!--  &lt;!&ndash; banner &ndash;&gt;-->
+<!--  <div class="container">-->
+<!--    <div class="text-center banner mobile">-->
+<!--      评课社区姊妹网站 - 导师评价网 <a href="https://pi-review.com/">PI Review</a> 上线！-->
+<!--    </div>-->
+
+<!--    <div class="text-center banner desktop">-->
+<!--      好消息, 评课社区姊妹网站 - 研究生导师评价网 <a href="https://pi-review.com/">PI Review</a> 上线！-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  &lt;!&ndash; end banner &ndash;&gt;-->
+
+
+  {% block content %}
+  {% endblock %}
+  <div id="push"></div>
+  </div><!-- ./wrap -->
+{% include 'common-footer.html' %}
+</body>
+
+
+
+
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://code.bdstatic.com/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+  <script src="https://code.bdstatic.com/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+<!--  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML"></script>-->
+  {% include 'common-scripts.html' %}
+  <script>
+   $('#signin').on('shown.bs.modal', function () {
+     $('#inputEmail').focus()
+   });
+
+   function signin_alert(msg, type) {
+     if (!type)
+       type = "danger";
+     $('#signin-alert').attr("class", "alert alert-" + type);
+     $('#signin-alert').html(msg);
+     $('#signin-alert').show();
+   }
+
+   $('#signin-form').submit(function(e) {
+     e.preventDefault();
+     var formdata = {}
+     $('#signin-form input').each(function() {
+       formdata[$(this).attr("name")] = $(this).val();
+     });
+     $.ajax({
+       type: "POST",
+       url: "{{ url_for('home.signin', next=request.path, ajax=True) | safe }}",
+       data: formdata,
+       dataType: "json",
+       success: function(res) {
+         if (res.status == 200) {
+           if (res.next)
+             window.location.href = res.next;
+           else
+             signin_alert(res.msg, "success");
+         } else {
+           signin_alert(res.msg);
+         }
+       },
+       error: function(e) {
+         signin_alert('天了噜! 服务器正在睡觉，请稍后再试。', "warning");
+       }
+     })
+   });
+
+   function read_notification(count) {
+     if (count == 0)
+         return;
+     $.ajax({
+        type: "POST",
+        url: "{{ url_for('api.read_notifications') }}",
+     });
+   }
+  </script>
+
+  {% block script %} {% endblock %}
+</html>

@@ -192,11 +192,18 @@ def unfollow_user():
 
 def generic_upload(file, type):
     ok,message = handle_upload(file, type)
+    upload_success_json = {}
+    upload_success_json['uploaded']= 'true'
+
+
+
     script_head = '<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(2,'
     script_tail = ');</script>'
     if ok:
         url = '/uploads/' + type + 's/' + message
-        return script_head + '"' + url + '"' + script_tail
+        upload_success_json['url'] = url
+        # return script_head + '"' + url + '"' + script_tail
+        return upload_success_json
     else:
         return script_head + '""' + ',' + '"' + message + '"' + script_tail
 

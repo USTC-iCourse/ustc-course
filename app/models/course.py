@@ -161,6 +161,8 @@ class Course(db.Model):
     name = db.Column(db.String(80), index=True) # 课程名称
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
 
+    course_code = db.Column(db.String(80), index=True) #CS102A
+
     introduction = db.Column(db.Text) # 老师提交的课程简介
     admin_announcement = db.Column(db.Text)
     homepage = db.Column(db.Text) # 课程主页

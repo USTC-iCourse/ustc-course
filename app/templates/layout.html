@@ -13,7 +13,7 @@
         {% else %}
         <button type="button" class="mobile btn btn-default navbar-btn pull-right right-mg-md" style="outline:none" data-toggle="modal" data-target="#signin">登录</button>
         {% endif %}
-        <a class="navbar-brand" href="{{ url_for('home.index') }}">USTC评课社区</a>
+        <a class="navbar-brand" href="{{ url_for('home.index') }}">Niuwa Curriculum Evaluation System</a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -24,7 +24,7 @@
           {% if current_user.is_authenticated %}
           <li {% if this_module and this_module=='home.follow_reviews' %}class="active"{% endif %}><a href="{{ url_for('home.follow_reviews') }}">关注</a></li>
           {% endif %}
-          <li><a href="https://pi-review.com/universities/257" target="_blank">导师</a></li>
+          <li><a href="https://www.cra.moe/" target="_blank">更多服务</a></li>
         </ul>
 
 	{% if this_module == 'home.search_reviews' %}
@@ -33,7 +33,7 @@
         <form class="navbar-form navbar-left desktop" action="{{ url_for('home.search') }}" method="get" role="search">
 	{% endif %}
           <div class="form-group">
-            <input type="text" name="q" class="form-control" id="search" placeholder="搜索课程、老师" style="width: 235px" value="{{ keyword or '' }}">
+            <input type="text" name="q" class="form-control" id="search" placeholder="搜索课程名称、老师" style="width: 235px" value="{{ keyword or '' }}">
           </div>
           <span class="desktop-wide">
             <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search grey"></span></button>
@@ -120,19 +120,18 @@
   </div>
   {% endif %}
 
-    <!-- banner -->
-    {% if banner %}
-    <div class="container">
-      {% if banner.mobile %}
-      <div class="text-center banner mobile">{{ banner.mobile|safe }}</div>
-      {% endif %}
+<!--  &lt;!&ndash; banner &ndash;&gt;-->
+<!--  <div class="container">-->
+<!--    <div class="text-center banner mobile">-->
+<!--      评课社区姊妹网站 - 导师评价网 <a href="https://pi-review.com/">PI Review</a> 上线！-->
+<!--    </div>-->
 
-      {% if banner.desktop %}
-      <div class="text-center banner desktop">{{ banner.desktop|safe }}</div>
-      {% endif %}
-    </div>
-    <!-- end banner -->
-    {% endif %}
+<!--    <div class="text-center banner desktop">-->
+<!--      好消息, 评课社区姊妹网站 - 研究生导师评价网 <a href="https://pi-review.com/">PI Review</a> 上线！-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  &lt;!&ndash; end banner &ndash;&gt;-->
+
 
   {% block content %}
   {% endblock %}
@@ -147,10 +146,10 @@
   <!-- Bootstrap core JavaScript
   ================================================== -->
   <!-- Placed at the end of the document so the pages load faster -->
-  <script src="/static/js/jquery.min.js"></script>
-  <script src="/static/js/bootstrap.min.js"></script>
-  <script src="/static/js/clipboard.min.js"></script>
-  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML"></script>
+  <script src="https://code.bdstatic.com/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+  <script src="https://code.bdstatic.com/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+  <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+<!--  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML"></script>-->
   {% include 'common-scripts.html' %}
   <script>
    $('#signin').on('shown.bs.modal', function () {

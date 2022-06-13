@@ -130,11 +130,11 @@ def bind_identity():
         return render_template('feedback.html',status=False,message=_('教师不能绑定学号！'), title='绑定学号')
     else:
         email_suffix = current_user.email.split('@')[-1]
-        if email_suffix == 'mail.ustc.edu.cn':
+        if email_suffix == 'mail.sustech.edu.cn':
             current_user.identity = 'Student'
             current_user.save()
             return redirect(url_for('.bind_identity'))
-        elif email_suffix == 'ustc.edu.cn':
+        elif email_suffix == 'sustech.edu.cn':
             current_user.identity = 'Teacher'
             current_user.save()
             return redirect(url_for('.bind_identity'))

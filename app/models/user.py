@@ -238,8 +238,8 @@ class User(db.Model, UserMixin):
 
     @classmethod
     def authenticate_email(cls, email, password):
-        expanded_email_student = email + '@mail.ustc.edu.cn'
-        expanded_email_teacher = email + '@ustc.edu.cn'
+        expanded_email_student = email + '@mail.sustech.edu.cn'
+        expanded_email_teacher = email + '@sustech.edu.cn'
         user = cls.query.filter(db.or_(User.email == email,
                                        User.email == expanded_email_student,
                                        User.email == expanded_email_teacher)).first()

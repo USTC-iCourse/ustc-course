@@ -1,6 +1,8 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, follow_course, follow_user, SearchLog
+
+from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, follow_course, follow_user, SearchLog, CourseTerm
+
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -155,9 +157,9 @@ def signup():
         password = request.form.get('password')
         user = User(username=username, email=email,password=password)
         email_suffix = email.split('@')[-1]
-        if email_suffix == 'mail.ustc.edu.cn':
+        if email_suffix == 'mail.sustech.edu.cn':
             user.identity = 'Student'
-        elif email_suffix == 'ustc.edu.cn':
+        elif email_suffix == 'sustech.edu.cn':
             user.identity = 'Teacher'
             ok,message = user.bind_teacher(email)
             #TODO: deal with bind feedback
