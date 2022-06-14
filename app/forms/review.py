@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import (StringField, IntegerField, RadioField, TextAreaField)
+from wtforms import (StringField, IntegerField, RadioField, TextAreaField, BooleanField)
 from wtforms.validators import (InputRequired,NumberRange)
 
 from app.models import Review
@@ -13,6 +13,7 @@ class ReviewForm(FlaskForm):
     rate = IntegerField('rate',validators=[InputRequired(),NumberRange(1,10)])
     content = TextAreaField('content',validators=[InputRequired()])
     is_mobile = IntegerField('is_mobile')
+    is_ajax = BooleanField('is_ajax', default=False)
 
 class ReviewCommentForm(FlaskForm):
     review_id = IntegerField('review id',validators=[InputRequired()])

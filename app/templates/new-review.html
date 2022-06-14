@@ -79,6 +79,25 @@
 {% block script %}
 <script src="/static/js/star-rating.min.js" type="text/javascript"></script>
 <script>
+function submit_review() {
+    var url = "{{ url_for('course.new_review', course_id=course.id) }}";
+    var data = $('#review-form').serializeArray().reduce(function(obj, item) {
+        obj[item.name] = item.value;
+        return obj;
+    }, {});
+    data['is_ajax'] = true;
+    $.post(url, data, function(o) {
+        if (!o.ok) {
+            alert('Failed to submit review, please try again!');
+        } else {
+            // remove auto saved content
+            var autoSaveKey = window.location.pathname;
+            localStorage.removeItem(autoSaveKey);
+            window.location.href = o.next_url;
+        }
+    }, 'json');
+}
+
 $('#rate-star').rating({
     min: 0,
     max: 5,
@@ -155,6 +174,9 @@ $(function(){
             }
             */
             $('input[name=rate]').val(Math.round($('input[name=rate]').val() * 2));
+
+            e.preventDefault();
+            submit_review();
     });
 });
 </script>

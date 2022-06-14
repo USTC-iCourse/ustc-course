@@ -58,7 +58,12 @@ def new_review(course_id):
             else:
                 review.update_time = datetime.utcnow()
                 review.update_course_rate(old_review)
-            return redirect(url_for('course.view_course',course_id=course_id))
+
+            next_url = url_for('course.view_course', course_id=course_id, _external=True) + '#review-' + str(review.id)
+            if form.is_ajax:
+                return jsonify({'ok': True, 'next_url': next_url })
+            else:
+                return redirect(next_url)
         else: # invalid submission, try again
             message = '提交失败，请编辑后重新提交！'
 
@@ -68,7 +73,10 @@ def new_review(course_id):
         {'name': 'grading', 'display': '给分好坏', 'options': ['超好', '一般', '杀手'] },
         {'name': 'gain', 'display': '收获多少', 'options': ['很多', '一般', '没有'] },
     ]
-    return render_template('new-review.html', form=form, course=course, review=review, polls=polls, message=message, is_new=is_new, title='写点评')
+    if form.is_ajax.data:
+        return jsonify({'ok': False})
+    else:
+        return render_template('new-review.html', form=form, course=course, review=review, polls=polls, message=message, is_new=is_new, title='写点评')
 
 
 @review.route('/delete/',methods=['POST'])
