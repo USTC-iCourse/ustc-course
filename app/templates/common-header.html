@@ -9,7 +9,7 @@
     <meta name="author" content="jenny42,aaron1992,boj">
     <link rel="icon" href="/static/image/favicon.ico">
 
-    <title>{% if title %}{{ title }} - {% endif %}USTC评课社区</title>
+    <title>{% if title and not hide_title %}{{ title }} - {% endif %}USTC评课社区</title>
 
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/style.css?ver=20220605" rel="stylesheet">

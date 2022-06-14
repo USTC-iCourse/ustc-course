@@ -32,7 +32,7 @@ def latest_reviews():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     reviews_paged = Review.query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
-    return render_template('latest-reviews.html', reviews=reviews_paged, title='全站最新点评', this_module='home.latest_reviews')
+    return render_template('latest-reviews.html', reviews=reviews_paged, title='全站最新点评', this_module='home.latest_reviews', hide_title=True)
 
 @home.route('/feed.xml')
 def latest_reviews_rss():
