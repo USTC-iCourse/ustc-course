@@ -37,7 +37,8 @@ def send_confirm_mail(email):
         'home.confirm_email',
         action='confirm',
         token=token,
-        _external=True)
+        _external=True,
+        _scheme='https')
     html = render_template('email/activate.html',
             confirm_url = confirm_url)
 
@@ -51,7 +52,8 @@ def send_reset_password_mail(email):
     reset_url = url_for(
         'home.reset_password',
         token=token,
-        _external=True)
+        _external=True,
+        _scheme='https')
     html = render_template('email/reset-password.html',
             reset_url = reset_url)
 
