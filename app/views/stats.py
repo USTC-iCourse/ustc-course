@@ -22,6 +22,9 @@ def index():
     site_stat['course_avg_rate'] = db.session.query(db.func.avg(Review.rate)).first()[0]
     site_stat['course_avg_rate_count'] = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).first()[0]
 
+    first_user = User.query.order_by(User.register_time).limit(1).first()
+    today = datetime.now()
+    site_stat['running_days'] = (today - first_user.register_time).days
 
     # find the distribution of the number of reviews per course
     course_review_counts = db.session.query(func.count(Review.id).label('review_count')).group_by(Review.course_id).subquery()
