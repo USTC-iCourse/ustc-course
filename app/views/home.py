@@ -8,10 +8,20 @@ from datetime import datetime
 from sqlalchemy import union, or_
 from sqlalchemy.sql.expression import literal_column, text
 from app import db
+from app import app
 from .course import deptlist
 import re
 
 home = Blueprint('home',__name__)
+
+def gen_index_url():
+    if 'DEBUG' in app.config and app.config['DEBUG']:
+        return url_for('home.index', _external=True)
+    else:
+        return url_for('home.index', _external=True, _scheme='https')
+
+def redirect_to_index():
+    return redirect(gen_index_url())
 
 @home.route('/')
 def index():
@@ -35,7 +45,7 @@ def latest_reviews_rss():
 @home.route('/follow_reviews')
 def follow_reviews():
     if not current_user.is_authenticated:
-        return redirect(url_for('home.latest_reviews', _external=True))
+        return redirect(url_for('home.latest_reviews', _external=True, _scheme='https'))
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     follow_type = request.args.get('follow_type', 'course', type=str)
@@ -56,7 +66,7 @@ def follow_reviews():
 
 @home.route('/signin/',methods=['POST','GET'])
 def signin():
-    next_url = request.args.get('next') or url_for('home.index', _external=True)
+    next_url = request.args.get('next') or gen_index_url()
     if current_user.is_authenticated:
         return redirect(next_url)
     form = LoginForm()
@@ -74,9 +84,11 @@ def signin():
                     return redirect(next_url)
             elif status:
                 '''没有确认邮箱的用户'''
-                message = '请点击邮箱里的激活链接。 <a href=%s>重发激活邮件</a>'%url_for('.confirm_email',
+                message = '请点击邮箱里的激活链接。 <a href=%s>重发激活邮件</a>' % url_for('.confirm_email',
                     email=user.email,
-                    action='send')
+                    action='send',
+                    _external=True,
+                    _scheme='https')
                 if request.args.get('ajax'):
                     return jsonify(status=403, msg=message)
                 else:
@@ -141,13 +153,13 @@ def switch_user(user_id):
         abort(404)
     logout_user()
     login_user(user)
-    return redirect(url_for('home.index', _external=True))
+    return redirect_to_index()
 
 
 @home.route('/signup/',methods=['GET','POST'])
 def signup():
     if current_user.is_authenticated:
-        return redirect(request.args.get('next') or url_for('home.index', _external=True))
+        return redirect(request.args.get('next') or gen_index_url())
     form = RegisterForm()
     if form.validate_on_submit():
         username = request.form.get('username')
@@ -179,7 +191,7 @@ def signup():
 def confirm_email():
     if current_user.is_authenticated:
         #logout_user()
-        return redirect(request.args.get('next') or url_for('home.index', _external=True))
+        return redirect(request.args.get('next') or gen_index_url())
     action = request.args.get('action')
     if action == 'confirm':
         token = request.args.get('token')
@@ -198,13 +210,11 @@ def confirm_email():
         user.confirm()
         flash(_('Your email has been confirmed'))
         login_user(user)
-        return redirect(url_for('home.index', _external=True))
+        return redirect_to_index()
     elif action == 'send':
         email = request.args.get('email')
         user = User.query.filter_by(email=email).first_or_404()
-        print(user)
         if not user.confirmed:
-            print(email)
             send_confirm_mail(email)
         return render_template('feedback.html', status=True, message=_('邮件已经发送，请查收！'), title='发送验证邮件')
     else:
@@ -215,13 +225,13 @@ def confirm_email():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home.index', _external=True))
+    return redirect_to_index()
 
 @home.route('/change-password/', methods=['GET'])
 def change_password():
     '''在控制面板里发邮件修改密码，另一个修改密码在user.py里面'''
     if not current_user.is_authenticated:
-        return redirect(url_for('home.signin', _external=True))
+        return redirect(url_for('home.signin', _external=True, _scheme='https'))
     send_reset_password_mail(current_user.email)
     return render_template('feedback.html', status=True, message=_('密码重置邮件已经发送。'), title='修改密码')
 
@@ -230,7 +240,7 @@ def change_password():
 def forgot_password():
     ''' 忘记密码'''
     if current_user.is_authenticated:
-        return redirect(request.args.get('next') or url_for('home.index', _external=True))
+        return redirect(request.args.get('next') or gen_index_url())
     form = ForgotPasswordForm()
     if form.validate_on_submit():
         email = form['email'].data
@@ -262,7 +272,7 @@ def reset_password(token):
         user.set_password(password)
         logout_user()
         flash('密码已经修改，请使用新密码登录。')
-        return redirect(url_for('home.signin', _external=True))
+        return redirect(url_for('home.signin', _external=True, _scheme='https'))
     return render_template('reset-password.html', form=form, title='重设密码')
 
 
@@ -305,7 +315,7 @@ def search_reviews():
     ''' 搜索点评内容 '''
     query_str = request.args.get('q')
     if not query_str:
-        return redirect(url_for('home.index', _external=True))
+        return redirect_to_index()
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
@@ -353,7 +363,7 @@ def search():
     ''' 搜索 '''
     query_str = request.args.get('q')
     if not query_str:
-        return redirect(url_for('home.index', _external=True))
+        return redirect_to_index()
     noredirect = request.args.get('noredirect')
 
     course_type = request.args.get('type',None,type=int)
