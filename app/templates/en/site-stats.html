@@ -93,7 +93,7 @@
         {% if 'course_avg_rate' in site_stat %}
           <tr>
 	    <td>Average Course Rating</td>
-            <td>{{ '%.2f' % site_stat['course_avg_rate'] }}</td>
+            <td>{{ '%.2f' % site_stat['course_avg_rate'] }} / 10</td>
           </tr>
         {% endif %}
         {% if 'course_avg_rate_count' in site_stat %}
