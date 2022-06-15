@@ -11,7 +11,7 @@ stats = Blueprint('stats',__name__)
 
 
 @stats.route('/')
-def index():
+def index(lang_en=False):
     '''view site stats'''
     today = datetime.now().strftime("%Y/%m/%d")
     site_stat = dict()
@@ -45,7 +45,13 @@ def index():
     # find the distribution of course rates
     course_rates = db.session.query(func.floor(CourseRate._rate_average).label('rate'), func.count(func.floor(CourseRate._rate_average)).label('count')).filter(CourseRate._rate_average > 0).group_by(db.text('rate')).order_by(db.text('rate')).all()
 
-    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=today, title='站点统计')
+    template = 'en/site-stats.html' if lang_en else 'site-stats.html'
+    return render_template(template, site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=today, title='站点统计')
+
+
+@stats.route('/en/')
+def index_en():
+    return index(lang_en=True)
 
 
 @stats.route('/rankings/')
@@ -198,7 +204,7 @@ def str_to_date(date_str):
 
 
 @stats.route('/stats_history/')
-def stats_history():
+def stats_history(lang_en=False):
     '''view site stats history'''
     date_str = request.args.get('date')
     if not date_str:
@@ -210,6 +216,9 @@ def stats_history():
     site_stat['course_count'] = Course.query.distinct(Course.id).join(CourseTerm).filter(CourseTerm.term < date_to_term(date)).count()
     site_stat['review_count'] = Review.query.filter(Review.publish_time < date).count()
     site_stat['registered_teacher_count'] = User.query.filter(User.identity == 'Teacher').filter(User.register_time < date).count()
+
+    first_user = User.query.order_by(User.register_time).limit(1).first()
+    site_stat['running_days'] = (date - first_user.register_time).days
 
     # find the distribution of the number of reviews per course
     course_review_counts = db.session.query(func.count(Review.id).label('review_count')).filter(Review.publish_time < date).group_by(Review.course_id).subquery()
@@ -232,7 +241,13 @@ def stats_history():
     course_rate_subquery = db.session.query(func.floor(func.avg(Review.rate)).label('rate')).filter(Review.publish_time < date).group_by(Review.course_id)
     course_rates = db.session.query(db.text('rate'), func.count(db.text('rate')).label('count')).select_from(course_rate_subquery).group_by(db.text('rate')).order_by(db.text('rate')).all()
 
-    return render_template('site-stats.html', site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=date_str, title='站点统计历史')
+    template = 'en/site-stats.html' if lang_en else 'site-stats.html'
+    return render_template(template, site_stat=site_stat, course_review_count_dist=course_review_count_dist, user_review_count_dist=user_review_count_dist, review_dates=review_dates, user_reg_dates=user_reg_dates, review_rates=review_rates, course_rates=course_rates, date=date_str, title='站点统计历史')
+
+
+@stats.route('/stats_history/en/')
+def stats_history_en():
+    return stats_history(lang_en=True)
 
 
 @stats.route('/rankings-history-list/', methods=['GET'])
