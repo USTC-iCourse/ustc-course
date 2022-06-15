@@ -160,7 +160,7 @@ Highcharts.chart('review-rate-dist', {
         }
     },
     series: [{
-	name: '评分',
+	name: 'Rating',
         data: [
         {% for tuple in review_rates %}
 	{{ tuple['count'] }},
