@@ -24,6 +24,19 @@
           <p class="dark-grey">{{ review.content|abstract }}
             <a href="{{ url_for('course.view_course', course_id=course.id) }}#review-{{ review.id }}"> >>{{ _('more') }}</a>
           </p>
+          <div class="pull-right">
+              {% if current_user.is_authenticated %}
+              <a class="nounderline" href="javascript: {{ 'cancel_' if review.is_upvoted() }}upvote_review({{ review.id }})">
+              {% else %}
+              <a class="nounderline" data-toggle="modal" data-target="#signin" href="#">
+              {% endif %}
+                <span class="glyphicon glyphicon-thumbs-up {{ 'blue' if review.is_upvoted() else 'grey' }} left-pd-lg" aria-hidden="true" ></span>
+                <span id="review-upvote-count-{{review.id}}">{{ review.upvote_count }}</span>
+              </a>
+
+              <span class="glyphicon glyphicon-comment {{ 'blue' if review.comments else 'grey' }} left-pd-md" aria-hidden="true"></span>
+              <span id="review-comment-count-{{review.id}}">{{ review.comment_count }}</span>
+          </div>
         </div>
           {% endif %}
           {% endif %}
@@ -32,3 +45,5 @@
   </div><!-- end float-element -->
 </div><!-- end container -->
 {% endblock %}
+
+{% include 'scripts/review-ajax.html' %}

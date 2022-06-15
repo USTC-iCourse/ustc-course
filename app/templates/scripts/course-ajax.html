@@ -1,0 +1,148 @@
+{% block script %}
+<script>
+ $('#myTab a').click(function (e) {
+   e.preventDefault()
+   $(this).tab('show')
+ })
+
+ var action_data = {
+   'follow': {
+     'enabled': {{ 'true' if course.following else 'false' }},
+     'count': {{ course.follow_count or 0 }},
+     'do_url': "{{ url_for('course.follow', course_id=course.id) }}",
+     'undo_url': "{{ url_for('course.unfollow', course_id=course.id) }}",
+   },
+   'downvote': {
+     'enabled': {{ 'true' if course.downvoted else 'false' }},
+     'count': {{ course.downvote_count or 0 }},
+     'do_url': "{{ url_for('course.downvote', course_id=course.id) }}",
+     'undo_url': "{{ url_for('course.undo_downvote', course_id=course.id) }}",
+     'conflict': 'upvote',
+   },
+   'upvote': {
+     'enabled': {{ 'true' if course.upvoted else 'false' }},
+     'count': {{ course.upvote_count or 0 }},
+     'do_url': "{{ url_for('course.upvote', course_id=course.id) }}",
+     'undo_url': "{{ url_for('course.undo_upvote', course_id=course.id) }}",
+     'conflict': 'downvote',
+   },
+   'join': {
+     'enabled': {{ 'true' if course.joined else 'false' }},
+     'do_url': "{{ url_for('course.join', course_id=course.id) }}",
+     'undo_url': "{{ url_for('course.quit', course_id=course.id) }}",
+   },
+ }
+
+ $(function() {
+   for (action in action_data) {
+
+     if (! $('.btn-' + action).length)
+       continue;
+
+     (function(action) {
+       var d = action_data[action];
+
+       var do_btn = $('.btn-' + action).filter('.btn-do');
+       var undo_btn = $('.btn-' + action).filter('.btn-undo');
+
+       function update_count(count) {
+         d.count = count;
+         $('.btn-' + action + ' .count').text(count);
+       }
+       function http_post_wrapper(url) {
+         $.post(url, null, function(o) {
+           if (o.count)
+             update_count(o.count);
+           if (!o.ok)
+             alert('Operation failed, please try again later!');
+           d.in_progress = false;
+         }, 'json');
+       }
+
+       do_btn.click(function() {
+         {% if user.is_authenticated %}
+         if (d.enabled)
+           return;
+         if (d.in_progress) {
+           alert('Operation in progress, please try again later!');
+           return;
+         }
+         if (d.conflict && action_data[d.conflict].in_progress) {
+           alert('A conflicting operation is in progress, please try again later!');
+           return;
+         }
+         d.in_progress = true;
+         do_btn.hide();
+         undo_btn.show();
+         d.enabled = true;
+         update_count(d.count + 1);
+         if (d.conflict && action_data[d.conflict].enabled) {
+           var conflict_do_btn = $('.btn-' + d.conflict).filter('.btn-do');
+           var conflict_undo_btn = $('.btn-' + d.conflict).filter('.btn-undo');
+           var conflict_count = action_data[d.conflict].count - 1;
+           action_data[d.conflict].count = conflict_count;
+           action_data[d.conflict].enabled = false;
+           $('.btn-' + d.conflict + ' .count').text(conflict_count);
+           conflict_undo_btn.hide();
+           conflict_do_btn.show();
+         }
+         http_post_wrapper(d.do_url);
+         {% else %}
+         $('#signin').modal('show');
+         {% endif %}
+       });
+
+       undo_btn.click(function() {
+         {% if user.is_authenticated %}
+         if (!d.enabled)
+           return;
+         if (d.in_progress) {
+           alert('Operation in progress, please try again later!');
+           return;
+         }
+         if (d.conflict && action_data[d.conflict].in_progress) {
+           alert('A conflicting operation is in progress, please try again later!');
+           return;
+         }
+         d.in_progress = true;
+         undo_btn.hide();
+         do_btn.show();
+         d.enabled = false;
+         update_count(d.count - 1);
+         http_post_wrapper(d.undo_url);
+         {% else %}
+         $('#signin').modal('show');
+         {% endif %}
+       });
+
+       update_count(d.count);
+
+       if (d.enabled) {
+         undo_btn.show();
+         do_btn.hide();
+       } else {
+         do_btn.show();
+         undo_btn.hide();
+       }
+     })(action);
+   }
+   $('#action-btn-group').show();
+ });
+
+ function delete_review(review_id)
+ {
+     if (!confirm('你真的要删除此点评吗？')) {
+         return;
+     }
+     $.post("{{ url_for('review.delete_review') }}", { id: review_id }, function(o) {
+         if (o.ok)
+            window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
+         else
+            alert(o.message);
+     }, 'json');
+ }
+
+</script>
+{% endblock %}
+
+{% include 'scripts/review-ajax.html' %}
