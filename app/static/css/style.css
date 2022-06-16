@@ -361,7 +361,6 @@ a.nounderline:active { text-decoration: none; }
 
 /* show more */
 .showmore-text {
-    max-height: 750px;
     overflow: hidden;
 }
 .showmore-wrapper {
