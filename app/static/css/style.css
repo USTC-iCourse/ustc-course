@@ -358,3 +358,53 @@ a.nounderline:active { text-decoration: none; }
 .larger-text {
     font-size: 1.2em !important;
 }
+
+/* auto expand */
+/* ref: https://segmentfault.com/a/1190000040030723 */
+.autoexpand-wrapper {
+  display: flex;
+  overflow: hidden;
+}
+.autoexpand-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: justify;
+  position: relative;
+  max-height: 750px;
+}
+.autoexpand-text::before {
+  content: '';
+  height: calc(100% - 30px);
+  float: right;
+}
+.autoexpand-btn {
+  position: relative;
+  float: right;
+  clear: both;
+  margin-left: 36px;
+  font-size: 14px;
+  padding: 0 12px;
+  background: #128bc1;
+  line-height: 28px;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+.autoexpand-btn::after {
+  content: '展开全部';
+}
+.autoexpand-input {
+  display: none;
+}
+.autoexpand-input:checked+.autoexpand-text {
+  max-height: none;
+}
+.autoexpand-input:checked+.autoexpand-text::after {
+  visibility: hidden;
+}
+.autoexpand-input:checked+.autoexpand-text .autoexpand-btn::before {
+  visibility: hidden;
+}
+.autoexpand-input:checked+.autoexpand-text .autoexpand-btn::after {
+  content: '收起';
+}

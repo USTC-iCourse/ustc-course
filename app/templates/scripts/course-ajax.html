@@ -141,6 +141,11 @@
      }, 'json');
  }
 
+ if ($('#course-intro').height() > 750) {
+   $('.course-intro-text').addClass('autoexpand-text');
+   $('.course-intro-btn').addClass('autoexpand-btn');
+ }
+
 </script>
 
 {% include 'scripts/review-ajax.html' %}

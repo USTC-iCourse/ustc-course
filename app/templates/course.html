@@ -11,7 +11,7 @@
         <br><span class="small grey align-bottom mobile">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
 
         {% if current_user.is_authenticated %}
-        <btn class="btn btn-link float-right"><a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程信息</a></btn>
+        <button class="btn btn-link float-right"><a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程信息</a></button>
         {% endif %}
         <hr>
         {% if course.review_count %}
@@ -85,12 +85,8 @@
 	{% if course.introduction %}
 	<div class="ud-pd-md">
 	  <div class="solid ud-pd-sm inline-h3">
-            <span class="blue h3">简介</span>
-	  </div>
-          <div>
-	  {{ course.introduction|safe }}
-          </div>
-          <p class="text-muted pull-right small">
+          <span class="blue h3">简介</span>
+          <span class="text-muted pull-right small" style="padding-top: 1em;">
              {% if user.is_authenticated %}
              <span class="glyphicon glyphicon-pencil grey left-pd-sm" aria-hidden="true" ></span>
              <a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程简介</a>
@@ -99,7 +95,15 @@
              <span class="glyphicon glyphicon-time grey left-pd-sm" aria-hidden="true" ></span>
              最后更新：<span class="localtime" style="display: none;">{{ course.last_edit_time|utctime }}</span>
              {% endif %}
-          </p>
+          </span>
+	  </div>
+      <div class="autoexpand-wrapper" id="course-intro">
+        <input id="autoexpand-input" class="autoexpand-input" type="checkbox">
+        <div class="course-intro-text">
+          <label class="course-intro-btn" for="autoexpand-input"></label>
+	      {{ course.introduction|safe }}
+        </div>
+      </div>
 	</div>
 	{% endif %}
 	{% if course.admin_announcement %}
