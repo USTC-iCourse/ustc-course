@@ -97,11 +97,14 @@
              {% endif %}
           </span>
 	  </div>
-      <div class="autoexpand-wrapper" id="course-intro">
-        <input id="autoexpand-input" class="autoexpand-input" type="checkbox">
-        <div class="course-intro-text">
-          <label class="course-intro-btn" for="autoexpand-input"></label>
-	      {{ course.introduction|safe }}
+      <div class="showmore-text" id="course-intro">
+	    {{ course.introduction|safe }}
+      </div>
+      <div class="showmore-wrapper">
+        <div class="showmore-shadow">
+          <div class="showmore-btn-wrapper">
+            <button class="showmore-btn">展开全部课程简介 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></button>
+          </div>
         </div>
       </div>
 	</div>

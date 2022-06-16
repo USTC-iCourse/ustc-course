@@ -141,9 +141,13 @@
      }, 'json');
  }
 
- if ($('#course-intro').height() > 750) {
-   $('.course-intro-text').addClass('autoexpand-text');
-   $('.course-intro-btn').addClass('autoexpand-btn');
+ $('.showmore-shadow').click(function(e) {
+   $('.showmore-text').css('max-height', 'none');
+   $('.showmore-wrapper').hide();
+ });
+
+ if ($('.showmore-text').height() >= 750) {
+   $('.showmore-wrapper').show();
  }
 
 </script>
