@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, follow_course, follow_user, SearchLog
+from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, follow_course, follow_user, SearchLog, ThirdPartySigninHistory
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -122,6 +122,12 @@ def signin_3rdparty():
     return render_template('signin-3rdparty.html', from_app=from_app, next_url=next_url, current_user=current_user, challenge=challenge, title='第三方登录')
 
 
+def update_3rdparty_signin_history_to_verified(email, token):
+    history = ThirdPartySigninHistory.query.filter_by(email=email, token=token).first()
+    history.verify_time = datetime.utcnow()
+    history.add()
+
+
 @home.route('/verify-3rdparty-signin/', methods=['GET'])
 def verify_3rdparty_signin():
     email = request.args.get('email')
@@ -137,6 +143,7 @@ def verify_3rdparty_signin():
     if user.token_3rdparty == token:
         user.token_3rdparty = None
         user.save()
+        update_3rdparty_signin_history_to_verified(email, token)
         resp = jsonify(success=True)
         return resp
     else:

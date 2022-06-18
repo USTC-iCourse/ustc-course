@@ -196,3 +196,50 @@ class ReviewComment(db.Model):
     @property
     def link(self):
         return self.review.link
+
+
+class ReviewHistory(db.Model):
+    __tablename__ = 'review_history'
+    id = db.Column(db.Integer,primary_key=True, unique=True)
+
+    difficulty = db.Column(db.Integer)
+    homework = db.Column(db.Integer)
+    grading = db.Column(db.Integer)
+    gain = db.Column(db.Integer)
+    rate = db.Column(db.Integer)
+    content = db.Column(db.Text())
+
+    publish_time = db.Column(db.DateTime, default=datetime.utcnow)
+    update_time = db.Column(db.DateTime, default=datetime.utcnow)
+
+    author_id = db.Column(db.Integer)
+    course_id = db.Column(db.Integer)
+    term = db.Column(db.String(10))
+
+    review_id = db.Column(db.Integer)
+    operation_time = db.Column(db.DateTime, default=datetime.utcnow)
+    operation_user_id = db.Column(db.Integer)
+    operation = db.Column(db.String(20))
+
+    def add(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+class ReviewCommentHistory(db.Model):
+    __tablename__ = 'review_comment_history'
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    review_id = db.Column(db.Integer)
+    author_id = db.Column(db.Integer)
+    content = db.Column(db.Text)
+    publish_time = db.Column(db.DateTime, default=datetime.utcnow)
+
+    comment_id = db.Column(db.Integer)
+
+    operation_time = db.Column(db.DateTime, default=datetime.utcnow)
+    operation_user_id = db.Column(db.Integer)
+    operation = db.Column(db.String(20))
+
+    def add(self):
+        db.session.add(self)
+        db.session.commit()

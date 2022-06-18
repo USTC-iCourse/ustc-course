@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify, request, Markup, redirect, render_template, abort
 from flask_login import login_required, current_user
 from app.models import Review, ReviewComment, User, Course, ImageStore
+from app.models import ReviewCommentHistory, ThirdPartySigninHistory
 from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email
 from app.utils import editor_parse_at
 from app.utils import send_hide_review_email, send_unhide_review_email
+from app.views.review import record_review_history
 from flask_babel import gettext as _
 from app import app
 import hashlib
@@ -76,6 +78,23 @@ def review_cancel_upvote():
     else:
         return jsonify(ok=False,message="A id must be given")
 
+
+def record_review_comment_history(comment, operation, commit=True):
+    history = ReviewCommentHistory()
+    history.review_id = comment.review_id
+    history.author_id = comment.author_id
+    history.content = comment.content
+
+    history.comment_id = comment.id
+    history.operation = operation
+    if current_user and current_user.is_authenticated:
+        history.operation_user_id = current_user.id
+
+    if commit:
+        history.add()
+    return history
+
+
 @api.route('/review/new_comment/',methods=['POST'])
 @login_required
 def review_new_comment():
@@ -92,6 +111,7 @@ def review_new_comment():
             content, mentioned_users = editor_parse_at(content)
             ok,message = comment.add(review,content)
             if ok:
+                record_review_comment_history(comment, 'create')
                 review.author.notify('comment', review)
                 for user in mentioned_users:
                     user.notify('mention', comment)
@@ -110,6 +130,7 @@ def delete_comment():
         comment = ReviewComment.query.with_for_update().get(comment_id)
         if comment:
             if comment.author == current_user or current_user.is_admin:
+                record_review_comment_history(comment, 'delete')
                 ok,message = comment.delete()
                 return jsonify(ok=ok,message=message)
             else:
@@ -131,6 +152,7 @@ def hide_review():
                 if ok:
                     review.author.notify('hide-review', review)
                     send_hide_review_email(review)
+                    record_review_history(review, 'hide')
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
@@ -151,6 +173,7 @@ def unhide_review():
                 if ok:
                     review.author.notify('unhide-review', review)
                     send_unhide_review_email(review)
+                    record_review_history(review, 'unhide')
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
@@ -233,6 +256,20 @@ def read_notifications():
     return jsonify(ok=True)
 
 
+def record_3rdparty_signin_history(user_id, email, from_app, next_url, challenge, token):
+    history = ThirdPartySigninHistory()
+    history.user_id = user_id
+    history.email = email
+    history.from_app = from_app
+    history.next_url = next_url
+    history.challenge = challenge
+    history.token = token
+    history.signin_time = datetime.utcnow()
+    history.verify_time = None
+
+    history.add()
+
+
 # successful 3rdparty signin will redirect to ${next_url}?challenge=${challenge}&date=${date}&email=${email}&status=200&token=${token}
 # here, ${date} is in %Y-%m-%d %H:%M:%S format of server time.
 # here, ${sign} is sha256("challenge=${challenge}&date=${date}&email=${email}&status=200")
@@ -267,6 +304,7 @@ def signin_3rdparty():
         token = hashlib.sha256(auth_str.encode('utf-8')).hexdigest()
         user.token_3rdparty = token
         user.save()
+        record_3rdparty_signin_history(user.id, user.email, from_app, next_url, challenge, token)
         return redirect(next_url + '?' + auth_str + '&token=' + token)
     else:
         if not status:

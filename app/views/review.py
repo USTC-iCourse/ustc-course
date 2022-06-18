@@ -1,6 +1,6 @@
 from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify
 from flask_security import current_user,login_required
-from app.models import Course, Review
+from app.models import Course, Review, ReviewHistory
 from app.forms import ReviewForm
 from app.utils import sanitize, editor_parse_at
 from flask_babel import gettext as _
@@ -9,6 +9,30 @@ import markdown
 from datetime import datetime
 
 review = Blueprint('review',__name__)
+
+
+def record_review_history(review, operation, commit=True):
+    history = ReviewHistory()
+    history.difficulty = review.difficulty
+    history.homework = review.homework
+    history.grading = review.grading
+    history.gain = review.gain
+    history.rate = review.rate
+    history.content = review.content
+    history.author_id = review.author_id
+    history.course_id = review.course_id
+    history.term = review.term
+    history.publish_time = review.publish_time
+    history.update_time = review.update_time
+
+    history.review_id = review.id
+    history.operation = operation
+    if current_user and current_user.is_authenticated:
+        history.operation_user_id = current_user.id
+
+    if commit:
+        history.add()
+    return history
 
 
 @course.route('/<int:course_id>/review/',methods=['GET','POST'])
@@ -55,9 +79,11 @@ def new_review(course_id):
                 # users can only receive @ notifications for new reviews
                 for user in mentioned_users:
                     user.notify('mention', review)
+                record_review_history(review, 'create')
             else:
                 review.update_time = datetime.utcnow()
                 review.update_course_rate(old_review)
+                record_review_history(review, 'update')
 
             next_url = url_for('course.view_course', course_id=course_id, _external=True) + '#review-' + str(review.id)
             if form.is_ajax:
@@ -96,6 +122,8 @@ def delete_review():
     if review.author != current_user and not current_user.is_admin:
         message = _('You have no right to do this.')
         return jsonify(ok=ok,message=message)
+
+    record_review_history(review, 'delete')
     review.delete()
     ok = True
     message = _('The review has been deleted.')

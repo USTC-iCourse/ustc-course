@@ -528,3 +528,22 @@ class Teacher(db.Model):
         normalized_rate = (teacher_rate + avg_rate * avg_rate_count) / (CourseRate.review_count + avg_rate_count)
         return normalized_rate
 
+
+class ThirdPartySigninHistory(db.Model):
+    __tablename__ = 'third_party_signin_history'
+
+    id = db.Column(db.Integer,primary_key=True)
+
+    user_id = db.Column(db.Integer)
+    email = db.Column(db.String(255))
+    from_app = db.Column(db.String(255))
+    next_url = db.Column(db.String(255))
+    challenge = db.Column(db.String(255))
+    token = db.Column(db.String(255))
+
+    signin_time = db.Column(db.DateTime, default=datetime.utcnow)
+    verify_time = db.Column(db.DateTime, default=None)
+
+    def add(self):
+        db.session.add(self)
+        db.session.commit()
