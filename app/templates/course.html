@@ -240,7 +240,7 @@
                 编辑
               </a>
               {% endif %}
-              {% if review.author == user %}
+              {% if review.author == user or user.is_admin %}
               <a class="nounderline" href="javascript: delete_review({{ review.id }})">
                 <span class="glyphicon glyphicon-trash grey left-pd-md small" aria-hidden="true"></span>
                 删除
