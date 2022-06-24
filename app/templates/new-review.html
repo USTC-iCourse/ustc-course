@@ -149,7 +149,9 @@ $(function(){
                 alert('请评分！');
                 return;
             }
-            if ($('textarea[name=content]').val().trim().length < 10) {
+            var content_html = $('textarea[name=content]').val();
+            var content_text = content_html.replace(/(<([^>]+)>)/ig, "");
+            if (content_text.trim().length < 10) {
                 e.preventDefault();
                 alert('点评内容太短啦！');
                 return;
