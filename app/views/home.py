@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, Teacher, Review, Notification, follow_course, follow_user, SearchLog, ThirdPartySigninHistory
+from app.models import User, RevokedToken as RT, Course, CourseRate, CourseTerm, Teacher, Review, Notification, follow_course, follow_user, SearchLog, ThirdPartySigninHistory
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -409,6 +409,10 @@ def search():
         fuzzy_keyword = keyword.replace('%', '')
         return q.filter(Course.name.like('%' + '%'.join([ char for char in fuzzy_keyword ]) + '%'))
 
+    def courseries_match(q, keyword):
+        courseries_keyword = keyword.replace('%', '')
+        return q.filter(CourseTerm.courseries.like(keyword + '%')).filter(CourseTerm.course_id == Course.id)
+
     def teacher_and_course_match_0(q, keywords):
         return fuzzy_match(teacher_match(q, keywords[0]), keywords[1])
 
@@ -416,7 +420,13 @@ def search():
         return fuzzy_match(teacher_match(q, keywords[1]), keywords[0])
 
     def ordering(query_obj, keywords):
-        ordering_field = 'anon_2_anon_3_anon_4_'
+        # This function is very ugly because sqlalchemy generates anon field names for the literal meta field according to the number of union entries.
+        # So, queries with different number of keywords have different ordering field names.
+        # Expect to refactor this code.
+        if len(keywords) == 1:
+            ordering_field = 'anon_2_anon_3_anon_4_anon_5_'
+        else:
+            ordering_field = 'anon_2_anon_3_anon_4_'
         if len(keywords) >= 3:
             for count in range(5, len(keywords) + 3):
                 ordering_field += 'anon_' + str(count) + '_'
@@ -432,7 +442,8 @@ def search():
         union_courses = (teacher_match(course_query_with_meta(1), keyword)
                          .union(exact_match(course_query_with_meta(2), keyword))
                          .union(include_match(course_query_with_meta(3), keyword))
-                         .union(fuzzy_match(course_query_with_meta(4), keyword)))
+                         .union(fuzzy_match(course_query_with_meta(4), keyword))
+                         .union(courseries_match(course_query_with_meta(0), keyword)))
         if union_keywords:
             union_keywords = union_keywords.union(union_courses)
         else:
