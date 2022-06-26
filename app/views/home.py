@@ -387,7 +387,7 @@ def search():
     #    # 开课地点
     #    course_query = course_query.filter(Course.campus==campus)
 
-    keywords = re.sub(r'''[~`!@#$%^&*(){}[]|\\:";'<>?,./]''', ' ', query_str).split()
+    keywords = re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', query_str).split()
     max_keywords_allowed = 10
     if len(keywords) > max_keywords_allowed:
         keywords = keywords[:max_keywords_allowed]
