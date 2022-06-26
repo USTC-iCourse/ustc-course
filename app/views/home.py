@@ -327,7 +327,7 @@ def search_reviews():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
 
-    keywords = re.sub(r'''[~`!@#$%^&*(){}[]|\\:";'<>?,./]''', ' ', query_str).split()
+    keywords = re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', query_str).split()
     max_keywords_allowed = 10
     if len(keywords) > max_keywords_allowed:
         keywords = keywords[:max_keywords_allowed]
