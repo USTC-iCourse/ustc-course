@@ -8,6 +8,12 @@ import re
 
 teacher = Blueprint('teacher', __name__)
 
+def to_int(data):
+    if data is None:
+        return 0
+    else:
+        return int(data)
+
 @teacher.route('/<int:teacher_id>')
 @teacher.route('/<int:teacher_id>/')
 def view_profile(teacher_id):
@@ -21,8 +27,22 @@ def view_profile(teacher_id):
     per_page = request.args.get('per_page', 10000, type=int)
     courses = teacher.courses.join(CourseRate).order_by(Course.QUERY_ORDER())
     courses_paged = courses.paginate(page=page, per_page=per_page)
-    return render_template('teacher-profile.html', teacher=teacher, courses=courses_paged, title=teacher.name,
-                           description=teacher.name + '共有 ' + str(courses_paged.total) + ' 门课程')
+
+    all_courses = courses.all()
+    total_rating = sum([ to_int(course.course_rate._rate_total) for course in all_courses ])
+    stats = {}
+    stats['num_rating'] = sum([ to_int(course.course_rate.review_count) for course in all_courses ])
+    if stats['num_rating'] == 0:
+        stats['avg_rating'] = 0
+    else:
+        stats['avg_rating'] = total_rating * 1.0 / stats['num_rating']
+    if len(all_courses) == 0:
+        stats['normalized_rating'] = 0
+    else:
+        stats['normalized_rating'] = all_courses[0].compute_normalized_rate(total_rating, stats['num_rating'])
+
+    return render_template('teacher-profile.html', teacher=teacher, courses=courses_paged, title=teacher.name, stats=stats,
+                           description=teacher.name + '共有 ' + str(courses_paged.total) + ' 门课程，' + str(stats['num_rating']) + ' 个点评，平均分 ' + ('%.2f' % stats['avg_rating']))
 
 @teacher.route('/<int:teacher_id>/profile_history/', methods=['GET'])
 @login_required

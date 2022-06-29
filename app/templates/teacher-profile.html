@@ -9,9 +9,9 @@
 	<div class="inline-h3">
           <span class="blue h3">课程</span>
 	  {% if courses.total == 0 %}
-          <span class="text-muted small">共 0 门</span>
+          <span class="text-muted small">还没有课程哦！</span>
           {% else %}
-          <span class="text-muted">(共 {{ courses.total }} 门)</span>
+          <span class="text-muted">(共 {{ courses.total }} 门课，共 {{ stats['num_rating'] }} 个点评，平均分 {{ '%.2f' % stats['avg_rating'] }}，归一化平均分 {{ '%.2f' % stats['normalized_rating'] }})</span>
 	</div>
 
 	{% for course in courses.items %}
