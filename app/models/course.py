@@ -708,7 +708,7 @@ class CourseRate(db.Model):
         if self.review_count != 0:
             self._rate_average = 1.0 * self._rate_total / self.review_count
         else:
-            self._rate_average = 0
+            self._rate_average = None
 
     def save(self):
         self._update_average()
