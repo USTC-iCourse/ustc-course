@@ -18,7 +18,7 @@
      var elem = $('#review-upvote-count-' + review_id);
      if (!elem) return null;
      if (elem.hasClass('in_progress')) {
-       alert('Operation in progress, please try again later');
+       alert('操作正在进行中，请稍候再试');
        return null;
      }
      elem.addClass('in_progress');
@@ -74,7 +74,8 @@
         function(html) {
             $('#review-' + review_id + '-comments').replaceWith(html);
             $('#review-' + review_id + '-comments').show();
-     }, 'html')
+            updateLocalTime();
+        }, 'html')
      .fail(function() {
         alert('重新加载评论区出错，请刷新页面');
      });

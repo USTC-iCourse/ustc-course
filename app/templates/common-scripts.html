@@ -26,29 +26,37 @@
    var day = pubTime.getDate().toString();
    return year + '年' + month + '月' + day + '日';
  }
-
- $('.localtime').each(function(index) {
-   var utcTime = $(this).text();
-   var pubTime = new Date(utcTime + ' UTC');
-   if (!pubTime) {
-     $(this).text(pubTime);
-     $(this).show();
-     return;
-   }
-   var now = new Date();
-   if (pubTime.getFullYear() == now.getFullYear() && pubTime.getMonth() == now.getMonth() && pubTime.getDate() == now.getDate()) {
-     $(this).text('今天 ' + toHourMinutes(pubTime));
-   } else {
-     var yesterday = new Date();
-     yesterday.setDate(yesterday.getDate() - 1); // JavaScript can handle date roll overs
-     if (pubTime.getFullYear() == yesterday.getFullYear() && pubTime.getMonth() == yesterday.getMonth() && pubTime.getDate() == yesterday.getDate()) {
-       $(this).text('昨天 ' + toHourMinutes(pubTime));
-     } else {
-       $(this).text(toYearMonthDate(pubTime) + ' ' + toHourMinutes(pubTime));
+ 
+ function updateLocalTime() {
+   $('.localtime').each(function(index) {
+     if ($(this).css('display') != 'none') {
+       return;
      }
-   }
-   $(this).show();
- });
+     var utcTime = $(this).text();
+     var pubTime = new Date(utcTime + ' UTC');
+     if (!pubTime) {
+       $(this).text(pubTime);
+       $(this).show();
+       return;
+     }
+     var now = new Date();
+     if (pubTime.getFullYear() == now.getFullYear() && pubTime.getMonth() == now.getMonth() && pubTime.getDate() == now.getDate()) {
+       $(this).text('今天 ' + toHourMinutes(pubTime));
+     } else {
+       var yesterday = new Date();
+       yesterday.setDate(yesterday.getDate() - 1); // JavaScript can handle date roll overs
+       if (pubTime.getFullYear() == yesterday.getFullYear() && pubTime.getMonth() == yesterday.getMonth() && pubTime.getDate() == yesterday.getDate()) {
+         $(this).text('昨天 ' + toHourMinutes(pubTime));
+       } else {
+         $(this).text(toYearMonthDate(pubTime) + ' ' + toHourMinutes(pubTime));
+       }
+     }
+     $(this).show();
+   });
+ }
+
+ updateLocalTime();
+
 
  new ClipboardJS('.review-links');
  $('.review-links').tooltip();
