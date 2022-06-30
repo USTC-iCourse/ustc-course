@@ -85,6 +85,7 @@ function submit_review() {
         obj[item.name] = item.value;
         return obj;
     }, {});
+    data['rate'] = Math.round(data['rate'] * 2);
     data['is_ajax'] = true;
     $.post(url, data, function(o) {
         if (!o.ok) {
@@ -95,7 +96,10 @@ function submit_review() {
             localStorage.removeItem(autoSaveKey);
             window.location.href = o.next_url;
         }
-    }, 'json');
+    }, 'json')
+    .fail(function() {
+        alert('Failed to submit review, please try again!');
+    });
 }
 
 $('#rate-star').rating({
@@ -175,7 +179,6 @@ $(function(){
                 $('textarea[name=content]').val(newcontent);
             }
             */
-            $('input[name=rate]').val(Math.round($('input[name=rate]').val() * 2));
 
             e.preventDefault();
             submit_review();

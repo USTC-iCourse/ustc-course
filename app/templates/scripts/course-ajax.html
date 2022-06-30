@@ -55,7 +55,11 @@
            if (!o.ok)
              alert('Operation failed, please try again later!');
            d.in_progress = false;
-         }, 'json');
+         }, 'json')
+         .fail(function() {
+           alert('Operation failed, please try again later!');
+           d.in_progress = false;
+         });
        }
 
        do_btn.click(function() {
@@ -138,7 +142,10 @@
             window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
          else
             alert(o.message);
-     }, 'json');
+     }, 'json')
+     .fail(function() {
+         alert('Request failed, please try again later!');
+     });
  }
 
  $('.showmore-shadow').click(function(e) {
