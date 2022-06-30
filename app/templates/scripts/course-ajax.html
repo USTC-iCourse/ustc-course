@@ -53,11 +53,11 @@
            if (o.count)
              update_count(o.count);
            if (!o.ok)
-             alert('Operation failed, please try again later!');
+             alert('操作失败，请重试');
            d.in_progress = false;
          }, 'json')
          .fail(function() {
-           alert('Operation failed, please try again later!');
+           alert('操作失败，请重试');
            d.in_progress = false;
          });
        }
@@ -67,11 +67,11 @@
          if (d.enabled)
            return;
          if (d.in_progress) {
-           alert('Operation in progress, please try again later!');
+           alert('操作正在进行中，请稍候再试');
            return;
          }
          if (d.conflict && action_data[d.conflict].in_progress) {
-           alert('A conflicting operation is in progress, please try again later!');
+           alert('相反的操作正在进行中，请稍候再试');
            return;
          }
          d.in_progress = true;
@@ -144,7 +144,7 @@
             alert(o.message);
      }, 'json')
      .fail(function() {
-         alert('Request failed, please try again later!');
+         alert('删除点评失败，请重试');
      });
  }
 
