@@ -100,11 +100,11 @@
          if (!d.enabled)
            return;
          if (d.in_progress) {
-           alert('Operation in progress, please try again later!');
+           alert('操作正在进行中，请稍候再试');
            return;
          }
          if (d.conflict && action_data[d.conflict].in_progress) {
-           alert('A conflicting operation is in progress, please try again later!');
+           alert('相反的操作正在进行中，请稍候再试');
            return;
          }
          d.in_progress = true;
