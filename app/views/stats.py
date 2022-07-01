@@ -30,7 +30,9 @@ def index(lang_en=False):
     course_review_count_dist = db.session.query(db.text('review_count'), func.count().label('course_count')).select_from(course_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
 
     # find the distribution of the number of reviews written by each user
-    user_review_counts = db.session.query(func.count(Review.id).label('review_count')).filter(Review.is_anonymous == False).group_by(Review.author_id).subquery()
+    user_review_counts = (db.session.query(func.count(Review.id).label('review_count'))
+                                    .filter(Review.is_anonymous == False).filter(Review.is_hidden == False).filter(Review.is_blocked == False)
+                                    .group_by(Review.author_id).subquery())
     user_review_count_dist = db.session.query(db.text('review_count'), func.count().label('user_count')).select_from(user_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
 
     # find the distribution of publication dates of reviews (count per month)
@@ -137,6 +139,7 @@ def view_ranking():
                                     Review.upvote_count.label('review_upvotes_count'))
                              .join(User).join(Course)
                              .filter(Review.is_blocked == False)
+                             .filter(Review.is_hidden == False)
                              .filter(func.length(Review.content) >= 500)
                              .order_by(Review.upvote_count.desc())
                              .limit(topk_count).all())
@@ -151,6 +154,7 @@ def view_ranking():
                                            func.length(Review.content).label('review_length'))
                                     .join(User).join(Course)
                                     .filter(Review.is_blocked == False)
+                                    .filter(Review.is_hidden == False)
                                     .order_by(func.length(Review.content).desc())
                                     .limit(topk_count).all())
 
@@ -228,7 +232,10 @@ def stats_history(lang_en=False):
     course_review_count_dist = db.session.query(db.text('review_count'), func.count().label('course_count')).select_from(course_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
 
     # find the distribution of the number of reviews written by each user
-    user_review_counts = db.session.query(func.count(Review.id).label('review_count')).filter(Review.is_anonymous == False).filter(Review.publish_time < date).group_by(Review.author_id).subquery()
+    user_review_counts = (db.session.query(func.count(Review.id).label('review_count'))
+                                    .filter(Review.is_anonymous == False).filter(Review.is_hidden == False).filter(Review.is_blocked == False)
+                                    .filter(Review.publish_time < date)
+                                    .group_by(Review.author_id).subquery())
     user_review_count_dist = db.session.query(db.text('review_count'), func.count().label('user_count')).select_from(user_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
 
     # find the distribution of publication dates of reviews (count per month)
