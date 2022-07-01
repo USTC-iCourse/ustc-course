@@ -27,16 +27,22 @@ def redirect_to_index():
 def index():
     return latest_reviews()
 
+def gen_reviews_query():
+    reviews = Review.query
+    if not current_user.is_authenticated:
+        reviews = reviews.filter(Review.is_visible_to_login_only == False)
+    return reviews.order_by(Review.update_time.desc())
+
 @home.route('/latest_reviews')
 def latest_reviews():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    reviews_paged = Review.query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
+    reviews_paged = gen_reviews_query().paginate(page=page, per_page=per_page)
     return render_template('latest-reviews.html', reviews=reviews_paged, title='全站最新点评', this_module='home.latest_reviews', hide_title=True)
 
 @home.route('/feed.xml')
 def latest_reviews_rss():
-    reviews_paged = Review.query.order_by(Review.update_time.desc()).paginate(page=1, per_page=50)
+    reviews_paged = gen_reviews_query().paginate(page=1, per_page=50)
     rss_content = render_template('feed.xml', reviews=reviews_paged)
     response = make_response(rss_content)
     response.headers['Content-Type'] = 'application/rss+xml'
