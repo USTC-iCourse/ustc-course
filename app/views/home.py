@@ -28,7 +28,7 @@ def index():
     return latest_reviews()
 
 def gen_reviews_query():
-    reviews = Review.query
+    reviews = Review.query.filter(Review.is_blocked == False).filter(Review.is_hidden == False)
     if not current_user.is_authenticated:
         reviews = reviews.filter(Review.is_visible_to_login_only == False)
     return reviews.order_by(Review.update_time.desc())
@@ -351,6 +351,7 @@ def search_reviews():
         teacher_query = Review.query.join(Review.course).join(Course.teachers).filter(Teacher.name == keyword)
         unioned_query = unioned_query.union(author_query).union(course_query).union(teacher_query)
 
+    unioned_query = unioned_query.filter(Review.is_blocked == False).filter(Review.is_hidden == False)
     if not current_user.is_authenticated:
         unioned_query = unioned_query.filter(Review.is_visible_to_login_only == False)
     reviews_paged = unioned_query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)

@@ -182,6 +182,44 @@ def unblock_review():
     else:
         return jsonify(ok=False,message="A id must be given")
 
+@api.route('/review/hide/', methods=['POST'])
+@login_required
+def hide_review():
+    review_id = request.values.get('review_id')
+    if review_id:
+        review = Review.query.with_for_update().get(review_id)
+        if review:
+            if current_user.is_authenticated and current_user == review.author:
+                ok,message = review.hide()
+                if ok:
+                    record_review_history(review, 'hide')
+                return jsonify(ok=ok,message=message)
+            else:
+                return jsonify(ok=False,message="Forbidden")
+        else:
+            return jsonify(ok=False,message="The review doesn't exist.")
+    else:
+        return jsonify(ok=False,message="A id must be given")
+
+@api.route('/review/unhide/', methods=['POST'])
+@login_required
+def unhide_review():
+    review_id = request.values.get('review_id')
+    if review_id:
+        review = Review.query.with_for_update().get(review_id)
+        if review:
+            if current_user.is_authenticated and current_user == review.author:
+                ok,message = review.unhide()
+                if ok:
+                    record_review_history(review, 'unhide')
+                return jsonify(ok=ok,message=message)
+            else:
+                return jsonify(ok=False,message="Forbidden")
+        else:
+            return jsonify(ok=False,message="The review doesn't exist.")
+    else:
+        return jsonify(ok=False,message="A id must be given")
+
 @api.route('/user/follow/', methods=['POST'])
 @login_required
 def follow_user():

@@ -39,6 +39,7 @@ class Review(db.Model):
 
     is_anonymous = db.Column(db.Boolean, default=False)
     is_visible_to_login_only = db.Column(db.Boolean, default=False)
+    is_hidden = db.Column(db.Boolean, default=False)
     is_blocked = db.Column(db.Boolean, default=False)
     filter_rule = db.Column(db.Text())
     #course: Course
@@ -115,6 +116,16 @@ class Review(db.Model):
 
     def unblock(self):
         self.is_blocked = False
+        self.__save()
+        return (True,"Success!")
+
+    def hide(self):
+        self.is_hidden = True
+        self.__save()
+        return (True,"Success!")
+
+    def unhide(self):
+        self.is_hidden = False
         self.__save()
         return (True,"Success!")
 

@@ -182,6 +182,7 @@
 
     {% for review in reviews %}
 	  {% if not review.is_blocked or current_user.is_admin or review.author == current_user %}
+      {% if not review.is_hidden or review.author == current_user %}
       {% if not review.is_visible_to_login_only or current_user.is_authenticated %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
@@ -251,8 +252,15 @@
                 删除
               </a>
               {% endif %}
-              {% if user.is_admin %}
-              <span class="glyphicon glyphicon-ban-circle grey left-pd-md" aria-hidden="true"></span>
+              {% if review.author == user %}
+                <span class="glyphicon glyphicon-ban-circle grey left-pd-md" aria-hidden="true"></span>
+                {% if review.is_hidden %}
+                <a href="javascript: unhide_review({{review.id}});">解除隐藏</a>
+                {% else %}
+                <a href="javascript: hide_review({{review.id}});">隐藏</a>
+                {% endif %}
+              {% elif user.is_admin %}
+                <span class="glyphicon glyphicon-ban-circle grey left-pd-md" aria-hidden="true"></span>
                 {% if review.is_blocked %}
                 <a href="javascript: unblock_review({{review.id}});">解除屏蔽</a>
                 {% else %}
@@ -273,6 +281,7 @@
 
           {% include 'review-comments.html' %}
         </div>
+	  {% endif %}
 	  {% endif %}
 	  {% endif %}
         {% endfor %}

@@ -159,6 +159,36 @@
      });
  }
 
+ function hide_review(review_id)
+ {
+     $.post("{{ url_for('api.hide_review') }}", { review_id: review_id },
+         function(o) {
+            if (o.ok) {
+               alert('隐藏点评成功，请刷新页面');
+            } else {
+               alert(o.message);
+            }
+     }, 'json')
+     .fail(function() {
+         alert('隐藏点评失败，请重试');
+     });
+ }
+
+ function unhide_review(review_id)
+ {
+     $.post("{{ url_for('api.unhide_review') }}", { review_id: review_id },
+         function(o) {
+            if (o.ok) {
+               alert('解除隐藏点评成功，请刷新页面');
+            } else {
+               alert(o.message);
+            }
+     }, 'json')
+     .fail(function() {
+         alert('解除隐藏点评失败，请重试');
+     });
+ }
+
  $('.review-filter-rule').each(function (index) {
      var id = $(this).attr('id')
      var prefix = 'review-filter-rule-'
