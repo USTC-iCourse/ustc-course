@@ -1,4 +1,4 @@
-            {% if review.is_hidden %}
+            {% if review.is_blocked %}
               {% if current_user.is_admin %}
                 <div class="alert alert-danger" role="alert">此点评因违反社区规则被屏蔽，仅作者和管理员可见。</div>
               {% endif %}

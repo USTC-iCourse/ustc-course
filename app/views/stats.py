@@ -136,7 +136,7 @@ def view_ranking():
                                     User.username.label('author_username'),
                                     Review.upvote_count.label('review_upvotes_count'))
                              .join(User).join(Course)
-                             .filter(Review.is_hidden == False)
+                             .filter(Review.is_blocked == False)
                              .filter(func.length(Review.content) >= 500)
                              .order_by(Review.upvote_count.desc())
                              .limit(topk_count).all())
@@ -150,7 +150,7 @@ def view_ranking():
                                            Review.upvote_count.label('review_upvotes_count'),
                                            func.length(Review.content).label('review_length'))
                                     .join(User).join(Course)
-                                    .filter(Review.is_hidden == False)
+                                    .filter(Review.is_blocked == False)
                                     .order_by(func.length(Review.content).desc())
                                     .limit(topk_count).all())
 

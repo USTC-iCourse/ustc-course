@@ -140,9 +140,9 @@
         <div class="ud-pd-md"></div>
         {% else %}
         
-	{% if course.num_hidden_reviews > 0 %}
+	{% if course.num_blocked_reviews > 0 %}
 	<div class="alert alert-warning" role="alert">
-		<span style="font-weight:bold;">本页面有 {{ course.num_hidden_reviews }} 条评论因违反<a href="/community-rules/">社区规范</a>被隐藏，请同学们文明点评，遵守社区规范。</span>
+		<span style="font-weight:bold;">本页面有 {{ course.num_blocked_reviews }} 条评论因违反<a href="/community-rules/">社区规范</a>被隐藏，请同学们文明点评，遵守社区规范。</span>
 	</div>
 	{% endif %}
 
@@ -181,7 +181,7 @@
 	{% endif %}
 
     {% for review in reviews %}
-	  {% if not review.is_hidden or current_user.is_admin or review.author == current_user %}
+	  {% if not review.is_blocked or current_user.is_admin or review.author == current_user %}
       {% if not review.is_visible_to_login_only or current_user.is_authenticated %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
@@ -253,7 +253,7 @@
               {% endif %}
               {% if user.is_admin %}
               <span class="glyphicon glyphicon-ban-circle grey left-pd-md" aria-hidden="true"></span>
-                {% if review.is_hidden %}
+                {% if review.is_blocked %}
                 <a href="javascript: unblock_review({{review.id}});">解除屏蔽</a>
                 {% else %}
                 <a href="javascript: block_review({{review.id}});">屏蔽</a>

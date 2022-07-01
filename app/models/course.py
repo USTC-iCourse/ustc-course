@@ -277,8 +277,8 @@ class Course(db.Model):
         return self
 
     @property
-    def num_hidden_reviews(self):
-        return self.reviews.filter(Review.is_hidden == True).count()
+    def num_blocked_reviews(self):
+        return self.reviews.filter(Review.is_blocked == True).count()
 
     @property
     def teacher(self):

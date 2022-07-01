@@ -11,7 +11,7 @@
         </div>
 
         {% for review in user.reviews %}
-          {% if not review.is_hidden or current_user.is_admin or current_user == user %}
+          {% if not review.is_blocked or current_user.is_admin or current_user == user %}
           {% if review.course %}
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">

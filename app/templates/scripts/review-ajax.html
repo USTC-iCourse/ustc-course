@@ -144,7 +144,7 @@
      });
  }
 
- function block_review(review_id)
+ function unblock_review(review_id)
  {
      $.post("{{ url_for('api.unblock_review') }}", { review_id: review_id },
          function(o) {

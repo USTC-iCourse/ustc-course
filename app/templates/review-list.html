@@ -3,7 +3,7 @@
       </div>
 
       {% for review in reviews.items %}
-          {% if not review.is_hidden or current_user.is_admin or current_user == review.author %}
+          {% if not review.is_blocked or current_user.is_admin or current_user == review.author %}
       <div class="ud-pd-md dashed">
         <div class="row">
           <div class="col-sm-1 col-xs-2 right-pd-no">
