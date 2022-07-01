@@ -146,7 +146,7 @@
 	</div>
 	{% endif %}
 
-	{% if course.review_count > 2 %}
+	{% if course.review_count >= 2 %}
 	<div class="ud-pd-sm">
 		<span class="right-pd-sm weight-heavy">排序</span>
 		<select name="sort_by" onchange="location=this.value">
