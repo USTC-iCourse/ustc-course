@@ -121,10 +121,17 @@ class User(db.Model, UserMixin):
     @property
     def reviews(self):
         query = Review.query.filter(Review.author_id == self.id)
-        if not current_user.is_authenticated or self.id != current_user.id:
+        if current_user.is_authenticated and self.id == current_user.id:
+            pass
+        else:
             query = query.filter(Review.is_anonymous == False)
-            query = query.filter(Review.is_blocked == False)
             query = query.filter(Review.is_hidden == False)
+
+        if current_user.is_authenticated and (self.id == current_user.id or current_user.is_admin):
+            pass
+        else:
+            query = query.filter(Review.is_blocked == False)
+
         if not current_user.is_authenticated:
             query = query.filter(Review.is_visible_to_login_only == False)
         return query.order_by(Review.update_time.desc()).all()

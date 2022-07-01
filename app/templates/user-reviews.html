@@ -11,7 +11,6 @@
         </div>
 
         {% for review in user.reviews %}
-          {% if not review.is_blocked or current_user.is_admin or current_user == user %}
           {% if review.course %}
         <div class="ud-pd-md dashed">
           <div class="ud-pd-sm">
@@ -44,7 +43,6 @@
               <span id="review-comment-count-{{review.id}}">{{ review.comment_count }}</span>
           </div>
         </div>
-          {% endif %}
           {% endif %}
         {% endfor %}
       </div><!-- end bm-pd-lg -->
