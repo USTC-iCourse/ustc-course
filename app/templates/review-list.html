@@ -12,7 +12,7 @@
           <div class="col-sm-11 col-xs-10">
             <div class="grey bm-pd-md">
           {% if review.is_anonymous %}
-          匿名用户
+          <span class="blue">匿名用户</span>
           {% else %}
 	      <a href="{{ url_for('user.view_profile', user_id=review.author.id) }}">{{ review.author.username }}</a>
           {% endif %}
