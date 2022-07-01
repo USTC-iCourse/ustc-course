@@ -19,6 +19,7 @@ def view_profile(user_id):
     if user.is_profile_hidden and current_user != user:
         message = '此用户的个人主页未公开！'
         return render_template('feedback.html', status=False, message=message)
+
     user.access_count += 1
     user.save_without_edit()
 
@@ -34,7 +35,10 @@ def reviews(user_id):
     '''用户点评过的所有课程'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry, the user does not seem to exist!')
+        message = '用户不存在！'
+        return render_template('feedback.html', status=False, message=message)
+    if user.is_profile_hidden and current_user != user:
+        message = '此用户的个人主页未公开！'
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('user-reviews.html',
@@ -49,7 +53,10 @@ def follow_course(user_id):
     '''用户关注过的所有课程'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry, the user does not seem to exist!')
+        message = '用户不存在！'
+        return render_template('feedback.html', status=False, message=message)
+    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
+        message = '此用户关注的课程未公开！'
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('follow-course.html',
@@ -66,7 +73,10 @@ def join_course(user_id):
     '''用户学过的所有课程'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry, the user does not seem to exist!')
+        message = '用户不存在！'
+        return render_template('feedback.html', status=False, message=message)
+    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
+        message = '此用户学过的课程未公开！'
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('join-course.html',
@@ -192,7 +202,10 @@ def followers(user_id):
     '''被关注的人页面'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry, the user does not seem to exist!')
+        message = '用户不存在！'
+        return render_template('feedback.html', status=False, message=message)
+    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
+        message = '此用户的粉丝列表未公开！'
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('followers.html',
@@ -205,7 +218,10 @@ def followings(user_id):
     '''关注的人页面'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry, the user does not seem to exist!')
+        message = '用户不存在！'
+        return render_template('feedback.html', status=False, message=message)
+    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
+        message = '此用户关注的人未公开！'
         return render_template('feedback.html', status=False, message=message)
 
     return render_template('followings.html',
