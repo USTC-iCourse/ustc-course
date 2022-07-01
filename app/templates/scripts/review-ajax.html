@@ -129,9 +129,9 @@
      elem.val('回复 @' + reply_to + ': ');
  }
 
- function hide_review(review_id)
+ function block_review(review_id)
  {
-     $.post("{{ url_for('api.hide_review') }}", { review_id: review_id },
+     $.post("{{ url_for('api.block_review') }}", { review_id: review_id },
          function(o) {
             if (o.ok) {
                alert('屏蔽成功，请刷新页面');
@@ -144,9 +144,9 @@
      });
  }
 
- function unhide_review(review_id)
+ function block_review(review_id)
  {
-     $.post("{{ url_for('api.unhide_review') }}", { review_id: review_id },
+     $.post("{{ url_for('api.unblock_review') }}", { review_id: review_id },
          function(o) {
             if (o.ok) {
                alert('解除屏蔽成功，请刷新页面');

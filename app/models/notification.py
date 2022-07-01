@@ -110,9 +110,9 @@ class Notification(db.Model):
             return '点评了' + self.ref_obj_name
         elif self.operation == 'follow':
             return '关注了' + self.ref_obj_name
-        elif self.operation == 'hide-review':
+        elif self.operation == 'block-review':
             return '您在课程「' + self.ref_obj.link + '」中的点评因违反' + self.community_rules_link + '，已被屏蔽'
-        elif self.operation == 'unhide-review':
+        elif self.operation == 'unblock-review':
             return '您在课程「' + self.ref_obj.link + '」中的点评已被解除屏蔽'
         else:
             return 'doge'
@@ -120,7 +120,7 @@ class Notification(db.Model):
     @property
     def __display_text(self):
         try:
-            if self.operation in ['hide-review', 'unhide-review']:
+            if self.operation in ['block-review', 'unblock-review']:
                 return self.operation_text
             else:
                 return self.from_user.link + ' ' + self.operation_text

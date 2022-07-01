@@ -254,9 +254,9 @@
               {% if user.is_admin %}
               <span class="glyphicon glyphicon-ban-circle grey left-pd-md" aria-hidden="true"></span>
                 {% if review.is_hidden %}
-                <a href="javascript: unhide_review({{review.id}});">解除屏蔽</a>
+                <a href="javascript: unblock_review({{review.id}});">解除屏蔽</a>
                 {% else %}
-                <a href="javascript: hide_review({{review.id}});">屏蔽</a>
+                <a href="javascript: block_review({{review.id}});">屏蔽</a>
                 {% endif %}
               {% endif %}
             </span>

@@ -5,7 +5,7 @@ from app.models import ReviewCommentHistory, ThirdPartySigninHistory
 from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email
 from app.utils import editor_parse_at
-from app.utils import send_hide_review_email, send_unhide_review_email
+from app.utils import send_block_review_email, send_unblock_review_email
 from app.views.review import record_review_history
 from flask_babel import gettext as _
 from app import app
@@ -140,19 +140,19 @@ def delete_comment():
     else:
         return jsonify(ok=False,message="A id must be given")
 
-@api.route('/review/hide/', methods=['POST'])
+@api.route('/review/block/', methods=['POST'])
 @login_required
-def hide_review():
+def block_review():
     review_id = request.values.get('review_id')
     if review_id:
         review = Review.query.with_for_update().get(review_id)
         if review:
             if current_user.is_admin:
-                ok,message = review.hide()
+                ok,message = review.block()
                 if ok:
-                    review.author.notify('hide-review', review)
-                    send_hide_review_email(review)
-                    record_review_history(review, 'hide')
+                    review.author.notify('block-review', review)
+                    send_block_review_email(review)
+                    record_review_history(review, 'block')
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
@@ -161,19 +161,19 @@ def hide_review():
     else:
         return jsonify(ok=False,message="A id must be given")
 
-@api.route('/review/unhide/', methods=['POST'])
+@api.route('/review/unblock/', methods=['POST'])
 @login_required
-def unhide_review():
+def unblock_review():
     review_id = request.values.get('review_id')
     if review_id:
         review = Review.query.with_for_update().get(review_id)
         if review:
             if current_user.is_admin:
-                ok,message = review.unhide()
+                ok,message = review.unblock()
                 if ok:
-                    review.author.notify('unhide-review', review)
-                    send_unhide_review_email(review)
-                    record_review_history(review, 'unhide')
+                    review.author.notify('unblock-review', review)
+                    send_unblock_review_email(review)
+                    record_review_history(review, 'unblock')
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
