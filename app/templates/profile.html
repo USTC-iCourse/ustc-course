@@ -45,6 +45,7 @@
         {% endfor %}
       </div><!-- end bm-pd-lg -->
 
+      {% if user == current_user or not user.is_following_hidden %}
       <div class="bm-pd-lg">
         <div class="inline-h3">
           <a href="{{ url_for('user.follow_course', user_id=user.id) }}">
@@ -67,15 +68,16 @@
 	  {% if course.introduction %}
 	  <span class="label label-danger">课程简介</span>
 	  {% endif %}
-	  {% if course in user.courses_joined %}
+          {% if course in user.courses_joined %}
           <span class="label label-info">已学过</span>
           {% endif %}
         </div>
         {% endfor %}
 
       </div>
+      {% endif %}
 
-
+      {% if user == current_user or not user.is_following_hidden %}
       {% if user.is_student and user.info %}
       <div class="bm-pd-lg">
         <div class="inline-h3">
@@ -117,6 +119,7 @@
         {% endif %}
       </div>
       {% endif %}
+      {% endif %}
 
 
 
@@ -149,6 +152,7 @@
         </ul>
       </div>
 
+      {% if user == current_user or not user.is_following_hidden %}
       <div class="ud-pd-md dashed">
         <ul class="list-unstyled dark-grey">
             <li class="ud-pd-sm">关注了 <strong><a href="{{ url_for('user.followings', user_id=user.id) }}">{{ user.following_count }}</a></strong> 人</li>
@@ -157,6 +161,7 @@
             <li class="ud-pd-sm">点评了 <strong><a href="{{ url_for('user.reviews', user_id=user.id) }}">{{ user.reviews_count }}</a></strong> 门课程</li>
         </ul>
       </div>
+      {% endif %}
 
     </div><!-- end col-md-4 -->
   </div><!-- end float-element -->
