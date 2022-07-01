@@ -182,6 +182,7 @@
 
     {% for review in reviews %}
 	  {% if not review.is_hidden or current_user.is_admin or review.author == current_user %}
+      {% if not review.is_visible_to_login_only or current_user.is_authenticated %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
             <span class="right-pd-sm px16">
@@ -272,6 +273,7 @@
 
           {% include 'review-comments.html' %}
         </div>
+	  {% endif %}
 	  {% endif %}
         {% endfor %}
         {% endif %}

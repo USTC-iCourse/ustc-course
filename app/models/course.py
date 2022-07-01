@@ -278,11 +278,7 @@ class Course(db.Model):
 
     @property
     def num_hidden_reviews(self):
-        num = 0
-        for review in self.reviews:
-            if review.is_hidden:
-                num += 1
-        return num
+        return self.reviews.filter(Review.is_hidden == True).count()
 
     @property
     def teacher(self):

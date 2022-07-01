@@ -121,6 +121,8 @@ class User(db.Model, UserMixin):
         query = Review.query.filter(Review.author_id == self.id)
         if not current_user.is_authenticated or self.id != current_user.id:
             query = query.filter(Review.is_anonymous == False)
+        if not current_user.is_authenticated:
+            query = query.filter(Review.is_visible_to_login_only == False)
         return query.order_by(Review.update_time.desc()).all()
 
     @property

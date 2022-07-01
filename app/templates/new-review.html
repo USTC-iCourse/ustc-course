@@ -51,24 +51,29 @@
         </div>
       </div>
 
-      <h4 class="grey">说几句吧！</h4>
-
       <div class="container-md desktop">
+        <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
           <textarea id="content-editor" name="content">{% if review.content %}{{ review.content|safe }}{% endif %}</textarea>
         </div>
-        <div class="ud-pd-sm"></div>
       </div>
-      <div class="container mobile">
+
+      <div class="mobile">
+        <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
           <input type="hidden" name="is_mobile" value="1">
           <textarea type="text" class="form-control" rows="8" name="content">{% if review.content %}{{ review.content_text }}{% endif %}</textarea>
         </div>
       </div>
 
+      <div class="ud-pd-sm"></div>
       <div class="class-control">
         <input {% if review.is_anonymous %}checked{% endif %} id="is_anonymous" name="is_anonymous" type="checkbox" value="1">
         <label for="is_anonymous">匿名发表点评</label>
+      </div>
+      <div class="class-control">
+        <input {% if review.is_visible_to_login_only %}checked{% endif %} id="is_visible_to_login_only" name="is_visible_to_login_only" type="checkbox" value="1">
+        <label for="is_visible_to_login_only">仅对登录用户可见</label>
       </div>
 
       <div class="container-md desktop">
