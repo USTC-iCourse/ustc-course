@@ -205,6 +205,9 @@
             {% endfor %}
 
             <span class="left-pd-md">{{ review.term|term_display }}</span>
+	        {% if current_user == review.author and review.is_visible_to_login_only %}
+	        <span class="pull-right label label-success" style="font-size: 100%;">仅登录可见</span>
+            {% endif %}
 	    {% if review.author.is_teacher %}
 	      {% if review.author.id in review.course.registered_teacher_id_list %}
 	      <span class="pull-right label label-success teacher-review-label" style="font-size: 100%;" data-toogle="tooltip" data-placement="top" title="该点评由本课程教师账号发表">本课程教师</span>
