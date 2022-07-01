@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash, \
 from flask_babel import gettext as _
 from .notification import Notification
 from werkzeug.contrib.cache import SimpleCache
+from .review import Review
 
 Roles = ['Admin',
         'User']
@@ -117,8 +118,10 @@ class User(db.Model, UserMixin):
 
     @property
     def reviews(self):
-        from app.models import Review
-        return Review.query.filter(Review.author_id == self.id).filter(Review.is_anonymous == False).all()
+        query = Review.query.filter(Review.author_id == self.id)
+        if not current_user.is_authenticated or self.id != current_user.id:
+            query = query.filter(Review.is_anonymous == False)
+        return query.order_by(Review.update_time.desc()).all()
 
     @property
     def reviews_count(self):

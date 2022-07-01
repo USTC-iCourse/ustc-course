@@ -28,6 +28,9 @@
             {% set course = review.course %}
             <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display|name_display_short }}）{% endif %}</a>
             <span class="small grey align-bottom left-pd-sm">{{ review.term_display }}</span>
+	        {% if review.is_anonymous %}
+	        <span class="label label-success">匿名</span>
+	        {% endif %}
             <span class="text-muted small float-right desktop localtime" style="display: none;">{{ review.update_time|utctime }}</span>
           </div>
           {% include 'review-hidden.html' %}
