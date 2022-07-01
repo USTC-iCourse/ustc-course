@@ -23,7 +23,11 @@
           </div>
           <div class="col-md-11 col-xs-10">
             <div class="grey bm-pd-md">
+          {% if review.is_anonymous %}
+          匿名用户
+          {% else %}
 	      <a href="{{ url_for('user.view_profile', user_id=review.author.id) }}">{{ review.author.username }}</a>
+          {% endif %}
 	      {% if review.publish_time == review.update_time %}点评了{% else %}更新了点评{% endif %}
               <a href="{{ url_for('course.view_course', course_id=review.course.id) }}">{{ review.course.name }}{% if review.course.teachers %}（{{ review.course.teacher_names_display }}）{% endif %}</a>
 

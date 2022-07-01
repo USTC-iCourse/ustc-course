@@ -185,7 +185,11 @@
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
             <span class="right-pd-sm px16">
+              {% if review.is_anonymous %}
+              匿名用户
+              {% else %}
               <a href={{ url_for('user.view_profile', user_id=review.author.id) }}>{{ review.author.username }}</a>
+              {% endif %}
             </span>
 
             {% for star in range(0,5) %}
