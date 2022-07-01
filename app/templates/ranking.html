@@ -148,8 +148,12 @@
             <th class="text-center">#{{ loop.index }}</th>
             <td><a href="{{ url_for('course.view_course', course_id=review.course_id) }}#review-{{ review.review_id }}"
                 target="_blank">{{ review.course_name }}</a></td>
+            {% if review.is_anonymous %}
+            <td>匿名用户</td>
+            {% else %}
             <td><a href="{{ url_for('user.view_profile', user_id=review.author_id) }}" target="_blank">{{
                 review.author_username }}</a></td>
+            {% endif %}
             <td>{{ review.review_upvotes_count }}</td>
           </tr>
           {% endfor %}
@@ -175,8 +179,12 @@
             <th class="text-center">#{{ loop.index }}</th>
             <td><a href="{{ url_for('course.view_course', course_id=review.course_id) }}#review-{{ review.review_id }}"
                 target="_blank">{{ review.course_name }}</a></td>
+            {% if review.is_anonymous %}
+            <td>匿名用户</td>
+            {% else %}
             <td><a href="{{ url_for('user.view_profile', user_id=review.author_id) }}" target="_blank">{{
                 review.author_username }}</a></td>
+            {% endif %}
             <td>{{ review.review_upvotes_count }}</td>
             <td>{{ review.review_length }}</td>
           </tr>
