@@ -14,7 +14,10 @@ def view_profile(user_id):
     '''用户的个人主页,展示用户在站点的活跃情况'''
     user = User.query.get(user_id)
     if not user:
-        message = _('Sorry, the user does not seem to exist!')
+        message = '用户不存在！'
+        return render_template('feedback.html', status=False, message=message)
+    if user.is_profile_hidden and current_user != user:
+        message = '此用户的个人主页未公开！'
         return render_template('feedback.html', status=False, message=message)
     user.access_count += 1
     user.save_without_edit()
@@ -102,6 +105,10 @@ def account_settings():
                 user.set_avatar(resize_avatar(info))
             else:
                 errors.append(_("Avatar upload failed"))
+
+        user.is_following_hidden = form['is_following_hidden'].data
+        user.is_profile_hidden = form['is_profile_hidden'].data
+
         user.save()
     return render_template('settings.html', user=user, form=form, errors=errors, title='用户设置')
 
@@ -155,7 +162,7 @@ def courses(user_id):
             courses_page = user.info.courses_joined.paginate(page=page,per_page=per_page)
             return render_template('list-courses.html',student=user.info,courses=courses_page)
         else:
-            return render_template('feedback.html',status=False,message=_('Erorr 203: please contact us!'))
+            return render_template('feedback.html',status=False,message=_('Error: please contact us!'))
     elif user:
         return render_template('feedback.html',status=False,message=_('This user have not bind a ID.Click\
             <a href=%(url)s><b>here</b></a> to bind.',url=url_for('.bind_identity')))

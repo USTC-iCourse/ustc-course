@@ -71,6 +71,8 @@ class ProfileForm(FlaskForm):
     description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])
     homepage = StringField('Homepage', validators=[Optional(),Length(max=200,message="长度不大于200")])
     avatar = FileField('Avatar', validators=[])
+    is_following_hidden = BooleanField('is_following_hidden', default=False)
+    is_profile_hidden = BooleanField('is_profile_hidden', default=False)
 
 '''
     def validate_username(form,field):

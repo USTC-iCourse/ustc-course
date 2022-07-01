@@ -69,6 +69,8 @@ class User(db.Model, UserMixin):
     homepage = db.Column(db.String(200))  # 用户博客、主页等
     description = db.Column(db.Text)
     _avatar = db.Column(db.String(100))
+    is_following_hidden = db.Column(db.Boolean, default=False)
+    is_profile_hidden = db.Column(db.Boolean, default=False)
     
     following_count = db.Column(db.Integer, default=0)
     follower_count = db.Column(db.Integer, default=0)
