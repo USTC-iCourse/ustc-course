@@ -37,6 +37,7 @@ class Review(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     term = db.Column(db.String(10), index=True)
 
+    is_anonymous = db.Column(db.Boolean, default=False)
     is_hidden = db.Column(db.Boolean, default=False)
     filter_rule = db.Column(db.Text())
     #course: Course

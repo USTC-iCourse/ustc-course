@@ -154,10 +154,15 @@ class User(db.Model, UserMixin):
             return []
 
     @property
+    def default_avatar(self):
+        return '/static/image/user.png'
+
+    @property
     def avatar(self):
         if self._avatar:
             return '/uploads/images/' + self._avatar
-        return '/static/image/user.png'
+        else:
+            return self.default_avatar
 
     def set_avatar(self,avatar):
         self._avatar = avatar

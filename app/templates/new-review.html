@@ -51,25 +51,34 @@
         </div>
       </div>
 
+      <h4 class="grey">说几句吧！</h4>
+
       <div class="container-md desktop">
-        <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
           <textarea id="content-editor" name="content">{% if review.content %}{{ review.content|safe }}{% endif %}</textarea>
         </div>
-        <button type="submit" class="btn btn-blue btn-flat float-right shadow">发布</button>
-        <div class="ud-pd-lg"></div>
+        <div class="ud-pd-sm"></div>
       </div>
-
       <div class="container mobile">
-        <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
           <input type="hidden" name="is_mobile" value="1">
           <textarea type="text" class="form-control" rows="8" name="content">{% if review.content %}{{ review.content_text }}{% endif %}</textarea>
         </div>
-        <button type="submit" class="btn btn-blue float-right">发布</button>
-        <div class="ud-pd-lg"></div>
       </div>
 
+      <div class="class-control">
+        <input {% if review.is_anonymous %}checked{% endif %} id="is_anonymous" name="is_anonymous" type="checkbox" value="1">
+        <label for="is_anonymous">匿名发表点评</label>
+      </div>
+
+      <div class="container-md desktop">
+        <button type="submit" class="btn btn-blue btn-flat float-right shadow">发布</button>
+      </div>
+      <div class="container mobile">
+        <button type="submit" class="btn btn-blue float-right">发布</button>
+      </div>
+
+      <div class="ud-pd-lg"></div>
 
     </form>
   </div>
