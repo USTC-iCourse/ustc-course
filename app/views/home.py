@@ -346,11 +346,13 @@ def search_reviews():
         else:
             unioned_query = unioned_query.union(content_query)
 
-        author_query = Review.query.join(Review.author).filter(User.username == keyword)
+        author_query = Review.query.join(Review.author).filter(User.username == keyword).filter(Review.is_anonymous == False)
         course_query = Review.query.join(Review.course).filter(Course.name.like('%' + keyword + '%'))
         teacher_query = Review.query.join(Review.course).join(Course.teachers).filter(Teacher.name == keyword)
         unioned_query = unioned_query.union(author_query).union(course_query).union(teacher_query)
 
+    if not current_user.is_authenticated:
+        unioned_query = unioned_query.filter(Review.is_visible_to_login_only == False)
     reviews_paged = unioned_query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
 
     if reviews_paged.total > 0:
