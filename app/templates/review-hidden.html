@@ -6,3 +6,6 @@
                 <div class="alert alert-danger" role="alert">您的点评违反了 <a href="https://icourse.club/community-rules/" target="_blank">社区规则</a>，已被管理员屏蔽。如需解除屏蔽，请修改后联系 service@icourse.club。</div>
               {% endif %}
             {% endif %}
+            {% if review.is_hidden %}
+                <div class="alert alert-danger" role="alert">您已隐藏此点评，点评内容仅对您可见。</div>
+            {% endif %}
