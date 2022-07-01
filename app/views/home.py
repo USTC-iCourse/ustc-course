@@ -156,19 +156,6 @@ def verify_3rdparty_signin():
         abort(403, description="user does not exist or token is invalid")
 
 
-@home.route('/su/<int:user_id>')
-@login_required
-def switch_user(user_id):
-    if not current_user.is_admin:
-        abort(403)
-    user = User.query.get(user_id)
-    if not user:
-        abort(404)
-    logout_user()
-    login_user(user)
-    return redirect_to_index()
-
-
 @home.route('/signup/',methods=['GET','POST'])
 def signup():
     if current_user.is_authenticated:
