@@ -348,8 +348,9 @@ def search_reviews():
 
         author_query = Review.query.join(Review.author).filter(User.username == keyword).filter(Review.is_anonymous == False)
         course_query = Review.query.join(Review.course).filter(Course.name.like('%' + keyword + '%'))
+        courseries_query = Review.query.join(Review.course).join(CourseTerm).filter(CourseTerm.courseries.like(keyword + '%')).filter(CourseTerm.course_id == Course.id)
         teacher_query = Review.query.join(Review.course).join(Course.teachers).filter(Teacher.name == keyword)
-        unioned_query = unioned_query.union(author_query).union(course_query).union(teacher_query)
+        unioned_query = unioned_query.union(author_query).union(course_query).union(courseries_query).union(teacher_query)
 
     unioned_query = unioned_query.filter(Review.is_blocked == False).filter(Review.is_hidden == False)
     if not current_user.is_authenticated:
