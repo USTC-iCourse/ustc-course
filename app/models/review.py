@@ -32,7 +32,7 @@ class Review(db.Model):
     upvote_users = db.relationship('User', secondary=review_upvotes)
     comments = db.relationship('ReviewComment', backref='review', lazy='joined')
 
-    author = db.relationship('User', backref=db.backref('reviews', order_by='desc(Review.publish_time)'), lazy='joined')
+    author = db.relationship('User', lazy='joined')
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     term = db.Column(db.String(10), index=True)

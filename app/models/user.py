@@ -116,6 +116,11 @@ class User(db.Model, UserMixin):
         return text
 
     @property
+    def reviews(self):
+        from app.models import Review
+        return Review.query.filter(Review.author_id == self.id).filter(Review.is_anonymous == False).all()
+
+    @property
     def reviews_count(self):
         return len(self.reviews)
 
