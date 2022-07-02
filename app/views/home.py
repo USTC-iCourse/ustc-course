@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, CourseTerm, Teacher, Review, Notification, follow_course, follow_user, SearchLog, ThirdPartySigninHistory
+from app.models import User, RevokedToken as RT, Course, CourseRate, CourseTerm, Teacher, Review, Notification, follow_course, follow_user, SearchLog, ThirdPartySigninHistory, Announcement
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -482,6 +482,11 @@ def search():
                 title=title,
                 this_module='home.search')
 
+
+@home.route('/announcements/')
+def announcements():
+    announcements = Announcement.query.order_by(Announcement.update_time.desc()).all()
+    return render_template('announcements.html', announcements=announcements)
 
 
 @home.route('/about/')
