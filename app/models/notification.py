@@ -124,6 +124,8 @@ class Notification(db.Model):
         try:
             if self.operation in ['block-review', 'unblock-review']:
                 return self.operation_text
+            elif self.ref_class == 'Review' and self.ref_obj.is_anonymous:
+                return '匿名用户 ' + self.operation_text
             else:
                 return self.from_user.link + ' ' + self.operation_text
         except:
