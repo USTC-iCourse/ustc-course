@@ -163,7 +163,11 @@ def load_courses(insert=True):
 
             db.session.add(t)
 
-        course_key = course['nameZh'] + '(' + ','.join(sorted(teacher_names)) + ')'
+        # deduplicate
+        teacher_names = sorted(list(set(teacher_names)))
+        teacher_objects = list(set(teacher_objects))
+
+        course_key = course['nameZh'] + '(' + ','.join(teacher_names) + ')'
         if course_key in courses_map:
             course = courses_map[course_key]
             course.teachers = teacher_objects
