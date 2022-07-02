@@ -56,6 +56,7 @@ def new_review(course_id):
     else:
         is_new = False
         old_review = Review()
+        old_review.content = review.content
         old_review.difficulty = review.difficulty
         old_review.homework = review.homework
         old_review.grading = review.grading
@@ -84,9 +85,16 @@ def new_review(course_id):
                 for user in mentioned_users:
                     user.notify('mention', review)
                 record_review_history(review, 'create')
-            else:
-                review.update_time = datetime.utcnow()
-                review.update_course_rate(old_review)
+            else: # update existing review
+                if old_review.content == review.content and old_review.difficulty == review.difficulty and old_review.homework == review.homework and old_review.grading == review.grading and old_review.gain == review.gain and old_review.rate == review.rate:
+                    # if content and rating are not changed, do not update the update_time
+                    # especially, if only privacy settings are changed, do not display on recent reviews or notify followers
+                    pass
+                else:
+                    review.update_time = datetime.utcnow()
+                    review.update_course_rate(old_review)
+                    for user in set(current_user.followers + course.followers):
+                        user.notify('update-review', review, ref_display_class='Course')
                 record_review_history(review, 'update')
 
             next_url = url_for('course.view_course', course_id=course_id, _external=True) + '#review-' + str(review.id)

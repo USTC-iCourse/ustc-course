@@ -108,6 +108,8 @@ class Notification(db.Model):
             return '评论了' + self.ref_obj_name
         elif self.operation == 'review':
             return '点评了' + self.ref_obj_name
+        elif self.operation == 'update-review':
+            return '更新了点评' + self.ref_obj_name
         elif self.operation == 'follow':
             return '关注了' + self.ref_obj_name
         elif self.operation == 'block-review':
