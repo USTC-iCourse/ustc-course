@@ -389,3 +389,30 @@ a.nounderline:active { text-decoration: none; }
     background: transparent;
     border: none;
 }
+
+/* go to top floating button from Freemind theme of Hexo */
+#gotop {
+    display:block;
+    width:36px;
+    height:36px;
+    position:fixed;
+    bottom:40px;
+    right:30px;
+    border-radius:7px;
+    text-decoration:none;
+    display:none; 
+}
+#gotop span {
+    display:block;
+    font-size:24px;
+    text-align:center;
+}
+#gotop {
+    background-color: #1caaea;
+}
+#gotop span {
+    color: #ffffff;
+}
+#gotop span:hover {
+    color: #ffffff;
+}
