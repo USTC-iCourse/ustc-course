@@ -29,20 +29,24 @@ def index():
 
 def gen_reviews_query():
     reviews = Review.query.filter(Review.is_blocked == False).filter(Review.is_hidden == False)
-    if not current_user.is_authenticated:
-        reviews = reviews.filter(Review.is_visible_to_login_only == False)
-    return reviews.order_by(Review.update_time.desc())
+    if current_user.is_authenticated:
+        return reviews
+    else:
+        return reviews.filter(Review.is_visible_to_login_only == False)
+
+def gen_ordered_reviews_query():
+    return gen_reviews_query().order_by(Review.update_time.desc())
 
 @home.route('/latest_reviews')
 def latest_reviews():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    reviews_paged = gen_reviews_query().paginate(page=page, per_page=per_page)
+    reviews_paged = gen_ordered_reviews_query().paginate(page=page, per_page=per_page)
     return render_template('latest-reviews.html', reviews=reviews_paged, title='全站最新点评', this_module='home.latest_reviews', hide_title=True)
 
 @home.route('/feed.xml')
 def latest_reviews_rss():
-    reviews_paged = gen_reviews_query().paginate(page=1, per_page=50)
+    reviews_paged = gen_ordered_reviews_query().paginate(page=1, per_page=50)
     rss_content = render_template('feed.xml', reviews=reviews_paged)
     response = make_response(rss_content)
     response.headers['Content-Type'] = 'application/rss+xml'
@@ -58,11 +62,11 @@ def follow_reviews():
 
     if follow_type == 'user':
         # show reviews for followed users
-        reviews = Review.query.join(follow_user, Review.author_id == follow_user.c.followed_id).filter(follow_user.c.follower_id == current_user.id)
+        reviews = gen_reviews_query().filter(Review.is_anonymous == False).join(follow_user, Review.author_id == follow_user.c.followed_id).filter(follow_user.c.follower_id == current_user.id)
         title = '「我关注的人」最新点评'
     else:
         # show reviews for followed courses
-        reviews = Review.query.join(follow_course, Review.course_id == follow_course.c.course_id).filter(follow_course.c.user_id == current_user.id)
+        reviews = gen_reviews_query().join(follow_course, Review.course_id == follow_course.c.course_id).filter(follow_course.c.user_id == current_user.id)
         title = '「我关注的课程」最新点评'
 
     reviews_to_show = reviews.filter(Review.author_id != current_user.id).order_by(Review.update_time.desc())
