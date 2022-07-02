@@ -31,7 +31,8 @@ depts_code_map = dict()
 classes_map = dict()
 majors_map = dict()
 titles_map = dict()
-teachers_map = dict()
+teachers_id_map = dict()
+teachers_name_map = dict()
 # We should load all existing courses, because SQLAlchemy does not support .merge on non-primary-key,
 # and we want to preserve course ID (primary key) for each (cno, term) pair.
 course_classes_map = dict()
@@ -46,8 +47,12 @@ def load_courses(insert=True):
 
     existing_teachers = Teacher.query.all()
     for t in existing_teachers:
-        teachers_map[t.name] = t
-    print('%d existing teachers loaded' % len(teachers_map))
+        if t.name in teachers_name_map:
+            teachers_name_map[t.name].append(t)
+        else:
+            teachers_name_map[t.name] = [t]
+        teachers_id_map[t.jwc_id] = t
+    print('%d existing teachers loaded' % len(existing_teachers))
 
     existing_courses = Course.query.all()
     for c in existing_courses:
@@ -68,6 +73,7 @@ def load_courses(insert=True):
     new_course_count = 0
     new_term_count = 0
     new_class_count = 0
+    new_dept_count = 0
 
     int_allow_empty = lambda string: int(string) if string.strip() else 0
     course_kcbh = {}
@@ -98,6 +104,7 @@ def load_courses(insert=True):
         
         teachers = []
         teacher_names = []
+        teacher_objects = []
         if 'teachers' in c:
             teachers = c['teachers']
         elif 'teacherAssignmentList' in c:
@@ -110,11 +117,31 @@ def load_courses(insert=True):
                 teacher = _t
                 teacher_name = teacher['nameZh']
             teacher_names.append(teacher_name)
-            if teacher_name in teachers_map:
-                t = teachers_map[teacher_name]
-            else:
+
+            try:
+                jwc_id = teacher['person']['id']
+            except:
+                jwc_id = None
+
+            if jwc_id is not None and jwc_id in teachers_id_map:
+                t = teachers_id_map[jwc_id]
+            elif teacher_name in teachers_name_map and len(teachers_name_map[teacher_name]) == 1:
+                t = teachers_name_map[teacher_name][0]
+            else: # either teacher does not exist, or name is ambiguous
                 t = Teacher()
+                teachers_id_map[jwc_id] = t
+                if teacher_name in teachers_name_map:
+                    teachers_name_map[teacher_name].append(t)
+                else:
+                    teachers_name_map[teacher_name] = [t]
+                new_teacher_count += 1
+
+            teacher_objects.append(t)
+
             t.name = teacher_name
+            if jwc_id is not None:
+                t.jwc_id = jwc_id
+
             try:
                 if teacher['person']['gender']['nameEn'] == 'Male':
                     t.gender = 'male'
@@ -134,26 +161,21 @@ def load_courses(insert=True):
             except:
                 pass
 
-            if not t.name in teachers_map:
-                db.session.add(t)
-                teachers_map[t.name] = t
-                new_teacher_count += 1
+            db.session.add(t)
 
         course_key = course['nameZh'] + '(' + ','.join(sorted(teacher_names)) + ')'
         if course_key in courses_map:
             course = courses_map[course_key]
-            print('Existing course ' + course_key)
+            course.teachers = teacher_objects
+            db.session.add(course)
+            #print('Existing course ' + course_key)
         else:
             course_name = course['nameZh']
             course = Course()
             course.name = course_name
-            course.teachers = []
+            course.teachers = teacher_objects
             db.session.add(course)
 
-            for t in teacher_names:
-                course.teachers.append(teachers_map[t])
-
-            db.session.add(course)
             courses_map[course_key] = course
 
             # course rate 
@@ -167,13 +189,19 @@ def load_courses(insert=True):
         if c['openDepartment']['code'] in depts_code_map:
             course.dept_id = depts_code_map[c['openDepartment']['code']].id
         else:
-            print('Department code ' + c['openDepartment']['code'] + ' not found in ' + str(c))
+            dept = Dept()
+            dept.code = c['openDepartment']['code']
+            dept.name = c['openDepartment']['simpleNameZh']
+            dept.name_eng = c['openDepartment']['nameEn']
+            db.session.add(dept)
+            print('New department ' + dept.name)
+            new_dept_count += 1
 
         # course term
         term_key = course_key + '@' + str(term)
         if term_key in course_terms_map:
             course_term = course_terms_map[term_key]
-            print('Existing course term ' + term_key)
+            #print('Existing course term ' + term_key)
         else:
             course_term = CourseTerm()
             db.session.add(course_term)
@@ -197,7 +225,7 @@ def load_courses(insert=True):
         if unique_key in course_classes_map:
             course_class = course_classes_map[unique_key]
             course_class.course = course # update course mapping
-            print('Existing course class ' + unique_key)
+            #print('Existing course class ' + unique_key)
         else:
             course_class = CourseClass()
             db.session.add(course_class)
@@ -216,6 +244,7 @@ def load_courses(insert=True):
     print('%d new courses loaded' % new_course_count)
     print('%d new terms loaded' % new_term_count)
     print('%d new classes loaded' % new_class_count)
+    print('%d new departments loaded' % new_dept_count)
 
 # we have merge now, do not drop existing data
 db.create_all()
