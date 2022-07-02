@@ -4,6 +4,8 @@ import os
 import requests
 import lxml.html
 import subprocess
+import time
+import datetime
 
 os.chdir(os.path.dirname(__file__))
 sys.path.append('..')  # fix import directory
@@ -36,18 +38,29 @@ if len(options) == 0:
     print('Semesters not found, please check whether cookie is valid')
     sys.exit(1)
 
+
+def need_download(filepath):
+    if not os.path.exists(filepath) or not os.path.isfile(filepath):
+        return True
+    mtime = os.path.getmtime(filepath)
+    mtime_obj = datetime.datetime.fromtimestamp(mtime)
+    return datetime.datetime.now() - datetime.timedelta(days=1) > mtime_obj
+
 print('Found ' + str(len(options)) + ' semesters')
 for option in options:
     semester_id = option.attrib['value']
     semester_name = option.text
     echo_text = 'semester ' + semester_name + ' (ID=' + semester_id + ')'
 
-    print('Downloading ' + echo_text)
-    lesson_url = 'https://jw.ustc.edu.cn/for-std/lesson-search/semester/' + semester_id + '/search/4367?courseCodeLike=&codeLike=&educationAssoc=&courseNameZhLike=&teacherNameLike=&schedulePlace=&classCodeLike=&courseTypeAssoc=&classTypeAssoc=&campusAssoc=&teachLangAssoc=&roomTypeAssoc=&examModeAssoc=&requiredPeriodInfo.totalGte=&requiredPeriodInfo.totalLte=&requiredPeriodInfo.weeksGte=&requiredPeriodInfo.weeksLte=&requiredPeriodInfo.periodsPerWeekGte=&requiredPeriodInfo.periodsPerWeekLte=&limitCountGte=&limitCountLte=&majorAssoc=&majorDirectionAssoc=&queryPage__=1%2C100000&_=1656750360507'
-    r = requests.get(lesson_url, headers=headers)
     save_file_path = os.path.join(folder, semester_name + '.json')
-    with open(save_file_path, 'w') as f:
-        f.write(r.text)
+    if need_download(save_file_path):
+        print('Downloading ' + echo_text)
+        lesson_url = 'https://jw.ustc.edu.cn/for-std/lesson-search/semester/' + semester_id + '/search/4367?courseCodeLike=&codeLike=&educationAssoc=&courseNameZhLike=&teacherNameLike=&schedulePlace=&classCodeLike=&courseTypeAssoc=&classTypeAssoc=&campusAssoc=&teachLangAssoc=&roomTypeAssoc=&examModeAssoc=&requiredPeriodInfo.totalGte=&requiredPeriodInfo.totalLte=&requiredPeriodInfo.weeksGte=&requiredPeriodInfo.weeksLte=&requiredPeriodInfo.periodsPerWeekGte=&requiredPeriodInfo.periodsPerWeekLte=&limitCountGte=&limitCountLte=&majorAssoc=&majorDirectionAssoc=&queryPage__=1%2C100000&_=1656750360507'
+        r = requests.get(lesson_url, headers=headers)
+        with open(save_file_path, 'w') as f:
+            f.write(r.text)
+    else:
+        print('Using cached ' + echo_text)
 
     print('Download complete, importing ' + echo_text)
     subprocess.run(['python3', 'import_courses_new.py', save_file_path])
