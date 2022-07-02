@@ -132,8 +132,8 @@ class User(db.Model, UserMixin):
         else:
             query = query.filter(Review.is_blocked == False)
 
-        if not current_user.is_authenticated:
-            query = query.filter(Review.is_visible_to_login_only == False)
+        if not current_user.is_authenticated or current_user.identity != 'Student':
+            query = query.filter(Review.only_visible_to_student == False)
         return query.order_by(Review.update_time.desc()).all()
 
     @property

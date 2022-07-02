@@ -13,7 +13,7 @@ class ReviewForm(FlaskForm):
     rate = IntegerField('rate',validators=[InputRequired(),NumberRange(1,10)])
     content = TextAreaField('content',validators=[InputRequired()])
     is_anonymous = BooleanField('is_anonymous', default=False)
-    is_visible_to_login_only = BooleanField('is_visible_to_login_only', default=False)
+    only_visible_to_student = BooleanField('only_visible_to_student', default=False)
     is_mobile = IntegerField('is_mobile', default=False)
     is_ajax = BooleanField('is_ajax', default=False)
 

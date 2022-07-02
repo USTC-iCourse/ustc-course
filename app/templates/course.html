@@ -183,7 +183,7 @@
     {% for review in reviews %}
 	  {% if not review.is_blocked or current_user.is_admin or review.author == current_user %}
       {% if not review.is_hidden or review.author == current_user %}
-      {% if not review.is_visible_to_login_only or current_user.is_authenticated %}
+      {% if not review.only_visible_to_student or (current_user.is_authenticated and current_user.identity == 'Student') %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
             <span class="right-pd-sm px16">
@@ -205,8 +205,8 @@
             {% endfor %}
 
             <span class="left-pd-md">{{ review.term|term_display }}</span>
-	        {% if current_user == review.author and review.is_visible_to_login_only %}
-	        <span class="pull-right label label-success" style="font-size: 100%;">仅登录可见</span>
+	        {% if current_user == review.author and review.only_visible_to_student %}
+	        <span class="pull-right label label-success" style="font-size: 100%;">仅登录学生可见</span>
             {% endif %}
 	    {% if review.author.is_teacher %}
 	      {% if review.author.id in review.course.registered_teacher_id_list %}

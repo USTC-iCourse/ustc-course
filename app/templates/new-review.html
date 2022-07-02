@@ -73,8 +73,8 @@
         <label for="is_anonymous">匿名发表点评</label>
       </div>
       <div class="class-control">
-        <input {% if review.is_visible_to_login_only %}checked{% endif %} id="is_visible_to_login_only" name="is_visible_to_login_only" type="checkbox" value="1">
-        <label for="is_visible_to_login_only">仅对登录用户可见</label>
+        <input {% if review.only_visible_to_student %}checked{% endif %} id="only_visible_to_student" name="only_visible_to_student" type="checkbox" value="1">
+        <label for="only_visible_to_student">仅登录学生用户可见</label>
       </div>
 
       <div class="container-md desktop">

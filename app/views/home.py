@@ -29,10 +29,10 @@ def index():
 
 def gen_reviews_query():
     reviews = Review.query.filter(Review.is_blocked == False).filter(Review.is_hidden == False)
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and current_user.identity == 'Student':
         return reviews
     else:
-        return reviews.filter(Review.is_visible_to_login_only == False)
+        return reviews.filter(Review.only_visible_to_student == False)
 
 def gen_ordered_reviews_query():
     return gen_reviews_query().order_by(Review.update_time.desc())
@@ -169,7 +169,7 @@ def signup():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-        user = User(username=username, email=email,password=password)
+        user = User(username=username, email=email, password=password)
         email_suffix = email.split('@')[-1]
         if email_suffix == 'mail.ustc.edu.cn':
             user.identity = 'Student'
@@ -178,8 +178,7 @@ def signup():
             ok,message = user.bind_teacher(email)
             #TODO: deal with bind feedback
         else:
-            #TODO: log Intenal error!
-            pass
+            abort(403, "必须使用科大学生或教师邮箱注册")
         send_confirm_mail(user.email)
         user.save()
         #login_user(user)
@@ -344,8 +343,8 @@ def search_reviews():
         unioned_query = unioned_query.union(author_query).union(course_query).union(courseries_query).union(teacher_query)
 
     unioned_query = unioned_query.filter(Review.is_blocked == False).filter(Review.is_hidden == False)
-    if not current_user.is_authenticated:
-        unioned_query = unioned_query.filter(Review.is_visible_to_login_only == False)
+    if not current_user.is_authenticated or current_user.identity != 'Student':
+        unioned_query = unioned_query.filter(Review.only_visible_to_student == False)
     reviews_paged = unioned_query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
 
     if reviews_paged.total > 0:

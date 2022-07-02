@@ -25,7 +25,7 @@ def record_review_history(review, operation, commit=True):
     history.publish_time = review.publish_time
     history.update_time = review.update_time
     history.is_anonymous = review.is_anonymous
-    history.is_visible_to_login_only = review.is_visible_to_login_only
+    history.only_visible_to_student = review.only_visible_to_student
     history.is_hidden = review.is_hidden
     history.is_blocked = review.is_blocked
 
