@@ -8,4 +8,5 @@ class BannerForm(FlaskForm):
     mobile = TextAreaField('mobile')
 
 class AnnouncementForm(FlaskForm):
+    title = StringField('title')
     content = TextAreaField('content')

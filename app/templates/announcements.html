@@ -15,26 +15,29 @@
 
       {% for announcement in announcements %}
       <div class="ud-pd-md dashed">
+        <h3>{{ announcement.title }}</h4>
+        <p class="text-muted">{{ announcement.content|safe }}</p>
+
         <div class="grey bm-pd-md">
 	      <a href="{{ url_for('user.view_profile', user_id=announcement.author.id) }}">{{ announcement.author.username }}</a> 发表于
           <span class="localtime" style="display: none;">{{ announcement.publish_time|utctime }}</span>
 	      {% if announcement.publish_time != announcement.update_time %}
 	      <span>（最后修改于</span> <span class="localtime" style="display: none;">{{ announcement.update_time|utctime }}</span><span>）</span>
 	      {% endif %}
-        </div>
-        <p class="text-muted">{{ announcement.content|safe }}</p>
 
-        {% if current_user.is_admin %}
-        <span class="pull-right">
-          <a class="nounderline" href="{{ url_for('admin.edit_announcement', announcement_id=announcement.id) }}">
-            <span class="glyphicon glyphicon-pencil grey left-pd-sm small" aria-hidden="true" ></span>
-            编辑
-          </a>
-          <a class="nounderline" href="javascript: delete_announcement({{ announcement.id }})">
-            <span class="glyphicon glyphicon-trash grey left-pd-md small" aria-hidden="true"></span>
-            删除
-        </span>
-        {% endif %}
+          {% if current_user.is_admin %}
+          <span class="pull-right">
+            <a class="nounderline" href="{{ url_for('admin.edit_announcement', announcement_id=announcement.id) }}">
+              <span class="glyphicon glyphicon-pencil grey left-pd-sm small" aria-hidden="true" ></span>
+              编辑
+            </a>
+            <a class="nounderline" href="javascript: delete_announcement({{ announcement.id }})">
+              <span class="glyphicon glyphicon-trash grey left-pd-md small" aria-hidden="true"></span>
+              删除
+            </a>
+          </span>
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
     </div>

@@ -47,6 +47,7 @@ class Announcement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     last_editor_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    title = db.Column(db.Text)
     content = db.Column(db.Text)
     publish_time = db.Column(db.DateTime(), default=datetime.utcnow())
     update_time = db.Column(db.DateTime(), default=datetime.utcnow())
