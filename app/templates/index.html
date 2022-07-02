@@ -19,7 +19,7 @@
       <div class="ud-pd-md dashed">
         <div class="row">
           <div class="col-sm-1 col-xs-2 right-pd-no">
-            <img class="avatar-md circle" src="{{ review.author.avatar }}"/>
+            <img class="avatar-md circle" src="{% if review.is_anonymous %}{{ review.author.default_avatar }}{% else %}{{ review.author.avatar }}{% endif %}"/>
           </div>
           <div class="col-md-11 col-xs-10">
             <div class="grey bm-pd-md">
