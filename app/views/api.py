@@ -18,36 +18,6 @@ from datetime import datetime
 api = Blueprint('api',__name__)
 
 
-@api.route('/reviews/')
-def get_reviews():
-    response = {'ok':True,
-            'info':'',
-            'data': []
-            }
-    course_id = request.args.get('course_id',type=int)
-    page = request.args.get('page',1,type=int)
-    if not course_id:
-        response['ok'] = False
-        response['info'] = 'Need to specify a course id'
-        return jsonify(response)
-    course = Course.query.get(course_id)
-    if not course:
-        response['ok'] = False
-        response['info'] = 'Course can\'t found'
-        return jsonify(response)
-    reviews = course.reviews.paginate(page)
-    for item in reviews.items:
-        review = {'id':item.id,
-                'rate':item.rate,
-                'content':item.content,
-                'author':{'name':item.author.username,
-                    'id':item.author_id},
-                'upvote':item.upvote,
-                }
-        response['data'].append(review)
-    return jsonify(response)
-
-
 @api.route('/review/upvote/',methods=['POST'])
 @login_required
 def review_upvote():
