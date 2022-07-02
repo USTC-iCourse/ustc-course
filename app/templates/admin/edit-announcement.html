@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+
+  <div class="row float-element">
+    <div class="row">
+      <div class="col-md-8 inline-h3">
+        <span class="blue h3">编辑管理员公告</span>
+        <hr>
+
+        <form method="post" enctype="multipart/form-data" action="{{ url_for('admin.edit_announcement_post', announcement_id=announcement.id) }}">
+          {{ form.csrf_token }}
+          <div class="ud-pd-sm">
+	        <textarea class="form-control content-editor" name="content" rows="5">{{ announcement.content or ''|safe }}</textarea>
+          </div>
+          <div class="ud-pd-sm">
+            <button type="submit" class="btn btn-middle btn-primary">提交</button>
+          </div>
+        </form>
+      </div>
+    </div> <!-- row -->
+  </div>  <!-- float-element  -->
+</div>  <!-- container -->
+{% endblock %}
+
+{% block script %}
+{% include 'ckeditor.html' %}
+{% endblock %}
