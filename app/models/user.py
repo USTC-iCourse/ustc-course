@@ -490,6 +490,7 @@ class Teacher(db.Model):
     last_edit_time = db.Column(db.DateTime)
     image_locked = db.Column(db.Boolean, default=False, nullable=False)
     info_locked = db.Column(db.Boolean, default=False, nullable=False)
+    jwc_id = db.Column(db.Integer) # 综合教务系统中的老师ID信息，teacher.person.id，不是 teacher.id
 
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
