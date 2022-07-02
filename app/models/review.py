@@ -229,6 +229,11 @@ class ReviewHistory(db.Model):
     course_id = db.Column(db.Integer)
     term = db.Column(db.String(10))
 
+    is_anonymous = db.Column(db.Boolean, default=False)
+    is_visible_to_login_only = db.Column(db.Boolean, default=False)
+    is_hidden = db.Column(db.Boolean, default=False)
+    is_blocked = db.Column(db.Boolean, default=False)
+
     review_id = db.Column(db.Integer)
     operation_time = db.Column(db.DateTime, default=datetime.utcnow)
     operation_user_id = db.Column(db.Integer)
