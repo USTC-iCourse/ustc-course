@@ -56,7 +56,13 @@ for option in options:
     if need_download(save_file_path):
         print('Downloading ' + echo_text)
         lesson_url = 'https://jw.ustc.edu.cn/for-std/lesson-search/semester/' + semester_id + '/search/4367?courseCodeLike=&codeLike=&educationAssoc=&courseNameZhLike=&teacherNameLike=&schedulePlace=&classCodeLike=&courseTypeAssoc=&classTypeAssoc=&campusAssoc=&teachLangAssoc=&roomTypeAssoc=&examModeAssoc=&requiredPeriodInfo.totalGte=&requiredPeriodInfo.totalLte=&requiredPeriodInfo.weeksGte=&requiredPeriodInfo.weeksLte=&requiredPeriodInfo.periodsPerWeekGte=&requiredPeriodInfo.periodsPerWeekLte=&limitCountGte=&limitCountLte=&majorAssoc=&majorDirectionAssoc=&queryPage__=1%2C100000&_=1656750360507'
-        r = requests.get(lesson_url, headers=headers)
+        for repeat in range(5):
+            try:
+                r = requests.get(lesson_url, headers=headers)
+                break
+            except:
+                print('Failed to download ' + echo_text + ', retry...')
+                continue
         with open(save_file_path, 'w') as f:
             f.write(r.text)
     else:
