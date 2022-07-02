@@ -7,3 +7,5 @@ class BannerForm(FlaskForm):
     desktop = TextAreaField('desktop')
     mobile = TextAreaField('mobile')
 
+class AnnouncementForm(FlaskForm):
+    content = TextAreaField('content')

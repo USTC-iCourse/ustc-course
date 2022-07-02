@@ -41,3 +41,30 @@ class SearchLog(db.Model):
         self.time = datetime.utcnow()
         db.session.add(self)
         db.session.commit()
+
+
+class Announcement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    last_editor_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    content = db.Column(db.Text)
+    publish_time = db.Column(db.DateTime(), default=datetime.utcnow())
+    update_time = db.Column(db.DateTime(), default=datetime.utcnow())
+
+    author = db.relationship('User', foreign_keys=[author_id])
+    last_editor = db.relationship('User', foreign_keys=[last_editor_id])
+
+    def add(self):
+        self.publish_time = datetime.utcnow()
+        self.update_time = self.publish_time
+        db.session.add(self)
+        db.session.commit()
+
+    def save(self):
+        self.update_time = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
