@@ -341,14 +341,18 @@ def my_urlize(text, trim_url_limit=None, nofollow=False, target=None):
     return u''.join(words)
 
 RESERVED_USERNAME = set(['管理员', 'admin', 'root',
-    'Administrator', 'example', 'test'])
+    'administrator', 'example', 'test', '匿名', 'anonymous'])
 
 def validate_username(username, check_db=True):
+    username = username.lower()
     if re.search('[@&<>"\'\s]', username):
         return ('此用户名含有非法字符，不能注册！')
     if username in RESERVED_USERNAME:
         return ('此用户名已被保留，不能注册！')
-    if check_db and User.query.filter_by(username=username).first():
+    for reserved_name in RESERVED_USERNAME:
+        if username.find(reserved_name) != -1:
+            return ('此用户名含有被保留的关键词，不能注册！')
+    if check_db and User.query.filter_by(username=username).count() != 0:
         return ('此用户名已被他人使用！')
     return 'OK'
 
