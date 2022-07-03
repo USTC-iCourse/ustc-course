@@ -31,7 +31,7 @@ def index(lang_en=False):
 
     # find the distribution of the number of reviews written by each user
     user_review_counts = (db.session.query(func.count(Review.id).label('review_count'))
-                                    .filter(Review.is_anonymous == False).filter(Review.is_hidden == False).filter(Review.is_blocked == False).filter(Review.only_visible_to_student == False)
+                                    .filter(Review.is_anonymous == False).filter(Review.is_hidden == False).filter(Review.is_blocked == False)
                                     .group_by(Review.author_id).subquery())
     user_review_count_dist = db.session.query(db.text('review_count'), func.count().label('user_count')).select_from(user_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
 
@@ -127,7 +127,6 @@ def view_ranking():
                            .filter(Review.is_anonymous == False)
                            .filter(Review.is_blocked == False)
                            .filter(Review.is_hidden == False)
-                           .filter(Review.only_visible_to_student == False)
                            .group_by(Review.author_id)
                            .order_by(db.text('score desc'))
                            .limit(topk_count).all())
@@ -238,7 +237,7 @@ def stats_history(lang_en=False):
 
     # find the distribution of the number of reviews written by each user
     user_review_counts = (db.session.query(func.count(Review.id).label('review_count'))
-                                    .filter(Review.is_anonymous == False).filter(Review.is_hidden == False).filter(Review.is_blocked == False).filter(Review.only_visible_to_student == False)
+                                    .filter(Review.is_anonymous == False).filter(Review.is_hidden == False).filter(Review.is_blocked == False)
                                     .filter(Review.publish_time < date)
                                     .group_by(Review.author_id).subquery())
     user_review_count_dist = db.session.query(db.text('review_count'), func.count().label('user_count')).select_from(user_review_counts).group_by(db.text('review_count')).order_by(db.text('review_count')).all()
