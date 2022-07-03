@@ -76,19 +76,8 @@ class Review(db.Model):
         db.session.commit()
 
     # self and old must have the same course_id
-    def update_course_rate(self,old):
-        course_rate = self.course.course_rate
-        course_rate.subtract(old.difficulty,
-                old.homework,
-                old.grading,
-                old.gain,
-                old.rate)
-        course_rate.add(self.difficulty,
-                self.homework,
-                self.grading,
-                self.gain,
-                self.rate)
-        db.session.commit()
+    def update_course_rate(self, old):
+        return self.course.update_rate(old, self)
 
     def upvote(self,author=current_user):
         if author in self.upvote_users:

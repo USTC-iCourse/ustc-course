@@ -629,6 +629,22 @@ class Course(db.Model):
         return self.latest_term.end_week
     # end of property from latest_term
 
+    def update_rate(self, old_review, new_review):
+        course_rate = self.course_rate
+        # blocked and hidden reviews are not considered in course rating
+        if old_review and not old_review.is_blocked and not old_review.is_hidden:
+            course_rate.subtract(old_review.difficulty,
+                                 old_review.homework,
+                                 old_review.grading,
+                                 old_review.gain,
+                                 old_review.rate)
+        if new_review and not new_review.is_blocked and not new_review.is_hidden:
+            course_rate.add(new_review.difficulty,
+                            new_review.homework,
+                            new_review.grading,
+                            new_review.gain,
+                            new_review.rate)
+        db.session.commit()
 
 
 class CourseRate(db.Model):
@@ -738,4 +754,3 @@ class CourseRate(db.Model):
         self._gain_total -= gain
         self._rate_total -= rate
         self.save()
-
