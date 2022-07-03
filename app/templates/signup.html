@@ -19,6 +19,7 @@
           <input type="email" id="reginput-email" name="email" class="form-control" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn" onchange="regverify('email')">
           <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
           <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+          <span class="help-block" style="display:none"></span>
           {% if form.errors.get('email') %}
             {% for info in form.errors.get('email') %}
               {{ info }}
@@ -35,6 +36,7 @@
           <input type="text" id="reginput-username" name="username" class="form-control" placeholder="Username" onchange="regverify('username')">
           <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
           <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+          <span class="help-block" style="display:none"></span>
           {% if form.errors.get('username') %}
             {% for info in form.errors.get('username') %}
               {{ info }}
@@ -52,6 +54,7 @@
           <input type="password" name="password" class="form-control" id="reginput-password" placeholder="Password" onchange="checkPassword()">
           <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
           <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+          <span class="help-block" style="display:none"></span>
           {% if form.errors.get('password') %}
             {% for info in form.errors.get('password') %}
               {{ info }}
@@ -66,8 +69,10 @@
           <input type="password" class="form-control" name="confirm_password" id="reginput-confirm-password" placeholder="Confirm Password" onchange="checkConfirmPassword()">
           <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
           <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+          <span class="help-block" style="display:none"></span>
         </div>
       </div>
+
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-4">
           <button type="submit" class="btn btn-blue btn-block">注册</button>
@@ -89,13 +94,16 @@
 {% block script %}
 <script>
  $('#reginput-email').focus();
- function inputFeedback(elem, ok) {
+ function inputFeedback(elem, ok, error_msg) {
    elem.find('.form-control-feedback').hide();
    if (ok) {
      elem.attr('class', 'form-group has-success has-feedback');
      elem.find('.glyphicon-ok').show();
+     elem.find('.help-block').hide();
    } else {
      elem.attr('class', 'form-group has-error has-feedback');
+     elem.find('.help-block').text(error_msg);
+     elem.find('.help-block').show();
      elem.find('.glyphicon-remove').show();
    }
  }
@@ -110,7 +118,7 @@
      },
      success: function(data) {
        elem = $('#regverify-' + name);
-       inputFeedback(elem, (data == 'OK'));
+       inputFeedback(elem, (data == 'OK'), data);
      },
      error: function(err) {
        alert('数据通信错误: ' + err.toString());
@@ -120,11 +128,11 @@
  function checkPassword() {
    pwd = $('#reginput-password').val();
    elem = $('#regverify-password');
-   inputFeedback(elem, (pwd.length >= 6));
+   inputFeedback(elem, (pwd.length >= 6), '密码长度必须大于等于 6 个字符！');
  }
  function checkConfirmPassword() {
    elem = $('#regverify-confirm-password');
-   inputFeedback(elem, ($('#reginput-password').val() === $('#reginput-confirm-password').val()));
+   inputFeedback(elem, ($('#reginput-password').val() === $('#reginput-confirm-password').val()), '两次输入的密码不匹配！');
  }
 </script>
 {% endblock %}
