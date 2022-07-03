@@ -102,7 +102,10 @@ function submit_review() {
     }, {});
     data['rate'] = Math.round(data['rate'] * 2);
     data['is_ajax'] = true;
+    console.log(url);
+    console.log(data);
     $.post(url, data, function(o) {
+        console.log(o);
         if (!o.ok) {
             alert('Failed to submit review, please try again!');
         } else {
@@ -143,60 +146,36 @@ $(function(){
     }
 
     $('#review-form').submit(function(e) {
-            if ($('input[name=difficulty]:radio:checked').length == 0) {
-                e.preventDefault();
-                alert('请选择课程难度！');
-                return;
-            }
-            if ($('input[name=homework]:radio:checked').length == 0) {
-                e.preventDefault();
-                alert('请选择作业多少！');
-                return;
-            }
-            if ($('input[name=grading]:radio:checked').length == 0) {
-                e.preventDefault();
-                alert('请选择给分好坏！');
-                return;
-            }
-            if ($('input[name=gain]:radio:checked').length == 0) {
-                e.preventDefault();
-                alert('请选择收获多少！');
-                return;
-            }
-            if ($('input[name=rate]').val() <= 0 || $('input[name=rate]').val() > 5) {
-                e.preventDefault();
-                alert('请评分！');
-                return;
-            }
-            var content_html = $('textarea[name=content]').val();
-            var content_text = content_html.replace(/(<([^>]+)>)/ig, "");
-            if (content_text.trim().length < 10) {
-                e.preventDefault();
-                alert('点评内容太短啦！');
-                return;
-            }
-            /*
-            // mobile device: to HTML
-            if ($('.mobile').length > 0) {
-                var content = $('textarea[name=content]').val();
-                var lines = content.split('\n');
-                var newcontent = '';
-                for (var i in lines) {
-                    var line = lines[i];
-                    if (line.trim().length == 0)
-                        continue;
-                    else {
-                        line = line.replace(/ /g, "&nbsp;");
-                        newcontent += '<p>' + line + '</p>\n';
-                    }
-                }
-                console.log(newcontent);
-                $('textarea[name=content]').val(newcontent);
-            }
-            */
+        e.preventDefault();
 
-            e.preventDefault();
-            submit_review();
+        if ($('input[name=difficulty]:radio:checked').length == 0) {
+            alert('请选择课程难度！');
+            return;
+        }
+        if ($('input[name=homework]:radio:checked').length == 0) {
+            alert('请选择作业多少！');
+            return;
+        }
+        if ($('input[name=grading]:radio:checked').length == 0) {
+            alert('请选择给分好坏！');
+            return;
+        }
+        if ($('input[name=gain]:radio:checked').length == 0) {
+            alert('请选择收获多少！');
+            return;
+        }
+        if ($('input[name=rate]').val() <= 0 || $('input[name=rate]').val() > 5) {
+            alert('请评分！');
+            return;
+        }
+        var content_html = $('textarea[name=content]').val();
+        var content_text = content_html.replace(/(<([^>]+)>)/ig, "");
+        if (content_text.trim().length < 10) {
+            alert('点评内容太短啦！');
+            return;
+        }
+
+        submit_review();
     });
 });
 </script>

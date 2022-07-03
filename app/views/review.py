@@ -107,7 +107,7 @@ def new_review(course_id):
                 record_review_history(review, 'update')
 
             next_url = url_for('course.view_course', course_id=course_id, _external=True) + '#review-' + str(review.id)
-            if form.is_ajax:
+            if form.is_ajax.data:
                 return jsonify({'ok': True, 'next_url': next_url })
             else:
                 return redirect(next_url)
