@@ -39,6 +39,19 @@ def log_login(app,user):
 user_logged_in.connect(log_login)
 user_loaded_from_cookie.connect(log_login)
 
+
+class ReverseProxied(object):
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        if 'DEBUG' not in app.config or not app.config['DEBUG']:
+            environ['wsgi.url_scheme'] = 'https'
+        return self.app(environ, start_response)
+
+app.wsgi_app = ReverseProxied(app.wsgi_app)
+
+
 from app.models import Banner
 @app.context_processor
 def inject_global_banner():
