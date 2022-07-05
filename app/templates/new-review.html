@@ -70,7 +70,11 @@
       <div class="ud-pd-sm"></div>
       <div class="class-control">
         <input {% if review.is_anonymous %}checked{% endif %} id="is_anonymous" name="is_anonymous" type="checkbox" value="1">
-        <label for="is_anonymous">匿名发表点评</label>
+        <label for="is_anonymous">匿名发表点评
+          {% if review.author.is_teacher %}
+          (由于您是教师用户，即使匿名发表点评，也会标注“教师点评”，但不会暴露您的用户名和头像)
+          {% endif %}
+        </label>
       </div>
       <div class="class-control">
         <input {% if review.only_visible_to_student %}checked{% endif %} id="only_visible_to_student" name="only_visible_to_student" type="checkbox" value="1">

@@ -209,7 +209,7 @@
 	        <span class="pull-right label label-success" style="font-size: 100%;">仅登录学生可见</span>
             {% endif %}
 	    {% if review.author.is_teacher %}
-	      {% if review.author.id in review.course.registered_teacher_id_list %}
+	      {% if review.author.id in review.course.registered_teacher_id_list and not review.is_anonymous %}
 	      <span class="pull-right label label-success teacher-review-label" style="font-size: 100%;" data-toogle="tooltip" data-placement="top" title="该点评由本课程教师账号发表">本课程教师</span>
 	      {% else %}
 	      <span class="pull-right label label-success teacher-review-label" style="font-size: 100%;" data-toogle="tooltip" data-placement="top" title="该点评由教师账号发表">教师点评</span>
