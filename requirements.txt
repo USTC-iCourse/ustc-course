@@ -4,7 +4,7 @@ Flask-SQLAlchemy==2.5.1
 Flask-login==0.5.0
 itsdangerous==1.1.0
 flask-mail==0.9.1
-lxml==4.7.1
+lxml==4.9.1
 flask-script==2.0.6
 flask-migrate==3.1.0
 flask-security==3.0.0
