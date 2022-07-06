@@ -196,8 +196,6 @@ def editor_parse_at(text):
     if not matches:
         return text, set(mentioned_users)
     for username in set([match.group(1) for match in matches]):
-        if len(username) > 30:
-            continue
         user = User.query.filter_by(username=username).first()
         if user:
             url = url_for('user.view_profile', user_id=user.id)
