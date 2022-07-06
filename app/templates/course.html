@@ -183,7 +183,7 @@
     {% for review in reviews %}
 	  {% if not review.is_blocked or current_user.is_admin or review.author == current_user %}
       {% if not review.is_hidden or review.author == current_user %}
-      {% if not review.only_visible_to_student or (current_user.is_authenticated and current_user.identity == 'Student') %}
+      {% if not review.only_visible_to_student or (current_user.is_authenticated and current_user.identity == 'Student') or review.author == current_user %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
             <span class="right-pd-sm px16">
