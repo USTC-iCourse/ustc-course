@@ -22,7 +22,7 @@ for review in reviews:
         db.session.add(review)
         record_review_history(review, 'fix_at')
         for user in mentioned_users:
-            user.notify('mention', review, review.author)
+            user.notify('mention', review, from_user=review.author, time=review.update_time)
 
 review_comments = ReviewComment.query.all()
 for comment in review_comments:
@@ -34,6 +34,6 @@ for comment in review_comments:
         db.session.add(comment)
         record_review_comment_history(comment, 'fix_at')
         for user in mentioned_users:
-            user.notify('mention', comment, comment.author)
+            user.notify('mention', comment, from_user=comment.author, time=comment.publish_time)
 
 db.session.commit()

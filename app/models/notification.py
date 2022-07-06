@@ -27,11 +27,11 @@ class Notification(db.Model):
     to_user = db.relationship('User', foreign_keys=to_user_id, backref=db.backref('notifications', order_by='desc(Notification.id)'))
     from_user = db.relationship('User', foreign_keys=from_user_id)
 
-    def __init__(self, to_user, from_user, operation, ref_obj, ref_display_class=None):
+    def __init__(self, to_user, from_user, operation, ref_obj, ref_display_class=None, time=None):
         self.to_user = to_user
         self.from_user = from_user
-        self.date = datetime.utcnow().date()
-        self.time = datetime.utcnow()
+        self.date = time.date() if time else datetime.utcnow().date()
+        self.time = time or datetime.utcnow()
         self.operation = operation
         self.ref_class = ref_obj.__class__.__name__
         self.ref_display_class = ref_display_class or self.ref_class

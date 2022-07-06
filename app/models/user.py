@@ -308,8 +308,8 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         db.session.commit()
 
-    def notify(self, operation, ref_obj, from_user=current_user, ref_display_class=None):
-        notification = Notification(self, from_user, operation, ref_obj, ref_display_class)
+    def notify(self, operation, ref_obj, from_user=current_user, ref_display_class=None, time=None):
+        notification = Notification(self, from_user, operation, ref_obj, ref_display_class, time)
         notification.save()
         self.unread_notification_count += 1
         db.session.commit()
