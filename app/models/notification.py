@@ -24,7 +24,7 @@ class Notification(db.Model):
     ref_display_class = db.Column(db.String(50))
     display_text = db.Column(db.Text)
 
-    to_user = db.relationship('User', foreign_keys=to_user_id, backref=db.backref('notifications', order_by='desc(Notification.id)'))
+    to_user = db.relationship('User', foreign_keys=to_user_id, backref=db.backref('notifications', order_by='desc(Notification.time)'))
     from_user = db.relationship('User', foreign_keys=from_user_id)
 
     def __init__(self, to_user, from_user, operation, ref_obj, ref_display_class=None, time=None):
