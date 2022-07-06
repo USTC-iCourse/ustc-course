@@ -77,9 +77,11 @@ class Notification(db.Model):
     @property
     def ref_obj_name(self):
         if self.ref_display_class == 'Review':
-            return '课程「' + self.ref_obj.link + '」中 ' + self.ref_obj.author.link + ' 的点评'
+            author_link = self.ref_obj.author.link if not self.ref_obj.is_anonymous else '匿名用户'
+            return '课程「' + self.ref_obj.link + '」中 ' + author_link + ' 的点评'
         elif self.ref_display_class == 'ReviewComment':
-            return '课程「' + self.ref_obj.review.link + '」中 ' + self.ref_obj.review.author.link + ' 的点评的 ' + self.ref_obj.author.link + ' 的评论'
+            review_author_link = self.ref_obj.review.author.link if not self.ref_obj.review.is_anonymous else '匿名用户'
+            return '课程「' + self.ref_obj.review.link + '」中 ' + review_author_link + ' 的点评中 ' + self.ref_obj.author.link + ' 的评论'
         elif self.ref_display_class == 'Course':
             return '课程「' + self.ref_obj.link + '」'
         elif self.ref_display_class == 'User':
