@@ -32,7 +32,7 @@ def gen_reviews_query():
     if current_user.is_authenticated and current_user.identity == 'Student':
         return reviews
     else:
-        return reviews.filter(Review.only_visible_to_student == False)
+        return reviews.filter(or_(Review.only_visible_to_student == False, Review.author == current_user))
 
 def gen_ordered_reviews_query():
     return gen_reviews_query().order_by(Review.update_time.desc())
@@ -343,7 +343,7 @@ def search_reviews():
 
     unioned_query = unioned_query.filter(Review.is_blocked == False).filter(Review.is_hidden == False)
     if not current_user.is_authenticated or current_user.identity != 'Student':
-        unioned_query = unioned_query.filter(Review.only_visible_to_student == False)
+        unioned_query = unioned_query.filter(or_(Review.only_visible_to_student == False, Review.author == current_user))
     reviews_paged = unioned_query.order_by(Review.update_time.desc()).paginate(page=page, per_page=per_page)
 
     if reviews_paged.total > 0:
