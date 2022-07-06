@@ -29,7 +29,7 @@ class Share(db.Model):
     author = db.relationship('User', backref='shares')
     #:course: backref to Course
     upvotes = db.relationship('User', secondary=share_upvotes)
-    comments = db.relationship('ShareComment', backref='share')
+    comments = db.relationship('ShareComment', backref='share', order_by='ShareComment.publish_time')
 
 class ShareComment(db.Model):
     __tablename__ = 'share_comments'

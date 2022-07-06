@@ -29,7 +29,7 @@ class Note(db.Model):
     upvotes = db.relationship('User', secondary=note_upvotes)
     author = db.relationship('User', backref='notes')
     #:course: backref to Course
-    comments = db.relationship('NoteComment', backref='note')
+    comments = db.relationship('NoteComment', backref='note', order_by='NoteComment.publish_time')
 
 class NoteComment(db.Model):
     __tablename__ = 'note_comments'

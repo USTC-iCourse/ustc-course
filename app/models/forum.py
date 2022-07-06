@@ -28,7 +28,7 @@ class ForumThread(db.Model):
 
     author = db.relationship('User', backref='forum_threads')
     #:course: backref to Course
-    posts = db.relationship('ForumPost',backref='thread')
+    posts = db.relationship('ForumPost', backref='thread', order_by='desc(ForumPost.update_time)')
     upvotes = db.relationship('User', secondary=forum_thread_upvotes)
 
     def save(self, course, title, content, author=current_user):

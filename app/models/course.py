@@ -170,13 +170,13 @@ class Course(db.Model):
     _image = db.Column(db.String(100))
 
     terms = db.relationship('CourseTerm', backref='course', order_by='desc(CourseTerm.term)', lazy='dynamic')
-    classes = db.relationship('CourseClass', backref='course', lazy='dynamic')
+    classes = db.relationship('CourseClass', backref='course', lazy='dynamic', order_by='desc(CourseClass.term)')
     _dept = db.relationship('Dept', backref='courses', lazy='joined')
 
     teachers = db.relationship('Teacher', secondary=course_teachers, backref=db.backref('courses', lazy='dynamic'), order_by='Teacher.id', lazy="joined")
-    reviews = db.relationship('Review', backref=db.backref('course', lazy='joined'), order_by='desc(Review.publish_time), desc(Review.id)', lazy='dynamic')
+    reviews = db.relationship('Review', backref=db.backref('course', lazy='joined'), order_by='desc(Review.update_time)', lazy='dynamic')
     notes = db.relationship('Note', backref=db.backref('course', lazy='joined'), order_by='desc(Note.upvote_count), desc(Note.id)', lazy='dynamic')
-    forum_threads = db.relationship('ForumThread', backref='course', order_by='desc(ForumThread.id)', lazy='dynamic')
+    forum_threads = db.relationship('ForumThread', backref='course', order_by='desc(ForumThread.update_time)', lazy='dynamic')
     shares = db.relationship('Share', backref='course', order_by='desc(Share.upvote_count), desc(Share.id)', lazy='dynamic')
 
     #followers : backref to User
@@ -186,7 +186,7 @@ class Course(db.Model):
 
     _course_rate = db.relationship('CourseRate', backref='course', uselist=False, lazy='joined')
 
-    _info_history = db.relationship('CourseInfoHistory', order_by='desc(CourseInfoHistory.id)', backref='course', lazy='dynamic')
+    _info_history = db.relationship('CourseInfoHistory', order_by='desc(CourseInfoHistory.update_time)', backref='course', lazy='dynamic')
 
     @property
     def info_history(self):

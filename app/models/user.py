@@ -499,7 +499,7 @@ class Teacher(db.Model):
     dept = db.relationship('Dept', backref='teachers')
     #courses: backref to Course
 
-    _info_history = db.relationship('TeacherInfoHistory', order_by='desc(TeacherInfoHistory.id)', backref='teacher', lazy='dynamic')
+    _info_history = db.relationship('TeacherInfoHistory', order_by='desc(TeacherInfoHistory.update_time)', backref='teacher', lazy='dynamic')
 
     def __repr__(self):
         return '<Teacher {}: {}>'.format(self.id, self.name)
