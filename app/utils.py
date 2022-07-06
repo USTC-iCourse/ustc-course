@@ -192,7 +192,7 @@ def editor_parse_at(text):
     if not text.endswith('\n'):
         text = text + '\n' # the parse function will not work with @somebody
     mentioned_users = []
-    matches = re.finditer('@([^@<>"\'\s]+)', text)
+    matches = re.finditer('@([^@<>"\':\s]+)', text)
     if not matches:
         return text, set(mentioned_users)
     for username in set([match.group(1) for match in matches]):
@@ -207,8 +207,7 @@ def editor_parse_at(text):
             # consider the following case: @boj @bojjenny42
             #   @boj is first matched and replaced, then the string becomes <a href="">@boj</a> <a href="">@boj</a>jenny42
             # the following regexp would do the trick.
-            text = re.sub("@" + re.escape(username) + '([@<>"\'\s])',
-                          atstring + '\\1', text)
+            text = re.sub("@" + re.escape(username), atstring, text)
             mentioned_users.append(user)
     return text, set(mentioned_users)
 
