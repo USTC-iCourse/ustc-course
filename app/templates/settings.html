@@ -27,7 +27,13 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">用户名</label>
           <div class="col-sm-5">
-            <input type="text" class="form-control" value="{{ user.username }}" name="username">
+            <input type="text" class="form-control" value="{% if form.username.data %}{{ form.username.data }}{% else %}{{ user.username }}{% endif %}" name="username">
+            <span class="help-block" style="display:none"></span>
+            {% if form.errors.get('username') %}
+              {% for info in form.errors.get('username') %}
+                {{ info }}
+              {% endfor %}
+            {% endif %}
           </div>
         </div>
 
@@ -45,6 +51,12 @@
           <label for="inputDescription" class="col-sm-2 control-label">个人简介</label>
           <div class="col-sm-5">
             <textarea type="text" class="form-control" rows="3" id="inputDescription" name="description" {% if form.description.data %}>{{ form.description.data }}{% else %} placeholder="还没有自我介绍">{% endif -%}</textarea>
+            <span class="help-block" style="display:none"></span>
+            {% if form.errors.get('description') %}
+              {% for info in form.errors.get('description') %}
+                {{ info }}
+              {% endfor %}
+            {% endif %}
           </div>
         </div>
 
@@ -53,6 +65,12 @@
           <label class="col-sm-2 control-label">个人主页</label>
           <div class="col-sm-5">
             <input type="text" class="form-control" name="homepage" {% if form.homepage.data %} value="{{ form.homepage.data }}"{% else %}placeholder="博客"{% endif %}>
+            <span class="help-block" style="display:none"></span>
+            {% if form.errors.get('homepage') %}
+              {% for info in form.errors.get('homepage') %}
+                {{ info }}
+              {% endfor %}
+            {% endif %}
           </div>
         </div>
 
