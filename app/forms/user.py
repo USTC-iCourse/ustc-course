@@ -20,7 +20,7 @@ class UsernameField(StringField):
             self.data = value
 
 class LoginForm(FlaskForm):
-    username = UsernameField('Username',validators=[DataRequired(), Length(max=256,message='The length must under 256')])
+    username = UsernameField('Username',validators=[DataRequired(), Length(max=30,message='The length must under 30')])
     password = PasswordField('Password',validators=[DataRequired()])
     remember = BooleanField('Remember me',default=False)
 
@@ -65,22 +65,23 @@ class ResetPasswordForm(FlaskForm):
         EqualTo('confirm_password', message='passwords must match')])
     confirm_password = PasswordField('confirm password')
 
+
 class ProfileForm(FlaskForm):
-    username = UsernameField('Username', validators=[DataRequired(),Length(max=30,message='The length must unser 30')])
+    username = UsernameField('Username', validators=[DataRequired(),Length(max=30,message='The length must under 30')])
     #gender = SelectField('Gender',choices=[('male',_('male')),('female',_('female')),('unkown',_('unkown'))],validators=[DataRequired()])
-    description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])
+    description = TextAreaField('Description', validators=[Optional(),Length(max=1024, message='长度不大于1024')])
     homepage = StringField('Homepage', validators=[Optional(),Length(max=200,message="长度不大于200")])
     avatar = FileField('Avatar', validators=[])
     is_following_hidden = BooleanField('is_following_hidden', default=False)
     is_profile_hidden = BooleanField('is_profile_hidden', default=False)
 
-'''
-    def validate_username(form,field):
-        if field.data!=current_user.username and User.query.filter_by(username=field.data).first():
-            raise ValidationError('The username has been taken!')
-        if field.data in RESERVED_USERNAME:
-            raise ValidationError('The username is reserved!')
-        '''
+    def validate_username(form, field):
+        res = validate_username(field.data, check_db=False)
+        if res == 'OK':
+            return True
+        else:
+            raise ValidationError(res)
+
 
 class TeacherProfileForm(FlaskForm):
     description = TextAreaField('Description', validators=[Optional(),Length(max=1024)])

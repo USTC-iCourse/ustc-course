@@ -186,8 +186,6 @@ def signup():
         #login_user(user)
         '''注册完毕后显示一个需要激活的页面'''
         return render_template('feedback.html', status=True, message=_('我们已经向您发送了激活邮件，请在邮箱中点击激活链接。如果您没有收到邮件，有可能是在垃圾箱中。'), title='注册')
-    if form.errors:
-        print(form.errors)
     return render_template('signup.html', form=form, title='注册')
 
 
