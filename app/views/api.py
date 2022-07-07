@@ -118,11 +118,9 @@ def block_review():
         review = Review.query.with_for_update().get(review_id)
         if review:
             if current_user.is_admin:
-                # substract rating for blocked reviews
-                review.course.update_rate(review, None)
-
                 ok,message = review.block()
                 if ok:
+                    review.course.update_rate()
                     review.author.notify('block-review', review)
                     send_block_review_email(review)
                     record_review_history(review, 'block')
@@ -144,9 +142,7 @@ def unblock_review():
             if current_user.is_admin:
                 ok,message = review.unblock()
                 if ok:
-                    # resume rating for unblocked reviews
-                    review.course.update_rate(None, review)
-
+                    review.course.update_rate()
                     review.author.notify('unblock-review', review)
                     send_unblock_review_email(review)
                     record_review_history(review, 'unblock')
@@ -166,11 +162,9 @@ def hide_review():
         review = Review.query.with_for_update().get(review_id)
         if review:
             if current_user.is_authenticated and current_user == review.author:
-                # subtract rating for hidden reviews
-                review.course.update_rate(review, None)
-
                 ok,message = review.hide()
                 if ok:
+                    review.course.update_rate()
                     record_review_history(review, 'hide')
                 return jsonify(ok=ok,message=message)
             else:
@@ -190,9 +184,7 @@ def unhide_review():
             if current_user.is_authenticated and current_user == review.author:
                 ok,message = review.unhide()
                 if ok:
-                    # resume rating for unhiddden reviews
-                    review.course.update_rate(None, review)
-
+                    review.course.update_rate()
                     record_review_history(review, 'unhide')
                 return jsonify(ok=ok,message=message)
             else:

@@ -77,7 +77,7 @@ class Review(db.Model):
 
     # self and old must have the same course_id
     def update_course_rate(self, old):
-        return self.course.update_rate(old, self)
+        return self.course.update_rate()
 
     def upvote(self,author=current_user):
         if author in self.upvote_users:

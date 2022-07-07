@@ -629,22 +629,17 @@ class Course(db.Model):
         return self.latest_term.end_week
     # end of property from latest_term
 
-    def update_rate(self, old_review, new_review):
+    def update_rate(self, commit_db=True):
         course_rate = self.course_rate
-        # blocked and hidden reviews are not considered in course rating
-        if old_review and not old_review.is_blocked and not old_review.is_hidden:
-            course_rate.subtract(old_review.difficulty,
-                                 old_review.homework,
-                                 old_review.grading,
-                                 old_review.gain,
-                                 old_review.rate)
-        if new_review and not new_review.is_blocked and not new_review.is_hidden:
-            course_rate.add(new_review.difficulty,
-                            new_review.homework,
-                            new_review.grading,
-                            new_review.gain,
-                            new_review.rate)
-        db.session.commit()
+        reviews = self.reviews.filter(Review.is_hidden == False).filter(Review.is_blocked == False).all()
+
+        course_rate.review_count = len(reviews)
+        course_rate._difficulty_total = sum([review.difficulty for review in reviews])
+        course_rate._homework_total = sum([review.homework for review in reviews])
+        course_rate._grading_total = sum([review.grading for review in reviews])
+        course_rate._gain_total = sum([review.gain for review in reviews])
+        course_rate._rate_total = sum([review.rate for review in reviews])
+        course_rate.save(commit_db)
 
 
 class CourseRate(db.Model):
@@ -722,10 +717,11 @@ class CourseRate(db.Model):
         else:
             self._rate_average = None
 
-    def save(self):
+    def save(self, commit_db=True):
         self._update_average()
         db.session.add(self)
-        db.session.commit()
+        if commit_db:
+            db.session.commit()
 
     def add(self,difficulty,homework,grading,gain,rate):
         if self.review_count == 0:
