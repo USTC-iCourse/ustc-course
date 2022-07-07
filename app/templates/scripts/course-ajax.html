@@ -132,10 +132,16 @@
    $('#action-btn-group').show();
  });
 
- function delete_review(review_id)
+ function delete_review(review_id, is_admin)
  {
-     if (!confirm('你真的要删除此点评吗？删除的点评是不可恢复的！')) {
-         return;
+     if (is_admin) {
+         if (!confirm('你正在作为管理员，删除其他用户的点评！建议使用屏蔽而非删除功能，确定删除吗？')) {
+             return;
+         }
+     } else {
+         if (!confirm('你真的要删除此点评吗？删除的点评是不可恢复的！')) {
+             return;
+         }
      }
      $.post("{{ url_for('review.delete_review') }}", { id: review_id }, function(o) {
          if (o.ok)

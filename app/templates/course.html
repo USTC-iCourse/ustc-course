@@ -253,7 +253,7 @@
               </a>
               {% endif %}
               {% if review.author == user or user.is_admin %}
-              <a class="nounderline" href="javascript: delete_review({{ review.id }})">
+              <a class="nounderline" href="javascript: delete_review({{ review.id }}, {{ '1' if review.author != user else '0' }})">
                 <span class="glyphicon glyphicon-trash grey left-pd-md small" aria-hidden="true"></span>
                 删除
               </a>
