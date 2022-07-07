@@ -99,7 +99,7 @@ def new_review(course_id):
                     pass
                 else:
                     review.update_time = datetime.utcnow()
-                    review.update_course_rate(old_review)
+                    review.course.update_rate()
                     for user in users_to_notify:
                         user.notify('update-review', review, ref_display_class='Course')
                     for user in mentioned_users:

@@ -50,16 +50,11 @@ class Review(db.Model):
             # Make sure that each user can only add one review for each course
             if self.author in self.course.review_users:
                 return None
-            course_rate = self.course.course_rate
-            course_rate.add(self.difficulty,
-                    self.homework,
-                    self.grading,
-                    self.gain,
-                    self.rate)
             self.course.review_users.append(self.author)
             db.session.add(self.course)
             db.session.add(self)
             db.session.commit()
+            self.course.update_rate()
             return self
         return None
 
@@ -67,17 +62,9 @@ class Review(db.Model):
         if not self.id:
             return None
         self.course.review_users.remove(self.author)
-        course_rate = self.course.course_rate
-        course_rate.subtract(self.difficulty,
-                self.homework,
-                self.grading,self.gain,
-                self.rate)
         db.session.delete(self)
         db.session.commit()
-
-    # self and old must have the same course_id
-    def update_course_rate(self, old):
-        return self.course.update_rate()
+        self.course.update_rate()
 
     def upvote(self,author=current_user):
         if author in self.upvote_users:
