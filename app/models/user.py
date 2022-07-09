@@ -71,6 +71,7 @@ class User(db.Model, UserMixin):
     _avatar = db.Column(db.String(100))
     is_following_hidden = db.Column(db.Boolean, default=False)
     is_profile_hidden = db.Column(db.Boolean, default=False)
+    is_deleted = db.Column(db.Boolean, default=False) # deleted account
     
     following_count = db.Column(db.Integer, default=0)
     follower_count = db.Column(db.Integer, default=0)
@@ -98,7 +99,7 @@ class User(db.Model, UserMixin):
         self.set_password(password)
 
     def __repr__(self):
-        return '<User {} ({})>'.format(self.email, self.password)
+        return '<User #{} {}>'.format(self.id, self.username)
 
     @property
     def url(self):

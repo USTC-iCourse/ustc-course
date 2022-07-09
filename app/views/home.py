@@ -86,7 +86,7 @@ def signin():
     if form.validate_on_submit():
         user, status, confirmed = User.authenticate(form['username'].data,form['password'].data)
         remember = form['remember'].data
-        if user:
+        if user and not user.is_deleted:
             if status and confirmed:
                 #validate uesr
                 login_user(user, remember=remember)

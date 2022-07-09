@@ -13,7 +13,7 @@ user = Blueprint('user', __name__)
 def view_profile(user_id):
     '''用户的个人主页,展示用户在站点的活跃情况'''
     user = User.query.get(user_id)
-    if not user:
+    if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
     if user.is_profile_hidden and current_user != user:
@@ -34,7 +34,7 @@ def view_profile(user_id):
 def reviews(user_id):
     '''用户点评过的所有课程'''
     user = User.query.get(user_id)
-    if not user:
+    if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
     if user.is_profile_hidden and current_user != user:
@@ -52,7 +52,7 @@ def reviews(user_id):
 def follow_course(user_id):
     '''用户关注过的所有课程'''
     user = User.query.get(user_id)
-    if not user:
+    if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
     if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
@@ -72,7 +72,7 @@ def follow_course(user_id):
 def join_course(user_id):
     '''用户学过的所有课程'''
     user = User.query.get(user_id)
-    if not user:
+    if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
     if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
@@ -173,7 +173,7 @@ def courses(user_id):
             return render_template('list-courses.html',student=user.info,courses=courses_page)
         else:
             return render_template('feedback.html',status=False,message=_('Error: please contact us!'))
-    elif user:
+    elif user and not user.is_deleted:
         return render_template('feedback.html',status=False,message=_('This user have not bind a ID.Click\
             <a href=%(url)s><b>here</b></a> to bind.',url=url_for('.bind_identity')))
     else:
@@ -201,7 +201,7 @@ def notice():
 def followers(user_id):
     '''被关注的人页面'''
     user = User.query.get(user_id)
-    if not user:
+    if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
     if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
@@ -217,7 +217,7 @@ def followers(user_id):
 def followings(user_id):
     '''关注的人页面'''
     user = User.query.get(user_id)
-    if not user:
+    if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
     if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
@@ -231,6 +231,8 @@ def followings(user_id):
 @user.route('/<int:user_id>/feed/<string:validation_code>')
 def notice_rss(user_id, validation_code):
     user = User.query.get(user_id)
+    if not user or user.is_deleted:
+        abort(404)
     expected = cal_validation_code(user)
     if expected != validation_code:
         abort(403)
