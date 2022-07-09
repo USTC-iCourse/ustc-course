@@ -146,6 +146,34 @@ class Review(db.Model):
         else:
             return '未知'
 
+    @property
+    def difficulty_display(self):
+        mapper = {1:'简单',
+                2:'中等',
+                3:'困难'}
+        return mapper[self.difficulty]
+
+    @property
+    def homework_display(self):
+        mapper = {1:'很少',
+                2:'中等',
+                3:'很多'}
+        return mapper[self.homework]
+
+    @property
+    def grading_display(self):
+        mapper = {1:'超好',
+                2:'一般',
+                3:'杀手',}
+        return mapper[self.grading]
+
+    @property
+    def gain_display(self):
+        mapper = {1:'很多',
+                2:'一般',
+                3:'没有'}
+        return mapper[self.gain]
+
 
 class ReviewComment(db.Model):
     __tablename__ = 'review_comments'

@@ -220,6 +220,19 @@
             </span>
           </div>
           {% include 'review-hidden.html' %}
+
+          <ul class="text-muted list-inline list-unstyled top-pd-sm desktop">
+            <li class="right-mg-md">课程难度：{{ review.difficulty_display }}</li>
+            <li class="right-mg-md">作业多少：{{ review.homework_display }}</li>
+            <li class="right-mg-md">给分好坏：{{ review.grading_display }}</li>
+            <li class="right-mg-md">收获大小：{{ review.gain_display }}</li>
+          </ul>
+          <ul class="text-muted list-inline list-unstyled top-pd-sm mobile">
+            <li>难度：{{ review.difficulty_display }}</li>
+            <li>作业：{{ review.homework_display }}</li>
+            <li>给分：{{ review.grading_display }}</li>
+            <li>收获：{{ review.gain_display }}</li>
+          </ul>
 	  <div class="review-content" id="review-content-{{ review.id }}">
             <p>{{ review.content|my_urlize(nofollow=true)|safe }}</p>
           </div>
