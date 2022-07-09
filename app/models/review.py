@@ -29,7 +29,7 @@ class Review(db.Model):
     upvote_count = db.Column(db.Integer, default=0) #点赞数量
     comment_count = db.Column(db.Integer, default=0)
 
-    upvote_users = db.relationship('User', secondary=review_upvotes)
+    upvote_users = db.relationship('User', backref='upvoted_reviews', secondary=review_upvotes)
     comments = db.relationship('ReviewComment', backref='review', lazy='joined', order_by='ReviewComment.publish_time')
 
     author = db.relationship('User', lazy='joined')

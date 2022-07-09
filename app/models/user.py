@@ -92,6 +92,7 @@ class User(db.Model, UserMixin):
             backref=db.backref('followers'))
     # followers: backref to User
     # notifications: backref to Notification
+    # upvoted_reviews: backref to Review
 
     def __init__(self, username, email, password):
         self.username = username

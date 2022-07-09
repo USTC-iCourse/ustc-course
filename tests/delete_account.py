@@ -12,10 +12,14 @@ from app.views.review import record_review_history
 ctx = app.test_request_context()
 ctx.push()
 
-user = User.query.filter(User.email == sys.argv[1]).first()
+if sys.argv[1].isdigit():
+    user = User.query.filter(User.id == sys.argv[1]).first()
+else:
+    user = User.query.filter(User.email == sys.argv[1]).first()
 if not user:
-    print('user ' + sys.argv[1] + ' not found')
+    print('user ' + sys.argv[1] + ' not found (please use User ID or email)')
     sys.exit(1)
+
 
 review_count = Review.query.filter(Review.author == user).count()
 if review_count > 0:
@@ -32,6 +36,7 @@ print(str(user) + ' has reviewed ' + str(len(user.reviewed_course)) + ' courses'
 print(str(user) + ' has followed ' + str(len(user.users_following)) + ' users')
 print(str(user) + ' has ' + str(len(user.followers)) + ' followers')
 print(str(user) + ' has ' + str(len(user.notifications)) + ' notifications')
+print(str(user) + ' has ' + str(len(user.upvoted_reviews)) + ' upvoted reviews')
 
 confirm = input('Confirm to delete user ' + str(user) + '? (y/n): ')
 if confirm != 'y' and confirm != 'Y':
@@ -49,6 +54,7 @@ user.reviewed_course = []
 user.users_following = []
 user.followers = []
 user.notifications = []
+user.upvoted_reviews = []
 
 user.is_deleted = True
 user.username = None
