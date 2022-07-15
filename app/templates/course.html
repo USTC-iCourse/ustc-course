@@ -76,7 +76,7 @@
           <button class="btn btn-white btn-flat btn-downvote btn-do"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 不推荐 <small>(<span class="count"></span>)</small></button>
           <button class="btn btn-blue btn-flat btn-downvote btn-undo"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> 取消不推荐 <small>(<span class="count"></span>)</small></button>
 
-          {% if current_user.is_student %}
+          {% if current_user.is_student and current_user.student_id %}
           <button class="btn btn-white btn-flat btn-join btn-do"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small></small></button>
           <button class="btn btn-blue btn-flat btn-join btn-undo"><span class="glyphicon glyphicon-book" aria-hidden="true"></span> 学过 <small></small></button>
           {% endif %}

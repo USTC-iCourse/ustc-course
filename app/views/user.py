@@ -174,8 +174,8 @@ def courses(user_id):
         else:
             return render_template('feedback.html',status=False,message=_('Error: please contact us!'))
     elif user and not user.is_deleted:
-        return render_template('feedback.html',status=False,message=_('This user have not bind a ID.Click\
-            <a href=%(url)s><b>here</b></a> to bind.',url=url_for('.bind_identity')))
+        return render_template('feedback.html',status=False,message=_('此用户尚未绑定学号。\
+            <a href=%(url)s><b>点击这里</b></a> 绑定学号。',url=url_for('.bind_identity')))
     else:
         return render_template('feedback.html',status=False,message=_('We can\'t find the User!'))
 
