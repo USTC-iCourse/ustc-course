@@ -452,7 +452,7 @@ class Course(db.Model):
 
     def join(self, user=current_user):
         from .user import join_course
-        if not user.is_student or user.info in self.students:
+        if not user.is_student or user.student_id is None or user.info in self.students:
             return False
 
         last_class = CourseClass.query.filter(CourseClass.course_id == self.id).order_by(CourseClass.term.desc()).first()
@@ -464,7 +464,7 @@ class Course(db.Model):
 
     def quit(self, user=current_user):
         from .user import join_course, Student
-        if not user.is_student or not user.info in self.students:
+        if not user.is_student or user.student_id is None or not user.info in self.students:
             return False
 
         classes = CourseClass.query.filter(CourseClass.course_id == self.id).join(join_course).join(Student).filter(Student.sno == user.student_id).all()
@@ -534,10 +534,10 @@ class Course(db.Model):
 
     @property
     def joined(self, user=current_user):
-        return user.is_student and user.info in self.students
+        return user.is_student and user.student_id and user.info in self.students
 
     def joined_classes(self, user=current_user):
-        if user.is_student:
+        if user.is_student and user.student_id:
             from .user import join_course
             return CourseClass.query.filter(CourseClass.course_id == self.id).join(join_course).filter(join_course.c.student_id == user.student_id).all()
         else:
