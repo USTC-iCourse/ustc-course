@@ -70,7 +70,7 @@ class Review(db.Model):
         if author in self.upvote_users:
             return False,"The user has upvoted!"
         self.upvote_users.append(author)
-        self.upvote_count +=1
+        self.upvote_count = len(self.upvote_users)
         self.__save()
         return True,"Success!"
 
@@ -78,7 +78,7 @@ class Review(db.Model):
         if author not in self.upvote_users:
             return (False,"The user has not upvoted!")
         self.upvote_users.remove(author)
-        self.upvote_count -=1
+        self.upvote_count = len(self.upvote_users)
         self.__save()
         return (True,"Success!")
 
@@ -189,9 +189,10 @@ class ReviewComment(db.Model):
     def add(self,review,content,author=current_user):
         self.content = content
         self.review = review
-        review.comment_count += 1
         self.author = author
         db.session.add(self)
+        review.comment_count = len(review.comments)
+        db.session.add(review)
         db.session.commit()
         return True,"Success!"
 
@@ -199,7 +200,7 @@ class ReviewComment(db.Model):
         if self.review:
             review = self.review
             review.comments.remove(self)
-            review.comment_count -= 1
+            review.comment_count = len(review.comments)
             db.session.add(review)
             db.session.commit()
         db.session.delete(self)
