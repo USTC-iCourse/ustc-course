@@ -371,32 +371,25 @@ class Course(db.Model):
 
     def upvote(self,user=current_user):
         user.courses_upvoted.append(self)
-        self.course_rate.upvote_count += 1
-        db.session.add(self)
+        self.course_rate.upvote_count = len(self.upvote_users)
         db.session.commit()
         return True
 
     def un_upvote(self,user=current_user):
         user.courses_upvoted.remove(self)
-        self.course_rate.upvote_count -= 1
-        db.session.add(self)
-        db.session.add(user)
+        self.course_rate.upvote_count = len(self.upvote_users)
         db.session.commit()
         return True
 
     def downvote(self,user=current_user):
         user.courses_downvoted.append(self)
-        self.course_rate.downvote_count += 1
-        db.session.add(self)
-        db.session.add(user)
+        self.course_rate.downvote_count = len(self.downvote_users)
         db.session.commit()
         return True
 
     def un_downvote(self,user=current_user):
         user.courses_downvoted.remove(self)
-        self.course_rate.downvote_count -= 1
-        db.session.add(self)
-        db.session.add(user)
+        self.course_rate.downvote_count = len(self.downvote_users)
         db.session.commit()
         return True
 
@@ -422,7 +415,7 @@ class Course(db.Model):
         if user in self.followers:
             return False
         self.followers.append(user)
-        self.course_rate.follow_count += 1
+        self.course_rate.follow_count = len(self.followers)
         db.session.commit()
         return True
 
@@ -430,7 +423,7 @@ class Course(db.Model):
         if not user in self.followers:
             return False
         self.followers.remove(user)
-        self.course_rate.follow_count -= 1
+        self.course_rate.follow_count = len(self.followers)
         db.session.commit()
         return True
 
