@@ -323,8 +323,8 @@ class User(db.Model, UserMixin):
         if followed in self.users_following:
             return False
         self.users_following.append(followed)
-        self.following_count += 1
-        followed.follower_count += 1
+        self.following_count = len(self.users_following)
+        followed.follower_count = len(followed.followers)
         db.session.commit()
         return True
 
@@ -332,8 +332,8 @@ class User(db.Model, UserMixin):
         if followed not in self.users_following:
             return False
         self.users_following.remove(followed)
-        self.following_count -= 1
-        followed.follower_count -= 1
+        self.following_count = len(self.users_following)
+        followed.follower_count = len(followed.followers)
         db.session.commit()
         return True
 

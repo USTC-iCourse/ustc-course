@@ -192,7 +192,6 @@ class ReviewComment(db.Model):
         self.author = author
         db.session.add(self)
         review.comment_count = len(review.comments)
-        db.session.add(review)
         db.session.commit()
         return True,"Success!"
 
@@ -201,7 +200,6 @@ class ReviewComment(db.Model):
             review = self.review
             review.comments.remove(self)
             review.comment_count = len(review.comments)
-            db.session.add(review)
             db.session.commit()
         db.session.delete(self)
         db.session.commit()
