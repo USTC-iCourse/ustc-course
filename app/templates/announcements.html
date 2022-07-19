@@ -15,7 +15,7 @@
 
       {% for announcement in announcements %}
       <div class="ud-pd-md dashed" id="announcement-{{ announcement.id }}">
-        <h3>{{ announcement.title }}</h4>
+        <h3>{{ announcement.title }} <a class="grey nounderline" href="{{ url_for('home.announcements', _external=True) }}#announcement-{{ announcement.id }}">#</a></h3>
         <p class="text-muted">{{ announcement.content|safe }}</p>
 
         <div class="grey bm-pd-md">
@@ -24,7 +24,6 @@
 	      {% if announcement.publish_time != announcement.update_time %}
 	      <span>（最后修改于</span> <span class="localtime" style="display: none;">{{ announcement.update_time|utctime }}</span><span>）</span>
 	      {% endif %}
-          <span class="left-pd-md small review-links" style="cursor:pointer;" data-clipboard-action="copy" data-clipboard-text="{{ url_for('home.announcements', _external=True) }}#announcement-{{ announcement.id }}" data-toggle="tooltip" data-trigger="click" data-placement="top" title="链接已复制">复制链接</span>
 
           {% if current_user.is_admin %}
           <span class="pull-right">
