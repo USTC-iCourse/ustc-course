@@ -488,7 +488,7 @@ def search():
 @home.route('/announcements/')
 def announcements():
     announcements = Announcement.query.order_by(Announcement.update_time.desc()).all()
-    return render_template('announcements.html', announcements=announcements)
+    return render_template('announcements.html', announcements=announcements, title='公告栏')
 
 
 @home.route('/about/')
