@@ -4,19 +4,24 @@ sys.path.append('..')
 from app import db
 from app.models import Review
 from lxml.html.clean import Cleaner
+from app.utils import sanitize
+from app.views.review import record_review_history
 
-review = Review.query.order_by(Review.id).first()
-while review is not None:
-	print(review.id)
-	cleaner = Cleaner(safe_attrs_only=False, style=False)
-	new_content = cleaner.clean_html(review.content)
-	if new_content != review.content:
-		print('=======')
-		print(review.content)
-		print('-------')
-		print(new_content)
-		print('=======')
-		review.content = new_content
-		db.session.commit()
+reviews = Review.query.all()
+print(len(reviews))
 
-	review = Review.query.filter(Review.id > review.id).order_by(Review.id).first()
+for review in reviews:
+    print(review.id)
+    new_content = sanitize(review.content)
+    if new_content != review.content:
+        print('=======')
+        print(review.content)
+        print('-------')
+        print(new_content)
+        print('=======')
+        review.content = new_content
+        db.session.add(review)
+        db.session.commit()
+
+        record_review_history(review, 'clean-html')
+        db.session.commit()
