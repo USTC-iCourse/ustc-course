@@ -119,11 +119,11 @@ def resize_avatar(old_file):
     return old_file
 
 def sanitize(text):
-    if text.strip():
-        cleaner = Cleaner(safe_attrs_only=False, style=False)
-        return cleaner.clean_html(text)
-    else:
-        return text
+    cleaner = Cleaner(safe_attrs_only=False, style=False)
+    text = cleaner.clean_html(text)
+    text = re.sub(r'<img (.*) style="height:[0-9]+px; width:[0-9]+px"', r'<img \1', text)
+    text = re.sub(r'<img (.*) style="width:[0-9]+px; height:[0-9]+px"', r'<img \1', text)
+    return text
 
 
 @app.template_filter('extract_domain')
