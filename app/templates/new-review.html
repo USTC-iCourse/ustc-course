@@ -3,6 +3,8 @@
 
 <div class="container">
   <div class="row float-element">
+  <div class="row">
+  <div class="col-md-8">
     <div class="inline-h3">
     <span class="blue h4">{% if not is_new %}编辑{% endif %}点评 &bull; <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display|name_display_short }}）{% endif %}</a></span>
     <span class="align-bottom left-pd-sm desktop">学期：{{ review.term|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
@@ -52,7 +54,7 @@
         </div>
       </div>
 
-      <div class="container-md desktop">
+      <div class="desktop">
         <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
           <textarea id="content-editor" name="content">{% if review.content %}{{ review.content|safe }}{% endif %}</textarea>
@@ -81,7 +83,7 @@
         <label for="only_visible_to_student">仅登录学生用户可见</label>
       </div>
 
-      <div class="container-md desktop">
+      <div class="desktop">
         <button type="submit" class="btn btn-blue btn-flat float-right shadow">发布</button>
       </div>
       <div class="container mobile">
@@ -91,6 +93,8 @@
       <div class="ud-pd-lg"></div>
 
     </form>
+  </div>
+  </div>
   </div>
 </div>
 {% endblock %}
