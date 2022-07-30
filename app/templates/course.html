@@ -146,7 +146,6 @@
 	</div>
 	{% endif %}
 
-	{% if reviews|length >= 2 %}
 	<div class="ud-pd-sm">
 		<span class="right-pd-sm weight-heavy">排序</span>
 		<select name="sort_by" onchange="location=this.value">
@@ -178,7 +177,6 @@
 		</select>
 		<span class="rl-pd-sm text-muted">{{ review_num }}条点评</span>
 	</div>
-	{% endif %}
 
     {% for review in reviews %}
 	  {% if not review.is_blocked or current_user.is_admin or review.author == current_user %}
