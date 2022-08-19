@@ -1,25 +1,39 @@
 # How to import courses
 
-本来打算写一个脚本搞定从登录到获取课程信息JSON，但发现这个过程有点复杂（特别是选择学期这块），就用文档方式写下来，手动操作。
+## 从教务系统导入所有课程（推荐）
 
-## 从公共查询导入
+1. 用统一身份认证账号密码（本科学号/密码）登录综合教务系统 `https://jw.ustc.edu.cn/`
+2. 打开浏览器 Developer Tools（Chrome 是 F12）中的 Network 选项卡
+3. 点击一个请求，找到 Headers 里面的 cookie，把 cookie 复制下来
+4. 在评课社区服务器上运行导入课程的脚本： `./tests/import_course_all_semesters.py <cookie>`，脚本会从最近的一个学期开始，从后往前导入各个学期的课程。因为一年之前的课程大多数情况下不会变化了，导入最近的两三个学期之后，可以 Ctrl+C 关掉（可能需要 Ctrl+C 多次才能停下来）。
 
-网址：<https://catalog.ustc.edu.cn/query/lesson>。
-
-1. 打开开发者工具，在 Network 中筛选 XHR 请求；
-2. 刷新页面，选择需要导入的学期；
-3. 此时应当能够从 Network 中看到两个 JSON 文件的请求，复制 URL 可以直接下载。
-  - 第一个是学期（semester）列表信息（`semester/list`）；
-  - 第二个是该学期的所有课程信息（`lesson/list-for-teach/<id>`），请记住下载时 URL 中的 id 的值。
-4. 运行导入脚本：
-
+输出类似是这样：
 ```
-$ python ./import_courses_catalog.py --id=241 --semester=path/to/semester.json --lesson=path/to/lesson.json
+$ ./tests/import_course_all_semesters.py 'sduuid=xxxx; _ga=xxxx; SESSION=xxxxx; user_locale=zh; fine_remember_login=-1; fine_auth_token=xxx'
+Found 67 semesters
+Downloading semester 2022年秋季学期 (ID=281)
+Download complete, importing semester 2022年秋季学期 (ID=281)
+127 existing departments loaded
+4262 existing teachers loaded
+14269 existing courses loaded
+60562 existing course classes loaded
+45602 existing course terms loaded
+...
+New course 新闻、传媒翻译(邢鸿飞)
+New course term 新闻、传媒翻译(邢鸿飞)@20221
+New course class TINT6403P01@20221
+load complete, committing changes to database
+87 new teachers loaded
+223 new courses loaded
+841 new terms loaded
+996 new classes loaded
+52 new departments loaded
+Import semester 2022年秋季学期 (ID=281) complete
+Downloading semester 2022年夏季学期 (ID=261)
+Download complete, importing semester 2022年夏季学期 (ID=261)
 ```
 
-请将 `id` 设置为 URL 中显示的值。
-
-## 从教务系统导入
+## 从教务系统导入某一个学期的课程
 
 1. 使用Chrome浏览器
 2. 用统一身份认证账号密码（本科学号/密码）登录综合教务系统 https://jw.ustc.edu.cn/
@@ -76,3 +90,23 @@ load complete, committing changes to database
 ```
 
 脚本运行完成后，课程导入过程就结束了。
+
+
+## 从公共查询导入（不能解决老师重名的问题，不推荐）
+
+网址：<https://catalog.ustc.edu.cn/query/lesson>。
+
+1. 打开开发者工具，在 Network 中筛选 XHR 请求；
+2. 刷新页面，选择需要导入的学期；
+3. 此时应当能够从 Network 中看到两个 JSON 文件的请求，复制 URL 可以直接下载。
+  - 第一个是学期（semester）列表信息（`semester/list`）；
+  - 第二个是该学期的所有课程信息（`lesson/list-for-teach/<id>`），请记住下载时 URL 中的 id 的值。
+4. 运行导入脚本：
+
+```
+$ python ./import_courses_catalog.py --id=241 --semester=path/to/semester.json --lesson=path/to/lesson.json
+```
+
+请将 `id` 设置为 URL 中显示的值。
+
+
