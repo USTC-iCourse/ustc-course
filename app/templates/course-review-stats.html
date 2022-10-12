@@ -1,0 +1,73 @@
+<script src="/static/js/highcharts/highcharts.js"></script>
+<script src="/static/js/highcharts/exporting.js"></script>
+<script src="/static/js/highcharts/export-data.js"></script>
+<script src="/static/js/highcharts/accessibility.js"></script>
+
+<figure class="highcharts-figure">
+    <div id="course-review-stats"></div>
+</figure>
+<script>
+Highcharts.chart('course-review-stats', {
+    chart: {
+        type: 'column'
+    },
+    exporting: {
+        filename: 'course-{{ course.id }}-review-stats'
+    },
+    title: {
+        text: ''
+    },
+    subtitle: {
+        text: ''
+    },
+    xAxis: {
+        categories: [
+          {% for row in course.review_per_year_dist() %}
+	        {{ row[0] }},
+          {% endfor %}
+        ],
+        crosshair: true
+    },
+    yAxis: [{
+        min: 0,
+        title: {
+            text: '平均分'
+        }
+    }, {
+        min: 0,
+        title: {
+            text: '点评数量'
+        },
+        opposite: true
+    }],
+    tooltip: {
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: [{
+	    name: '平均分',
+        type: 'column',
+        yAxis: 0,
+        data: [
+          {% for row in course.review_per_year_dist() %}
+	        {{ '%.1f' % row[2] }},
+          {% endfor %}
+        ]
+    }, {
+        name: '点评数量',
+        type: 'spline',
+        yAxis: 1,
+        data: [
+          {% for row in course.review_per_year_dist() %}
+	        {{ row[1] }},
+          {% endfor %}
+        ]
+    }]
+});
+</script>
