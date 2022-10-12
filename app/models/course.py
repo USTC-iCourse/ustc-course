@@ -284,6 +284,11 @@ class Course(db.Model):
     def num_deleted_reviews(self):
         return db.session.query(db.func.count(db.distinct(ReviewHistory.author_id))).filter(ReviewHistory.course_id == self.id).filter(ReviewHistory.operation == 'delete').first()[0]
 
+    def review_per_year_dist(self):
+        x = db.session.query(db.extract('year', Review.publish_time).label('year'), db.func.count(Review.id), db.func.avg(Review.rate)).filter(Review.course_id == self.id).group_by(db.text('year')).order_by(db.text('year')).all()
+        print(x)
+        return x
+
     @property
     def teacher(self):
         if len(self.teachers) >= 1:
