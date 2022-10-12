@@ -3,7 +3,7 @@ from flask import url_for, Markup
 from app import db
 from decimal import Decimal
 from sqlalchemy import orm
-from .review import Review
+from .review import Review, ReviewHistory
 from .user import Teacher
 from collections import Counter
 try:
@@ -279,6 +279,10 @@ class Course(db.Model):
     @property
     def num_blocked_reviews(self):
         return self.reviews.filter(Review.is_blocked == True).count()
+
+    @property
+    def num_deleted_reviews(self):
+        return ReviewHistory.query.filter(ReviewHistory.course_id == self.id).filter(ReviewHistory.operation == 'delete').distinct(ReviewHistory.author_id).count()
 
     @property
     def teacher(self):
