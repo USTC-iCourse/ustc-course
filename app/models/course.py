@@ -282,7 +282,7 @@ class Course(db.Model):
 
     @property
     def num_deleted_reviews(self):
-        return ReviewHistory.query.filter(ReviewHistory.course_id == self.id).filter(ReviewHistory.operation == 'delete').distinct(ReviewHistory.author_id).count()
+        return db.session.query(db.func.count(db.distinct(ReviewHistory.author_id))).filter(ReviewHistory.course_id == self.id).filter(ReviewHistory.operation == 'delete').first()[0]
 
     @property
     def teacher(self):
