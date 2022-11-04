@@ -287,6 +287,9 @@ class Course(db.Model):
     def review_per_year_dist(self):
         return db.session.query(db.extract('year', Review.publish_time).label('year'), db.func.count(Review.id), db.func.avg(Review.rate)).filter(Review.course_id == self.id).group_by(db.text('year')).order_by(db.text('year')).all()
 
+    def review_per_term_dist(self):
+        return db.session.query(Review.term, db.func.count(Review.id), db.func.avg(Review.rate)).filter(Review.course_id == self.id).group_by(Review.term).order_by(Review.term).all()
+
     @property
     def teacher(self):
         if len(self.teachers) >= 1:

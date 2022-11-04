@@ -22,10 +22,13 @@ Highcharts.chart('course-review-stats', {
     },
     xAxis: {
         categories: [
-          {% for row in course.review_per_year_dist() %}
-	        {{ row[0] }},
+          {% for row in course.review_per_term_dist() %}
+	        '{{ row[0]|term_display }}',
           {% endfor %}
         ],
+        labels: {
+            autoRotation: [0, -30, -45, -60, -90]
+        },
         crosshair: true
     },
     yAxis: [{
@@ -51,21 +54,21 @@ Highcharts.chart('course-review-stats', {
         }
     },
     series: [{
-	    name: '平均分',
+        name: '点评数量',
         type: 'column',
-        yAxis: 0,
+        yAxis: 1,
         data: [
-          {% for row in course.review_per_year_dist() %}
-	        {{ '%.1f' % row[2] }},
+          {% for row in course.review_per_term_dist() %}
+	        {{ row[1] }},
           {% endfor %}
         ]
     }, {
-        name: '点评数量',
+	    name: '平均分',
         type: 'spline',
-        yAxis: 1,
+        yAxis: 0,
         data: [
-          {% for row in course.review_per_year_dist() %}
-	        {{ row[1] }},
+          {% for row in course.review_per_term_dist() %}
+	        {{ '%.1f' % row[2] }},
           {% endfor %}
         ]
     }]
