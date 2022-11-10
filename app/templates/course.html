@@ -182,6 +182,7 @@
 			{% endfor %}
 		</select>
 		<span class="rl-pd-sm text-muted">{{ review_num }}条点评</span>
+        <button type="button" class="btn btn-small btn-default left-mg-md" data-toggle="modal" data-target="#review-stats">课程学期评分趋势</button>
 	</div>
 
     {% for review in reviews %}
@@ -378,11 +379,6 @@
           {% endfor %}
         </div>
         {% endfor %}
-
-        <div class="ud-pd-md dashed">
-          <h4 class="blue">各学期评分趋势</h5>
-          {% include 'course-review-stats.html' %}
-        </div>
       </div>
     </div> <!-- row -->
   </div>  <!-- float-element  -->
@@ -392,6 +388,19 @@
   <span>▲</span>
 </a>
 
+<div class="modal fade" id="review-stats" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-signin">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">课程学期评分趋势</h4>
+      </div>
+      <div class="modal-body">
+        {% include 'course-review-stats.html' %}
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block script %}
