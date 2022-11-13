@@ -142,6 +142,8 @@ def load_tree():
                 program_id = program_data['id']
                 program = programs_map[program_id] if program_id in programs_map else Program()
                 program.id = program_id
+                program.dept_id = dept_id
+                program.major_id = major_id
                 program.name = program_data['nameZh']
                 program.name_en = program_data['nameEn']
                 program.grade = program_data['grade']
