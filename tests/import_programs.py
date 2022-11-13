@@ -69,6 +69,11 @@ def load_dept(dept_data):
     return dept
 
 
+def to_numeric_term(term_str):
+    term_str.replace('0--', '9')  # 毕业论文用 0-- 代替，应该是排在最后的
+    return term_str.replace('春', '1').replace('秋', '0').replace('夏', '2')
+
+
 def load_program_course(program_id, course_type, course):
     course_group = course_groups_map[course['course']['code']]
     key = str(program_id) + '|' + str(course_group.code)
@@ -84,6 +89,7 @@ def load_program_course(program_id, course_type, course):
     program_course.type = course_type
     program_course.remark = course['remark']
     program_course.terms = ','.join(course['terms'])
+    program_course.terms_numeric = to_numeric_term(program_course.terms)
 
     program_courses_map[key] = program_course
     db.session.add(program_course)
