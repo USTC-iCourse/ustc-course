@@ -90,7 +90,8 @@ class CourseTerm(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     term = db.Column(db.String(10), index=True) # 学年学期，例如 20142 表示 2015 年春季学期
 
-    courseries = db.Column(db.String(20)) # course_series, 课程编号，短的
+    courseries = db.Column(db.String(20)) # course_series, 课程编号，长的，例如 CS1001A.01
+    code = db.Column(db.String(20)) # 课程编号，短的，例如 CS1001A
     kcid = db.Column(db.Integer)    # 课程id
 
     course_major = db.Column(db.String(20)) # 学科类别
@@ -160,6 +161,7 @@ class Course(db.Model):
     id = db.Column(db.Integer,unique=True,primary_key=True)
     name = db.Column(db.String(80), index=True) # 课程名称
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
+    code = db.Column(db.String(50)) # 课程号，短的，例如 CS1001A
 
     introduction = db.Column(db.Text) # 老师提交的课程简介
     admin_announcement = db.Column(db.Text)
