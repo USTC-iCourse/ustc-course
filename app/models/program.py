@@ -14,7 +14,13 @@ class Program(db.Model):
     grade = db.Column(db.String(50))
 
     dept = db.relationship('Dept')
-    major = db.relationship('Major')
+    major = db.relationship('Major', backref='programs')
+
+
+course_group_relation = db.Table('course_group_relations',
+    db.Column('code', db.String(50), db.ForeignKey('course_groups.code')),
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'))
+)
 
 
 # CourseGroup is identified by the short course code (e.g. CS1001A)
@@ -29,6 +35,8 @@ class CourseGroup(db.Model):
     name_en = db.Column(db.String(255))
     seasons = db.Column(db.String(50))
     total_periods = db.Column(db.Integer)
+
+    courses = db.relationship('Course', secondary=course_group_relation, backref='course_groups', lazy='dynamic')
 
 
 class ProgramCourse(db.Model):
@@ -46,12 +54,6 @@ class ProgramCourse(db.Model):
     remark = db.Column(db.Text)
     terms = db.Column(db.String(50))
 
-    course_group = db.relationship('CourseGroup')
-    program = db.relationship('Program')
+    course_group = db.relationship('CourseGroup', backref='programs')
+    program = db.relationship('Program', backref='courses')
     dept = db.relationship('Dept')
-
-
-course_group_relation = db.Table('course_group_relations',
-    db.Column('code', db.String(50), db.ForeignKey('course_groups.code')),
-    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'))
-)
