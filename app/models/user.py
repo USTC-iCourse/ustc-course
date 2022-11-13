@@ -364,7 +364,7 @@ class Major(db.Model):
 
     id = db.Column(db.Integer, unique=True, primary_key=True)
     name = db.Column(db.String(200))
-    name_eng = db.Column(db.String(200))
+    name_en = db.Column(db.String(200))
     code = db.Column(db.String(20))
 
 # 行政班级
