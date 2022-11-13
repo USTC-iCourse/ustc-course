@@ -35,15 +35,15 @@ class ProgramCourse(db.Model):
     __tablename__ = 'program_courses'
 
     id = db.Column(db.Integer, primary_key=True)
-    course_group_id = db.Column(db.String(50), db.ForeignKey('course_groups.code'))
     program_id = db.Column(db.Integer, db.ForeignKey('programs.id'))
+    course_group_code = db.Column(db.String(50), db.ForeignKey('course_groups.code'))
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
     compulsory = db.Column(db.Boolean)
     exam_mode = db.Column(db.String(50))
     total_periods = db.Column(db.Integer)
     weeks = db.Column(db.Integer)
     type = db.Column(db.String(50))
-    remark = db.Column(db.String(50))
+    remark = db.Column(db.Text)
     terms = db.Column(db.String(50))
 
     course_group = db.relationship('CourseGroup')
