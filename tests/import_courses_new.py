@@ -220,7 +220,7 @@ def load_courses(insert=True):
         # change 123456.01 format to the original 12345601 format
         class_code = c['code'].replace('.', '').upper()
         course_term.courseries = class_code
-        course_term.code = course.code
+        course_term.code = course_code_short
         course_term.class_numbers = class_code
 
         for key in course_kcbh[code]:
