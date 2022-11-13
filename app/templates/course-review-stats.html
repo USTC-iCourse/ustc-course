@@ -54,23 +54,28 @@ Highcharts.chart('course-review-stats', {
         }
     },
     series: [{
-        name: '点评数量',
-        type: 'column',
-        yAxis: 1,
-        data: [
-          {% for row in course.review_per_term_dist() %}
-	        {{ row[1] }},
-          {% endfor %}
-        ]
-    }, {
 	    name: '平均分',
         type: 'spline',
         yAxis: 0,
+        index: 1,
+        legendIndex: 0,
         data: [
           {% for row in course.review_per_term_dist() %}
 	        {{ '%.1f' % row[2] }},
           {% endfor %}
         ]
-    }]
+    }, {
+        name: '点评数量',
+        type: 'column',
+        yAxis: 1,
+        index: 0,
+        legendIndex: 1,
+        data: [
+          {% for row in course.review_per_term_dist() %}
+	        {{ row[1] }},
+          {% endfor %}
+        ]
+    }],
+    colors: ['#434348', '#7cb5ec']
 });
 </script>
