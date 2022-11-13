@@ -15,6 +15,7 @@ class Program(db.Model):
 
     dept = db.relationship('Dept')
     major = db.relationship('Major', backref='programs')
+    courses = db.relationship('ProgramCourse', order_by='ProgramCourse.terms_numeric, ProgramCourse.type')
 
 
 course_group_relation = db.Table('course_group_relations',
@@ -53,7 +54,8 @@ class ProgramCourse(db.Model):
     type = db.Column(db.String(50))
     remark = db.Column(db.Text)
     terms = db.Column(db.String(50))
+    terms_numeric = db.Column(db.String(50))
 
     course_group = db.relationship('CourseGroup', backref='program_courses')
-    program = db.relationship('Program', backref='courses')
+    program = db.relationship('Program')
     dept = db.relationship('Dept')

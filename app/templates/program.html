@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+    <div class="bm-pd-lg">
+      <div class="center top-pd-md">
+        <span class="h3 blue">{{ program.name }}</span>
+        <span>（{{ program.dept.name }} {{ program.major.name }} {{ program.grade }}级 {{ program.train_type }}）</p>
+      </div>
+
+      <p>&nbsp;</p>
+
+      <table class="table table-bordered text-center table-hover min-margin-table">
+        <tr>
+          <th>课程号</th>
+          <th>课程名</th>
+          <th>必修/选修</th>
+          <th>考核形式</th>
+          <th>学分</th>
+          <th>课程类别</th>
+          <th>开课学期</th>
+        </tr>
+        {% for course in program.courses %}
+        <tr>
+          <td><a href="{{ url_for('home.search', q=course.course_group_code) }}">{{ course.course_group_code }}</a></td>
+          <td><a href="{{ url_for('home.search', q=course.course_group.name) }}">{{ course.course_group.name }}</a></td>
+          <td>{{ '必修' if course.compulsory else '选修' }}</td>
+          <td><span class="small">{{ course.exam_mode }}</span></td>
+          <td>{{ course.course_group.credits }}</td>
+          <td>{{ course.type }}</td>
+          <td>{{ course.terms }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div> <!-- end float-element -->
+</div> <!-- end container -->
+
+{% endblock %}
