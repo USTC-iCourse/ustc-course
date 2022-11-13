@@ -161,7 +161,6 @@ class Course(db.Model):
     id = db.Column(db.Integer,unique=True,primary_key=True)
     name = db.Column(db.String(80), index=True) # 课程名称
     dept_id = db.Column(db.Integer, db.ForeignKey('depts.id'))
-    code = db.Column(db.String(50)) # 课程号，短的，例如 CS1001A
 
     introduction = db.Column(db.Text) # 老师提交的课程简介
     admin_announcement = db.Column(db.Text)

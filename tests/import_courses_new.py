@@ -172,10 +172,6 @@ def load_courses(insert=True):
         if course_key in courses_map:
             course = courses_map[course_key]
             course.teachers = teacher_objects
-            if course.code and course.code != course_code_short:
-                print('Warning: different course code: old ' + course.code + ' vs. new ' + course_code_short)
-            if not course.code:
-                course.code = course_code_short
             db.session.add(course)
             #print('Existing course ' + course_key)
         else:
@@ -183,7 +179,6 @@ def load_courses(insert=True):
             course = Course()
             course.name = course_name
             course.teachers = teacher_objects
-            course.code = course_code_short
             db.session.add(course)
 
             courses_map[course_key] = course
