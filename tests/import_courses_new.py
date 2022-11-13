@@ -168,9 +168,14 @@ def load_courses(insert=True):
         teacher_objects = list(set(teacher_objects))
 
         course_key = course['nameZh'] + '(' + ','.join(teacher_names) + ')'
+        course_code_short = course['code']
         if course_key in courses_map:
             course = courses_map[course_key]
             course.teachers = teacher_objects
+            if course.code and course.code != course_code_short:
+                print('Warning: different course code: old ' + course.code + ' vs. new ' + course_code_short)
+            if not course.code:
+                course.code = course_code_short
             db.session.add(course)
             #print('Existing course ' + course_key)
         else:
@@ -178,6 +183,7 @@ def load_courses(insert=True):
             course = Course()
             course.name = course_name
             course.teachers = teacher_objects
+            course.code = course_code_short
             db.session.add(course)
 
             courses_map[course_key] = course
@@ -219,6 +225,7 @@ def load_courses(insert=True):
         # change 123456.01 format to the original 12345601 format
         class_code = c['code'].replace('.', '').upper()
         course_term.courseries = class_code
+        course_term.code = course.code
         course_term.class_numbers = class_code
 
         for key in course_kcbh[code]:
