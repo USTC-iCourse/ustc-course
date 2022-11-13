@@ -6,3 +6,4 @@ from .user import user
 from .teacher import teacher
 from .admin import admin
 from .stats import stats
+from .program import program

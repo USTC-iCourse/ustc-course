@@ -54,6 +54,6 @@ class ProgramCourse(db.Model):
     remark = db.Column(db.Text)
     terms = db.Column(db.String(50))
 
-    course_group = db.relationship('CourseGroup', backref='programs')
+    course_group = db.relationship('CourseGroup', backref='program_courses')
     program = db.relationship('Program', backref='courses')
     dept = db.relationship('Dept')
