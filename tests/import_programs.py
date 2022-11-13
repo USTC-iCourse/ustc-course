@@ -128,10 +128,12 @@ def load_tree():
     tree_json = requests.get(site_root + 'api/teach/program/tree?access_token=' + access_token, headers=headers)
     tree = json.loads(tree_json.text)
     
-    for dept_id in tree:
-        dept_data = tree[dept_id]
+    for json_dept_id in tree:
+        dept_data = tree[json_dept_id]
         dept_code = dept_data['code']
         dept_name = dept_data['nameZh']
+        dept = load_dept(dept_data)
+
         for major_id in dept_data['majors']:
             major_data = dept_data['majors'][major_id]
             major_code = major_data['code']
@@ -148,8 +150,8 @@ def load_tree():
                 program_id = program_data['id']
                 program = programs_map[program_id] if program_id in programs_map else Program()
                 program.id = program_id
-                program.dept_id = dept_id
-                program.major_id = major_id
+                program.dept_id = dept.id
+                program.major_id = major.id
                 program.name = program_data['nameZh']
                 program.name_en = program_data['nameEn']
                 program.grade = program_data['grade']
