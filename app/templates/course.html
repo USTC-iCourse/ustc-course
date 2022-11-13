@@ -170,9 +170,7 @@
 			</option>
 			{% endfor %}
 		</select>
-
-        <p class="mobile"></p>
-
+		<br class="mobile">
 		<span class="right-pd-sm weight-heavy mobile">评分</span>
 		<span class="left-pd-sm right-pd-sm weight-heavy desktop">评分</span>
 		<select name="rating" onchange="location=this.value">
@@ -184,10 +182,7 @@
 			{% endfor %}
 		</select>
 		<span class="rl-pd-sm text-muted">{{ review_num }}条点评</span>
-
-        <p class="mobile"></p>
-
-        <button type="button" class="btn btn-small btn-default" data-toggle="modal" data-target="#review-stats">课程学期评分趋势</button>
+        <button type="button" class="btn btn-small btn-default left-mg-md" data-toggle="modal" data-target="#review-stats">课程学期评分趋势</button>
 	</div>
 
     {% for review in reviews %}
