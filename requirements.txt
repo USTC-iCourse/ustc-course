@@ -22,5 +22,5 @@ pdfkit==1.0.0
 # don't know why these dependencies fail...
 click==7.1.2
 wtforms==3.0.1
-pillow==9.0.1
+pillow==9.3.0
 MarkupSafe==2.0.1
