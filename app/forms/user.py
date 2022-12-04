@@ -20,7 +20,7 @@ class UsernameField(StringField):
             self.data = value
 
 class LoginForm(FlaskForm):
-    username = UsernameField('Username',validators=[DataRequired(), Length(max=30,message='The length must under 30')])
+    username = UsernameField('Username',validators=[DataRequired()])
     password = PasswordField('Password',validators=[DataRequired()])
     remember = BooleanField('Remember me',default=False)
 
