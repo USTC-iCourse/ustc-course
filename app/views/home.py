@@ -110,7 +110,7 @@ def signin():
         else:
             error = _('用户名或密码错误！')
     else:
-        error = '表单提交出错：' + str(form.errors)
+        error = '表单验证错误：' + str(form.errors)
 
     #TODO: log the form errors
     if request.args.get('ajax'):

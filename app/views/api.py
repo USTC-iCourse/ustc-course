@@ -89,7 +89,7 @@ def review_new_comment():
         else:
             return jsonify(ok=False,message="The review doesn't exist.")
     else:
-        return jsonify(ok=False,message=form.errors)
+        return jsonify(ok=False,message=('表单验证出错：' + str(form.errors)))
 
 
 @api.route('/review/delete_comment/',methods=['POST'])

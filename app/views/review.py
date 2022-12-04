@@ -112,7 +112,7 @@ def new_review(course_id):
             else:
                 return redirect(next_url)
         else: # invalid submission, try again
-            message = '提交失败，请编辑后重新提交！'
+            message = '提交失败，请编辑后重新提交！错误信息：' + str(form.errors)
 
     polls = [
         {'name': 'difficulty', 'display': '课程难度', 'options': ['简单', '中等', '困难'] },
