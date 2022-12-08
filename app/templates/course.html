@@ -5,6 +5,9 @@
 
   <div class="row float-element">
     <div class="row">
+
+      <!-- 主内容 -->
+
       <div class="col-md-8 inline-h3">
         <span class="blue h3">{{ course.name }}</span><span class="h3 blue mobile">{% if course.teachers %}（{{ course.teacher_names_display|name_display_short }}）{% endif %}</span>
         <span class="small grey align-bottom left-pd-sm desktop">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
@@ -13,9 +16,11 @@
         {% if current_user.is_authenticated %}
         <button class="btn btn-link float-right"><a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程信息</a></button>
         {% endif %}
+
         <hr>
-        {% if course.review_count %}
+
         <div class="ud-pd-sm blue">
+        {% if course.review_count %}
           {% for star in range(0,5) %}
             {% if course.rate.average_rate >= 1.5 + star * 2 %}
             <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true"></span>
@@ -26,15 +31,14 @@
             {% endif %}
           {% endfor %}
           <span class="rl-pd-sm h4">{{ course.rate.average_rate }}</span><span class="rl-pd-sm text-muted">({{ course.review_count }}人评价)</span>
-        </div>
         {% else %}
-        <div class="ud-pd-sm blue">
           {% for star in range(0,5) %}
             <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true"></span>
           {% endfor %}
           <span class="rl-pd-sm h4"><span class="text-muted px12">(暂无评价)</span>
-        </div>
         {% endif %}
+        </div>
+
         <ul class="text-muted list-inline list-unstyled ud-pd-sm">
           <li class="right-mg-md">课程难度：{{ course.rate.difficulty or '你猜' }}</li>
           <li class="right-mg-md">作业多少：{{ course.rate.homework or '你猜' }}</li>
@@ -53,17 +57,12 @@
           </tr>
           <tr>
             <td><strong>课程层次：</strong>{{ course.course_level or '未知' }}</td>
-            <td><strong>学分：</strong>{{ course.credit or '未知' }}</td>
+            <td><strong><span style="user-select:none">　　</span>学分：</strong>{{ course.credit or '未知' }}</td>
           </tr>
-          </tbody>
         </table>
 
         <div class="ud-pd-sm">
-          {% if course.homepage and course.homepage != 'http://' %}
-          <strong>课程主页</strong>：<a href="{{ course.homepage }}">{{ course.homepage }}</a>
-          {% else %}
-          <strong>课程主页</strong>：暂无（如果你知道，劳烦告诉我们！）
-          {% endif %}
+          <strong>课程主页</strong>：{% if course.homepage and course.homepage != 'http://' %}<a href="{{ course.homepage }}">{{ course.homepage }}</a>{% else %}暂无（如果你知道，劳烦告诉我们！）{% endif %}
         </div>
 
         <div id="action-btn-group" class="ud-pd-md" style="display:none">
@@ -82,118 +81,112 @@
           {% endif %}
         </div>
 
-	{% if course.introduction %}
-	<div class="ud-pd-md">
-	  <div class="solid ud-pd-sm inline-h3">
-          <span class="blue h3">简介</span>
-          <span class="text-muted pull-right small" style="padding-top: 1em;">
-             {% if user.is_authenticated %}
-             <span class="glyphicon glyphicon-pencil grey left-pd-sm" aria-hidden="true" ></span>
-             <a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程简介</a>
-             {% endif %}
-             {% if course.last_edit_time %}
-             <span class="glyphicon glyphicon-time grey left-pd-sm" aria-hidden="true" ></span>
-             最后更新：<span class="localtime" style="display: none;">{{ course.last_edit_time|utctime }}</span>
-             {% endif %}
-          </span>
-	  </div>
-      <div class="showmore-text" id="course-intro">
-	    {{ course.introduction|safe }}
-      </div>
-      <div class="showmore-wrapper">
-        <div class="showmore-shadow">
-          <div class="showmore-btn-wrapper">
-            <button class="showmore-btn">展开全部课程简介 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></button>
+        {% if course.introduction %}
+        <div class="ud-pd-md">
+          <div class="solid ud-pd-sm inline-h3">
+            <span class="blue h3">简介</span>
+            <span class="text-muted pull-right small" style="padding-top: 1em;">
+              {% if user.is_authenticated %}
+              <span class="glyphicon glyphicon-pencil grey left-pd-sm" aria-hidden="true"></span>
+              <a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程简介</a>
+              {% endif %}
+              {% if course.last_edit_time %}
+              <span class="glyphicon glyphicon-time grey left-pd-sm" aria-hidden="true"></span>
+              最后更新：<span class="localtime" style="display: none;">{{ course.last_edit_time|utctime }}</span>
+              {% endif %}
+            </span>
+          </div>
+          <div class="showmore-text" id="course-intro">{{ course.introduction|safe }}</div>
+          <div class="showmore-wrapper"> <!-- TODO: 减少套娃层数 -->
+            <div class="showmore-shadow">
+              <div class="showmore-btn-wrapper">
+                <button class="showmore-btn">展开全部课程简介 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-	</div>
-	{% endif %}
-	{% if course.admin_announcement %}
-	<div class="ud-pd-md">
-	  <div class="solid ud-pd-sm inline-h3">
-            <span class="blue h3">管理员公告</span>
-	  </div>
-	  <div>
-          {{ course.admin_announcement|safe }}
-	  </div>
-	</div>
-	{% endif %}
+        {% endif %}
 
-	<div class="solid ud-pd-md inline-h3">
-	  <span class="blue h3" id="review-anchor">点评</span>
+        {% if course.admin_announcement %}
+        <div class="ud-pd-md">
+          <div class="solid ud-pd-sm inline-h3"><span class="blue h3">管理员公告</span></div>
+          <div>{{ course.admin_announcement|safe }}</div>
+        </div>
+        {% endif %}
+
+        <div class="solid ud-pd-md inline-h3">
+          <span class="blue h3" id="review-anchor">点评</span>
           {% if current_user.is_authenticated %}
           <a type="button" href="{{ url_for('course.new_review',course_id=course.id) }}" class="btn btn-white float-right blue">
-            <span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true" ></span>
+            <span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true"></span>
             {% if not course.reviewed %}写点评{% else %}编辑点评{% endif %}
           </a>
           {% else %}
-          <a type="button" data-toggle="modal" data-target="#signin" class="btn btn-white float-right blue"><span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true"></span>写点评</a>
+          <a type="button" data-toggle="modal" data-target="#signin" class="btn btn-white float-right blue">
+            <span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true"></span>
+            写点评
+          </a>
           {% endif %}
         </div>
 
-
         {% if reviews|length == 0 %}
-        <div class="tips">
-          <p>还没有评论耶！放着我来！</p>
-        </div>
+        <div class="tips"><p>还没有评论耶！放着我来！</p></div>
         <div class="ud-pd-md"></div>
-        {% else %}
-        
-	{% if course.num_blocked_reviews > 0 %}
-	<div class="alert alert-warning" role="alert">
-		<span style="font-weight:bold;">本页面有 {{ course.num_blocked_reviews }} 条评论因违反<a href="/community-rules/">社区规范</a>被隐藏，请同学们文明点评，遵守社区规范。</span>
-	</div>
-	{% endif %}
-	{% if course.num_deleted_reviews > 0 %}
-	<div class="alert alert-warning" role="alert">
-		<span style="font-weight:bold;">本课程有 {{ course.num_deleted_reviews }} 位用户曾删除过点评。</span>
-	</div>
-	{% endif %}
+        {% else %} <!-- 点评开始 -->
 
+        {% if course.num_blocked_reviews > 0 %}
+        <div class="alert alert-warning" role="alert">
+          <span style="font-weight:bold;">本页面有 {{ course.num_blocked_reviews }} 条评论因违反<a href="/community-rules/">社区规范</a>被隐藏，请同学们文明点评，遵守社区规范。</span>
+        </div>
+        {% endif %}
+        {% if course.num_deleted_reviews > 0 %}
+        <div class="alert alert-warning" role="alert">
+          <span style="font-weight:bold;">本课程有 {{ course.num_deleted_reviews }} 位用户曾删除过点评。</span>
+        </div>
+        {% endif %}
 
-	<div class="ud-pd-sm review-header">
-		<span class="right-pd-sm weight-heavy">排序</span>
-		<select name="sort_by" onchange="location=this.value">
-			{% for key, label in sort_dict.items() %}
-			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=key, term=term, rating=rating, _anchor='review-anchor') }}" {% if key==sort_by %}selected{% endif %}>{{ label }}</option>
-			{% endfor %}
-		</select>
-		<span class="left-pd-sm right-pd-sm weight-heavy">学期</span>
-		<select name="term" onchange="location=this.value">
-			{% if course.terms_count > 1 %}
-			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, rating=rating, _anchor='review-anchor') }}" {% if not term %}selected{% endif %}>全部</option>
-			{% endif %}
-			{% for item in course.review_term_list %}
-			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, term=item, rating=rating, _anchor='review-anchor') }}" {% if item==term %}selected{% endif %}>
-			{{ item|term_display }} ({{ course.review_term_dist[item] }})
-			</option>
-			{% endfor %}
-		</select>
+        <div class="ud-pd-sm review-header">
+          <span class="right-pd-sm weight-heavy">排序</span>
+          <select name="sort_by" onchange="location=this.value">
+            {% for key, label in sort_dict.items() %}
+            <option value="{{ url_for('course.view_course', course_id=course.id, sort_by=key, term=term, rating=rating, _anchor='review-anchor') }}" {% if key==sort_by %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <span class="left-pd-sm right-pd-sm weight-heavy">学期</span>
+          <select name="term" onchange="location=this.value">
+            {% if course.terms_count > 1 %}
+            <option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, rating=rating, _anchor='review-anchor') }}" {% if not term %}selected{% endif %}>全部</option>
+            {% endif %}
+            {% for item in course.review_term_list %}
+            <option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, term=item, rating=rating, _anchor='review-anchor') }}" {% if item==term %}selected{% endif %}>
+            {{ item|term_display }} ({{ course.review_term_dist[item] }})
+            </option>
+            {% endfor %}
+          </select>
 
-		<p class="mobile"></p>
+          <p class="mobile"></p>
 
-		<span class="right-pd-sm weight-heavy mobile">评分</span>
-		<span class="left-pd-sm right-pd-sm weight-heavy desktop">评分</span>
-		<select name="rating" onchange="location=this.value">
-			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, term=term, _anchor='review-anchor') }}" {% if not term %}selected{% endif %}>全部</option>
-			{% for n in range(5, 0, -1) %}
-			<option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, term=term, rating=n, _anchor='review-anchor') }}" {% if n==rating %}selected{% endif %}>
-				{{ '★'*n }} ({{ course.review_rate_dist[2*n] + course.review_rate_dist[2*n-1] }})
-			</option>
-			{% endfor %}
-		</select>
-		<span class="rl-pd-sm text-muted">{{ review_num }}条点评</span>
+          <span class="right-pd-sm weight-heavy mobile">评分</span>
+          <span class="left-pd-sm right-pd-sm weight-heavy desktop">评分</span>
+          <select name="rating" onchange="location=this.value">
+            <option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, term=term, _anchor='review-anchor') }}" {% if not term %}selected{% endif %}>全部</option>
+            {% for n in range(5, 0, -1) %}
+            <option value="{{ url_for('course.view_course', course_id=course.id, sort_by=sort_by, term=term, rating=n, _anchor='review-anchor') }}" {% if n==rating %}selected{% endif %}>
+              {{ '★'*n }} ({{ course.review_rate_dist[2*n] + course.review_rate_dist[2*n-1] }})
+            </option>
+            {% endfor %}
+          </select>
+          <span class="rl-pd-sm text-muted">{{ review_num }}条点评</span>
 
-		<p class="mobile"></p>
+          <p class="mobile"></p>
 
-        <button type="button" class="btn btn-small btn-default" data-toggle="modal" data-target="#review-stats">课程学期评分趋势</button>
-	</div>
+          <button type="button" class="btn btn-small btn-default" data-toggle="modal" data-target="#review-stats">课程学期评分趋势</button>
+        </div>
 
-    {% for review in reviews %}
-	  {% if not review.is_blocked or current_user.is_admin or review.author == current_user %}
-      {% if not review.is_hidden or review.author == current_user %}
-      {% if not review.only_visible_to_student or (current_user.is_authenticated and current_user.identity == 'Student') or review.author == current_user %}
+        {% for review in reviews %}
+        {% if not review.is_blocked or current_user.is_admin or review.author == current_user %}
+        {% if not review.is_hidden or review.author == current_user %}
+        {% if not review.only_visible_to_student or (current_user.is_authenticated and current_user.identity == 'Student') or review.author == current_user %}
         <div class="ud-pd-md dashed review" id="review-{{review.id}}">
           <div class="blue ud-pd-sm">
             <span class="right-pd-sm px16">
@@ -243,35 +236,39 @@
             <li>给分：{{ review.grading_display }}</li>
             <li>收获：{{ review.gain_display }}</li>
           </ul>
-	  <div class="review-content" id="review-content-{{ review.id }}">
-            <p>{{ review.content|my_urlize(nofollow=true)|safe }}</p>
-          </div>
-	  {% if review.filter_rule %}
-	  <div style="display:none;" class="review-filter-rule" id="review-filter-rule-{{ review.id }}">{{ review.filter_rule }}</div>
-	  {% endif %}
+
+          <div class="review-content" id="review-content-{{ review.id }}"><p>{{ review.content|my_urlize(nofollow=true)|safe }}</p></div>
+
+          {% if review.filter_rule %}
+          <div style="display:none;" class="review-filter-rule" id="review-filter-rule-{{ review.id }}">{{ review.filter_rule }}</div>
+          {% endif %}
 
           <div class="bm-pd-md grey" id="review-{{ review.id }}">
             <span class="small localtime" style="display: none;">{{ review.publish_time|utctime }}</span>
-	    {% if review.publish_time != review.update_time %}
-	    <span class="small">（最后修改于</span> <span class="small localtime" style="display: none;">{{ review.update_time|utctime }}</span><span class="small">）</span>
-	    {% endif %}
+            {% if review.publish_time != review.update_time %}
+            <span class="small">（最后修改于</span> <span class="small localtime" style="display: none;">{{ review.update_time|utctime }}</span><span class="small">）</span>
+            {% endif %}
+
             {% if current_user.is_authenticated %}
             <a class="nounderline" href="javascript: {{ 'cancel_' if review.is_upvoted() }}upvote_review({{ review.id }})">
             {% else %}
             <a class="nounderline" data-toggle="modal" data-target="#signin" href="#">
             {% endif %}
-                <span class="glyphicon glyphicon-thumbs-up {{ 'blue' if review.is_upvoted() else 'grey' }} left-pd-lg" aria-hidden="true" ></span>
-                <span id="review-upvote-count-{{review.id}}">{{ review.upvote_count }}</span>
+              <span class="glyphicon glyphicon-thumbs-up {{ 'blue' if review.is_upvoted() else 'grey' }} left-pd-lg" aria-hidden="true"></span>
+              <span id="review-upvote-count-{{review.id}}">{{ review.upvote_count }}</span>
             </a>
+
             <a class="nounderline" href="javascript: show_review_comments({{ review.id }})">
               <span class="glyphicon glyphicon-comment {{ 'blue' if review.comments else 'grey' }} left-pd-md" aria-hidden="true"></span>
               <span id="review-comment-count-{{review.id}}">{{ review.comment_count }}</span>
             </a>
+
             <span class="left-pd-md small review-links" style="cursor:pointer;" data-clipboard-action="copy" data-clipboard-text="{{ url_for('course.view_course', course_id=course.id, _external=True) }}#review-{{ review.id }}" data-toggle="tooltip" data-trigger="click" data-placement="top" title="链接已复制">复制链接</span>
+
             <span class="pull-right">
               {% if review.author == user %}
               <a class="nounderline desktop" href="{{ url_for('course.new_review',course_id=course.id) }}">
-                <span class="glyphicon glyphicon-pencil grey left-pd-sm small" aria-hidden="true" ></span>
+                <span class="glyphicon glyphicon-pencil grey left-pd-sm small" aria-hidden="true"></span>
                 编辑
               </a>
               {% endif %}
@@ -281,6 +278,7 @@
                 删除
               </a>
               {% endif %}
+
               {% if review.author == user %}
                 <span class="glyphicon glyphicon-ban-circle grey left-pd-md" aria-hidden="true"></span>
                 {% if review.is_hidden %}
@@ -299,25 +297,24 @@
             </span>
           </div>
 
-	  {% if review.author == current_user and review.upvote_users|length > 0 %}
-	  <div class="bm-pd-md" id="review-upvotes-{{ review.id }}">
-	    <p style="line-break: loose;">
-              <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true" ></span>
-	      {% for upvote_user in review.upvote_users %}{% if upvote_user != review.upvote_users[0] %}、{% endif %}<a href={{ url_for('user.view_profile', user_id=upvote_user.id) }}>{{ upvote_user.username }}</a>{% endfor %}
-	    </p>
-	  </div>
+          {% if review.author == current_user and review.upvote_users|length > 0 %}
+          <div class="bm-pd-md" id="review-upvotes-{{ review.id }}">
+            <p style="line-break: loose;">
+              <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true"></span>
+              {% for upvote_user in review.upvote_users %}{% if upvote_user != review.upvote_users[0] %}、{% endif %}<a href={{ url_for('user.view_profile', user_id=upvote_user.id) }}>{{ upvote_user.username }}</a>{% endfor %}
+            </p>
+          </div>
           {% endif %}
 
           {% include 'review-comments.html' %}
         </div>
-	  {% endif %}
-	  {% endif %}
-	  {% endif %}
-        {% endfor %}
         {% endif %}
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+
+        {% endif %} <!-- 点评结束 -->
       </div>
-
-
 
       <!-- 右边栏 -->
 
@@ -326,14 +323,14 @@
         <div class="ud-pd-md dashed">
           <img class="avatar-lg circle" src="{{ teacher.image }}"/>
           {% if current_user.is_authenticated %}
-          {% if not teacher.info_locked %}
-          <btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
-          {% else %}
-          <a class="btn btn-grey float-right">教师信息已被锁定</a>
-            {% if current_user.is_admin %}
-            <a class="btn btn-danger float-right" href="{{ url_for('teacher.unlock_profile', teacher_id=teacher.id) }}">解锁教师信息</a>
+            {% if not teacher.info_locked %}
+            <btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
+            {% else %}
+            <a class="btn btn-grey float-right">教师信息已被锁定</a>
+              {% if current_user.is_admin %}
+              <a class="btn btn-danger float-right" href="{{ url_for('teacher.unlock_profile', teacher_id=teacher.id) }}">解锁教师信息</a>
+              {% endif %}
             {% endif %}
-          {% endif %}
           {% endif %}
           <h3 class="blue"><a href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}">{{ teacher.name }}</a></h3>
           <p>{{ teacher.dept.name }}</p>
@@ -344,6 +341,7 @@
           </p>
         </div>
         {% endfor %}
+
         {% if course.teachers_count == 0 %}
         <div class="ud-pd-md dashed">
           <img class="avatar-lg circle" src="/static/image/teacher.jpg"/>
@@ -385,13 +383,12 @@
         </div>
         {% endfor %}
       </div>
-    </div> <!-- row -->
-  </div>  <!-- float-element  -->
-</div>  <!-- container -->
 
-<a id="gotop" href="#">
-  <span>▲</span>
-</a>
+    </div> <!-- row -->
+  </div> <!-- float-element -->
+</div> <!-- container -->
+
+<a id="gotop" href="#"><span>▲</span></a>
 
 <div class="modal fade" id="review-stats" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-signin">
