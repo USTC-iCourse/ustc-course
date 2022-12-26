@@ -19,9 +19,15 @@
           <th>考核形式</th>
           <th>学分</th>
           <th>课程类别</th>
-          <th>开课学期</th>
         </tr>
         {% for course in program.courses %}
+
+        {% if loop.index0 == 0 or program.courses[loop.index0 - 1].terms != course.terms %}
+        {% if course.terms %}
+        <tr><td colspan="6" style="font-weight:bold; font-size:1.5em;">{{ course.terms }}</td></tr>
+        {% endif %}
+        {% endif %}
+
         {% if highlight_course_id != course.id %}
         <tr>
         {% else %}
@@ -33,7 +39,6 @@
           <td><span class="small">{{ course.exam_mode }}</span></td>
           <td>{{ course.course_group.credits }}</td>
           <td>{{ course.type }}</td>
-          <td>{{ course.terms }}</td>
         </tr>
         {% endfor %}
       </table>
