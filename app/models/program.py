@@ -17,6 +17,9 @@ class Program(db.Model):
     major = db.relationship('Major', backref='programs')
     courses = db.relationship('ProgramCourse', order_by='ProgramCourse.terms_numeric, ProgramCourse.type')
 
+    def __repr__(self):
+        return '<Program ' + str(self.id) + ' (' + self.name + ')>'
+
 
 course_group_relation = db.Table('course_group_relations',
     db.Column('code', db.String(50), db.ForeignKey('course_groups.code')),

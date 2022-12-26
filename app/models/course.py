@@ -645,6 +645,29 @@ class Course(db.Model):
         course_rate._rate_total = sum([review.rate for review in reviews])
         course_rate.save(commit_db)
 
+    # key1: { key2: [value1, value2] } }
+    # value1 and value2 are sorted by sort_key
+    def add_to_2_level_dict(self, root, key1, key2, value, sort_key):
+        if key1 in root:
+            if key2 in root[key1]:
+                root[key1][key2].append(value)
+                root[key1][key2].sort(key=sort_key, reverse=True)
+            else:
+                root[key1][key2] = [value]
+        else:
+            root[key1] = {key2: [value]}
+
+    @property
+    def sorted_program_courses(self):
+        program_courses = []
+        for course_group in self.course_groups:
+            program_courses += course_group.program_courses
+        depts = {}
+        for program_course in program_courses:
+            program = program_course.program
+            self.add_to_2_level_dict(depts, program.dept, program.name, program_course, lambda program_course: program_course.program.grade)
+        return depts
+
 
 class CourseRate(db.Model):
     __tablename__ = 'course_rates'

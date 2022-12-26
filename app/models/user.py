@@ -358,6 +358,9 @@ class Dept(db.Model):
     name_eng = db.Column(db.String(200))
     code = db.Column(db.String(10))
 
+    def __repr__(self):
+        return '<Dept {}>'.format(self.name)
+
 # 专业
 class Major(db.Model):
     __tablename__ = 'majors'
