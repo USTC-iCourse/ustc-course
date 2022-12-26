@@ -415,18 +415,6 @@
           {% endfor %}
         </div>
         {% endfor %}
-
-        <div class="ud-pd-md dashed">
-          <h4 class="blue">课程所在培养计划</h5>
-        {% for course_group in course.course_groups %}
-        {% for program_course in course_group.program_courses %}
-          <div class="ud-pd-sm">
-            <a href="{{ url_for('program.view_program', program_id=program_course.program.id) }}">{{ program_course.program.name }}</a>
-            <span class="grey small">{{ program_course.program.grade }}级 {{ program_course.type }} {{ program_course.terms }}</span>
-          </div>
-        {% endfor %}
-        {% endfor %}
-        </div>
       </div>
     </div> <!-- row -->
   </div>  <!-- float-element  -->
