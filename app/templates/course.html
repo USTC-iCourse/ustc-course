@@ -59,6 +59,9 @@
             <td colspan="2">
             <ul class="nav nav-pills" role="tablist">
               <li><strong>培养计划：</strong></li>
+              {% if not course.course_groups %}
+              不在培养计划内
+              {% else %}
               <li class="dropdown">
                 <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 			  	请选择院系
@@ -84,6 +87,7 @@
                   {% endfor %}
                 </ul>
               </li>
+              {% endif %}
             </ul>
             </td>
           </tr>
