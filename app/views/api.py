@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, Markup, redirect, render_template, abort
 from flask_login import login_required, current_user
-from app.models import Review, ReviewComment, User, Course, ImageStore
+from app.models import Review, ReviewComment, User, Course, ImageStore, Notification
 from app.models import ReviewCommentHistory, ThirdPartySigninHistory
 from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email
@@ -42,6 +42,8 @@ def review_cancel_upvote():
         review = Review.query.with_for_update().get(review_id)
         if review:
             ok,message = review.cancel_upvote()
+            if ok:
+                Notification.remove(current_user, review.author, 'upvote')
             return jsonify(ok=ok,message=message, count=review.upvote_count)
         else:
             return jsonify(ok=False,message="The review doesn't exist.")
