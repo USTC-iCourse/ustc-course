@@ -140,3 +140,8 @@ class Notification(db.Model):
     @property
     def link(self):
         return self.ref_obj.link
+
+    @staticmethod
+    def remove(from_user, to_user, operation):
+        Notification.query.filter_by(from_user_id=from_user.id, to_user_id=to_user.id, operation='upvote').delete()
+        db.session.commit()
