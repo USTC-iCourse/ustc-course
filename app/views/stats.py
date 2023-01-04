@@ -59,9 +59,6 @@ def index_en():
 @stats.route('/rankings/')
 def view_ranking():
     '''view rankings'''
-    if True:
-        return render_template('error-page.html', code=404), 404
-
     today = datetime.now().strftime("%Y/%m/%d")
 
     topk_count = 30
@@ -135,13 +132,15 @@ def view_ranking():
                            .limit(topk_count).all())
 
     # find top 10 reviews with the most number of upvotes
-    review_rank_join = sql.join(User, sql.join(Course, Review, Course.id == Review.course_id), User.id == Review.author_id)
+    # WARNING: ALL REVIEW QUERYS MUST CONTAIN "is_anonymous", otherwise anonymous reviews will be leaked!
+    # review_rank_join = sql.join(User, sql.join(Course, Review, Course.id == Review.course_id), User.id == Review.author_id)
     review_rank = (db.session.query(Course.id.label('course_id'),
                                     Course.name.label('course_name'),
                                     Review.id.label('review_id'),
                                     User.id.label('author_id'),
                                     User.username.label('author_username'),
-                                    Review.upvote_count.label('review_upvotes_count'))
+                                    Review.upvote_count.label('review_upvotes_count'),
+                                    Review.is_anonymous.label('is_anonymous'))
                              .join(User).join(Course)
                              .filter(Review.is_blocked == False)
                              .filter(Review.is_hidden == False)
@@ -157,7 +156,8 @@ def view_ranking():
                                            User.id.label('author_id'),
                                            User.username.label('author_username'),
                                            Review.upvote_count.label('review_upvotes_count'),
-                                           func.length(Review.content).label('review_length'))
+                                           func.length(Review.content).label('review_length'),
+                                           Review.is_anonymous.label('is_anonymous'))
                                     .join(User).join(Course)
                                     .filter(Review.is_blocked == False)
                                     .filter(Review.is_hidden == False)
