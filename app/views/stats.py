@@ -133,7 +133,6 @@ def view_ranking():
 
     # find top 10 reviews with the most number of upvotes
     # WARNING: ALL REVIEW QUERYS MUST CONTAIN "is_anonymous", otherwise anonymous reviews will be leaked!
-    # review_rank_join = sql.join(User, sql.join(Course, Review, Course.id == Review.course_id), User.id == Review.author_id)
     review_rank = (db.session.query(Course.id.label('course_id'),
                                     Course.name.label('course_name'),
                                     Review.id.label('review_id'),
@@ -150,6 +149,7 @@ def view_ranking():
                              .limit(topk_count).all())
 
     # find top 10 longest reviews
+    # WARNING: ALL REVIEW QUERYS MUST CONTAIN "is_anonymous", otherwise anonymous reviews will be leaked!
     review_length_rank = (db.session.query(Course.id.label('course_id'),
                                            Course.name.label('course_name'),
                                            Review.id.label('review_id'),
