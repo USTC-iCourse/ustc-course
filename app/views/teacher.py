@@ -85,7 +85,7 @@ def edit_profile(teacher_id):
         info_history.save(teacher, current_user) 
 
         return redirect(url_for('teacher.view_profile', teacher_id=teacher.id))
-    else:
+    elif request.method == 'POST':
         errors = ['表单验证错误：' + str(form.errors)]
     return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form, title='编辑教师信息 - ' + teacher.name)
 
