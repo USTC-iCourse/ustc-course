@@ -120,7 +120,7 @@ def account_settings():
         user.is_profile_hidden = form['is_profile_hidden'].data
 
         user.save()
-    else:
+    elif request.method == 'POST':
         errors = ['表单验证错误：' + str(form.errors)]
     return render_template('settings.html', user=user, form=form, errors=errors, title='用户设置')
 

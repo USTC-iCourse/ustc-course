@@ -109,7 +109,7 @@ def signin():
                 error = _('用户名或密码错误！')
         else:
             error = _('用户名或密码错误！')
-    else:
+    elif request.method == 'POST':
         error = '表单验证错误：' + str(form.errors)
 
     #TODO: log the form errors
