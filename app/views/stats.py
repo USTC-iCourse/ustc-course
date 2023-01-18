@@ -78,7 +78,7 @@ def view_ranking():
     # join Teacher, Course, Review, Dept classes via course_teachers intermediate table
     teacher_rank_join = sql.outerjoin(sql.join(Teacher, sql.join(course_teachers, sql.join(Course, Review, Course.id == Review.course_id), course_teachers.c.course_id == Course.id), course_teachers.c.teacher_id == Teacher.id), Dept, Dept.id == Course.dept_id)
     # find teachers with low rating courses (average rate < 8)
-    teachers_with_low_rating_course = sql.select(Teacher.id).join(course_teachers).join(Course).join(CourseRate).filter(CourseRate._rate_average < 8)
+    teachers_with_low_rating_course = sql.select(Teacher.id).join(course_teachers).join(Course).join(CourseRate).filter(CourseRate._rate_average > 0).filter(CourseRate._rate_average < 8)
     # find teachers with at least 3 high rating courses (average rate > 9)
     teacher_query_with_high_rating_course = sql.select(Teacher.id.label('teacher_id'), func.count(CourseRate.id).label('course_count')).select_from(sql.join(Teacher, sql.join(course_teachers, CourseRate, course_teachers.c.course_id == CourseRate.id), Teacher.id == course_teachers.c.teacher_id)).filter(CourseRate._rate_average > 9).group_by(Teacher.id)
     teachers_with_high_rating_course = db.session.query(db.text('teacher_id')).select_from(teacher_query_with_high_rating_course).filter(db.text('course_count >= 3')).all()
