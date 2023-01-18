@@ -23,12 +23,19 @@
 
           <select name="term">
             {% set joined_term = course.joined_term() %}
+            {% if not joined_term %}
+              <option value="">请选择学期</option>
+            {% endif %}
+
             {% for term in course.term_ids %}
               <option value="{{ term }}" {% if review.term == term or ((not review.term or review.term not in course.term_ids) and joined_term == term) %}selected="selected"{% endif %}>{{ term|term_display }}
               {% if joined_term == term %}(学过){% endif %}
               </option>
             {% endfor %}
           </select>
+          {% if (not review.term or review.term not in course.term_ids) and not joined_term %}
+          <span class="grey">&nbsp;如果不记得了，可以随便选一个 :)</span>
+          {% endif %}
           <span class="clearfix"></span>
         </div>
 
@@ -156,6 +163,10 @@ $(function(){
     $('#review-form').submit(function(e) {
         e.preventDefault();
 
+        if ($('select[name=term]').val() == '') {
+            alert('请选择学期，如果不记得了，可以随便选一个 :)');
+            return;
+        }
         if ($('input[name=difficulty]:radio:checked').length == 0) {
             alert('请选择课程难度！');
             return;
