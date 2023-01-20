@@ -20,6 +20,7 @@ def find_anonymous_reviews(review_ids):
         review = Review.query.get(review_id)
         if review and review.is_anonymous:
             anonymous_reviews.append(review_id)
+            print('Found anonymous review ', review, review.course, review.author)
     return anonymous_reviews
 
 base_folder = '../uploads/rankings-history'
