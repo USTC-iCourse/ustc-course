@@ -412,8 +412,14 @@ def get_rankings_history_file_list():
             date = date_tuple[0]
             year_month = date.split('-')[0] + ' 年 ' + date.split('-')[1].strip('0') + ' 月'
             if year_month not in year_months:
-                year_months[year_month] = []
-            year_months[year_month].append(date_tuple)
+                year_months[year_month] = [date_tuple]
+            else:
+                # only preserve one history file per week
+                curr_day = int(date.split('-')[2].strip('0'))
+                prev_date = year_months[year_month][-1][0]
+                prev_day = int(prev_date.split('-')[2].strip('0'))
+                if curr_day - prev_day >= 7:
+                    year_months[year_month].append(date_tuple)
         return year_months
     except:
         return []
