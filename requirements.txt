@@ -1,4 +1,4 @@
-Flask==1.1.4
+Flask==1.1.2
 Flask-WTF==1.0.0
 Flask-SQLAlchemy==2.5.1
 Flask-login==0.5.0
@@ -23,4 +23,4 @@ pdfkit==1.0.0
 click==7.1.2
 wtforms==3.0.1
 pillow==9.3.0
-MarkupSafe==2.0.1
+MarkupSafe==2.1.2
