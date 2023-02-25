@@ -14,7 +14,7 @@ flask-babel==2.0.0
 # for debug only
 flask-debugtoolbar==0.13.1
 html2text==2020.1.16
-markdown==3.3.6
+markdown==3.4.1
 pytz==2021.1
 werkzeug==2.2.3
 cachelib==0.10.2
