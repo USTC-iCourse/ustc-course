@@ -123,13 +123,19 @@ def load_courses(insert=True):
             except:
                 jwc_id = None
 
+            t = None
+            # if jwc_id is specified, and teacher exists, use existing teacher; otherwise assume it is a new teacher
             if jwc_id is not None and jwc_id in teachers_id_map:
                 t = teachers_id_map[jwc_id]
-            elif teacher_name in teachers_name_map and len(teachers_name_map[teacher_name]) == 1:
+            # if jwc_id is not specified, we can only determine by teacher name
+            # if there is only one teacher with the name, we assume the new course is the same teacher
+            if jwc_id is None and teacher_name in teachers_name_map and len(teachers_name_map[teacher_name]) == 1:
                 t = teachers_name_map[teacher_name][0]
-            else: # either teacher does not exist, or name is ambiguous
+
+            if t is None: # either teacher does not exist, or name is ambiguous
                 t = Teacher()
-                teachers_id_map[jwc_id] = t
+                if jwc_id is not None:
+                    teachers_id_map[jwc_id] = t
                 if teacher_name in teachers_name_map:
                     teachers_name_map[teacher_name].append(t)
                 else:
