@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash, \
      check_password_hash
 from flask_babel import gettext as _
 from .notification import Notification
-from werkzeug.contrib.cache import SimpleCache
+from cachelib.simple import SimpleCache
 from .review import Review
 
 Roles = ['Admin',
