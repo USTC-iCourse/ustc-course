@@ -59,6 +59,42 @@
             <td><strong>课程层次：</strong>{{ course.course_level or '未知' }}</td>
             <td><strong><span style="user-select:none">　　</span>学分：</strong>{{ course.credit or '未知' }}</td>
           </tr>
+          <tr>
+            <td colspan="2">
+            <ul class="nav nav-pills" role="tablist">
+              <li><strong>培养计划：</strong></li>
+              {% if not course.course_groups %}
+              不在培养计划内
+              {% else %}
+              <li class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+			  	请选择院系
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu multi-level" role="menu">
+                  {% for dept, dept_programs in course.sorted_program_courses.items() %}
+                  <li class="dropdown-submenu">
+                    <a href="#">{{ dept.name }}</a>
+                    <ul class="dropdown-menu">
+                    {% for program_name, grade_programs in dept_programs.items() %}
+                      <li class="dropdown-submenu">
+                        <a href="#">{{ program_name }}</a>
+                        <ul class="dropdown-menu">
+                        {% for program_course in grade_programs %}
+                          <li><a href="{{ url_for('program.view_program', program_id=program_course.program.id) }}?highlight_course={{ program_course.id }}">{{ program_course.program.grade }}级 {{ program_course.type }} {{ program_course.terms }}</a></li>
+                        {% endfor %}
+                        </ul>
+                      </li>
+                    {% endfor %}
+                    </ul>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </li>
+              {% endif %}
+            </ul>
+            </td>
+          </tr>
         </table>
 
         <div class="ud-pd-sm">

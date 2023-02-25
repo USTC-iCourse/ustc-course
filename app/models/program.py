@@ -13,9 +13,12 @@ class Program(db.Model):
     train_type = db.Column(db.String(50))
     grade = db.Column(db.String(50))
 
-    dept = db.relationship('Dept')
-    major = db.relationship('Major', backref='programs')
-    courses = db.relationship('ProgramCourse', order_by='ProgramCourse.terms_numeric, ProgramCourse.type')
+    dept = db.relationship('Dept', viewonly=True)
+    major = db.relationship('Major', backref='programs', viewonly=True)
+    courses = db.relationship('ProgramCourse', order_by='ProgramCourse.terms_numeric, ProgramCourse.type', viewonly=True)
+
+    def __repr__(self):
+        return '<Program ' + str(self.id) + ' (' + self.name + ')>'
 
 
 course_group_relation = db.Table('course_group_relations',
@@ -37,7 +40,7 @@ class CourseGroup(db.Model):
     seasons = db.Column(db.String(50))
     total_periods = db.Column(db.Integer)
 
-    courses = db.relationship('Course', secondary=course_group_relation, backref='course_groups', lazy='dynamic')
+    courses = db.relationship('Course', secondary=course_group_relation, backref='course_groups', lazy='dynamic', viewonly=True)
 
 
 class ProgramCourse(db.Model):
@@ -56,6 +59,6 @@ class ProgramCourse(db.Model):
     terms = db.Column(db.String(50))
     terms_numeric = db.Column(db.String(50))
 
-    course_group = db.relationship('CourseGroup', backref='program_courses')
-    program = db.relationship('Program')
-    dept = db.relationship('Dept')
+    course_group = db.relationship('CourseGroup', backref='program_courses', viewonly=True)
+    program = db.relationship('Program', viewonly=True)
+    dept = db.relationship('Dept', viewonly=True)

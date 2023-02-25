@@ -19,18 +19,27 @@
           <th>考核形式</th>
           <th>学分</th>
           <th>课程类别</th>
-          <th>开课学期</th>
         </tr>
         {% for course in program.courses %}
+
+        {% if loop.index0 == 0 or program.courses[loop.index0 - 1].terms != course.terms %}
+        {% if course.terms %}
+        <tr><td colspan="6" style="font-weight:bold; font-size:1.5em;">{{ course.terms }}</td></tr>
+        {% endif %}
+        {% endif %}
+
+        {% if highlight_course_id != course.id %}
         <tr>
+        {% else %}
+        <tr style="font-weight:bold;">
+        {% endif %}
           <td><a href="{{ url_for('home.search', q=course.course_group_code) }}">{{ course.course_group_code }}</a></td>
           <td><a href="{{ url_for('home.search', q=course.course_group.name) }}">{{ course.course_group.name }}</a></td>
           <td>{{ '必修' if course.compulsory else '选修' }}</td>
           <td><span class="small">{{ course.exam_mode }}</span></td>
           <td>{{ course.course_group.credits }}</td>
           <td>{{ course.type }}</td>
-          <td>{{ course.terms }}</td>
-          </tr>
+        </tr>
         {% endfor %}
       </table>
     </div>

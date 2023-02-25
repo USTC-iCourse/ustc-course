@@ -132,13 +132,14 @@ def view_ranking():
                            .limit(topk_count).all())
 
     # find top 10 reviews with the most number of upvotes
-    review_rank_join = sql.join(User, sql.join(Course, Review, Course.id == Review.course_id), User.id == Review.author_id)
+    # WARNING: ALL REVIEW QUERYS MUST CONTAIN "is_anonymous", otherwise anonymous reviews will be leaked!
     review_rank = (db.session.query(Course.id.label('course_id'),
                                     Course.name.label('course_name'),
                                     Review.id.label('review_id'),
                                     User.id.label('author_id'),
                                     User.username.label('author_username'),
-                                    Review.upvote_count.label('review_upvotes_count'))
+                                    Review.upvote_count.label('review_upvotes_count'),
+                                    Review.is_anonymous.label('is_anonymous'))
                              .join(User).join(Course)
                              .filter(Review.is_blocked == False)
                              .filter(Review.is_hidden == False)
@@ -148,13 +149,15 @@ def view_ranking():
                              .limit(topk_count).all())
 
     # find top 10 longest reviews
+    # WARNING: ALL REVIEW QUERYS MUST CONTAIN "is_anonymous", otherwise anonymous reviews will be leaked!
     review_length_rank = (db.session.query(Course.id.label('course_id'),
                                            Course.name.label('course_name'),
                                            Review.id.label('review_id'),
                                            User.id.label('author_id'),
                                            User.username.label('author_username'),
                                            Review.upvote_count.label('review_upvotes_count'),
-                                           func.length(Review.content).label('review_length'))
+                                           func.length(Review.content).label('review_length'),
+                                           Review.is_anonymous.label('is_anonymous'))
                                     .join(User).join(Course)
                                     .filter(Review.is_blocked == False)
                                     .filter(Review.is_hidden == False)
@@ -266,12 +269,18 @@ def stats_history_en():
 
 @stats.route('/rankings-history-list/', methods=['GET'])
 def rankings_history():
+    if True:
+        return render_template('error-page.html', code=404), 404
+
     history_files = get_rankings_history_file_list()
     return render_template('rankings-history.html', history_files=history_files, title='排行榜历史')
 
 
 @stats.route('/rankings-history/<path:path>', methods=['GET'])
 def rankings_history_file(path):
+    if True:
+        return render_template('error-page.html', code=404), 404
+
     return send_from_directory(get_rankings_history_base(), path)
 
 
