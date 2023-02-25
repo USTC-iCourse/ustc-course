@@ -325,7 +325,7 @@ a.nounderline:active { text-decoration: none; }
     cursor: pointer;
 }
 
-/* 通知的下拉框样式 */
+/* 通知下拉框样式 */
 #notice-link { color: grey; }
 #notice-link:focus,
 #notice-link:hover { text-decoration: underline; }
@@ -334,6 +334,11 @@ a.nounderline:active { text-decoration: none; }
 #dropdown-notice .notice { padding: 0 20px; }
 
 .notice-number-box { background-color: #d23524; }
+
+/* 点评 review */
+.review-header { display: flex; flex-wrap: wrap; align-items: center; }
+.review-header > button,
+.review-header > select { margin: 8px 0; }
 
 .review img { max-width: 100%; object-fit: contain; }
 
