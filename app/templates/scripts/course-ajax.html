@@ -1,3 +1,4 @@
+<script src="/static/stellarnav/js/stellarnav.js"></script>
 <script>
  $('#myTab a').click(function (e) {
    e.preventDefault()
@@ -183,6 +184,18 @@
  	$("html,body").animate({scrollTop:"0px"},200);
  });
 
+ // stellar nav
+ jQuery(document).ready(function($) {
+ 	jQuery('.stellarnav').stellarNav({
+ 		theme: 'light',
+ 		breakpoint: 960,
+ 		position: 'right',
+        menuLabel: '所属培养计划',
+        closeLabel: '关闭',
+        mobileMode: true
+ 	});
+ });
+	
 </script>
 
 {% include 'scripts/review-ajax.html' %}
