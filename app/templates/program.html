@@ -41,7 +41,7 @@
         <tr style="font-weight:bold; background:#ffffaa;">
         {% endif %}
           <td><a href="{{ url_for('home.search', q=course.course_group_code) }}">{{ course.course_group_code }}</a></td>
-          <td><a href="{{ url_for('home.search', q=course.course_group.name) }}">{{ course.course_group.name }}</a></td>
+          <td><a href="{{ url_for('home.search', q=course.course_group_code) }}">{{ course.course_group.name }}</a></td>
           <td>{{ '必修' if course.compulsory else '选修' }}</td>
           <td><span class="small">{{ course.exam_mode }}</span></td>
           <td>{{ course.course_group.credits }}</td>
