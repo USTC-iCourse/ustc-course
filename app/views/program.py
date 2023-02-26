@@ -21,4 +21,6 @@ def view_program(program_id):
     else:
         highlight_course_id = None
 
-    return render_template('program.html', program=program, highlight_course_id=highlight_course_id)
+    title = program.name + '培养方案'
+
+    return render_template('program.html', title=title, program=program, highlight_course_id=highlight_course_id)

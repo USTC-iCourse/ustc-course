@@ -7,7 +7,14 @@
     <div class="bm-pd-lg">
       <div class="center top-pd-md">
         <p><span class="h3 blue">{{ program.name }}</span></p>
-        <p><strong>{{ program.dept.name }} {{ program.major.name }} {{ program.grade }}级 {{ program.train_type }}</strong></p>
+        <p><strong>{{ program.dept.name }} {{ program.major.name }} {{ program.grade }}级 
+        {% if program.train_type == '主修' %}
+        主修学位
+        {% else %}
+        {{ program.train_type }}
+        {% endif %}
+        </strong></p>
+        <p>培养方案页面是评课社区推出的新功能，信息可能不完善，仅供参考，请以 <a href="https://catalog.ustc.edu.cn/plan" target="_blank">教务处培养方案</a> 为准。</p>
         <p>&nbsp;</p>
       </div>
 
