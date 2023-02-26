@@ -38,7 +38,7 @@
         {% if highlight_course_id != course.id %}
         <tr>
         {% else %}
-        <tr style="font-weight:bold;">
+        <tr style="font-weight:bold; background:#ffffaa;">
         {% endif %}
           <td><a href="{{ url_for('home.search', q=course.course_group_code) }}">{{ course.course_group_code }}</a></td>
           <td><a href="{{ url_for('home.search', q=course.course_group.name) }}">{{ course.course_group.name }}</a></td>
