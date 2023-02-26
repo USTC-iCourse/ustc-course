@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+
+  <div class="row float-element">
+    <div class="row">
+
+        <div class="desktop">
+          <ul class="nav nav-pills" role="tablist">
+            <li class="dropdown">
+              <button class="program-btn btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		      所有培养方案
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu multi-level" role="menu">
+                {% for dept, dept_programs in programs.items() %}
+                <li class="dropdown-submenu">
+                  <a href="#">{{ dept.name }}</a>
+                  <ul class="dropdown-menu">
+                  {% for program_name, grade_programs in dept_programs.items() %}
+                    <li class="dropdown-submenu">
+                      <a href="#">{{ program_name }}</a>
+                      <ul class="dropdown-menu">
+                      {% for program in grade_programs %}
+                        <li><a href="{{ url_for('program.view_program', program_id=program.id) }}">{{ program.grade }}级</a></li>
+                      {% endfor %}
+                      </ul>
+                    </li>
+                  {% endfor %}
+                  </ul>
+                </li>
+                {% endfor %}
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mobile stellarnav">
+          <div class="float-right">
+            <button class="program-btn btn btn-default dropdown-toggle menu-toggle" type="button" aria-haspopup="true" aria-expanded="true">
+		    所有培养方案
+            <span class="caret"></span>
+            </button>
+          </div>
+
+          <ul>
+            {% for dept, dept_programs in programs.items() %}
+            <li>
+              <a href="#">{{ dept.name }}</a>
+              <ul>
+              {% for program_name, grade_programs in dept_programs.items() %}
+                <li>
+                  <a href="#">{{ program_name }}</a>
+                  <ul>
+                  {% for program in grade_programs %}
+                    <li><a href="{{ url_for('program.view_program', program_id=program.id) }}">{{ program.grade }}级</a></li>
+                  {% endfor %}
+                  </ul>
+                </li>
+              {% endfor %}
+              </ul>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+    </div> <!-- row -->
+  </div> <!-- float-element -->
+</div> <!-- container -->
+{% endblock %}
+
+{% block script %}
+<script src="/static/stellarnav/js/stellarnav.js"></script>
+<script>
+ // stellar nav
+ jQuery(document).ready(function($) {
+ 	jQuery('.stellarnav').stellarNav({
+ 		theme: 'light',
+ 		breakpoint: 960,
+		position: 'none',
+        closeBtn: false,
+        mobileMode: true
+ 	});
+ });
+	
+ $(document).ready(function() {
+     $('.program-btn').click();
+ });
+</script>
+{% endblock %}
