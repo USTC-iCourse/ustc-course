@@ -21,11 +21,12 @@
 
         <div class="float-right">
           <ul class="nav nav-pills" role="tablist">
-            {% if not course.course_groups %}
-            不在培养计划内
-            {% else %}
             <li class="dropdown">
               <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              {% if not course.course_groups %}
+              不在培养计划内
+              </button>
+              {% else %}
 		      所属培养计划
                 <span class="caret"></span>
               </button>
@@ -48,8 +49,8 @@
                 </li>
                 {% endfor %}
               </ul>
+              {% endif %}
             </li>
-            {% endif %}
           </ul>
         </div>
 
