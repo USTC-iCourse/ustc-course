@@ -5,7 +5,8 @@
  * Released under the MIT license
  */
 /* all nav */
-.stellarnav { position: relative; width: 100%; z-index: 9900; line-height: normal; }
+/*.stellarnav { position: relative; width: 100%; z-index: 9900; line-height: normal; }*/
+.stellarnav > ul { position: relative; width: 100%; z-index: 9900; line-height: normal; }
 .stellarnav a { color: #777; }
 .stellarnav ul { margin: 0; padding: 0; text-align: center; }
 .stellarnav li { list-style: none; display: block; margin: 0; padding: 0; position: relative; line-height: normal; vertical-align: middle; }
@@ -78,7 +79,8 @@ body.stellarnav-noscroll-x { overflow-x: hidden; }
 .stellarnav.dark .icon-close:after { border-color: #FFF; }
 
 /* mobile nav */
-.stellarnav .menu-toggle, .stellarnav .call-btn-mobile, .stellarnav .location-btn-mobile, .stellarnav .close-menu { padding: 15px; box-sizing: border-box; }
+/*.stellarnav .menu-toggle, .stellarnav .call-btn-mobile, .stellarnav .location-btn-mobile, .stellarnav .close-menu { padding: 15px; box-sizing: border-box; }*/
+.stellarnav .menu-toggle, .stellarnav .call-btn-mobile, .stellarnav .location-btn-mobile, .stellarnav .close-menu { padding: 8px; box-sizing: border-box; }
 .stellarnav .menu-toggle span.bars { display: inline-block; margin-right: 7px; position: relative; top: 3px; }
 .stellarnav .menu-toggle span.bars span { display: block; width: 15px; height: 2px; border-radius: 6px; background: #777; margin: 0 0 3px; }
 .stellarnav .full { width: 100%; }
@@ -128,7 +130,7 @@ body.stellarnav-noscroll-x { overflow-x: hidden; }
 .stellarnav.mobile li.has-sub > a:after, .stellarnav.mobile li li.has-sub > a:after, .stellarnav.mobile li.drop-left li.has-sub > a:after { display: none; }
 
 /* left and right positions */
-.stellarnav.mobile.right > ul, .stellarnav.mobile.left > ul { position: fixed; top: 0; bottom: 0; width: 100%; max-width: 280px; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+/*.stellarnav.mobile.right > ul, .stellarnav.mobile.left > ul { position: fixed; top: 0; bottom: 0; width: 100%; max-width: 280px; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }*/
 .stellarnav.mobile.right > ul { right: 0; }
 .stellarnav.mobile.right .close-menu, .stellarnav.mobile.left .close-menu { display: inline-block; text-align: right; }
 .stellarnav.mobile.left > ul { left: 0; }
