@@ -217,11 +217,27 @@
 				}
 			});
 
+			// if li item is children, expands the dropdown menu on each click
+			nav.find('li').on('click', function(e) {
+				if ($(this).children('ul').length > 0) {
+				    e.preventDefault();
+				    $(this).children('ul').stop(true, true).slideToggle(settings.openingSpeed);
+				    $(this).toggleClass('open');
+                } else {
+                    var href = $(this).children('a').first();
+                    if (href && href.attr('href').startsWith('/')) {
+                        window.location.href = href.attr('href');
+                    }
+                }
+                e.stopPropagation();
+			});
+
 			// expands the dropdown menu on each click
 			nav.find('li .dd-toggle').on('click', function(e) {
 				e.preventDefault();
 				$(this).parent('li').children('ul').stop(true, true).slideToggle(settings.openingSpeed);
 				$(this).parent('li').toggleClass('open');
+                e.stopPropagation();
 			});
 
 			var resetTriggers = function() {
