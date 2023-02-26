@@ -17,7 +17,7 @@ def index(lang_en=False):
     site_stat = dict()
     site_stat['user_count'] = User.query.count()
     site_stat['course_count'] = Course.query.count()
-    site_stat['review_count'] = Review.query.count()
+    site_stat['review_count'] = Review.query.filter(Review.is_hidden == False).filter(Review.is_blocked == False).count()
     site_stat['registered_teacher_count'] = User.query.filter(User.identity == 'Teacher').count()
     site_stat['course_avg_rate'] = db.session.query(db.func.avg(Review.rate)).first()[0]
     site_stat['course_avg_rate_count'] = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).first()[0]
