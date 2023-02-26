@@ -19,7 +19,7 @@
 
         <hr>
 
-        <div class="float-right">
+        <div class="desktop float-right">
           <ul class="nav nav-pills" role="tablist">
             <li class="dropdown">
               <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -73,6 +73,30 @@
           <span class="rl-pd-sm h4"><span class="text-muted px12">(暂无评价)</span>
         {% endif %}
         </div>
+
+        {% if course.course_groups %}
+        <div class="mobile stellarnav">
+          <ul>
+            {% for dept, dept_programs in course.sorted_program_courses.items() %}
+            <li>
+              <a href="#">{{ dept.name }}</a>
+              <ul>
+              {% for program_name, grade_programs in dept_programs.items() %}
+                <li>
+                  <a href="#">{{ program_name }}</a>
+                  <ul>
+                  {% for program_course in grade_programs %}
+                    <li><a href="{{ url_for('program.view_program', program_id=program_course.program.id) }}?highlight_course={{ program_course.id }}">{{ program_course.program.grade }}级 {{ program_course.type }} {{ program_course.terms }}</a></li>
+                  {% endfor %}
+                  </ul>
+                </li>
+              {% endfor %}
+              </ul>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
 
         <ul class="text-muted list-inline list-unstyled ud-pd-sm">
           <li class="right-mg-md">课程难度：{{ course.rate.difficulty or '你猜' }}</li>
