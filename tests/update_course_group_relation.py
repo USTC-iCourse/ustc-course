@@ -21,6 +21,6 @@ for course_term in course_terms:
     if course_term.code in course_group_map:
         course_group = course_group_map[course_term.code]
         if not is_in_group(course_term, course_group):
-            course_term.course.course_groups += [course_group]
+            course_group_relation.insert().values(code=course_group.code, course_id=course_term.course.id)
 
 db.session.commit()
