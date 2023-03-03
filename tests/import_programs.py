@@ -7,6 +7,7 @@ from app.models import *
 from datetime import datetime
 import json
 import requests
+import subprocess
 
 # configuration for information source
 domain = 'catalog.ustc.edu.cn'
@@ -160,9 +161,12 @@ def load_tree():
                 db.session.add(program)
 
                 count = load_program(program_id)
-                print('Loaded ' + str(count) + ' courses in ' + program.train_type + ' ' + dept_name + ' ' + major.name + ' ' + str(program.grade) + ' ' + program.name)
-
                 db.session.commit()
+
+                print('Loaded ' + str(count) + ' courses in ' + program.train_type + ' ' + dept_name + ' ' + major.name + ' ' + str(program.grade) + ' ' + program.name)
 
 
 load_tree()
+
+subprocess.run(['python3', 'update_course_group_relation.py'])
+print('Updated course group relations')
