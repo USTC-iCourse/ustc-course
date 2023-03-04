@@ -76,14 +76,15 @@
 
 
 
-        {% if course.course_groups %}
         <div class="mobile stellarnav">
+          {% if course.course_groups %}
           <div class="float-right">
             <button class="btn btn-default dropdown-toggle menu-toggle" type="button" aria-haspopup="true" aria-expanded="true">
 		    培养方案
             <span class="caret"></span>
             </button>
           </div>
+          {% endif %}
 
           <div class="ud-pd-sm blue">
           {% if course.review_count %}
@@ -105,6 +106,7 @@
           {% endif %}
           </div>
 
+          {% if course.course_groups %}
           <ul>
             {% for dept, dept_programs in course.sorted_program_courses.items() %}
             <li>
@@ -124,8 +126,8 @@
             </li>
             {% endfor %}
           </ul>
+          {% endif %}
         </div>
-        {% endif %}
 
 
         <ul class="text-muted list-inline list-unstyled ud-pd-sm">
