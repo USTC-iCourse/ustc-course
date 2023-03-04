@@ -54,6 +54,28 @@
           </ul>
         </div>
 
+          <div class="desktop ud-pd-sm blue">
+          {% if course.review_count %}
+            {% for star in range(0,5) %}
+              {% if course.rate.average_rate >= 1.5 + star * 2 %}
+              <span class="glyphicon glyphicon-star glyphicon-lg" aria-hidden="true"></span>
+              {% elif course.rate.average_rate >= 0.5 + star * 2 %}
+              <span class="glyphicon glyphicon-star-half glyphicon-lg" aria-hidden="true"></span>
+              {% else %}
+              <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true"></span>
+              {% endif %}
+            {% endfor %}
+            <span class="rl-pd-sm h4">{{ course.rate.average_rate }}</span><span class="rl-pd-sm text-muted">({{ course.review_count }}人评价)</span>
+          {% else %}
+            {% for star in range(0,5) %}
+              <span class="glyphicon glyphicon-star-empty glyphicon-lg" aria-hidden="true"></span>
+            {% endfor %}
+            <span class="rl-pd-sm h4"><span class="text-muted px12">(暂无评价)</span>
+          {% endif %}
+          </div>
+
+
+
         {% if course.course_groups %}
         <div class="mobile stellarnav">
           <div class="float-right">
