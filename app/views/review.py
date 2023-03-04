@@ -88,7 +88,8 @@ def new_review(course_id):
             if is_new:
                 review.add()
                 for user in users_to_notify:
-                    user.notify('review', review, ref_display_class='Course')
+                    if user != current_user:
+                        user.notify('review', review, ref_display_class='Course')
                 for user in mentioned_users:
                     user.notify('mention', review)
                 record_review_history(review, 'create')
@@ -101,7 +102,8 @@ def new_review(course_id):
                     review.update_time = datetime.utcnow()
                     review.course.update_rate()
                     for user in users_to_notify:
-                        user.notify('update-review', review, ref_display_class='Course')
+                        if user != current_user:
+                            user.notify('update-review', review, ref_display_class='Course')
                     for user in mentioned_users:
                         user.notify('mention', review)
                 record_review_history(review, 'update')
