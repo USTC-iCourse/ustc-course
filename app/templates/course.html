@@ -19,14 +19,11 @@
 
         <hr>
 
+        {% if course.course_groups %}
         <div class="desktop float-right">
           <ul class="nav nav-pills" role="tablist">
             <li class="dropdown">
               <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-              {% if not course.course_groups %}
-              不在培养方案内
-              </button>
-              {% else %}
 		      所属培养方案
                 <span class="caret"></span>
               </button>
@@ -53,6 +50,7 @@
             </li>
           </ul>
         </div>
+        {% endif %}
 
           <div class="desktop ud-pd-sm blue">
           {% if course.review_count %}
