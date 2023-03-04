@@ -26,7 +26,7 @@ def review_upvote():
         review = Review.query.with_for_update().get(review_id)
         if review:
             ok,message = review.upvote()
-            if ok:
+            if ok and current_user != review.author:
                 review.author.notify('upvote', review)
             return jsonify(ok=ok,message=message, count=review.upvote_count)
         else:
@@ -84,7 +84,8 @@ def review_new_comment():
             ok,message = comment.add(review,content)
             if ok:
                 record_review_comment_history(comment, 'create')
-                review.author.notify('comment', review)
+                if review.author != current_user:
+                    review.author.notify('comment', review)
                 for user in mentioned_users:
                     user.notify('mention', comment)
             return jsonify(ok=ok,message=message,content=content)
