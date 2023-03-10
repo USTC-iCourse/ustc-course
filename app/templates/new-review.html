@@ -190,7 +190,7 @@ $(function(){
         var content_html = $('textarea[name=content]').val();
         var content_text = content_html.replace(/(<([^>]+)>)/ig, "");
         if (content_text.trim().length < 10) {
-            alert('点评内容太短啦！');
+            alert('点评内容太短啦！（需大长于10字符）');
             return;
         }
 
