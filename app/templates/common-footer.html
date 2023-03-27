@@ -1,20 +1,20 @@
 <div class="container" id="footer">
     <div class="ud-pd-sm">
-      <a class="right-pd-md" href='/about/'>关于我们</a>
-      <a class="right-pd-md" href='/community-rules/'>社区规范</a>
-      <a class="right-pd-md" href='/report-review/'>投诉点评</a>
-      <a class="right-pd-md" href='/stats/'>站点统计</a>
-      <a class="right-pd-md" href='/stats/rankings/'>排行榜</a>
-      <a class="right-pd-md" href='/announcements/'>公告栏</a>
-      <a class="right-pd-md" href='/program/'>培养方案</a>
-      <a class="right-pd-md hidden" href='/copyright/'>版权与隐私</a>
-      <a class="right-pd-md hidden" href='/report-bug/'>发现漏洞</a>
+      <a class="right-mg-md" href='/about/'>关于我们</a>
+      <a class="right-mg-md" href='/community-rules/'>社区规范</a>
+      <a class="right-mg-md" href='/report-review/'>投诉点评</a>
+      <a class="right-mg-md" href='/stats/'>站点统计</a>
+      <a class="right-mg-md" href='/stats/rankings/'>排行榜</a>
+      <a class="right-mg-md" href='/announcements/'>公告栏</a>
+      <a class="right-mg-md" href='/program/'>培养方案</a>
+      <a class="right-mg-md hidden" href='/copyright/'>版权与隐私</a>
+      <a class="right-mg-md hidden" href='/report-bug/'>发现漏洞</a>
       {% if current_user.is_admin %}
-      <a class="right-pd-md" href='{{ url_for('admin.set_banner') }}'>Banner设置</a>
+      <a class="right-mg-md" href='{{ url_for('admin.set_banner') }}'>Banner设置</a>
       {% endif %}
       <span class="float-right hidden">
-        <a class="right-pd-sm">中文</a>
-        <a class="left-pd-sm">English</a>
+        <a class="right-mg-sm">中文</a>
+        <a class="left-mg-sm">English</a>
       </span>
     </div>
     <span class="footer-text text-muted">Copyright &copy; {{ date.year }} USTC评课社区</span>
