@@ -28,3 +28,15 @@ schema = CollectionSchema(fields, "get the embeddings of icourse reviews")
 
 milvus_collection = Collection("icourse_reviews", schema, consistency_level="Strong")
 print(fmt.format("Created collection `icourse_reviews`"))
+
+print("Start creating index in Milvus...")
+index = {
+    "index_type": "FLAT",
+    "metric_type": "L2",
+    "params": {}
+}
+
+if len(milvus_collection.indexes) == 0:
+    milvus_collection.create_index("embeddings", index)
+
+milvus_collection.load()
