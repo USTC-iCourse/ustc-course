@@ -31,6 +31,7 @@ When a user publishes or updates a review, we insert or update the embedding of 
 ### Challenges
 
 1. How to find the most relevant reviews and summaries for a given user prompt?
+2. How to prompt the OpenAI Completion API such that the responses contain references to the reviews, like what New Bing has achieved?
 
 ### Future Work
 
