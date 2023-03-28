@@ -86,21 +86,20 @@ def get_embedding_of_review(review):
         traceback.print_exc()
 
 
+def review_embedding_exists(review):
+    query = 'id == ' + str(review.id)
+    res = milvus_collection.query(expr=query, offset=0, limit=1, output_fields=['id'], consistency_level="Strong")
+    return (len(res) > 0)
+
+
 def get_embedding_of_all_reviews():
     print('Querying all public reviews...')
     public_reviews = Review.query.filter(Review.is_hidden == False).filter(Review.is_blocked == False).filter(Review.only_visible_to_student == False).order_by(Review.id).all()
     print('Iterating over ' + str(len(public_reviews)) + ' public reviews...')
     for review in public_reviews:
-        get_embedding_of_review(review)
+        if not review_embedding_exists(review):
+            get_embedding_of_review(review)
 
 
 print("Start getting embeddings...")
 get_embedding_of_all_reviews()
-
-print("Start Creating index in Milvus...")
-index = {
-    "index_type": "FLAT",
-    "metric_type": "L2"
-}
-
-milvus_collection.create_index("embeddings", index)
