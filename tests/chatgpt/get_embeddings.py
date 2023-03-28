@@ -8,6 +8,7 @@ import openai
 import os
 import traceback
 from markdownify import markdownify
+import time
 
 from milvus_connector import milvus_collection
 
@@ -63,19 +64,23 @@ def save_embedding(review, embedding):
         [review.author_id],
         [embedding]
     ]
+    start_time = time.time()
     insert_result = milvus_collection.insert(entities)
     milvus_collection.flush()
-    print(f"Number of entities in Milvus: {milvus_collection.num_entities}")
+    elapsed_time = time.time() - start_time
+    print(f"Saved embedding to Milvus: num_documents {milvus_collection.num_entities}, time {elapsed_time}")
 
 
 def get_embedding_of_review(review):
     prompt = generate_prompt(review)
     try:
         print(prompt)
+        start_time = time.time()
         (embedding, tokens) = get_embedding_of_content(prompt)
+        elapsed_time = time.time() - start_time
 
         prompt_length = len(prompt)
-        print(f"Saved embedding of review #{review.id}, course #{review.course_id}, author #{review.author_id}, length {prompt_length}, num_tokens {tokens}")
+        print(f"Get embedding of review #{review.id}, course #{review.course_id}, author #{review.author_id}, length {prompt_length}, num_tokens {tokens}, time {elapsed_time}")
 
         save_embedding(review, embedding)
     except openai.error.APIConnectionError:
