@@ -26,7 +26,6 @@ def get_chatgpt_completion(prompt):
 
 def get_chatgpt_summary(course, prompt):
     try:
-        print(prompt)
         start_time = time.time()
         (completion, prompt_tokens, completion_tokens) = get_chatgpt_completion(prompt)
         elapsed_time = time.time() - start_time
