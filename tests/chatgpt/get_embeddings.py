@@ -94,7 +94,11 @@ def get_embedding_of_review(review):
 def review_embedding_exists(review):
     query = 'id == ' + str(review.id)
     res = milvus_collection.query(expr=query, offset=0, limit=1, output_fields=['id'], consistency_level="Strong")
-    return (len(res) > 0)
+    if len(res) > 0:
+        print(f"Skipped review #{review.id} because it already exists in Milvus")
+        return True
+    else:
+        return False
 
 
 def get_embedding_of_all_reviews():
