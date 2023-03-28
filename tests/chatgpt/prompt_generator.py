@@ -53,7 +53,7 @@ def generate_short_prompt(reviews, full_prompt):
 
 
 def generate_summary_prompt(reviews):
-    header = '请尽可能详细地从考试、给分、作业、上课水平、课程内容、选课建议等方面总结以下几位用户在' + get_course(reviews[0].course) + '课程的点评：\n'
+    header = '根据下列点评，尽可能详细、全面地总结' + get_course(reviews[0].course) + '课程的考试、给分、作业、上课水平、课程内容、选课建议等，大约800字，可以引用点评中的原句：\n'
     contents = [get_user(review) + '的点评：' + html2markdown(review.content).strip() for review in reviews]
 
     joined_contents = '\n'.join(contents)
