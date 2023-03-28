@@ -170,6 +170,8 @@ class Course(db.Model):
 
     _image = db.Column(db.String(100))
 
+    summary = db.Column(db.Text) # AI generated summary
+
     terms = db.relationship('CourseTerm', backref='course', order_by='desc(CourseTerm.term)', lazy='dynamic')
     classes = db.relationship('CourseClass', backref='course', lazy='dynamic', order_by='desc(CourseClass.term)')
     _dept = db.relationship('Dept', backref='courses', lazy='joined')
