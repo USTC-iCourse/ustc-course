@@ -1,6 +1,12 @@
 from markdownify import markdownify
 
 
+PROMPT_LENGTH_LIMIT = 3000
+PROMPT_HEADROOM = 200
+CUTOFF_MIN_MESSAGE_LENGTH = 140
+SUMMARY_EXPECTED_LENGTH = 500
+
+
 def get_user(review):
     if review.is_anonymous:
         return '匿名用户'
@@ -23,10 +29,39 @@ def get_course_term(review):
         return review.term_display + '季学期'
 
 
-def html_to_markdown(content):
+def html2markdown(content):
     return markdownify(content, strip=['a', 'img'])
 
 
 def generate_embedding_prompt(review):
     header = get_user(review) + '在' + get_course(review.course) + '课程' + get_course_term(review) + '的点评：\n'
-    return header + html_to_markdown(review.content)
+    return header + html2markdown(review.content).strip()
+
+
+def generate_short_prompt(reviews, full_prompt):
+    cutoff_ratio = PROMPT_LENGTH_LIMIT * 1.0 / len(full_prompt)
+    prompt = ''
+    for review in reviews:
+        content = html2markdown(review.content).strip()
+        if len(content) > CUTOFF_MIN_MESSAGE_LENGTH:
+            cutoff_len = max(int(len(content) * cutoff_ratio), CUTOFF_MIN_MESSAGE_LENGTH)
+            content = content[0:cutoff_len]
+        prompt += get_user(review) + '的点评：' + content + '\n'
+        if len(prompt) > PROMPT_LENGTH_LIMIT:
+            return prompt[:PROMPT_LENGTH_LIMIT + PROMPT_HEADROOM]
+    return prompt
+
+
+def generate_summary_prompt(reviews):
+    header = '请尽可能详细地从考试、给分、作业、上课水平、课程内容、选课建议等方面总结以下几位用户在' + get_course(reviews[0].course) + '课程的点评：\n'
+    contents = [get_user(review) + '的点评：' + html2markdown(review.content).strip() for review in reviews]
+
+    joined_contents = '\n'.join(contents)
+    if len(joined_contents) <= SUMMARY_EXPECTED_LENGTH:
+        return joined_contents
+
+    full_prompt = header + joined_contents
+    if len(full_prompt) <= PROMPT_LENGTH_LIMIT:
+        return full_prompt
+    else:
+        return header + generate_short_prompt(reviews, full_prompt)
