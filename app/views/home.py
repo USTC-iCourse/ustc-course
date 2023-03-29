@@ -207,7 +207,7 @@ def confirm_email():
         RT.add(token)
         email = None
         try:
-            email = ts.loads(token, salt="email-confirm-key", max_age=86400)
+            email = ts.loads(token, salt=app.config['EMAIL_CONFIRM_SECRET_KEY'], max_age=86400)
         except:
             abort(404)
 
@@ -269,7 +269,7 @@ def reset_password(token):
     if form.validate_on_submit():
         RT.add(token)
         try:
-            email = ts.loads(token, salt="password-reset-key", max_age=86400)
+            email = ts.loads(token, salt=app.config['PASSWORD_RESET_SECRET_KEY'], max_age=86400)
         except:
             return render_template('feedback.html', status=False, message=_('此密码重置链接无效，请准确复制邮件中的链接。'))
         user = User.query.filter_by(email=email).first_or_404()

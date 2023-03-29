@@ -31,7 +31,7 @@ def rand_str():
 
 def send_confirm_mail(email):
     subject = 'Confirm your email.'
-    token = ts.dumps(email, salt='email-confirm-key')
+    token = ts.dumps(email, salt=app.config['EMAIL_CONFIRM_SECRET_KEY'])
 
     confirm_url = url_for(
         'home.confirm_email',
@@ -47,7 +47,7 @@ def send_confirm_mail(email):
 
 def send_reset_password_mail(email):
     subject = 'Reset your password'
-    token = ts.dumps(email, salt='password-reset-key')
+    token = ts.dumps(email, salt=app.config['PASSWORD_RESET_SECRET_KEY'])
 
     reset_url = url_for(
         'home.reset_password',

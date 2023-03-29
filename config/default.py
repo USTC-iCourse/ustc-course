@@ -6,7 +6,10 @@ DEBUG = False
 for arg in sys.argv:
     if arg == '-d':
         DEBUG = True
+
 SECRET_KEY = 'secret-key'
+EMAIL_CONFIRM_SECRET_KEY = 'secret-key'
+PASSWORD_RESET_SECRET_KEY = 'secret-key'
 
 
 # available languages
