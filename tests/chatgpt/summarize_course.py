@@ -46,7 +46,10 @@ def get_summary_of_course(course):
     public_reviews = (Review.query.filter_by(course_id=course.id)
         .filter(Review.is_hidden == False).filter(Review.is_blocked == False).filter(Review.only_visible_to_student == False)
         .order_by(Review.upvote_count.desc(), Review.publish_time.desc())
+        .all()
         )
+    if len(public_reviews) == 0:
+        return None
     prompt = generate_summary_prompt(public_reviews)
     if len(prompt) <= SUMMARY_EXPECTED_LENGTH:  # too short, no need to summarize
         return prompt
