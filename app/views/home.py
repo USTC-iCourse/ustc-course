@@ -1,18 +1,22 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken as RT, Course, CourseRate, CourseTerm, Teacher, Review, Notification, follow_course, follow_user, SearchLog, ThirdPartySigninHistory, Announcement
+from app.models import User, RevokedToken, Course, CourseRate, CourseTerm, Teacher, Review, Notification, follow_course, follow_user, SearchLog, ThirdPartySigninHistory, Announcement, PasswordResetToken
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import union, or_
 from sqlalchemy.sql.expression import literal_column, text
 from app import db
 from app import app
 from .course import deptlist
 import re
+from itsdangerous import URLSafeTimedSerializer
+
 
 home = Blueprint('home',__name__)
+ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
 
 def gen_index_url():
     if 'DEBUG' in app.config and app.config['DEBUG']:
@@ -202,9 +206,9 @@ def confirm_email():
         token = request.args.get('token')
         if not token:
             return render_template('feedback.html', status=False, message=_('此激活链接无效，请准确复制邮件中的链接。'))
-        if RT.query.get(token):
+        if RevokedToken.query.get(token):
             return render_template('feedback.html', status=False, message=_('此激活链接已被使用过。'))
-        RT.add(token)
+        RevokedToken.add(token)
         email = None
         try:
             email = ts.loads(token, salt=app.config['EMAIL_CONFIRM_SECRET_KEY'], max_age=86400)
@@ -232,12 +236,31 @@ def logout():
     logout_user()
     return redirect_to_index()
 
+
+def generate_reset_password_token(user):
+    token_str = ts.dumps(user.email, salt=app.config['PASSWORD_RESET_SECRET_KEY'])
+    expires_at = datetime.utcnow() + timedelta(minutes=60)
+
+    # Invalidate previous tokens
+    previous_tokens = PasswordResetToken.query.filter_by(user_id=user.id).all()
+    for prev_token in previous_tokens:
+        db.session.delete(prev_token)
+
+    # Save the new token
+    token = PasswordResetToken(user_id=user.id, token=token_str, expires_at=expires_at)
+    db.session.add(token)
+    db.session.commit()
+
+    return token_str
+
+
 @home.route('/change-password/', methods=['GET'])
 def change_password():
-    '''在控制面板里发邮件修改密码，另一个修改密码在user.py里面'''
+    '''在控制面板里发邮件修改密码'''
     if not current_user.is_authenticated:
         return redirect(url_for('home.signin', _external=True, _scheme='https'))
-    send_reset_password_mail(current_user.email)
+    token = generate_reset_password_token(current_user)
+    send_reset_password_mail(current_user.email, token)
     return render_template('feedback.html', status=True, message=_('密码重置邮件已经发送。'), title='修改密码')
 
 
@@ -251,7 +274,8 @@ def forgot_password():
         email = form['email'].data
         user = User.query.filter_by(email=email).first()
         if user:
-            send_reset_password_mail(email)
+            token = generate_reset_password_token(user)
+            send_reset_password_mail(user.email, token)
             message = _('密码重置邮件已发送。')  #一个反馈信息
             status = True
         else:
@@ -263,18 +287,29 @@ def forgot_password():
 @home.route('/reset-password/<string:token>/', methods=['GET','POST'])
 def reset_password(token):
     '''重设密码'''
-    if RT.query.get(token):
+
+    if RevokedToken.query.get(token):
         return render_template('feedback.html', status=False, message=_('此密码重置链接已被使用过。'))
+
+    stored_token = PasswordResetToken.query.filter_by(token=token).first()
+    if not stored_token:
+        return render_template('feedback.html', status=False, message=_('此密码重置链接无效，请准确复制邮件中的链接。'))
+
+    if stored_token.is_expired():
+        return render_template('feedback.html', status=False, message=_('此密码重置链接已经过期。'))
+
+    user = User.query.get(stored_token.user_id)
+    if not user:
+        return render_template('feedback.html', status=False, message=_('用户不存在。'))
+
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        RT.add(token)
-        try:
-            email = ts.loads(token, salt=app.config['PASSWORD_RESET_SECRET_KEY'], max_age=86400)
-        except:
-            return render_template('feedback.html', status=False, message=_('此密码重置链接无效，请准确复制邮件中的链接。'))
-        user = User.query.filter_by(email=email).first_or_404()
+        RevokedToken.add(token)
         password = form['password'].data
         user.set_password(password)
+
+        db.session.delete(stored_token)
+        db.session.commit()
         logout_user()
         flash('密码已经修改，请使用新密码登录。')
         return redirect(url_for('home.signin', _external=True, _scheme='https'))

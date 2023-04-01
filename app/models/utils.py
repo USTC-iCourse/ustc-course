@@ -1,6 +1,7 @@
 from app import db
 from datetime import datetime
 
+
 class RevokedToken(db.Model):
     value = db.Column(db.String(100), unique=True, primary_key=True)
     revoke_time = db.Column(db.DateTime(), default=datetime.utcnow())
@@ -10,6 +11,16 @@ class RevokedToken(db.Model):
         token = cls(value=value)
         db.session.add(token)
         db.session.commit()
+
+
+class PasswordResetToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    token = db.Column(db.String(255), unique=True, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+
+    def is_expired(self):
+        return datetime.utcnow() > self.expires_at
 
 
 class Banner(db.Model):
