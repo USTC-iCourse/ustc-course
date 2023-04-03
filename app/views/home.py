@@ -211,7 +211,7 @@ def confirm_email():
         RevokedToken.add(token)
         email = None
         try:
-            email = ts.loads(token, salt=app.config['EMAIL_CONFIRM_SECRET_KEY'], max_age=86400)
+            email = ts.loads(token, salt=app.config['EMAIL_CONFIRM_SECRET_KEY'], max_age=3600)
         except:
             abort(404)
 
