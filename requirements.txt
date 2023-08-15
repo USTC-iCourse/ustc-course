@@ -2,6 +2,8 @@ alembic==1.11.2
 Babel==2.12.1
 blinker==1.6.2
 cachelib==0.10.2
+certifi==2023.7.22
+charset-normalizer==3.2.0
 click==8.1.6
 dnspython==2.4.2
 email-validator==2.0.0.post2
@@ -34,9 +36,11 @@ passlib==1.7.4
 pdfkit==1.0.0
 Pillow==10.0.0
 pytz==2023.3
+requests==2.31.0
 roboverse==0.0.0
 SQLAlchemy==2.0.19
 typing_extensions==4.7.1
+urllib3==2.0.4
 waitress==2.1.2
 Werkzeug==2.3.7
 WTForms==3.0.1

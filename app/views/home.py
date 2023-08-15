@@ -1,3 +1,16 @@
+import logging
+import os
+import secrets
+import base64
+import hashlib
+import hmac
+import uuid
+from urllib import parse
+import requests
+
+# corresponding meta thread:
+# https://meta.discourse.org/t/use-discourse-as-an-identity-provider-sso-discourseconnect/32974
+
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
 from app.models import User, RevokedToken, Course, CourseRate, CourseTerm, Teacher, Review, Notification, follow_course, \
@@ -13,6 +26,7 @@ from app import app
 from .course import deptlist
 import re
 from itsdangerous import URLSafeTimedSerializer
+from flask import session
 
 home = Blueprint('home', __name__)
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
@@ -93,47 +107,113 @@ def follow_reviews():
                          this_module='home.follow_reviews')
 
 
+@home.route('/signincallback/', methods=['GET'])
+def signincallback():
+  url_params = parse.parse_qs(parse.urlsplit(request.url).query)
+  error = None
+  if "sso" not in url_params:
+    error = 'oauth error: no sso'
+    pass  # handle error, with "sso" in url
+
+  if "sig" not in url_params:
+    error = 'oauth error: no sig'
+    pass  # handle error, with "sig" in url
+
+  sso = str.encode(url_params["sso"][0])
+  h = hmac.new(app.config['CALL_DISCOURSE_SSO_SECRET'], sso, hashlib.sha256)
+  sso_bytes = h.digest()
+  sig_bytes = bytes.fromhex(url_params["sig"][0])
+
+  if sso_bytes != sig_bytes:
+    error = 'oauth error, sso != sig'
+    pass  # handle error, "sso" disagrees with "sig"
+
+  decoded = base64.b64decode(sso).decode()
+  response = parse.parse_qs(decoded)
+
+  get_res = lambda x: got[0] if (got := response.get(x)) else None
+
+  if "nonce" not in response or session['nonce'] != get_res("nonce"):
+    error = 'oauth error, nonce not match'
+    pass  # handle error, with "nonce"
+
+  email = get_res("email")
+  if not email:
+    error = 'empty email in oauth response'
+
+  if error is None:
+    session['nonce'] = None
+    # 检查用户是否已经注册
+    if not User.query.filter_by(email=email).first():
+      is_admin = get_res("admin")
+      is_mod = get_res("moderator")
+      avatar_url = get_res("avatar_url")
+      username = get_res("username")
+      groups = get_res(
+        "groups")  # 'moderators,trust_level_3,trust_level_4,talents,PartialDevelopers,trust_level_1,trust_level_2,trust_level_0,admins,staff'
+      is_course_review_admin = 'CourseReviewAdmin' in groups.split(',') if groups else False
+      user = User(username=username, email=email, password=str(uuid.uuid4().hex))
+
+      if avatar_url:
+        user.set_avatar(avatar_url)
+
+      if is_admin or is_mod or is_course_review_admin:
+        user.role = 'Admin'
+
+      try:
+        email_suffix = email.split('@')[-1].strip()
+        if email_suffix.endswith('xjtu.edu.cn'):
+          email_split = email_suffix.split('.')
+          if email_split[0] == 'stu':
+            user.identity = 'Student'
+          else:
+            user.identity = 'Teacher'
+        else:
+          # TODO: handle non xjtu email as MaybeStudent
+          user.identity = 'Student'
+
+      except Exception as e:
+        return render_template('signin.html', error=f'bad email format: {email} {e}', title='登录')
+
+      user.save()
+      user.confirm()
+      login_user(user, remember=session['remember'])
+    else:
+      user = User.query.filter_by(email=session["email"])
+      login_user(user, remember=session['remember'])
+    return redirect(session['next_url'])
+  else:
+    return render_template('signin.html', error=error, title='登录')
+
+
 @home.route('/signin/', methods=['POST', 'GET'])
 def signin():
   next_url = request.args.get('next') or gen_index_url()
   if current_user.is_authenticated:
     return redirect(next_url)
+
   form = LoginForm()
   error = ''
-  if form.validate_on_submit():
-    user, status, confirmed = User.authenticate(form['username'].data, form['password'].data)
-    remember = form['remember'].data
-    if user and not user.is_deleted:
-      if status and confirmed:
-        # validate user
-        login_user(user, remember=remember)
-        if request.args.get('ajax'):
-          return jsonify(status=200, next=next_url)
-        else:
-          return redirect(next_url)
-      elif status:
-        '''没有确认邮箱的用户'''
-        message = '请点击邮箱里的激活链接。 <a href=%s>重发激活邮件</a>' % url_for('.confirm_email',
-                                                                                  email=user.email,
-                                                                                  action='send',
-                                                                                  _external=True,
-                                                                                  _scheme='https')
-        if request.args.get('ajax'):
-          return jsonify(status=403, msg=message)
-        else:
-          return render_template('feedback.html', status=False, message=message)
-      else:
-        error = _('用户名或密码错误！')
-    else:
-      error = _('用户名或密码错误！')
-  elif request.method == 'POST':
-    error = '表单验证错误：' + str(form.errors)
 
-  # TODO: log the form errors
+  nonce = secrets.token_urlsafe()
+  return_url = app.config['RETURN_URL']
+  payload = str.encode("nonce=" + nonce + "&return_sso_url=" + return_url)
+
+  BASE64_PAYLOAD = base64.b64encode(payload)
+  URL_ENCODED_PAYLOAD = parse.quote(BASE64_PAYLOAD)
+
+  sig = hmac.new(app.config['CALL_DISCOURSE_SSO_SECRET'], BASE64_PAYLOAD, hashlib.sha256)
+  HEX_SIGNATURE = sig.hexdigest()
+
+  disurl = app.config['DISCOURSE_URL'] + "/session/sso_provider?sso=" + URL_ENCODED_PAYLOAD + "&sig=" + HEX_SIGNATURE
+  session['nonce'] = nonce
+  session['remember'] = form['remember'].data
+  session['next_url'] = next_url
+
   if request.args.get('ajax'):
-    return jsonify(status=404, msg=error)
+    return jsonify(status=200, next=disurl)
   else:
-    return render_template('signin.html', form=form, error=error, title='登录')
+    return redirect(disurl)
 
 
 @home.route('/signup/', methods=['GET', 'POST'])

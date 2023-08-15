@@ -24,9 +24,9 @@ class UsernameField(StringField):
 
 
 class LoginForm(FlaskForm):
-  username = UsernameField('Username', validators=[DataRequired()])
-  password = PasswordField('Password', validators=[DataRequired()])
-  remember = BooleanField('Remember me', default=False)
+  username = UsernameField('Username', )
+  password = PasswordField('Password', )
+  remember = BooleanField('Remember me', default=True)
 
 
 class RegisterForm(FlaskForm):

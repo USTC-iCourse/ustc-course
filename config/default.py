@@ -40,7 +40,7 @@ UPLOAD_FOLDER = '/var/course-uploads/'
 # Alowed extentsions for a filetype
 # for example 'image': set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = {
-  'image': set(['png', 'jpg', 'jpeg', 'gif']),
+  'image': set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif']),
   'file': set(
     '7z|avi|csv|doc|docx|flv|gif|gz|gzip|jpeg|jpg|mov|mp3|mp4|mpc|mpeg|mpg|ods|odt|pdf|png|ppt|pptx|ps|pxd|rar|rtf|tar|tgz|txt|vsd|wav|wma|wmv|xls|xlsx|xml|zip'.split(
       '|')),
@@ -55,3 +55,12 @@ DEBUG_TB_PROFILER_ENABLED = True
 # Enable the template editor
 DEBUG_TB_TEMPLATE_EDITOR_ENABLED = True
 DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+# URL to return to after signing on
+RETURN_URL = "https://courses.xjtu.live/signincallback/"
+# URL to Discourse
+DISCOURSE_URL = "https://xjtu.live"
+# replace with your own secret
+CALL_DISCOURSE_SSO_SECRET = os.environ['COURSE_DISCOURSE_AS_SSO_PROVIDER_SECRETE']
+assert len(CALL_DISCOURSE_SSO_SECRET) > 20
+CALL_DISCOURSE_SSO_SECRET = bytes(CALL_DISCOURSE_SSO_SECRET, 'utf-8')

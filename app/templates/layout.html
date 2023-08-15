@@ -119,20 +119,13 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <div class="form-signin-heading">
                             <span class="h2">请登录</span>
-                            <a class="btn btn-default float-right" href="/signup">注册</a>
                         </div>
                         <div id="signin-alert" role="alert" class="display: none"></div>
-                        <label for="inputEmail" class="sr-only">用户名</label>
-                        <input type="text" name="username" id="inputEmail" class="form-control"
-                               placeholder="用户名或邮箱" required autofocus>
-                        <label for="inputPassword" class="sr-only">密码</label>
-                        <input type="password" name="password" id="inputPassword" class="form-control"
-                               placeholder="密码" required>
+
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox" name="remember">记住我
                             </label>
-                            <a class="float-right" href="{{ url_for('home.forgot_password') }}">忘记密码</a>
                         </div>
                         <button class="btn btn-lg btn-blue btn-block" type="submit">登录</button>
                     </form>

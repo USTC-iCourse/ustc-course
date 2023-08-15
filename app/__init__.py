@@ -17,6 +17,10 @@ from flask_debugtoolbar import DebugToolbarExtension
 app = Flask(__name__)
 app.config.from_object('config.default')
 
+if app.config['DEBUG']:
+  app.config['WTF_CSRF_CHECK_DEFAULT'] = False
+  app.config['RETURN_URL'] = 'http://localhost/signincallback/'
+
 toolbar = DebugToolbarExtension(app)
 
 db = SQLAlchemy(app)
@@ -79,7 +83,7 @@ def page_not_found(e):
 
 @app.errorhandler(400)
 def page_not_found(e):
-  return render_template('error-page.html', code=400), 400
+  return render_template('error-page.html', code=400, error=e), 400
 
 
 @app.errorhandler(500)

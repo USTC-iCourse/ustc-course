@@ -14,14 +14,17 @@
                 <p class="ud-pd-md grey px20">哎呀抱歉，您的请求格式错误&gt;_&lt; </p>
             {% elif code == 500 %}
                 <h1 style="color:#366184;">500 Internal Server Error</h1>
-                <p class="ud-pd-md grey px20">哎呀抱歉，服务器给跪了&gt;_&lt; </p>
+                <p class="ud-pd-md grey px20">服务器内部错误 </p>
             {% elif code == 502 %}
                 <h1 style="color:#366184;">502 Bad Gateway</h1>
-                <p class="ud-pd-md grey px20">哎呀抱歉，服务器给跪了&gt;_&lt; </p>
+                <p class="ud-pd-md grey px20">服务器内部错误 </p>
             {% else %}
                 <h1 style="color:#366184;">HTTP Error {{ code }}</h1>
-                <p class="ud-pd-md grey px20">哎呀抱歉，服务器给跪了&gt;_&lt; </p>
+                <p class="ud-pd-md grey px20">服务器内部错误 </p>
             {% endif %}
+            <p class="ud-pd-md grey px20">错误信息：
+                {{ error }}
+            </p>
             <div class="ud-pd-lg"></div>
             <p class="ud-pd-lg grey">
                 如果这是网站的bug，或者要找的页面你很重要，请通过交大門(xjtu.live)站内聊天功能联系admin</p>
