@@ -154,7 +154,7 @@ def signup():
       ok, message = user.bind_teacher(email)
       # TODO: deal with bind feedback
     else:
-      abort(403, "必须使用科大学生或教师邮箱注册")
+      abort(403, "必须使用交大学生或教师邮箱注册")
     send_confirm_mail(user.email)
     user.save()
     # login_user(user)

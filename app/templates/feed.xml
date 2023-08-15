@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <atom:link href="https://xjtu.live/courses/feed.xml" rel="self" type="application/rss+xml"/>
-        <title>XJTU 评课社区 - 全站最新点评</title>
+        <title>交大門评课社区 - 全站最新点评</title>
         <link>https://xjtu.live/courses/</link>
         <description>评课是为了更好地选课！</description>
         {% for review in reviews.items %}
