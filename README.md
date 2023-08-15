@@ -46,7 +46,7 @@ GRANT ALL ON icourse.* to 'ustc_course'@'localhost';
 
 ### Python 依赖及系统设置
 
-安装 Python 依赖库：```pip3 install -r requirements.txt```。其中 ```requirements.txt``` 是版本库根目录re下的文件。
+安装 Python 依赖库：```pip3 install -r requirements.txt```。其中 ```requirements.txt``` 是版本库根目录下的文件。
 
 如果 pip3 过程中出现错误，可能是缺少编译这些 Python 库所需的依赖。在 Ubuntu/Debian
 系统上，可以 ```apt-get install python3-dev libxslt1-dev libxml2-dev libmysqlclient-dev```

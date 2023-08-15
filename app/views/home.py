@@ -16,7 +16,7 @@ from flask_login import login_user, login_required, current_user, logout_user
 from app.models import User, RevokedToken, Course, CourseRate, CourseTerm, Teacher, Review, Notification, follow_course, \
   follow_user, SearchLog, ThirdPartySigninHistory, Announcement, PasswordResetToken
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
-from app.utils import ts, send_confirm_mail, send_reset_password_mail
+from app.utils import ts, send_confirm_mail
 from flask_babel import gettext as _
 from datetime import datetime, timedelta
 from sqlalchemy import union, or_
