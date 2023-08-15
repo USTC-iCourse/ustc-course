@@ -3,7 +3,7 @@ import sys
 
 # Server config
 SERVER_NAME = None
-DEBUG = False
+DEBUG = True
 for arg in sys.argv:
   if arg == '-d':
     DEBUG = True

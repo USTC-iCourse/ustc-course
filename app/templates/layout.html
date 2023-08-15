@@ -118,7 +118,7 @@
                     <form id="signin-form" class="form-signin">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <div class="form-signin-heading">
-                            <span class="h2">请登录</span>
+                            <span class="h2">使用交大門账户登录</span>
                         </div>
                         <div id="signin-alert" role="alert" class="display: none"></div>
 
@@ -127,7 +127,7 @@
                                 <input type="checkbox" name="remember">记住我
                             </label>
                         </div>
-                        <button class="btn btn-lg btn-blue btn-block" type="submit">登录</button>
+                        <button class="btn btn-lg btn-blue btn-block" type="submit">跳转到交大門登录</button>
                     </form>
                 </div>
             </div>
@@ -162,7 +162,7 @@
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>
 <script src="/static/js/clipboard.min.js"></script>
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML"></script>
+<script async src="https://xjtu.live/xjtumen-g/cdn/MathJax.js?config=TeX-AMS_HTML"></script>
 {% include 'common-scripts.html' %}
 <script>
     $('#signin').on('shown.bs.modal', function () {
@@ -199,7 +199,7 @@
                 }
             },
             error: function (e) {
-                signin_alert('天了噜! 服务器正在睡觉，请稍后再试。', "warning");
+                signin_alert('Internal Error:', e, "warning");
             }
         })
     });

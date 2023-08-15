@@ -45,19 +45,6 @@ def send_confirm_mail(email):
   mail.send(msg)
 
 
-def send_reset_password_mail(email, token):
-  subject = 'Reset your password'
-
-  reset_url = url_for(
-    'home.reset_password',
-    token=token,
-    _external=True,
-    _scheme='https')
-  html = render_template('email/reset-password.html',
-                         reset_url=reset_url)
-
-  msg = Message(subject=subject, html=html, recipients=[email])
-  mail.send(msg)
 
 
 def send_block_review_email(review):

@@ -98,12 +98,8 @@ def account_settings():
   errors = []
   if form.validate_on_submit():
     username = form['username'].data.strip()
-    if username == user.username:
-      pass
-    elif User.query.filter_by(username=username).all():
-      errors.append(_("Sorry, the username " + username + " has been taken!"))
-    else:
-      user.username = username
+    if username != user.username:
+      errors.append(_(f"You cannot change your {username} yourself, please contact admin"))
 
     user.homepage = form['homepage'].data.strip()
     if not user.homepage.startswith('http'):
@@ -124,43 +120,6 @@ def account_settings():
   elif request.method == 'POST':
     errors = ['表单验证错误：' + str(form.errors)]
   return render_template('settings.html', user=user, form=form, errors=errors, title='用户设置')
-
-
-@user.route('/settings/bind/', methods=['GET', 'POST'])
-@login_required
-def bind_identity():
-  user = current_user
-  identity = current_user.identity
-  form = ProfileForm(formdata=request.form, obj=user)
-  if identity == 'Student':
-    if request.method == "POST":
-      sno = request.form.get('sno')
-      if sno:
-        ok, message = current_user.bind_student(sno)
-        current_user.save()
-        if ok:
-          return redirect(url_for('.account_settings'))
-        else:
-          return render_template('bind-stu.html', user=current_user, error=message)
-      else:
-        error = _('必须输入一个学号!')
-        return render_template('bind-stu.html', user=current_user, error=error, title='绑定学号')
-    else:
-      return render_template('bind-stu.html', user=current_user, error=None, title='绑定学号')
-  elif identity == 'Teacher':
-    return render_template('feedback.html', status=False, message=_('教师不能绑定学号！'), title='绑定学号')
-  else:
-    email_suffix = current_user.email.split('@')[-1]
-    if email_suffix == 'mail.ustc.edu.cn':
-      current_user.identity = 'Student'
-      current_user.save()
-      return redirect(url_for('.bind_identity'))
-    elif email_suffix == 'ustc.edu.cn':
-      current_user.identity = 'Teacher'
-      current_user.save()
-      return redirect(url_for('.bind_identity'))
-    else:
-      return render_template('feedback.html', status=False, message=_('The server met some problem.Please contact us.'))
 
 
 @user.route('/<int:user_id>/courses/')

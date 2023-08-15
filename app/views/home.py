@@ -179,7 +179,7 @@ def signincallback():
       user.confirm()
       login_user(user, remember=session['remember'])
     else:
-      user = User.query.filter_by(email=session["email"])
+      user = User.query.filter_by(email=email).first()
       login_user(user, remember=session['remember'])
     return redirect(session['next_url'])
   else:
@@ -285,21 +285,6 @@ def logout():
   return redirect_to_index()
 
 
-def generate_reset_password_token(user):
-  token_str = ts.dumps(user.email, salt=app.config['PASSWORD_RESET_SECRET_KEY'])
-  expires_at = datetime.utcnow() + timedelta(minutes=60)
-
-  # Invalidate previous tokens
-  previous_tokens = PasswordResetToken.query.filter_by(user_id=user.id).all()
-  for prev_token in previous_tokens:
-    db.session.delete(prev_token)
-
-  # Save the new token
-  token = PasswordResetToken(user_id=user.id, token=token_str, expires_at=expires_at)
-  db.session.add(token)
-  db.session.commit()
-
-  return token_str
 
 
 @home.route('/change-password/', methods=['GET'])
@@ -333,40 +318,8 @@ def forgot_password():
   return render_template('forgot-password.html', title='忘记密码')
 
 
-@home.route('/reset-password/<string:token>/', methods=['GET', 'POST'])
-def reset_password(token):
-  '''重设密码'''
-
-  if RevokedToken.query.get(token):
-    return render_template('feedback.html', status=False, message=_('此密码重置链接已被使用过。'))
-
-  stored_token = PasswordResetToken.query.filter_by(token=token).first()
-  if not stored_token:
-    return render_template('feedback.html', status=False, message=_('此密码重置链接无效，请准确复制邮件中的链接。'))
-
-  if stored_token.is_expired():
-    return render_template('feedback.html', status=False, message=_('此密码重置链接已经过期。'))
-
-  user = User.query.get(stored_token.user_id)
-  if not user:
-    return render_template('feedback.html', status=False, message=_('用户不存在。'))
-
-  form = ResetPasswordForm()
-  if form.validate_on_submit():
-    RevokedToken.add(token)
-    password = form['password'].data
-    user.set_password(password)
-
-    db.session.delete(stored_token)
-    db.session.commit()
-    logout_user()
-    flash('密码已经修改，请使用新密码登录。')
-    return redirect(url_for('home.signin', _external=True, _scheme='https'))
-  return render_template('reset-password.html', form=form, title='重设密码')
-
 
 class MyPagination(object):
-
   def __init__(self, page, per_page, total, items):
     self.page = page
     self.per_page = per_page
