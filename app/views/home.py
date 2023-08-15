@@ -136,53 +136,6 @@ def signin():
     return render_template('signin.html', form=form, error=error, title='登录')
 
 
-# 3rdparty signin should have url format: https://${icourse_site_url}/signin-3rdparty/?from_app=${from_app}&next_url=${next_url}&challenge=${challenge}
-# here, ${from_app} is the 3rdparty site name displayed to the user
-# here, ${next_url} is the 3rdparty login verification URL to the 3rdparty site
-# here, ${challenge} is a challenge string provided by the 3rdparty site
-@home.route('/signin-3rdparty/', methods=['GET'])
-def signin_3rdparty():
-  from_app = request.args.get('from_app')
-  if not from_app:
-    abort(400, description="from_app parameter not specified")
-  next_url = request.args.get('next_url')
-  if not next_url:
-    abort(400, description="next_url parameter not specified")
-  challenge = request.args.get('challenge')
-  if not challenge:
-    abort(400, description="challenge parameter not specified")
-  return render_template('signin-3rdparty.html', from_app=from_app, next_url=next_url, current_user=current_user,
-                         challenge=challenge, title='第三方登录')
-
-
-def update_3rdparty_signin_history_to_verified(email, token):
-  history = ThirdPartySigninHistory.query.filter_by(email=email, token=token).first()
-  history.verify_time = datetime.utcnow()
-  history.add()
-
-
-@home.route('/verify-3rdparty-signin/', methods=['GET'])
-def verify_3rdparty_signin():
-  email = request.args.get('email')
-  if not email:
-    abort(400, description="email parameter not specified")
-  token = request.args.get('token')
-  if not token:
-    abort(400, description="token parameter not specified")
-
-  user = User.query.filter_by(email=email).first()
-  if not user:
-    abort(403, description="user does not exist or token is invalid")
-  if user.token_3rdparty == token:
-    user.token_3rdparty = None
-    user.save()
-    update_3rdparty_signin_history_to_verified(email, token)
-    resp = jsonify(success=True)
-    return resp
-  else:
-    abort(403, description="user does not exist or token is invalid")
-
-
 @home.route('/signup/', methods=['GET', 'POST'])
 def signup():
   if current_user.is_authenticated:
@@ -586,6 +539,3 @@ def report_bug():
 def not_found():
   '''返回404页面'''
   return render_template('404.html', title='404')
-
-
-
