@@ -105,7 +105,7 @@ def signin():
     remember = form['remember'].data
     if user and not user.is_deleted:
       if status and confirmed:
-        # validate uesr
+        # validate user
         login_user(user, remember=remember)
         if request.args.get('ajax'):
           return jsonify(status=200, next=next_url)
@@ -588,8 +588,4 @@ def not_found():
   return render_template('404.html', title='404')
 
 
-@home.route('/songshu/')
-def songshu():
-  '''Test'''
 
-  return render_template('songshu.html')
