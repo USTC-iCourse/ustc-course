@@ -1,60 +1,66 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
-    {% include 'mobile-navbar.html' %}
+    <div class="container">
+        <div class="row float-element">
+            {% include 'mobile-navbar.html' %}
 
-    {% if courses.total > 0 %}
-    <div class="ud-pd-sm">
-      <span class="text-muted">共 {{ courses.total }} 门课（当前第 {{ courses.page }} 页）</span>
-    </div>
-    {% include "course-list.html" %}
+            {% if courses.total > 0 %}
+                <div class="ud-pd-sm">
+                    <span class="text-muted">共 {{ courses.total }} 门课（当前第 {{ courses.page }} 页）</span>
+                </div>
+                {% include "course-list.html" %}
 
-    <nav>
-      <ul class="pagination">
-        {% if courses.has_prev %} 
-        <li>
-            <a href="{{ url_for('home.search', q=keyword, page=courses.page-1, term=term, dept=dept) }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        {% else %} 
-        <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-        {% endif %}
-        
-        {% for page in courses.iter_pages(left_edge=1, right_edge=0) %}
-            {% if page == courses.page %}
-            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
-            {% elif page %}
-            <li><a href="{{ url_for('home.search', q=keyword, page=page, term=term, dept=dept) }}">{{ page }}</a></li>
+                <nav>
+                    <ul class="pagination">
+                        {% if courses.has_prev %}
+                            <li>
+                                <a href="{{ url_for('home.search', q=keyword, page=courses.page-1, term=term, dept=dept) }}"
+                                   aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="disabled"><a href="#" aria-label="Previous"><span
+                                    aria-hidden="true">&laquo;</span></a></li>
+                        {% endif %}
+
+                        {% for page in courses.iter_pages(left_edge=1, right_edge=0) %}
+                            {% if page == courses.page %}
+                                <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
+                            {% elif page %}
+                                <li>
+                                    <a href="{{ url_for('home.search', q=keyword, page=page, term=term, dept=dept) }}">{{ page }}</a>
+                                </li>
+                            {% else %}
+                                <li><a>...</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if courses.has_next %}
+                            <li>
+                                <a href="
+                                        {{ url_for('home.search', q=keyword, page=courses.page+1, term=term, dept=dept) }}"
+                                   aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
             {% else %}
-            <li><a>...</a></li>
+                <div class="ud-pd-md">
+                    <p>建议：</p>
+                    <ul>
+                        <li>如果您想搜索老师，请输入老师的全名；</li>
+                        <li>如果您想搜索课程，请输入部分或全部的课程名称；</li>
+                        <li>如果您想搜索点评，请输入点评内容中的关键词或点评作者的用户名，并再次搜索。</li>
+                    </ul>
+                </div>
             {% endif %}
-        {% endfor %}
 
-        {% if courses.has_next %}
-        <li>
-          <a href="{{ url_for('home.search', q=keyword, page=courses.page+1, term=term, dept=dept) }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-        {% endif %}
-      </ul>
-    </nav>
-    {% else %}
-    <div class="ud-pd-md">
-      <p>建议：</p>
-      <ul>
-	<li>如果您想搜索老师，请输入老师的全名；</li>
-	<li>如果您想搜索课程，请输入部分或全部的课程名称；</li>
-	<li>如果您想搜索点评，请输入点评内容中的关键词或点评作者的用户名，并再次搜索。</li>
-      </ul>
-    </div>
-    {% endif %}
-
-  </div>
-</div><!-- /.container -->
+        </div>
+    </div><!-- /.container -->
 {% endblock %}
 
 {% block script %}

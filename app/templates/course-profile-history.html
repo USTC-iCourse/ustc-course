@@ -1,47 +1,51 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
-    <div class="col-md-8">
-      <div class="bm-pd-lg">
-	<div class="inline-h3">
-          <span class="blue h3">课程信息编辑历史</span>
-          <span class="text-muted">(共 {{ course.info_history_count }} 次)</span>
-	</div>
+            <div class="col-md-8">
+                <div class="bm-pd-lg">
+                    <div class="inline-h3">
+                        <span class="blue h3">课程信息编辑历史</span>
+                        <span class="text-muted">(共 {{ course.info_history_count }} 次)</span>
+                    </div>
 
-	{% if course.info_history_count == 0 %}
-        <p>还没有被人工编辑过哦！</p>
-        {% else %}
-	  {% for history in course.info_history %}
-      	  <div class="ud-pd-md dashed">
-    	    <p>课程主页：
-      	      {% if history.homepage and history.homepage != 'http://' %}
-      	      <a href="{{ history.homepage }}">{{ history.homepage }}</a>
-      	      {% else %}暂无{% endif %}
-      	    </p>
-            <p>课程简介：{% if history.introduction %}{{ history.introduction|safe }}{% else %}暂无{% endif %}</p>
-            <div>
-              <span class="text-muted">贡献者：<a href="{{ url_for('user.view_profile', user_id=history.author) }}">{{ history.author_user.username }}</a></span>
-              <span class="text-muted pull-right">编辑时间：<span class="localtime" style="display: none;">{{ history.update_time|utctime }}</span></span>
-            </div>
-      	  </div>
-	  {% endfor %}
-        {% endif %}
-      </div><!-- bm-pd-lg -->
-    </div><!-- end col-md-8 -->
+                    {% if course.info_history_count == 0 %}
+                        <p>还没有被人工编辑过哦！</p>
+                    {% else %}
+                        {% for history in course.info_history %}
+                            <div class="ud-pd-md dashed">
+                                <p>课程主页：
+                                    {% if history.homepage and history.homepage != 'http://' %}
+                                        <a href="{{ history.homepage }}">{{ history.homepage }}</a>
+                                    {% else %}暂无{% endif %}
+                                </p>
+                                <p>课程简介：{% if history.introduction %}{{ history.introduction|safe }}{% else %}
+                                    暂无{% endif %}</p>
+                                <div>
+                                    <span class="text-muted">贡献者：<a
+                                            href="{{ url_for('user.view_profile', user_id=history.author) }}">{{ history.author_user.username }}</a></span>
+                                    <span class="text-muted pull-right">编辑时间：<span class="localtime"
+                                                                                       style="display: none;">{{ history.update_time|utctime }}</span></span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div><!-- bm-pd-lg -->
+            </div><!-- end col-md-8 -->
 
-    <div class="col-md-4 right-col">
-      <div class="ud-pd-md dashed">
-	<h3 class="blue">{{ course.name }}</h3>
-	{% if current_user.is_authenticated %}
-	<btn class="btn btn-link float-right"><a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程信息</a></btn>
-	{% endif %}
-        <p>教师：{{ course.teacher_names_display|name_display_short }}</p>
-      </div>
-    </div><!-- end col-md-4 -->
-  </div><!-- end float-element -->
-</div><!-- end container -->
+            <div class="col-md-4 right-col">
+                <div class="ud-pd-md dashed">
+                    <h3 class="blue">{{ course.name }}</h3>
+                    {% if current_user.is_authenticated %}
+                        <btn class="btn btn-link float-right"><a
+                                href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程信息</a></btn>
+                    {% endif %}
+                    <p>教师：{{ course.teacher_names_display|name_display_short }}</p>
+                </div>
+            </div><!-- end col-md-4 -->
+        </div><!-- end float-element -->
+    </div><!-- end container -->
 
 {% endblock %}

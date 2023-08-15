@@ -1,138 +1,152 @@
 {% extends "layout-simple.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
-    {{ error }}
-    <h3 class="blue">注册</h3>
-    <hr>
-    <form class="form-horizontal" method="post" action="{{ url_for('home.signup') }}">
-      <div id='csrf-token' class="form-group" type="hiddent">
-        {{ form.csrf_token }}
-      </div>
+            {{ error }}
+            <h3 class="blue">注册</h3>
+            <hr>
+            <form class="form-horizontal" method="post" action="{{ url_for('home.signup') }}">
+                <div id='csrf-token' class="form-group" type="hiddent">
+                    {{ form.csrf_token }}
+                </div>
 
 
-      <div id="regverify-email" class="form-group">
-        <label for="reginput-email" class="col-sm-2 control-label">科大邮箱</label>
-        <div class="col-sm-4">
-          <input type="email" id="reginput-email" name="email" class="form-control" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn" onchange="regverify('email')">
-          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
-          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
-          <span class="help-block" style="display:none"></span>
-          {% if form.errors.get('email') %}
-            {% for info in form.errors.get('email') %}
-              {{ info }}
-            {% endfor %}
-          {% endif %}
+                <div id="regverify-email" class="form-group">
+                    <label for="reginput-email" class="col-sm-2 control-label">科大邮箱</label>
+                    <div class="col-sm-4">
+                        <input type="email" id="reginput-email" name="email" class="form-control"
+                               placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn" onchange="regverify('email')">
+                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"
+                              style="display:none"></span>
+                        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"
+                              style="display:none"></span>
+                        <span class="help-block" style="display:none"></span>
+                        {% if form.errors.get('email') %}
+                            {% for info in form.errors.get('email') %}
+                                {{ info }}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+
+                <div id="regverify-username" class="form-group">
+                    <label for="reginput-username" class="col-sm-2 control-label">用户名</label>
+                    <div class="col-sm-4">
+                        <input type="text" id="reginput-username" name="username" class="form-control"
+                               placeholder="Username" onchange="regverify('username')">
+                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"
+                              style="display:none"></span>
+                        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"
+                              style="display:none"></span>
+                        <span class="help-block" style="display:none"></span>
+                        {% if form.errors.get('username') %}
+                            {% for info in form.errors.get('username') %}
+                                {{ info }}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+
+                <div id="regverify-password" class="form-group">
+                    <label for="reginput-password" class="col-sm-2 control-label">密码</label>
+                    <div class="col-sm-4">
+                        <input type="password" name="password" class="form-control" id="reginput-password"
+                               placeholder="Password" onchange="checkPassword()">
+                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"
+                              style="display:none"></span>
+                        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"
+                              style="display:none"></span>
+                        <span class="help-block" style="display:none"></span>
+                        {% if form.errors.get('password') %}
+                            {% for info in form.errors.get('password') %}
+                                {{ info }}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div id="regverify-confirm-password" class="form-group">
+                    <label for="reginput-confirm-password" class="col-sm-2 control-label">确认密码</label>
+                    <div class="col-sm-4">
+                        <input type="password" class="form-control" name="confirm_password"
+                               id="reginput-confirm-password" placeholder="Confirm Password"
+                               onchange="checkConfirmPassword()">
+                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"
+                              style="display:none"></span>
+                        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"
+                              style="display:none"></span>
+                        <span class="help-block" style="display:none"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-4">
+                        <button type="submit" class="btn btn-blue btn-block">注册</button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="row ud-pd-md">
+                <div class="col-sm-offset-2 col-sm-4">
+                    <span class="text-muted">已有账号？ <a href="{{ url_for('home.signin') }}">马上登录</a></span>
+                </div>
+            </div>
+
         </div>
-      </div>
-
-
-
-      <div id="regverify-username" class="form-group">
-        <label for="reginput-username" class="col-sm-2 control-label">用户名</label>
-        <div class="col-sm-4">
-          <input type="text" id="reginput-username" name="username" class="form-control" placeholder="Username" onchange="regverify('username')">
-          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
-          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
-          <span class="help-block" style="display:none"></span>
-          {% if form.errors.get('username') %}
-            {% for info in form.errors.get('username') %}
-              {{ info }}
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
-
-
-
-
-      <div id="regverify-password" class="form-group">
-        <label for="reginput-password" class="col-sm-2 control-label">密码</label>
-        <div class="col-sm-4">
-          <input type="password" name="password" class="form-control" id="reginput-password" placeholder="Password" onchange="checkPassword()">
-          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
-          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
-          <span class="help-block" style="display:none"></span>
-          {% if form.errors.get('password') %}
-            {% for info in form.errors.get('password') %}
-              {{ info }}
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
-
-      <div id="regverify-confirm-password" class="form-group">
-        <label for="reginput-confirm-password" class="col-sm-2 control-label">确认密码</label>
-        <div class="col-sm-4">
-          <input type="password" class="form-control" name="confirm_password" id="reginput-confirm-password" placeholder="Confirm Password" onchange="checkConfirmPassword()">
-          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
-          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
-          <span class="help-block" style="display:none"></span>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-4">
-          <button type="submit" class="btn btn-blue btn-block">注册</button>
-        </div>
-      </div>
-    </form>
-
-    <div class="row ud-pd-md">
-      <div class="col-sm-offset-2 col-sm-4">
-        <span class="text-muted">已有账号？ <a href="{{ url_for('home.signin') }}">马上登录</a></span>
-      </div>
     </div>
-
-  </div>
-</div>
 {% endblock %}
 
 
 {% block script %}
-<script>
- $('#reginput-email').focus();
- function inputFeedback(elem, ok, error_msg) {
-   elem.find('.form-control-feedback').hide();
-   if (ok) {
-     elem.attr('class', 'form-group has-success has-feedback');
-     elem.find('.glyphicon-ok').show();
-     elem.find('.help-block').hide();
-   } else {
-     elem.attr('class', 'form-group has-error has-feedback');
-     elem.find('.help-block').text(error_msg);
-     elem.find('.help-block').show();
-     elem.find('.glyphicon-remove').show();
-   }
- }
- function regverify(name) {
-   $.ajax({
-     type: "get",
-     url: "{{ url_for('api.reg_verify') }}",
-     async: true,
-     data: {
-       name: name,
-       value: $('#reginput-' + name).val(),
-     },
-     success: function(data) {
-       elem = $('#regverify-' + name);
-       inputFeedback(elem, (data == 'OK'), data);
-     },
-     error: function(err) {
-       alert('数据通信错误: ' + err.toString());
-     }
-   });
- }
- function checkPassword() {
-   pwd = $('#reginput-password').val();
-   elem = $('#regverify-password');
-   inputFeedback(elem, (pwd.length >= 6), '密码长度必须大于等于 6 个字符！');
- }
- function checkConfirmPassword() {
-   elem = $('#regverify-confirm-password');
-   inputFeedback(elem, ($('#reginput-password').val() === $('#reginput-confirm-password').val()), '两次输入的密码不匹配！');
- }
-</script>
+    <script>
+        $('#reginput-email').focus();
+
+        function inputFeedback(elem, ok, error_msg) {
+            elem.find('.form-control-feedback').hide();
+            if (ok) {
+                elem.attr('class', 'form-group has-success has-feedback');
+                elem.find('.glyphicon-ok').show();
+                elem.find('.help-block').hide();
+            } else {
+                elem.attr('class', 'form-group has-error has-feedback');
+                elem.find('.help-block').text(error_msg);
+                elem.find('.help-block').show();
+                elem.find('.glyphicon-remove').show();
+            }
+        }
+
+        function regverify(name) {
+            $.ajax({
+                type: "get",
+                url: "{{ url_for('api.reg_verify') }}",
+                async: true,
+                data: {
+                    name: name,
+                    value: $('#reginput-' + name).val(),
+                },
+                success: function (data) {
+                    elem = $('#regverify-' + name);
+                    inputFeedback(elem, (data == 'OK'), data);
+                },
+                error: function (err) {
+                    alert('数据通信错误: ' + err.toString());
+                }
+            });
+        }
+
+        function checkPassword() {
+            pwd = $('#reginput-password').val();
+            elem = $('#regverify-password');
+            inputFeedback(elem, (pwd.length >= 6), '密码长度必须大于等于 6 个字符！');
+        }
+
+        function checkConfirmPassword() {
+            elem = $('#regverify-confirm-password');
+            inputFeedback(elem, ($('#reginput-password').val() === $('#reginput-confirm-password').val()), '两次输入的密码不匹配！');
+        }
+    </script>
 {% endblock %}

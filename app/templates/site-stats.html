@@ -1,591 +1,592 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<script src="/static/js/highcharts/highcharts.js"></script>
-<script src="/static/js/highcharts/exporting.js"></script>
-<script src="/static/js/highcharts/export-data.js"></script>
-<script src="/static/js/highcharts/accessibility.js"></script>
+    <script src="/static/js/highcharts/highcharts.js"></script>
+    <script src="/static/js/highcharts/exporting.js"></script>
+    <script src="/static/js/highcharts/export-data.js"></script>
+    <script src="/static/js/highcharts/accessibility.js"></script>
 
-<link href="/static/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-datepicker3.min.css" rel="stylesheet">
 
-<style>
-.highcharts-figure,
-.highcharts-data-table table {
-    margin: 1em auto;
-}
-
-.highcharts-data-table table {
-    font-family: Verdana, sans-serif;
-    border-collapse: collapse;
-    border: 1px solid #ebebeb;
-    margin: 10px auto;
-    text-align: center;
-    width: 100%;
-    max-width: 500px;
-}
-
-.highcharts-data-table caption {
-    padding: 1em 0;
-    font-size: 1.2em;
-    color: #555;
-}
-
-.highcharts-data-table th {
-    font-weight: 600;
-    padding: 0.5em;
-}
-
-.highcharts-data-table td,
-.highcharts-data-table th,
-.highcharts-data-table caption {
-    padding: 0.5em;
-}
-
-.highcharts-data-table thead tr,
-.highcharts-data-table tr:nth-child(even) {
-    background: #f8f8f8;
-}
-
-.highcharts-data-table tr:hover {
-    background: #f1f7ff;
-}
-</style>
-
-<div class="container">
-  <div class="row float-element">
-
-    <div class="col-md-offset-1 col-md-10" style="padding: 0;">
-      <div class="center top-pd-md bm-pd-lg desktop">
-        <span class="h3 blue"><strong>评课社区统计信息</strong></span>
-        <span>（{{ date }}）<span>
-      </div>
-      <div class="top-pd-md bm-pd-lg mobile">
-        <span class="h3 blue"><strong>评课社区统计信息</strong></span>
-        <span>（{{ date }}）<span>
-      </div>
-
-      <div class="col-md-4" style="padding: 0;">
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>统计信息</strong></span>
-        </div>
-	<table class="table">
-          <tr>
-	    <td>运行天数</td>
-            <td>{{ site_stat['running_days'] }}</td>
-          </tr>
-          <tr>
-	    <td>用户数</td>
-            <td>{{ site_stat['user_count'] }}</td>
-          </tr>
-          <tr>
-	    <td>课程数</td>
-            <td>{{ site_stat['course_count'] }}</td>
-          </tr>
-          <tr>
-	    <td>点评数</td>
-            <td>{{ site_stat['review_count'] }}</td>
-          </tr>
-          <tr>
-	    <td>注册教师数</td>
-            <td>{{ site_stat['registered_teacher_count'] }}</td>
-          </tr>
-        {% if 'course_avg_rate' in site_stat %}
-          <tr>
-	    <td>平均评分</td>
-            <td>{{ '%.2f' % site_stat['course_avg_rate'] }} / 10</td>
-          </tr>
-        {% endif %}
-        {% if 'course_avg_rate_count' in site_stat %}
-          <tr>
-	    <td>平均每门课的点评数</td>
-            <td>{{ '%.2f' % site_stat['course_avg_rate_count'] }}</td>
-          </tr>
-        {% endif %}
-	</table>
-      </div>
-      </div>
-      <div class="clearfix"></div>
-
-      <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>点评评分分布</strong></span>
-        </div>
-
-<figure class="highcharts-figure">
-    <div id="review-rate-dist"></div>
-</figure>
-<script>
-Highcharts.chart('review-rate-dist', {
-    chart: {
-        type: 'column'
-    },
-    exporting: {
-        filename: 'review-rate-distribution'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in review_rates %}
-	{{ tuple['rate'] }},
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: '点评数量'
+    <style>
+        .highcharts-figure,
+        .highcharts-data-table table {
+            margin: 1em auto;
         }
-    },
-    tooltip: {
-	headerFormat: '<table>',
-	pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
-            '<td style="padding:0"><b>{point.y}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 个点评的评分为 </td>',
-        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
-	    '</tr></table>',
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
+
+        .highcharts-data-table table {
+            font-family: Verdana, sans-serif;
+            border-collapse: collapse;
+            border: 1px solid #ebebeb;
+            margin: 10px auto;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
         }
-    },
-    series: [{
-	name: '评分',
-        data: [
-        {% for tuple in review_rates %}
-	{{ tuple['count'] }},
-        {% endfor %}
-	]
-    }]
-});
-</script>
-      </div>
 
-      <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>课程评分分布</strong></span>
-        </div>
-
-<figure class="highcharts-figure">
-    <div id="course-rate-dist"></div>
-</figure>
-<script>
-Highcharts.chart('course-rate-dist', {
-    chart: {
-        type: 'column'
-    },
-    exporting: {
-        filename: 'course-rate-distribution'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in course_rates %}
-	{% if tuple[0] < 10 %}
-	  "{{ tuple[0]|int }}-{{ tuple[0]|int + 1}}",
-	{% else %}
-	  {{ tuple[0] }},
-	{% endif %}
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: '课程数'
+        .highcharts-data-table caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
         }
-    },
-    tooltip: {
-	headerFormat: '<table>',
-	pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
-            '<td style="padding:0"><b>{point.y}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 门课程的平均分为 </td>',
-        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> 分</td>' +
-	    '</tr></table>',
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
+
+        .highcharts-data-table th {
+            font-weight: 600;
+            padding: 0.5em;
         }
-    },
-    series: [{
-	name: '课程平均评分',
-        data: [
-        {% for tuple in course_rates %}
-	{{ tuple[1] }},
-        {% endfor %}
-	]
-    }]
-});
-</script>
-      </div>
 
-      <div class="clearfix"></div>
-
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>课程点评数量分布</strong></span>
-        </div>
-
-<figure class="highcharts-figure">
-    <div id="num-reviews-per-course"></div>
-</figure>
-<script>
-Highcharts.chart('num-reviews-per-course', {
-    chart: {
-        type: 'line'
-    },
-    exporting: {
-        filename: 'num-reviews-per-course'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in course_review_count_dist %}
-	{{ tuple[0] }},
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: [{
-        min: 0,
-        title: {
-            text: '课程数量'
+        .highcharts-data-table td,
+        .highcharts-data-table th,
+        .highcharts-data-table caption {
+            padding: 0.5em;
         }
-    }],
-    tooltip: {
-        formatter: function() {
-            var s = [];
-            var point = this.points[1];
-            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
-                   '<strong>' + point.y + '</strong> 门课程有<strong>至少 ' + point.x + '</strong> 条点评<br>');
-            point = this.points[0];
-            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
-                   '<strong>' + point.y + '</strong> 门课程有<strong>恰好 ' + point.x + '</strong> 条点评<br>');
-            return s.join('');
-        },
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
+
+        .highcharts-data-table thead tr,
+        .highcharts-data-table tr:nth-child(even) {
+            background: #f8f8f8;
         }
-    },
-    series: [{
-        name: '恰好有N个点评的课程数',
-        type: 'column',
-        data: [
-        {% for tuple in course_review_count_dist %}
-        {{ tuple[1] }},
-        {% endfor %}
-	    ]
-    }, {
-        name: '至少有N个点评的课程数',
-        type: 'spline',
-        color: '#fd7e14',
-        data: [
-        {% set total = namespace(value=0) %}
-        {% for tuple in course_review_count_dist %}
-        {% set total.value = total.value + tuple[1] %}
-        {% endfor %}
 
-        {% for tuple in course_review_count_dist %}
-        {{ total.value }},
-        {% set total.value = total.value - tuple[1] %}
-        {% endfor %}
-        ]
-    }]
-});
-</script>
-      </div>
-
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>用户写点评数量分布</strong></span>
-        </div>
-
-<figure class="highcharts-figure">
-    <div id="num-reviews-per-user"></div>
-</figure>
-<script>
-Highcharts.chart('num-reviews-per-user', {
-    chart: {
-        type: 'line'
-    },
-    exporting: {
-        filename: 'num-reviews-per-user'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in user_review_count_dist %}
-	{{ tuple[0] }},
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: [{
-        min: 0,
-        title: {
-            text: '用户数量'
+        .highcharts-data-table tr:hover {
+            background: #f1f7ff;
         }
-    }],
-    tooltip: {
-        formatter: function() {
-            var s = [];
-            var point = this.points[1];
-            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
-                   '<strong>' + point.y + '</strong> 个用户写了<strong>至少 ' + point.x + '</strong> 条点评<br>');
-            point = this.points[0];
-            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
-                   '<strong>' + point.y + '</strong> 个用户写了<strong>恰好 ' + point.x + '</strong> 条点评<br>');
-            return s.join('');
-        },
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: [{
-        type: 'column',
-        name: '恰好写了N个点评的用户数',
-        data: [
-        {% for tuple in user_review_count_dist %}
-        {{ tuple[1] }},
-        {% endfor %}
-	    ]
-    }, {
-        type: 'spline',
-        name: '至少写了N个点评的用户数',
-        color: '#fd7e14',
-        data: [
-        {% set total = namespace(value=0) %}
-        {% for tuple in user_review_count_dist %}
-        {% set total.value = total.value + tuple[1] %}
-        {% endfor %}
+    </style>
 
-        {% for tuple in user_review_count_dist %}
-        {{ total.value }},
-        {% set total.value = total.value - tuple[1] %}
-        {% endfor %}
-        ]
-    }]
-});
-</script>
-      </div>
+    <div class="container">
+        <div class="row float-element">
 
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>每月新增点评数</strong></span>
-        </div>
+            <div class="col-md-offset-1 col-md-10" style="padding: 0;">
+                <div class="center top-pd-md bm-pd-lg desktop">
+                    <span class="h3 blue"><strong>评课社区统计信息</strong></span>
+                    <span>（{{ date }}）<span>
+                </div>
+                <div class="top-pd-md bm-pd-lg mobile">
+                    <span class="h3 blue"><strong>评课社区统计信息</strong></span>
+                    <span>（{{ date }}）<span>
+                </div>
 
-<figure class="highcharts-figure">
-    <div id="new-reviews-per-month"></div>
-</figure>
-<script>
-Highcharts.chart('new-reviews-per-month', {
-    chart: {
-        type: 'line'
-    },
-    exporting: {
-        filename: 'num-reviews-per-month'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in review_dates %}
-	"{{ tuple.publish_year }}-{{ tuple.publish_month if tuple.publish_month >= 10 else '0' ~ tuple.publish_month }}",
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: [{
-        min: 0,
-        title: {
-            text: '每月新增点评数'
-        }
-    }, {
-        min: 0,
-        title: {
-            text: '总点评数'
-        },
-        opposite: true
-    }],
-    tooltip: {
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: [{
-	name: '每月新增点评数',
-        yAxis: 0,
-        data: [
-        {% for tuple in review_dates %}
-	{{ tuple.review_count }},
-        {% endfor %}
-	]
-    }, {
-	name: '总点评数',
-        color: '#fd7e14',
-        yAxis: 1,
-        data: [
-	{% set total = namespace(value=0) %}
-        {% for tuple in review_dates %}
-	{% set total.value = total.value + tuple.review_count %}
-	{{ total.value }},
-        {% endfor %}
-	]
-    }]
-});
-</script>
-      </div>
+                <div class="col-md-4" style="padding: 0;">
+                    <div class="ud-pd-sm">
+                        <div class="bm-pd-sm">
+                            <span class="h4"><strong>统计信息</strong></span>
+                        </div>
+                        <table class="table">
+                            <tr>
+                                <td>运行天数</td>
+                                <td>{{ site_stat['running_days'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>用户数</td>
+                                <td>{{ site_stat['user_count'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>课程数</td>
+                                <td>{{ site_stat['course_count'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>点评数</td>
+                                <td>{{ site_stat['review_count'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>注册教师数</td>
+                                <td>{{ site_stat['registered_teacher_count'] }}</td>
+                            </tr>
+                            {% if 'course_avg_rate' in site_stat %}
+                                <tr>
+                                    <td>平均评分</td>
+                                    <td>{{ '%.2f' % site_stat['course_avg_rate'] }} / 10</td>
+                                </tr>
+                            {% endif %}
+                            {% if 'course_avg_rate_count' in site_stat %}
+                                <tr>
+                                    <td>平均每门课的点评数</td>
+                                    <td>{{ '%.2f' % site_stat['course_avg_rate_count'] }}</td>
+                                </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
 
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>每月新增用户数</strong></span>
-        </div>
+                <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>点评评分分布</strong></span>
+                    </div>
 
-<figure class="highcharts-figure">
-    <div id="num-users-per-month"></div>
-</figure>
-<script>
-Highcharts.chart('num-users-per-month', {
-    chart: {
-        type: 'line'
-    },
-    exporting: {
-        filename: 'num-users-per-month'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in user_reg_dates %}
-	"{{ tuple.reg_year }}-{{ tuple.reg_month if tuple.reg_month >= 10 else '0' ~ tuple.reg_month }}",
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: [{
-        min: 0,
-        title: {
-            text: '每月新增用户数'
-        }
-    }, {
-        min: 0,
-        title: {
-            text: '总用户数'
-        },
-        opposite: true
-    }],
-    tooltip: {
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: [{
-	name: '每月新增用户数',
-        yAxis: 0,
-        data: [
-        {% for tuple in user_reg_dates %}
-	{{ tuple.user_count }},
-        {% endfor %}
-	]
-    }, {
-	name: '总用户数',
-        yAxis: 1,
-        color: '#fd7e14',
-        data: [
-	{% set total = namespace(value=0) %}
-        {% for tuple in user_reg_dates %}
-	{% set total.value = total.value + tuple.user_count %}
-	{{ total.value }},
-        {% endfor %}
-	]
-    }]
-});
-</script>
-      </div>
+                    <figure class="highcharts-figure">
+                        <div id="review-rate-dist"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('review-rate-dist', {
+                            chart: {
+                                type: 'column'
+                            },
+                            exporting: {
+                                filename: 'review-rate-distribution'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in review_rates %}
+                                        {{ tuple['rate'] }},
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: '点评数量'
+                                }
+                            },
+                            tooltip: {
+                                headerFormat: '<table>',
+                                pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
+                                    '<td style="padding:0"><b>{point.y}</b></td>' +
+                                    '<td style="color:{series.color};padding:0"> 个点评的评分为 </td>',
+                                footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
+                                    '</tr></table>',
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                name: '评分',
+                                data: [
+                                    {% for tuple in review_rates %}
+                                        {{ tuple['count'] }},
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
 
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>历史统计</strong></span>
-        </div>
-	<form method="get" action="{{ url_for('stats.stats_history') }}">
-          <div class="input-group col-md-2">
-	    <input type="text" class="form-control" id="stats-datepicker" name="date" value="{{ date }}" required>
-	    <div class="input-group-btn">
-              <button type="submit" class="btn btn-primary">Go!</button>
-	    </div>
-	  </div>
-	</form>
-      </div>
+                <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>课程评分分布</strong></span>
+                    </div>
 
-    </div>
-  </div><!-- end float-element -->
-</div><!-- end container -->
+                    <figure class="highcharts-figure">
+                        <div id="course-rate-dist"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('course-rate-dist', {
+                            chart: {
+                                type: 'column'
+                            },
+                            exporting: {
+                                filename: 'course-rate-distribution'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in course_rates %}
+                                        {% if tuple[0] < 10 %}
+                                            "{{ tuple[0]|int }}-{{ tuple[0]|int + 1}}",
+                                        {% else %}
+                                            {{ tuple[0] }},
+                                        {% endif %}
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: '课程数'
+                                }
+                            },
+                            tooltip: {
+                                headerFormat: '<table>',
+                                pointFormat: '<tr><td style="color:{series.color};padding:0">共有 </td>' +
+                                    '<td style="padding:0"><b>{point.y}</b></td>' +
+                                    '<td style="color:{series.color};padding:0"> 门课程的平均分为 </td>',
+                                footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
+                                    '<td style="color:{series.color};padding:0"> 分</td>' +
+                                    '</tr></table>',
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                name: '课程平均评分',
+                                data: [
+                                    {% for tuple in course_rates %}
+                                        {{ tuple[1] }},
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="ud-pd-sm">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>课程点评数量分布</strong></span>
+                    </div>
+
+                    <figure class="highcharts-figure">
+                        <div id="num-reviews-per-course"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('num-reviews-per-course', {
+                            chart: {
+                                type: 'line'
+                            },
+                            exporting: {
+                                filename: 'num-reviews-per-course'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in course_review_count_dist %}
+                                        {{ tuple[0] }},
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: [{
+                                min: 0,
+                                title: {
+                                    text: '课程数量'
+                                }
+                            }],
+                            tooltip: {
+                                formatter: function () {
+                                    var s = [];
+                                    var point = this.points[1];
+                                    s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                                        '<strong>' + point.y + '</strong> 门课程有<strong>至少 ' + point.x + '</strong> 条点评<br>');
+                                    point = this.points[0];
+                                    s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                                        '<strong>' + point.y + '</strong> 门课程有<strong>恰好 ' + point.x + '</strong> 条点评<br>');
+                                    return s.join('');
+                                },
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                name: '恰好有N个点评的课程数',
+                                type: 'column',
+                                data: [
+                                    {% for tuple in course_review_count_dist %}
+                                        {{ tuple[1] }},
+                                    {% endfor %}
+                                ]
+                            }, {
+                                name: '至少有N个点评的课程数',
+                                type: 'spline',
+                                color: '#fd7e14',
+                                data: [
+                                    {% set total = namespace(value=0) %}
+                                    {% for tuple in course_review_count_dist %}
+                                        {% set total.value = total.value + tuple[1] %}
+                                    {% endfor %}
+
+                                    {% for tuple in course_review_count_dist %}
+                                        {{ total.value }},
+                                        {% set total.value = total.value - tuple[1] %}
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
+
+                <div class="ud-pd-sm">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>用户写点评数量分布</strong></span>
+                    </div>
+
+                    <figure class="highcharts-figure">
+                        <div id="num-reviews-per-user"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('num-reviews-per-user', {
+                            chart: {
+                                type: 'line'
+                            },
+                            exporting: {
+                                filename: 'num-reviews-per-user'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in user_review_count_dist %}
+                                        {{ tuple[0] }},
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: [{
+                                min: 0,
+                                title: {
+                                    text: '用户数量'
+                                }
+                            }],
+                            tooltip: {
+                                formatter: function () {
+                                    var s = [];
+                                    var point = this.points[1];
+                                    s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                                        '<strong>' + point.y + '</strong> 个用户写了<strong>至少 ' + point.x + '</strong> 条点评<br>');
+                                    point = this.points[0];
+                                    s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                                        '<strong>' + point.y + '</strong> 个用户写了<strong>恰好 ' + point.x + '</strong> 条点评<br>');
+                                    return s.join('');
+                                },
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                type: 'column',
+                                name: '恰好写了N个点评的用户数',
+                                data: [
+                                    {% for tuple in user_review_count_dist %}
+                                        {{ tuple[1] }},
+                                    {% endfor %}
+                                ]
+                            }, {
+                                type: 'spline',
+                                name: '至少写了N个点评的用户数',
+                                color: '#fd7e14',
+                                data: [
+                                    {% set total = namespace(value=0) %}
+                                    {% for tuple in user_review_count_dist %}
+                                        {% set total.value = total.value + tuple[1] %}
+                                    {% endfor %}
+
+                                    {% for tuple in user_review_count_dist %}
+                                        {{ total.value }},
+                                        {% set total.value = total.value - tuple[1] %}
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
+
+                <div class="ud-pd-sm">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>每月新增点评数</strong></span>
+                    </div>
+
+                    <figure class="highcharts-figure">
+                        <div id="new-reviews-per-month"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('new-reviews-per-month', {
+                            chart: {
+                                type: 'line'
+                            },
+                            exporting: {
+                                filename: 'num-reviews-per-month'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in review_dates %}
+                                        "{{ tuple.publish_year }}-{{ tuple.publish_month if tuple.publish_month >= 10 else '0' ~ tuple.publish_month }}",
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: [{
+                                min: 0,
+                                title: {
+                                    text: '每月新增点评数'
+                                }
+                            }, {
+                                min: 0,
+                                title: {
+                                    text: '总点评数'
+                                },
+                                opposite: true
+                            }],
+                            tooltip: {
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                name: '每月新增点评数',
+                                yAxis: 0,
+                                data: [
+                                    {% for tuple in review_dates %}
+                                        {{ tuple.review_count }},
+                                    {% endfor %}
+                                ]
+                            }, {
+                                name: '总点评数',
+                                color: '#fd7e14',
+                                yAxis: 1,
+                                data: [
+                                    {% set total = namespace(value=0) %}
+                                    {% for tuple in review_dates %}
+                                        {% set total.value = total.value + tuple.review_count %}
+                                        {{ total.value }},
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
+
+                <div class="ud-pd-sm">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>每月新增用户数</strong></span>
+                    </div>
+
+                    <figure class="highcharts-figure">
+                        <div id="num-users-per-month"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('num-users-per-month', {
+                            chart: {
+                                type: 'line'
+                            },
+                            exporting: {
+                                filename: 'num-users-per-month'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in user_reg_dates %}
+                                        "{{ tuple.reg_year }}-{{ tuple.reg_month if tuple.reg_month >= 10 else '0' ~ tuple.reg_month }}",
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: [{
+                                min: 0,
+                                title: {
+                                    text: '每月新增用户数'
+                                }
+                            }, {
+                                min: 0,
+                                title: {
+                                    text: '总用户数'
+                                },
+                                opposite: true
+                            }],
+                            tooltip: {
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                name: '每月新增用户数',
+                                yAxis: 0,
+                                data: [
+                                    {% for tuple in user_reg_dates %}
+                                        {{ tuple.user_count }},
+                                    {% endfor %}
+                                ]
+                            }, {
+                                name: '总用户数',
+                                yAxis: 1,
+                                color: '#fd7e14',
+                                data: [
+                                    {% set total = namespace(value=0) %}
+                                    {% for tuple in user_reg_dates %}
+                                        {% set total.value = total.value + tuple.user_count %}
+                                        {{ total.value }},
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
+
+                <div class="ud-pd-sm">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>历史统计</strong></span>
+                    </div>
+                    <form method="get" action="{{ url_for('stats.stats_history') }}">
+                        <div class="input-group col-md-2">
+                            <input type="text" class="form-control" id="stats-datepicker" name="date" value="{{ date }}"
+                                   required>
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-primary">Go!</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div><!-- end float-element -->
+    </div><!-- end container -->
 {% endblock %}
 {% block script %}
-<script src="/static/js/bootstrap-datepicker.min.js"></script>
-<script>
-$('#stats-datepicker').datepicker({
-    format: 'yyyy/mm/dd',
-    endDate: '0d'
-});
-</script>
+    <script src="/static/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $('#stats-datepicker').datepicker({
+            format: 'yyyy/mm/dd',
+            endDate: '0d'
+        });
+    </script>
 {% endblock %}

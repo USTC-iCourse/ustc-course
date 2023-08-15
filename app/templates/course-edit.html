@@ -1,124 +1,141 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
+    <div class="container">
 
-  <div class="row float-element">
-    <div class="row">
-      <div class="col-md-8 inline-h3">
-        <span class="blue h3"><a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}</a></span><span class="h3 blue mobile">（{{ course.teacher.name }}）</span>
-        <span class="small grey align-bottom left-pd-sm">学期：{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
-        <hr>
+        <div class="row float-element">
+            <div class="row">
+                <div class="col-md-8 inline-h3">
+                    <span class="blue h3"><a
+                            href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}</a></span><span
+                        class="h3 blue mobile">（{{ course.teacher.name }}）</span>
+                    <span class="small grey align-bottom left-pd-sm">学期：{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
+                    <hr>
 
-        <table class="table table-condensed no-border">
-          <tr>
-            <td><strong>学科类别：</strong>{{ course.course_major or '未知' }}</td>
-            <td><strong>开课单位：</strong>{{ course.dept or '未知' }}</td>
-          </tr>
-          <tr>
-            <td><strong>课程层次：</strong>{{ course.course_level or '未知' }}</td>
-            <td><strong>学分：</strong>{{ course.credit or '未知' }}
-          </tr>
-          <tr>
-            <td><strong>时间：</strong>{{ course.time_locations_display or '未知' }}</td>
-            <td><strong>地点：</strong>{{ course.term_ids|term_display or '未知' }}
-              <span class="float-right"><a href="http://mis.teach.ustc.edu.cn/gradkcjs.do?kcid={{ course.kcid }}" target="_blank">更多信息</a><span></td>
-          </tr>
-          <!--
+                    <table class="table table-condensed no-border">
+                        <tr>
+                            <td><strong>学科类别：</strong>{{ course.course_major or '未知' }}</td>
+                            <td><strong>开课单位：</strong>{{ course.dept or '未知' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>课程层次：</strong>{{ course.course_level or '未知' }}</td>
+                            <td><strong>学分：</strong>{{ course.credit or '未知' }}
+                        </tr>
+                        <tr>
+                            <td><strong>时间：</strong>{{ course.time_locations_display or '未知' }}</td>
+                            <td><strong>地点：</strong>{{ course.term_ids|term_display or '未知' }}
+                                <span class="float-right"><a
+                                        href="http://mis.teach.ustc.edu.cn/gradkcjs.do?kcid={{ course.kcid }}"
+                                        target="_blank">更多信息</a><span></td>
+                        </tr>
+                        <!--
           暂时不用这些
           <td><strong>评分制：</strong>{{ course.grading_type or '未知' }}</td>
           <td><strong>周学时：</strong>{{ course.hours_per_week or '未知' }}</td>
           -->
-          </tbody>
-        </table>
-        <p><a href="{{ url_for('course.profile_history', course_id=course.id) }}">查看编辑历史（共 {{ course.info_history_count }} 次）</a></p>
+                        </tbody>
+                    </table>
+                    <p>
+                        <a href="{{ url_for('course.profile_history', course_id=course.id) }}">查看编辑历史（共 {{ course.info_history_count }}
+                            次）</a></p>
 
-        <form method="post" enctype="multipart/form-data">
-          {{ form.csrf_token }}
-          <div class="form-group">
-            <label class="control-label">课程主页链接</label>
-            <input class="form-control" type="text" name="homepage" value="{{ course.homepage or '' }}">
-          </div>
-          <div class="form-group">
-            <label class="control-label">课程简介</label>
-            <p>课程简介是公共编辑的，应该是尽量客观的信息（如课程大纲、教材、考试形式等）。主观评价请写在点评里。</p>
-            <p>助教、课程QQ/微信群等信息建议注明学期，以免与往年的混淆。</p>
-            <textarea class="form-control content-editor" name="introduction" rows="5">{{ course.introduction or ''|safe }}</textarea>
-          </div>
-          {% if current_user.is_admin %}
-	  <div class="form-group">
-	    <label class="control-label">管理员公告</label>
-	    <textarea class="form-control content-editor" name="admin_announcement" rows="5">{{ course.admin_announcement or ''|safe }}</textarea>
-	  </div>
-	  {% endif %}
-          <button type="submit" class="btn btn-sm btn-default">提交</button>
-        </form>
+                    <form method="post" enctype="multipart/form-data">
+                        {{ form.csrf_token }}
+                        <div class="form-group">
+                            <label class="control-label">课程主页链接</label>
+                            <input class="form-control" type="text" name="homepage" value="{{ course.homepage or '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">课程简介</label>
+                            <p>
+                                课程简介是公共编辑的，应该是尽量客观的信息（如课程大纲、教材、考试形式等）。主观评价请写在点评里。</p>
+                            <p>助教、课程QQ/微信群等信息建议注明学期，以免与往年的混淆。</p>
+                            <textarea class="form-control content-editor" name="introduction"
+                                      rows="5">{{ course.introduction or ''|safe }}</textarea>
+                        </div>
+                        {% if current_user.is_admin %}
+                            <div class="form-group">
+                                <label class="control-label">管理员公告</label>
+                                <textarea class="form-control content-editor" name="admin_announcement"
+                                          rows="5">{{ course.admin_announcement or ''|safe }}</textarea>
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-sm btn-default">提交</button>
+                    </form>
 
-      </div>
+                </div>
 
-      <!-- 右边栏 -->
+                <!-- 右边栏 -->
 
-      <div class="col-md-4 rl-pd-lg">
-        {% for teacher in course.teachers %}
-        <div class="ud-pd-md dashed">
-          <img class="avatar-lg circle" src="{{ teacher.image }}"/>
-          {% if current_user.is_authenticated %}
-          <btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
-          {% if current_user.is_admin %}
-          <btn class="btn btn-link float-right"><a href="javascript: remove_teacher({{ teacher.id }});">从课程中删除教师</a></btn>
-          {% endif %}
-          {% endif %}
-          <h3 class="blue"><a href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}">{{ teacher.name }}</a></h3>
-          <p>{{ teacher.dept.name }}</p>
-          <p>教师主页：
-            {% if teacher.homepage and teacher.homepage != 'http://' %}
-            <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>
-            {% else %}暂无{% endif %}
-          </p>
-        </div>
-        {% endfor %}
-        {% if course.teachers_count == 0 %}
-        <div class="ud-pd-md dashed">
-          <img class="avatar-lg circle" src="/static/image/teacher.jpg"/>
-          <h3 class="blue">老师甲</h3>
-        </div>
-        {% endif %}
+                <div class="col-md-4 rl-pd-lg">
+                    {% for teacher in course.teachers %}
+                        <div class="ud-pd-md dashed">
+                            <img class="avatar-lg circle" src="{{ teacher.image }}"/>
+                            {% if current_user.is_authenticated %}
+                                <btn class="btn btn-link float-right"><a
+                                        href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a>
+                                </btn>
+                                {% if current_user.is_admin %}
+                                    <btn class="btn btn-link float-right"><a
+                                            href="javascript: remove_teacher({{ teacher.id }});">从课程中删除教师</a>
+                                    </btn>
+                                {% endif %}
+                            {% endif %}
+                            <h3 class="blue"><a
+                                    href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}">{{ teacher.name }}</a>
+                            </h3>
+                            <p>{{ teacher.dept.name }}</p>
+                            <p>教师主页：
+                                {% if teacher.homepage and teacher.homepage != 'http://' %}
+                                    <a href="{{ teacher.homepage }}" target="_blank"><span
+                                            class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>
+                                {% else %}暂无{% endif %}
+                            </p>
+                        </div>
+                    {% endfor %}
+                    {% if course.teachers_count == 0 %}
+                        <div class="ud-pd-md dashed">
+                            <img class="avatar-lg circle" src="/static/image/teacher.jpg"/>
+                            <h3 class="blue">老师甲</h3>
+                        </div>
+                    {% endif %}
 
-        {% if current_user.is_admin %}
-        <div class="ud-pd-md dashed">
-          <h4 class="blue">添加教师</h4>
-          <form method="post" enctype="multipart/form-data" action="{{ url_for('course.add_teacher', course_id=course.id) }}" target="_blank">
-            {{ form.csrf_token }}
-            <input class="form-control" type="text" name="teacher_id" placeholder="教师ID，即教师页面URL的最后一个数字">
-            <button type="submit" class="btn btn-sm btn-default">添加教师</button>
-          </form>
-        </div>
-        {% endif %}
-      </div>
+                    {% if current_user.is_admin %}
+                        <div class="ud-pd-md dashed">
+                            <h4 class="blue">添加教师</h4>
+                            <form method="post" enctype="multipart/form-data"
+                                  action="{{ url_for('course.add_teacher', course_id=course.id) }}" target="_blank">
+                                {{ form.csrf_token }}
+                                <input class="form-control" type="text" name="teacher_id"
+                                       placeholder="教师ID，即教师页面URL的最后一个数字">
+                                <button type="submit" class="btn btn-sm btn-default">添加教师</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
 
-    </div> <!-- row -->
-  </div>  <!-- float-element  -->
-</div>  <!-- container -->
+            </div> <!-- row -->
+        </div>  <!-- float-element  -->
+    </div>  <!-- container -->
 {% endblock %}
 
 
 
 
 {% block script %}
-<script>
- function remove_teacher(teacher_id)
- {
-     if (!confirm('你真的要从课程中删除此教师吗？')) {
-         return;
-     }
-     $.post("{{ url_for('course.remove_teacher', course_id=course.id) }}", { teacher_id: teacher_id }, function(o) {
-         if (o.ok)
-            window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
-         else
-            alert(o.message);
-     }, 'json');
- }
-</script>
+    <script>
+        function remove_teacher(teacher_id) {
+            if (!confirm('你真的要从课程中删除此教师吗？')) {
+                return;
+            }
+            $.post("{{ url_for('course.remove_teacher', course_id=course.id) }}", {teacher_id: teacher_id}, function (o) {
+                if (o.ok)
+                    window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
+                else
+                    alert(o.message);
+            }, 'json');
+        }
+    </script>
 
-{% include 'ckeditor.html' %}
+    {% include 'ckeditor.html' %}
 {% endblock %}

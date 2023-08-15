@@ -1,34 +1,41 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
-    <div class="col-md-offset-1 col-md-10" style="padding: 0;">
-      <div class="center top-pd-md">
-        <span class="h3 blue"><strong>评课社区公告栏</strong></span>
+    <div class="container">
+        <div class="row float-element">
+            <div class="col-md-offset-1 col-md-10" style="padding: 0;">
+                <div class="center top-pd-md">
+                    <span class="h3 blue"><strong>评课社区公告栏</strong></span>
 
-        {% if current_user.is_admin %}
-        <a type="button" href="{{ url_for('admin.add_announcement') }}" class="btn btn-white float-right blue">发布公告</a>
-        {% endif %}
-      </div>
-      <div class="clearfix"></div>
+                    {% if current_user.is_admin %}
+                        <a type="button" href="{{ url_for('admin.add_announcement') }}"
+                           class="btn btn-white float-right blue">发布公告</a>
+                    {% endif %}
+                </div>
+                <div class="clearfix"></div>
 
-      {% for announcement in announcements %}
-      <div class="ud-pd-md dashed" id="announcement-{{ announcement.id }}">
-        <h3>{{ announcement.title }} <a class="grey nounderline" href="{{ url_for('home.announcements', _external=True) }}#announcement-{{ announcement.id }}">#</a></h3>
-        <p class="text-muted">{{ announcement.content|safe }}</p>
+                {% for announcement in announcements %}
+                    <div class="ud-pd-md dashed" id="announcement-{{ announcement.id }}">
+                        <h3>{{ announcement.title }} <a class="grey nounderline"
+                                                        href="{{ url_for('home.announcements', _external=True) }}#announcement-{{ announcement.id }}">#</a>
+                        </h3>
+                        <p class="text-muted">{{ announcement.content|safe }}</p>
 
-        <div class="grey bm-pd-md">
-	      <a href="{{ url_for('user.view_profile', user_id=announcement.author.id) }}">{{ announcement.author.username }}</a> 发表于
-          <span class="localtime" style="display: none;">{{ announcement.publish_time|utctime }}</span>
-	      {% if announcement.publish_time != announcement.update_time %}
-	      <span>（最后修改于</span> <span class="localtime" style="display: none;">{{ announcement.update_time|utctime }}</span><span>）</span>
-	      {% endif %}
+                        <div class="grey bm-pd-md">
+                            <a href="{{ url_for('user.view_profile', user_id=announcement.author.id) }}">{{ announcement.author.username }}</a>
+                            发表于
+                            <span class="localtime"
+                                  style="display: none;">{{ announcement.publish_time|utctime }}</span>
+                            {% if announcement.publish_time != announcement.update_time %}
+                                <span>（最后修改于</span><span class="localtime"
+                                                              style="display: none;">{{ announcement.update_time|utctime }}</span>
+                                <span>）</span>
+                            {% endif %}
 
-          {% if current_user.is_admin %}
-          <span class="pull-right">
+                            {% if current_user.is_admin %}
+                                <span class="pull-right">
             <a class="nounderline" href="{{ url_for('admin.edit_announcement', announcement_id=announcement.id) }}">
-              <span class="glyphicon glyphicon-pencil grey left-pd-sm small" aria-hidden="true" ></span>
+              <span class="glyphicon glyphicon-pencil grey left-pd-sm small" aria-hidden="true"></span>
               编辑
             </a>
             <a class="nounderline" href="javascript: delete_announcement({{ announcement.id }})">
@@ -36,31 +43,30 @@
               删除
             </a>
           </span>
-          {% endif %}
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div><!-- end float-element -->
-</div><!-- end container -->
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div><!-- end float-element -->
+    </div><!-- end container -->
 {% endblock %}
 
 {% block script %}
- <script>
- function delete_announcement(announcement_id)
- {
-     if (!confirm('你真的要删除这条公告吗？')) {
-         return;
-     }
-     $.post("{{ url_for('admin.delete_announcement') }}", { announcement_id: announcement_id }, function(o) {
-         if (o.ok)
-            window.location.reload();
-         else
-            alert(o.message);
-     }, 'json')
-     .fail(function() {
-         alert('删除公告失败，请重试');
-     });
- }
- </script>
+    <script>
+        function delete_announcement(announcement_id) {
+            if (!confirm('你真的要删除这条公告吗？')) {
+                return;
+            }
+            $.post("{{ url_for('admin.delete_announcement') }}", {announcement_id: announcement_id}, function (o) {
+                if (o.ok)
+                    window.location.reload();
+                else
+                    alert(o.message);
+            }, 'json')
+                .fail(function () {
+                    alert('删除公告失败，请重试');
+                });
+        }
+    </script>
 {% endblock %}

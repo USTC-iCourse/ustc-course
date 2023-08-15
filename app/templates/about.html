@@ -1,85 +1,97 @@
 {% extends "layout-simple.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
-    {{ error }}
+            {{ error }}
 
-    <h3 class="blue">USTC评课社区</h3>
-    <hr>
-    <div class="dark-grey desktop-width75">
-      <div class="ud-pd-sm">
-        <h4 class="blue">简介</h4>
-        <p>欢迎来到USTC评课社区！经过两个多月的赶工，USTC评课社区终于在 2015 年 5 月和大家见面了，至今已运行 {{ running_days }} 天。{{ num_users }} 位小伙伴们为 {{ course_count }} 门课程贡献了 {{ review_count }} 篇点评。</p>
-        <p>这是服务于科大师生的平台，在这里，你可以点评课程，获取课程信息，更多功能还在开发中...</p>
-      </div>
+            <h3 class="blue">XJTU评课社区</h3>
+            <hr>
+            <div class="dark-grey desktop-width75">
+                <div class="ud-pd-sm">
+                    <h4 class="blue">简介</h4>
+                    <p>欢迎来到XJTU评课社区！经过两个多月的赶工，XJTU评课社区终于在 2015 年 5
+                        月和大家见面了，至今已运行 {{ running_days }} 天。{{ num_users }} 位小伙伴们为 {{ course_count }}
+                        门课程贡献了 {{ review_count }} 篇点评。</p>
+                    <p>这是服务于科大师生的平台，在这里，你可以点评课程，获取课程信息，更多功能还在开发中...</p>
+                </div>
 
-      <!--
-      <div class="ud-pd-sm">
-        <h4 class="blue">产品由来</h4>
-        <p>每个老师都有自己的风格，每一门课也有自己的特点；没有最好的课程，只有哪些课程更适合自己。可是，每学期初选课的时候都很头疼耶！不仅不知道任课老师是不是自己喜欢的类型，连这门课大概要学哪些内容我都不知道。然而选课时间有限（一般只有三周），不足以判断是否应该选这门课、或者这个老师的课，而且开始上课之后再换班也影响上课效果（你总不可能把所有老师的第一节课都上一遍吧？可是有些老师只在第一节课介绍课程情况），教务系统课程信息形同虚设，问学长学姐也不一定靠谱（每个人的喜好不同啊！），选课特么是一件很烦人的事情耶！而且选坑课了以后，错过时间还不能退课，我就经常遇到这种情况，直接影响学习热情。
-          <br>
-          <br><strong>不，选课不应该这么困难！</strong>
-          <br>
-          <br>因此我们希望模仿MOOC学院，做一个校内的课程信息的分享平台，这里不仅提供课程的简要信息（如时间、地点），更重要的提供课程评价。同学们可以在这里分享自己对课程的了解，更可以通过看其他人的点评来更好的选择自己的课程。
-        </p>
-      </div>
-        -->
+                <!--
+                <div class="ud-pd-sm">
+                  <h4 class="blue">产品由来</h4>
+                  <p>每个老师都有自己的风格，每一门课也有自己的特点；没有最好的课程，只有哪些课程更适合自己。可是，每学期初选课的时候都很头疼耶！不仅不知道任课老师是不是自己喜欢的类型，连这门课大概要学哪些内容我都不知道。然而选课时间有限（一般只有三周），不足以判断是否应该选这门课、或者这个老师的课，而且开始上课之后再换班也影响上课效果（你总不可能把所有老师的第一节课都上一遍吧？可是有些老师只在第一节课介绍课程情况），教务系统课程信息形同虚设，问学长学姐也不一定靠谱（每个人的喜好不同啊！），选课特么是一件很烦人的事情耶！而且选坑课了以后，错过时间还不能退课，我就经常遇到这种情况，直接影响学习热情。
+                    <br>
+                    <br><strong>不，选课不应该这么困难！</strong>
+                    <br>
+                    <br>因此我们希望模仿MOOC学院，做一个校内的课程信息的分享平台，这里不仅提供课程的简要信息（如时间、地点），更重要的提供课程评价。同学们可以在这里分享自己对课程的了解，更可以通过看其他人的点评来更好的选择自己的课程。
+                  </p>
+                </div>
+                  -->
 
-      <div class="ud-pd-sm">
-        <h4 class="blue">愿景</h4>
-        <p>促进校内课程信息公开，帮助学生找到更适合自己的课程。</p>
-      </div>
+                <div class="ud-pd-sm">
+                    <h4 class="blue">愿景</h4>
+                    <p>促进校内课程信息公开，帮助学生找到更适合自己的课程。</p>
+                </div>
 
-      <div class="ud-pd-sm">
-        <h4 class="blue">开发团队</h4>
-          <p>我们拉了一帮小伙伴一起来做这个网站，分工大概是这样的： </p>
-        <ul class="list-unstyled lh-lg">
-          <li>产品：张静宁（<a href="https://jenny42.com/" target="_blank">jenny42</a>）</li>
-          <li>后端：李博杰（<a href="https://ring0.me/whoami/" target="_blank">boj</a>）、常震（<a href="https://www.zmyth.me/" target="_blank">Aaron1992</a>）</li>
-          <li>前端：张静宁（<a href="https://jenny42.com/" target="_blank">jenny42</a>）</li>
-          <li>友情帮助：郑子涵（<a href="https://zhengzihan.com/" target="_blank">zzh1996</a>）</li>
-        </ul>
-      </div>
+                <div class="ud-pd-sm">
+                    <h4 class="blue">开发团队</h4>
+                    <p>我们拉了一帮小伙伴一起来做这个网站，分工大概是这样的： </p>
+                    <ul class="list-unstyled lh-lg">
+                        <li>产品：张静宁（<a href="https://jenny42.com/" target="_blank">jenny42</a>）</li>
+                        <li>后端：李博杰（<a href="https://ring0.me/whoami/" target="_blank">boj</a>）、常震（<a
+                                href="https://www.zmyth.me/" target="_blank">Aaron1992</a>）
+                        </li>
+                        <li>前端：张静宁（<a href="https://jenny42.com/" target="_blank">jenny42</a>）</li>
+                        <li>友情帮助：郑子涵（<a href="https://zhengzihan.com/" target="_blank">zzh1996</a>）</li>
+                    </ul>
+                </div>
 
-      <div class="ud-pd-sm">
-        <h4 class="blue">开源</h4>
-        <p>评课社区代码以 GNU AGPL v3 协议开源。<a href="https://github.com/USTC-iCourse/ustc-course" target="_blank">https://github.com/USTC-iCourse/ustc-course</a></p>
-      </div>
+                <div class="ud-pd-sm">
+                    <h4 class="blue">开源</h4>
+                    <p>评课社区代码以 GNU AGPL v3 协议开源。<a href="https://github.com/XJTU-iCourse/ustc-course"
+                                                              target="_blank">https://github.com/XJTU-iCourse/ustc-course</a>
+                    </p>
+                </div>
 
-      <div class="ud-pd-sm">
-        <h4 class="blue">评课社区 Telegram channel</h4>
-	<p><a href="https://t.me/ustc_icourse" target="_blank">https://t.me/ustc_icourse</a></p>
-        <p><img src="/static/image/telegram_channel.jpg" width="40%" /></p>
-      </div>
+                <div class="ud-pd-sm">
+                    <h4 class="blue">评课社区 Telegram channel</h4>
+                    <p><a href="https://t.me/ustc_icourse" target="_blank">https://t.me/ustc_icourse</a></p>
+                    <p><img src="/static/image/telegram_channel.jpg" width="40%"/></p>
+                </div>
 
-      <div class="ud-pd-sm lh-lg">
-        <h4 class="blue">联系我们</h4>
-        <ul class="list-unstyled">
-        <li>1. 如果我们提供的信息有偏差：如课程信息上的错误、老师的头像不对，或者用户信息不对，或者课程不全（本站使用程序从公开课程信息中抓取数据，可能出bug或者更新不及时）</li>
-        <li>2. 如果你对我们的社区有什么想法或者建议</li>
-        <li>3. 如果你发现我们的网站有bug或者漏洞，或者发生故障</li>
-        <li>4. 如果你看到社区里有不当言论（侮辱、攻击、色情、广告等）</li>
-        <li>5. 如果你是老师，你愿意给我们平台提供更多自己的课程信息（如课程简介）</li>
-        <li>6. 如果你是老师，你觉得我们平台上自己的头像太丑，想要给我们发自己的头像（好的头像能吸引更多学生报你的课哟！），或者你不希望我们平台使用您的照片作为头像（本站使用程序从科大域名的网站上抓取头像，可能不准确）</li>
-        </ul>
-	<p>都欢迎加入评课社区用户群（见上），或邮件联系我们（service@icourse.club）。<strong>对于比较紧急的问题，例如网站bug、漏洞、网站无法访问等，请发邮件到 service@icourse.club。</strong></p>
-      </div>
+                <div class="ud-pd-sm lh-lg">
+                    <h4 class="blue">联系我们</h4>
+                    <ul class="list-unstyled">
+                        <li>1.
+                            如果我们提供的信息有偏差：如课程信息上的错误、老师的头像不对，或者用户信息不对，或者课程不全（本站使用程序从公开课程信息中抓取数据，可能出bug或者更新不及时）
+                        </li>
+                        <li>2. 如果你对我们的社区有什么想法或者建议</li>
+                        <li>3. 如果你发现我们的网站有bug或者漏洞，或者发生故障</li>
+                        <li>4. 如果你看到社区里有不当言论（侮辱、攻击、色情、广告等）</li>
+                        <li>5. 如果你是老师，你愿意给我们平台提供更多自己的课程信息（如课程简介）</li>
+                        <li>6.
+                            如果你是老师，你觉得我们平台上自己的头像太丑，想要给我们发自己的头像（好的头像能吸引更多学生报你的课哟！），或者你不希望我们平台使用您的照片作为头像（本站使用程序从科大域名的网站上抓取头像，可能不准确）
+                        </li>
+                    </ul>
+                    <p>都欢迎加入评课社区用户群（见上）。<strong>对于比较紧急的问题，例如网站bug、漏洞、网站无法访问等，请发邮件到
+                        service@icourse.club。</strong></p>
+                </div>
 
-      <div class="ud-pd-sm">
-        <h4 class="blue">评课社区网站二维码（欢迎分享）</h4>
-        <p><img src="/static/image/icourse.qr.png" /></p>
-      </div>
+                <div class="ud-pd-sm">
+                    <h4 class="blue">评课社区网站二维码（欢迎分享）</h4>
+                    <p><img src="/static/image/icourse.qr.png"/></p>
+                </div>
 
-      <div class="ud-pd-sm lh-lg">
-        <h4 class="blue">特别感谢</h4>
-        <p>感谢 <a href="https://blog.yfgao.com/" target="_blank">高一凡</a> 曾经提供服务器支持；感谢 <a href="https://cvhc.cc/" target="_blank">崔灏</a> 提供域名支持。</p>
-      </div>
+                <div class="ud-pd-sm lh-lg">
+                    <h4 class="blue">特别感谢</h4>
+                    <p>感谢 <a href="https://blog.yfgao.com/" target="_blank">高一凡</a> 曾经提供服务器支持；感谢 <a
+                            href="https://cvhc.cc/" target="_blank">崔灏</a> 提供域名支持。</p>
+                </div>
 
-    </div>
-  </div><!-- end float-element -->
-</div><!-- end container -->
+            </div>
+        </div><!-- end float-element -->
+    </div><!-- end container -->
 {% endblock %}
 
 {% block script %}

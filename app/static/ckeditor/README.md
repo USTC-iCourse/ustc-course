@@ -17,10 +17,10 @@ http://docs.ckeditor.com
 
 Installing CKEditor is an easy task. Just follow these simple steps:
 
- 1. **Download** the latest version from the CKEditor website:
-    http://ckeditor.com. You should have already completed this step, but be
-    sure you have the very latest version.
- 2. **Extract** (decompress) the downloaded file into the root of your website.
+1. **Download** the latest version from the CKEditor website:
+   http://ckeditor.com. You should have already completed this step, but be
+   sure you have the very latest version.
+2. **Extract** (decompress) the downloaded file into the root of your website.
 
 **Note:** CKEditor is by default installed in the `ckeditor` folder. You can
 place the files in whichever you want though.

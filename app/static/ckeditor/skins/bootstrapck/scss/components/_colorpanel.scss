@@ -49,52 +49,52 @@ The COLOR PALETTE section instead is a table with a variable number of cells
 
 /* The container of the color palette. */
 .cke_colorblock {
-    padding: 3px;
-    font-size: 11px;
-    font-family: 'Microsoft Sans Serif', Tahoma, Arial, Verdana, Sans-Serif;
+  padding: 3px;
+  font-size: 11px;
+  font-family: 'Microsoft Sans Serif', Tahoma, Arial, Verdana, Sans-Serif;
 }
 
 .cke_colorblock,
 .cke_colorblock a {
-    text-decoration: none;
-    color: #000;
+  text-decoration: none;
+  color: #000;
 }
 
 /* The box which is to represent a single color on the color palette.
    It is a small, square-shaped element which can be selected from the palette. */
 span.cke_colorbox {
-    width: 10px;
-    height: 10px;
-    border: 1px solid $gray;
-    float: left;
+  width: 10px;
+  height: 10px;
+  border: 1px solid $gray;
+  float: left;
 }
 
 .cke_rtl span.cke_colorbox {
-    float: right;
+  float: right;
 }
 
 /* The wrapper of the span.cke_colorbox. It provides an extra border and padding. */
 a.cke_colorbox {
-    border: 1px solid #fff;
-    padding: 2px;
-    float: left;
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
+  border: 1px solid #fff;
+  padding: 2px;
+  float: left;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
 }
 
 .cke_rtl a.cke_colorbox {
-    float: right;
+  float: right;
 }
 
 /* Different states of the a.cke_colorbox wrapper. */
 a {
-    &:hover, &:focus, &:active {
-        &.cke_colorbox {
-            border: 1px solid $hr-border;
-            background-color: $gray-lighter;
-        }
+  &:hover, &:focus, &:active {
+    &.cke_colorbox {
+      border: 1px solid $hr-border;
+      background-color: $gray-lighter;
     }
+  }
 }
 
 /* Buttons which are visible at the top/bottom of the color palette:
@@ -102,18 +102,18 @@ a {
    - cke_colormore (BOTTOM) executes the color dialog.
 */
 a.cke_colorauto, a.cke_colormore {
-    border: 1px solid #fff;
-    padding: 2px;
-    display: block;
-    cursor: pointer;
+  border: 1px solid #fff;
+  padding: 2px;
+  display: block;
+  cursor: pointer;
 }
 
 /* Different states of cke_colorauto/cke_colormore buttons. */
 a {
-    &:hover, &:focus, &:active {
-        &.cke_colorauto, &.cke_colormore {
-            border: 1px solid $hr-border;
-            background-color: $gray-lighter;
-        }
+  &:hover, &:focus, &:active {
+    &.cke_colorauto, &.cke_colormore {
+      border: 1px solid $hr-border;
+      background-color: $gray-lighter;
     }
+  }
 }

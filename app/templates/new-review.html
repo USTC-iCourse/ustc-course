@@ -1,202 +1,217 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
-  <div class="row">
-  <div class="col-md-8">
-    <div class="inline-h3">
-    <span class="blue h4">{% if not is_new %}编辑{% endif %}点评 &bull; <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}{% if course.teachers %}（{{ course.teacher_names_display|name_display_short }}）{% endif %}</a></span>
-    <span class="align-bottom left-pd-sm desktop">学期：{{ review.term|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
-    <br><span class="align-bottom mobile">学期：{{ review.term|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
+    <div class="container">
+        <div class="row float-element">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="inline-h3">
+                        <span class="blue h4">{% if not is_new %}编辑{% endif %}点评 &bull; <a
+                                href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}
+                                {% if course.teachers %}（{{ course.teacher_names_display|name_display_short }}
+                                    ）{% endif %}</a></span>
+                        <span class="align-bottom left-pd-sm desktop">学期：{{ review.term|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
+                        <br><span
+                            class="align-bottom mobile">学期：{{ review.term|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
+                    </div>
+                    <hr>
+                    {% if message != '' %}
+                        <div class="alert alert-danger">{{ message }}</div>
+                    {% endif %}
+                    {% include 'review-hidden.html' %}
+                    <form id="review-form" class="form-horizontal" method="post"
+                          action="{{ url_for('course.new_review', course_id=course.id) }}">
+                        {{ form.csrf_token }}
+                        <div class="rate-part ud-pd-md">
+                            <div class="ud-pd-sm">
+                                <span class="right-pd-sm weight-heavy">学　　期</span>
+
+                                <select name="term">
+                                    {% set joined_term = course.joined_term() %}
+                                    {% if not joined_term %}
+                                        <option value="">请选择学期</option>
+                                    {% endif %}
+
+                                    {% for term in course.term_ids %}
+                                        <option value="{{ term }}"
+                                                {% if review.term == term or ((not review.term or review.term not in course.term_ids) and joined_term == term) %}selected="selected"{% endif %}>{{ term|term_display }}
+                                            {% if joined_term == term %}(学过){% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% if (not review.term or review.term not in course.term_ids) and not joined_term %}
+                                    <span class="grey">&nbsp;如果不记得了，可以随便选一个 :)</span>
+                                {% endif %}
+                                <span class="clearfix"></span>
+                            </div>
+
+                            {% for poll in polls %}
+                                <div class="ud-pd-sm">
+                                    <span class="right-pd-sm weight-heavy">{{ poll['display'] }}</span>
+                                    <div class="btn-group btn-group-inv" data-toggle="buttons">
+                                        {% for option in poll['options'] %}
+                                            <label class="btn btn-flat btn-grey rl-mg-sm {% if review[poll['name']] == loop.index %}active{% endif %}">
+                                                <input type="radio" name="{{ poll['name'] }}" autocomplete="off"
+                                                       value="{{ loop.index }}"
+                                                       {% if review[poll['name']] == loop.index %}checked{% endif %}>
+                                                {{ option }}
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <link rel="stylesheet" href="/static/css/star-rating.min.css" media="all" rel="stylesheet"
+                                  type="text/css">
+                            <div class="ud-pd-sm">
+                                <span class="weight-heavy pull-left">评个分吧？</span>
+                                <input id="rate-star" name="rate" value="{{ review.rate / 2.0 if review.rate else 0 }}">
+                                <span class="clearfix"></span>
+                            </div>
+                        </div>
+
+                        <div class="desktop">
+                            <h4 class="grey">说几句吧！</h4>
+                            <div class="ud-pd-sm">
+                                <textarea id="content-editor" name="content">{% if review.content %}
+                                    {{ review.content|safe }}{% endif %}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="mobile">
+                            <h4 class="grey">说几句吧！</h4>
+                            <div class="ud-pd-sm">
+                                <input type="hidden" name="is_mobile" value="1">
+                                <textarea type="text" class="form-control" rows="8"
+                                          name="content">{% if review.content %}
+                                    {{ review.content_text }}{% endif %}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="ud-pd-sm"></div>
+                        <div class="class-control">
+                            <input {% if review.is_anonymous %}checked{% endif %} id="is_anonymous" name="is_anonymous"
+                                   type="checkbox" value="1">
+                            <label for="is_anonymous">匿名发表点评
+                                {% if review.author.is_teacher %}
+                                    (由于您是教师用户，即使匿名发表点评，也会标注“教师点评”，但不会暴露您的用户名和头像)
+                                {% endif %}
+                            </label>
+                        </div>
+                        <div class="class-control">
+                            <input {% if review.only_visible_to_student %}checked{% endif %}
+                                   id="only_visible_to_student" name="only_visible_to_student" type="checkbox"
+                                   value="1">
+                            <label for="only_visible_to_student">仅登录学生用户可见</label>
+                        </div>
+
+                        <div class="desktop">
+                            <button type="submit" class="btn btn-blue btn-flat float-right shadow">发布</button>
+                        </div>
+                        <div class="container mobile">
+                            <button type="submit" class="btn btn-blue float-right">发布</button>
+                        </div>
+
+                        <div class="ud-pd-lg"></div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <hr>
-    {% if message != '' %}
-    <div class="alert alert-danger">{{ message }}</div>
-    {% endif %}
-    {% include 'review-hidden.html' %}
-    <form id="review-form" class="form-horizontal" method="post" action="{{ url_for('course.new_review', course_id=course.id) }}">
-      {{ form.csrf_token }}
-      <div class="rate-part ud-pd-md">
-        <div class="ud-pd-sm">
-          <span class="right-pd-sm weight-heavy">学　　期</span>
-
-          <select name="term">
-            {% set joined_term = course.joined_term() %}
-            {% if not joined_term %}
-              <option value="">请选择学期</option>
-            {% endif %}
-
-            {% for term in course.term_ids %}
-              <option value="{{ term }}" {% if review.term == term or ((not review.term or review.term not in course.term_ids) and joined_term == term) %}selected="selected"{% endif %}>{{ term|term_display }}
-              {% if joined_term == term %}(学过){% endif %}
-              </option>
-            {% endfor %}
-          </select>
-          {% if (not review.term or review.term not in course.term_ids) and not joined_term %}
-          <span class="grey">&nbsp;如果不记得了，可以随便选一个 :)</span>
-          {% endif %}
-          <span class="clearfix"></span>
-        </div>
-
-        {% for poll in polls %}
-        <div class="ud-pd-sm">
-          <span class="right-pd-sm weight-heavy">{{ poll['display'] }}</span>
-          <div class="btn-group btn-group-inv" data-toggle="buttons">
-            {% for option in poll['options'] %}
-            <label class="btn btn-flat btn-grey rl-mg-sm {% if review[poll['name']] == loop.index %}active{% endif %}">
-                <input type="radio" name="{{ poll['name'] }}" autocomplete="off" value="{{ loop.index }}" {% if review[poll['name']] == loop.index %}checked{% endif %}>
-                {{ option }}
-            </label>
-            {% endfor %}
-          </div>
-        </div>
-        {% endfor %}
-
-        <link rel="stylesheet" href="/static/css/star-rating.min.css" media="all" rel="stylesheet" type="text/css">
-        <div class="ud-pd-sm">
-          <span class="weight-heavy pull-left">评个分吧？</span>
-          <input id="rate-star" name="rate" value="{{ review.rate / 2.0 if review.rate else 0 }}">
-          <span class="clearfix"></span>
-        </div>
-      </div>
-
-      <div class="desktop">
-        <h4 class="grey">说几句吧！</h4>
-        <div class="ud-pd-sm">
-          <textarea id="content-editor" name="content">{% if review.content %}{{ review.content|safe }}{% endif %}</textarea>
-        </div>
-      </div>
-
-      <div class="mobile">
-        <h4 class="grey">说几句吧！</h4>
-        <div class="ud-pd-sm">
-          <input type="hidden" name="is_mobile" value="1">
-          <textarea type="text" class="form-control" rows="8" name="content">{% if review.content %}{{ review.content_text }}{% endif %}</textarea>
-        </div>
-      </div>
-
-      <div class="ud-pd-sm"></div>
-      <div class="class-control">
-        <input {% if review.is_anonymous %}checked{% endif %} id="is_anonymous" name="is_anonymous" type="checkbox" value="1">
-        <label for="is_anonymous">匿名发表点评
-          {% if review.author.is_teacher %}
-          (由于您是教师用户，即使匿名发表点评，也会标注“教师点评”，但不会暴露您的用户名和头像)
-          {% endif %}
-        </label>
-      </div>
-      <div class="class-control">
-        <input {% if review.only_visible_to_student %}checked{% endif %} id="only_visible_to_student" name="only_visible_to_student" type="checkbox" value="1">
-        <label for="only_visible_to_student">仅登录学生用户可见</label>
-      </div>
-
-      <div class="desktop">
-        <button type="submit" class="btn btn-blue btn-flat float-right shadow">发布</button>
-      </div>
-      <div class="container mobile">
-        <button type="submit" class="btn btn-blue float-right">发布</button>
-      </div>
-
-      <div class="ud-pd-lg"></div>
-
-    </form>
-  </div>
-  </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block script %}
-<script src="/static/js/star-rating.min.js" type="text/javascript"></script>
-<script>
-function submit_review() {
-    var url = "{{ url_for('course.new_review', course_id=course.id) }}";
-    var data = $('#review-form').serializeArray().reduce(function(obj, item) {
-        obj[item.name] = item.value;
-        return obj;
-    }, {});
-    data['rate'] = Math.round(data['rate'] * 2);
-    data['is_ajax'] = true;
-    console.log(url);
-    console.log(data);
-    $.post(url, data, function(o) {
-        console.log(o);
-        if (!o.ok) {
-            alert('Failed to submit review, please try again!');
-        } else {
-            // remove auto saved content
-            var autoSaveKey = window.location.pathname;
-            localStorage.removeItem(autoSaveKey);
-            window.location.href = o.next_url;
-        }
-    }, 'json')
-    .fail(function() {
-        alert('提交点评失败，请重试！');
-    });
-}
-
-$('#rate-star').rating({
-    min: 0,
-    max: 5,
-    step: 0.5,
-    size: "xs",
-    showClear: false,
-    glyphicon: false,
-    ratingClass: 'glyphicon glyphicon-star',
-    starCaptions: function(val) {
-        return val*2;
-    },
-    starCaptionClasses: function(val) {
-        return "blue";
-    },
-});
-
-$(function(){
-    // remove desktop/mobile-only elements to avoid name conflicts
-    if ($('.desktop').css('display') == 'none') {
-        $('.desktop').remove();
-    }
-    if ($('.mobile').css('display') == 'none') {
-        $('.mobile').remove();
-    }
-
-    $('#review-form').submit(function(e) {
-        e.preventDefault();
-
-        if ($('select[name=term]').val() == '') {
-            alert('请选择学期，如果不记得了，可以随便选一个 :)');
-            return;
-        }
-        if ($('input[name=difficulty]:radio:checked').length == 0) {
-            alert('请选择课程难度！');
-            return;
-        }
-        if ($('input[name=homework]:radio:checked').length == 0) {
-            alert('请选择作业多少！');
-            return;
-        }
-        if ($('input[name=grading]:radio:checked').length == 0) {
-            alert('请选择给分好坏！');
-            return;
-        }
-        if ($('input[name=gain]:radio:checked').length == 0) {
-            alert('请选择收获多少！');
-            return;
-        }
-        if ($('input[name=rate]').val() <= 0 || $('input[name=rate]').val() > 5) {
-            alert('请评分！');
-            return;
-        }
-        var content_html = $('textarea[name=content]').val();
-        var content_text = content_html.replace(/(<([^>]+)>)/ig, "");
-        if (content_text.trim().length < 10) {
-            alert('点评内容太短啦！（需长于10字符）');
-            return;
+    <script src="/static/js/star-rating.min.js" type="text/javascript"></script>
+    <script>
+        function submit_review() {
+            var url = "{{ url_for('course.new_review', course_id=course.id) }}";
+            var data = $('#review-form').serializeArray().reduce(function (obj, item) {
+                obj[item.name] = item.value;
+                return obj;
+            }, {});
+            data['rate'] = Math.round(data['rate'] * 2);
+            data['is_ajax'] = true;
+            console.log(url);
+            console.log(data);
+            $.post(url, data, function (o) {
+                console.log(o);
+                if (!o.ok) {
+                    alert('Failed to submit review, please try again!');
+                } else {
+                    // remove auto saved content
+                    var autoSaveKey = window.location.pathname;
+                    localStorage.removeItem(autoSaveKey);
+                    window.location.href = o.next_url;
+                }
+            }, 'json')
+                .fail(function () {
+                    alert('提交点评失败，请重试！');
+                });
         }
 
-        submit_review();
-    });
-});
-</script>
-{% include 'ckeditor.html' %}
+        $('#rate-star').rating({
+            min: 0,
+            max: 5,
+            step: 0.5,
+            size: "xs",
+            showClear: false,
+            glyphicon: false,
+            ratingClass: 'glyphicon glyphicon-star',
+            starCaptions: function (val) {
+                return val * 2;
+            },
+            starCaptionClasses: function (val) {
+                return "blue";
+            },
+        });
+
+        $(function () {
+            // remove desktop/mobile-only elements to avoid name conflicts
+            if ($('.desktop').css('display') == 'none') {
+                $('.desktop').remove();
+            }
+            if ($('.mobile').css('display') == 'none') {
+                $('.mobile').remove();
+            }
+
+            $('#review-form').submit(function (e) {
+                e.preventDefault();
+
+                if ($('select[name=term]').val() == '') {
+                    alert('请选择学期，如果不记得了，可以随便选一个 :)');
+                    return;
+                }
+                if ($('input[name=difficulty]:radio:checked').length == 0) {
+                    alert('请选择课程难度！');
+                    return;
+                }
+                if ($('input[name=homework]:radio:checked').length == 0) {
+                    alert('请选择作业多少！');
+                    return;
+                }
+                if ($('input[name=grading]:radio:checked').length == 0) {
+                    alert('请选择给分好坏！');
+                    return;
+                }
+                if ($('input[name=gain]:radio:checked').length == 0) {
+                    alert('请选择收获多少！');
+                    return;
+                }
+                if ($('input[name=rate]').val() <= 0 || $('input[name=rate]').val() > 5) {
+                    alert('请评分！');
+                    return;
+                }
+                var content_html = $('textarea[name=content]').val();
+                var content_text = content_html.replace(/(<([^>]+)>)/ig, "");
+                if (content_text.trim().length < 10) {
+                    alert('点评内容太短啦！（需长于10字符）');
+                    return;
+                }
+
+                submit_review();
+            });
+        });
+    </script>
+    {% include 'ckeditor.html' %}
 {% endblock %}

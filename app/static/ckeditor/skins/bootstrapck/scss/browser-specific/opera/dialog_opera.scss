@@ -15,17 +15,15 @@ This file contains styles to used by all versions of Opera only.
 
 /* Opera has problem with box-shadow and td with border-collapse: collapse */
 /* inset shadow is mis-aligned */
-.cke_dialog_footer
-{
-    display: block;
-    height: 38px;
+.cke_dialog_footer {
+  display: block;
+  height: 38px;
 }
 
-.cke_ltr .cke_dialog_footer > *
-{
-    float:right;
+.cke_ltr .cke_dialog_footer > * {
+  float: right;
 }
-.cke_rtl .cke_dialog_footer > *
-{
-    float:left;
+
+.cke_rtl .cke_dialog_footer > * {
+  float: left;
 }

@@ -1,1 +1,1 @@
-course = Blueprint('course',__name__)
+course = Blueprint('course', __name__)

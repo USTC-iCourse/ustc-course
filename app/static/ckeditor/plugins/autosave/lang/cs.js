@@ -9,9 +9,9 @@ CKEDITOR.plugins.setLang('autosave', 'cs', {
     title: 'Porovnejre automaticky uložený obsah s obsahem nahraným z webové stránky',
     loadedContent: 'Nahraný obsah',
     autoSavedContent: 'Automaticky uložený obsah z: \'',
-	ok: 'Ano, zvolit automaticky uložený obsah',
-	no: 'Ne',
-	diffType: 'Zvolte si typ náhledu:',
-	sideBySide: 'Pohled HTML vedle HTML',
-	inline: 'Pohled Obsah/Obsah'
+    ok: 'Ano, zvolit automaticky uložený obsah',
+    no: 'Ne',
+    diffType: 'Zvolte si typ náhledu:',
+    sideBySide: 'Pohled HTML vedle HTML',
+    inline: 'Pohled Obsah/Obsah'
 });

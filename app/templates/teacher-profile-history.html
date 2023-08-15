@@ -1,58 +1,63 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
-    <div class="col-md-8">
-      <div class="bm-pd-lg">
-	<div class="inline-h3">
-          <span class="blue h3">教师信息编辑历史</span>
-          <span class="text-muted">(共 {{ teacher.info_history_count }} 次)</span>
-	</div>
+            <div class="col-md-8">
+                <div class="bm-pd-lg">
+                    <div class="inline-h3">
+                        <span class="blue h3">教师信息编辑历史</span>
+                        <span class="text-muted">(共 {{ teacher.info_history_count }} 次)</span>
+                    </div>
 
-	{% if teacher.info_history_count == 0 %}
-        <p>还没有被人工编辑过哦！</p>
-        {% else %}
-	  {% for history in teacher.info_history %}
-      	  <div class="ud-pd-md dashed">
-      	    <img class="avatar-lg circle" src="{{ history.image }}"/>
-    	    <p>教师主页：
-      	      {% if history.homepage and history.homepage != 'http://' %}
-      	      <a href="{{ history.homepage }}">{{ history.homepage }}</a>
-      	      {% else %}暂无{% endif %}
-      	    </p>
-    	    <p>研究方向：
-      	      {% if history.research_interest %}
-      	      {{ history.research_interest }}
-      	      {% else %}暂无{% endif %}
-      	    </p>
-            <div>
-              <span class="text-muted">贡献者：<a href="{{ url_for('user.view_profile', user_id=history.author) }}">{{ history.author_user.username }}</a></span>
-              <span class="text-muted pull-right">编辑时间：<span class="localtime" style="display: none;">{{ history.update_time|utctime }}</span></span>
-            </div>
-      	  </div>
-	  {% endfor %}
-        {% endif %}
-      </div><!-- bm-pd-lg -->
-    </div><!-- end col-md-8 -->
+                    {% if teacher.info_history_count == 0 %}
+                        <p>还没有被人工编辑过哦！</p>
+                    {% else %}
+                        {% for history in teacher.info_history %}
+                            <div class="ud-pd-md dashed">
+                                <img class="avatar-lg circle" src="{{ history.image }}"/>
+                                <p>教师主页：
+                                    {% if history.homepage and history.homepage != 'http://' %}
+                                        <a href="{{ history.homepage }}">{{ history.homepage }}</a>
+                                    {% else %}暂无{% endif %}
+                                </p>
+                                <p>研究方向：
+                                    {% if history.research_interest %}
+                                        {{ history.research_interest }}
+                                    {% else %}暂无{% endif %}
+                                </p>
+                                <div>
+                                    <span class="text-muted">贡献者：<a
+                                            href="{{ url_for('user.view_profile', user_id=history.author) }}">{{ history.author_user.username }}</a></span>
+                                    <span class="text-muted pull-right">编辑时间：<span class="localtime"
+                                                                                       style="display: none;">{{ history.update_time|utctime }}</span></span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div><!-- bm-pd-lg -->
+            </div><!-- end col-md-8 -->
 
-    <div class="col-md-4 right-col">
-      <div class="ud-pd-md dashed">
-	<img class="avatar-lg circle" src="{{ teacher.image }}"/>
-	{% if current_user.is_authenticated %}
-	<btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
-	{% endif %}
-	<h3 class="blue">{{ teacher.name }}</h3>
-	<p>{{ teacher.dept.name }}</p>
-	<p>教师主页：
-          {% if teacher.homepage and teacher.homepage != 'http://' %}
-          <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a>
-          {% else %}暂无{% endif %}
-	</p>
-      </div>
-    </div><!-- end col-md-4 -->
-  </div><!-- end float-element -->
-</div><!-- end container -->
+            <div class="col-md-4 right-col">
+                <div class="ud-pd-md dashed">
+                    <img class="avatar-lg circle" src="{{ teacher.image }}"/>
+                    {% if current_user.is_authenticated %}
+                        <btn class="btn btn-link float-right"><a
+                                href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a>
+                        </btn>
+                    {% endif %}
+                    <h3 class="blue">{{ teacher.name }}</h3>
+                    <p>{{ teacher.dept.name }}</p>
+                    <p>教师主页：
+                        {% if teacher.homepage and teacher.homepage != 'http://' %}
+                            <a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link"
+                                                                                   aria-hidden="true"></span> 戳这里</a>
+                        {% else %}暂无{% endif %}
+                    </p>
+                </div>
+            </div><!-- end col-md-4 -->
+        </div><!-- end float-element -->
+    </div><!-- end container -->
 
 {% endblock %}

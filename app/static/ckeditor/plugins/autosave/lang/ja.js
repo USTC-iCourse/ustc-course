@@ -9,9 +9,9 @@ CKEDITOR.plugins.setLang('autosave', 'ja', {
     title: 'Compare auto-saved content with that loaded from the website',
     loadedContent: '現在保存されている投稿',
     autoSavedContent: '投稿途中だった内容: \'',
-	ok: '投稿途中だった内容（緑）を使う',
-	no: 'いいえ',
-	diffType: '比較モード',
-	sideBySide: '横に並べる',
-	inline: '行ごとに比較'
+    ok: '投稿途中だった内容（緑）を使う',
+    no: 'いいえ',
+    diffType: '比較モード',
+    sideBySide: '横に並べる',
+    inline: '行ごとに比較'
 });

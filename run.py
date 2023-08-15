@@ -7,17 +7,20 @@ import sys
 
 debug = False
 for arg in sys.argv:
-    if arg == '-d':
-        debug = True
+  if arg == '-d':
+    debug = True
+
 
 def start():
-    if debug:
-        db.create_all()
-        app.run(port=2021, threaded=True, host='0.0.0.0')
-    else:
-        app.run(port=3000, threaded=True)
-
+  if debug:
+    db.create_all()
+    app.run(port=2021, threaded=True, host='127.0.0.1')
+  else:
+    from waitress import serve
+    serve(app, host="127.0.0.1", port=3000)
+    # serve(app, host="127.0.0.1", port=8030)
+    # app.run(port=8030, threaded=True)
 
 
 if __name__ == '__main__':
-    start()
+  start()

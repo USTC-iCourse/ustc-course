@@ -1,118 +1,128 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
-    <div class="bm-pd-lg">
-      <h3 class="blue">账户设置</h3>
-      <hr>
-      {% for error in errors %}
-        <div class="alert alert-danger">{{ error }}</div>
-      {% endfor %}
-      <form class="form-horizontal" method="post" enctype="multipart/form-data">
-        {{ form.csrf_token }}
-        <div class="form-group">
-          <label class="col-sm-2 control-label">头像</label>
-          <div class="col-sm-5">
-            <img class="avatar-lg circle rl-mg-md" src="{{ user.avatar }}"/>
-            <label class="btn btn-grey radius4 fileupload">
-              <input type="file" name="avatar" onchange="$('#avatar-upload-btn').html('选择'); $('#avatar-upload-msg').show()"/>
-              <span id="avatar-upload-btn">选择</span>
-            </label>
-            <button id="avatar-upload-msg" type="submit" class="btn btn-blue" style="display:none">上传</button>
-          </div>
-        </div>
+            <div class="bm-pd-lg">
+                <h3 class="blue">账户设置</h3>
+                <hr>
+                {% for error in errors %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endfor %}
+                <form class="form-horizontal" method="post" enctype="multipart/form-data">
+                    {{ form.csrf_token }}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">头像</label>
+                        <div class="col-sm-5">
+                            <img class="avatar-lg circle rl-mg-md" src="{{ user.avatar }}"/>
+                            <label class="btn btn-grey radius4 fileupload">
+                                <input type="file" name="avatar"
+                                       onchange="$('#avatar-upload-btn').html('选择'); $('#avatar-upload-msg').show()"/>
+                                <span id="avatar-upload-btn">选择</span>
+                            </label>
+                            <button id="avatar-upload-msg" type="submit" class="btn btn-blue" style="display:none">
+                                上传
+                            </button>
+                        </div>
+                    </div>
 
-        <div class="form-group">
-          <label class="col-sm-2 control-label">用户名</label>
-          <div class="col-sm-5">
-            <input type="text" class="form-control" value="{% if form.username.data %}{{ form.username.data }}{% else %}{{ user.username }}{% endif %}" name="username">
-            <span class="help-block" style="display:none"></span>
-            {% if form.errors.get('username') %}
-              {% for info in form.errors.get('username') %}
-                {{ info }}
-              {% endfor %}
-            {% endif %}
-          </div>
-        </div>
-
-
-        <div class="form-group">
-          <label class="col-sm-2 control-label">科大邮箱</label>
-          <div class="col-sm-5">
-            <input type="text" class="form-control" value="{{ user.email }}" disabled>
-          </div>
-        </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">用户名</label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" value="
+                                    {% if form.username.data %}{{ form.username.data }}{% else %}{{ user.username }}{% endif %}"
+                                   name="username">
+                            <span class="help-block" style="display:none"></span>
+                            {% if form.errors.get('username') %}
+                                {% for info in form.errors.get('username') %}
+                                    {{ info }}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
 
 
-
-        <div class="form-group">
-          <label for="inputDescription" class="col-sm-2 control-label">个人简介</label>
-          <div class="col-sm-5">
-            <textarea type="text" class="form-control" rows="3" id="inputDescription" name="description" {% if form.description.data %}>{{ form.description.data }}{% else %} placeholder="还没有自我介绍">{% endif -%}</textarea>
-            <span class="help-block" style="display:none"></span>
-            {% if form.errors.get('description') %}
-              {% for info in form.errors.get('description') %}
-                {{ info }}
-              {% endfor %}
-            {% endif %}
-          </div>
-        </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">科大邮箱</label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" value="{{ user.email }}" disabled>
+                        </div>
+                    </div>
 
 
-        <div class="form-group">
-          <label class="col-sm-2 control-label">个人主页</label>
-          <div class="col-sm-5">
-            <input type="text" class="form-control" name="homepage" {% if form.homepage.data %} value="{{ form.homepage.data }}"{% else %}placeholder="博客"{% endif %}>
-            <span class="help-block" style="display:none"></span>
-            {% if form.errors.get('homepage') %}
-              {% for info in form.errors.get('homepage') %}
-                {{ info }}
-              {% endfor %}
-            {% endif %}
-          </div>
-        </div>
+                    <div class="form-group">
+                        <label for="inputDescription" class="col-sm-2 control-label">个人简介</label>
+                        <div class="col-sm-5">
+                            <textarea type="text" class="form-control" rows="3" id="inputDescription" name="description"
+                                    {% if form.description.data %}>{{ form.description.data }}{% else %}
+                                        placeholder="还没有自我介绍">{% endif -%}</textarea>
+                            <span class="help-block" style="display:none"></span>
+                            {% if form.errors.get('description') %}
+                                {% for info in form.errors.get('description') %}
+                                    {{ info }}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
 
 
-        <div class="form-group">
-          <label class="col-sm-2 control-label">隐私设置</label>
-          <div class="col-sm-5">
-            <div>
-              <input {% if user.is_following_hidden %}checked{% endif %} id="is_following_hidden" name="is_following_hidden" type="checkbox" value="1">
-              <label for="is_following_hidden">隐藏关注的人、关注的课程、学过的课程</label>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">个人主页</label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" name="homepage" {% if form.homepage.data %}
+                                   value="{{ form.homepage.data }}"{% else %}placeholder="博客"{% endif %}>
+                            <span class="help-block" style="display:none"></span>
+                            {% if form.errors.get('homepage') %}
+                                {% for info in form.errors.get('homepage') %}
+                                    {{ info }}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">隐私设置</label>
+                        <div class="col-sm-5">
+                            <div>
+                                <input {% if user.is_following_hidden %}checked{% endif %} id="is_following_hidden"
+                                       name="is_following_hidden" type="checkbox" value="1">
+                                <label for="is_following_hidden">隐藏关注的人、关注的课程、学过的课程</label>
+                            </div>
+                            <div>
+                                <input {% if user.is_profile_hidden %}checked{% endif %} id="is_profile_hidden"
+                                       name="is_profile_hidden" type="checkbox" value="1">
+                                <label for="is_profile_hidden">彻底隐藏个人主页</label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-2">
+                            <button type="submit" class="btn btn-blue btn-block">更新资料</button>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div>
-              <input {% if user.is_profile_hidden %}checked{% endif %} id="is_profile_hidden" name="is_profile_hidden" type="checkbox" value="1">
-              <label for="is_profile_hidden">彻底隐藏个人主页</label>
-            </div>
-          </div>
-        </div>
-
-
-        <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-2">
-            <button type="submit" class="btn btn-blue btn-block">更新资料</button>
-          </div>
-        </div>
-      </form>
-    </div>
-    {% if user.info %}
-    <!-- a student's information -->
-    {% if user.is_student %}
-    <p class="text-success">{{ _('你已经绑定了学号<b>%(sno)s</b>。<a href=%(url)s>有错吗</a>？',sno=user.info.sno,url=url_for('user.bind_identity') ) }}</p> 
-    <!-- a teacher's information -->
-    {% elif user.is_teacher %}
-    <p class="text-success">{{ _('你已经绑定了教工信息：<b>%(name)s</b>。<a href=%(url)s>有错吗</a>？',name=user.info.name,url=url_for('user.bind_identity') ) }}</p> 
-    {% else %}
-    <p class="text-danger">{{ _('唔，出错了！') }}</p>
-    {% endif %}
-    {% else %}
-    <p class="text-success">{{ _('你还没有绑定学号，<a  href="%(url)s">戳这里</a>绑定。', url=url_for('user.bind_identity')) }}
-      {% endif %}
-      <p class="text-success">你可以通过发送邮件修改密码，<a href="{{ url_for('home.change_password')
-                                                             }}">戳这里</a> 发邮件</p>
-  </div> <!-- end float-element -->
-</div> <!-- end container -->
+            {% if user.info %}
+                <!-- a student's information -->
+                {% if user.is_student %}
+                    <p class="text-success">{{ _('你已经绑定了学号<b>%(sno)s</b>。<a href=%(url)s>有错吗</a>？',sno=user.info.sno,url=url_for('user.bind_identity') ) }}</p>
+                    <!-- a teacher's information -->
+                {% elif user.is_teacher %}
+                    <p class="text-success">{{ _('你已经绑定了教工信息：<b>%(name)s</b>。<a href=%(url)s>有错吗</a>？',name=user.info.name,url=url_for('user.bind_identity') ) }}</p>
+                {% else %}
+                    <p class="text-danger">{{ _('唔，出错了！') }}</p>
+                {% endif %}
+            {% else %}
+                <p class="text-success">
+                {{ _('你还没有绑定学号，<a  href="%(url)s">戳这里</a>绑定。', url=url_for('user.bind_identity')) }}
+            {% endif %}
+            <p class="text-success">你可以通过发送邮件修改密码，<a
+                    href="{{ url_for('home.change_password') }}">戳这里</a> 发邮件</p>
+        </div> <!-- end float-element -->
+    </div> <!-- end container -->
 
 {% endblock %}

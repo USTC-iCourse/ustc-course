@@ -1,56 +1,63 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
-    <div class="bm-pd-lg">
-      <div class="center top-pd-md">
-        <p><span class="h3 blue">{{ program.name }}</span></p>
-        <p><strong>{{ program.dept.name }} {{ program.major.name }} {{ program.grade }}级 
-        {% if program.train_type == '主修' %}
-        主修学位
-        {% else %}
-        {{ program.train_type }}
-        {% endif %}
-        </strong></p>
-        <p>培养方案页面是评课社区推出的新功能，信息可能不完善，仅供参考，请以 <a href="https://catalog.ustc.edu.cn/plan" target="_blank">教务处培养方案</a> 为准。</p>
-        <p>&nbsp;</p>
-      </div>
+            <div class="bm-pd-lg">
+                <div class="center top-pd-md">
+                    <p><span class="h3 blue">{{ program.name }}</span></p>
+                    <p><strong>{{ program.dept.name }} {{ program.major.name }} {{ program.grade }}级
+                        {% if program.train_type == '主修' %}
+                            主修学位
+                        {% else %}
+                            {{ program.train_type }}
+                        {% endif %}
+                    </strong></p>
+                    <p>培养方案页面是评课社区推出的新功能，信息可能不完善，仅供参考，请以 <a
+                            href="https://catalog.ustc.edu.cn/plan" target="_blank">教务处培养方案</a> 为准。</p>
+                    <p>&nbsp;</p>
+                </div>
 
-      <table class="table table-bordered text-center table-hover min-margin-table">
-        <tr>
-          <th>课程号</th>
-          <th>课程名</th>
-          <th>必修/选修</th>
-          <th>考核形式</th>
-          <th>学分</th>
-          <th>课程类别</th>
-        </tr>
-        {% for course in program.courses %}
+                <table class="table table-bordered text-center table-hover min-margin-table">
+                    <tr>
+                        <th>课程号</th>
+                        <th>课程名</th>
+                        <th>必修/选修</th>
+                        <th>考核形式</th>
+                        <th>学分</th>
+                        <th>课程类别</th>
+                    </tr>
+                    {% for course in program.courses %}
 
-        {% if loop.index0 == 0 or program.courses[loop.index0 - 1].terms != course.terms %}
-        {% if course.terms %}
-        <tr><td colspan="6" style="font-weight:bold; font-size:1.5em;">{{ course.terms }}</td></tr>
-        {% endif %}
-        {% endif %}
+                        {% if loop.index0 == 0 or program.courses[loop.index0 - 1].terms != course.terms %}
+                            {% if course.terms %}
+                                <tr>
+                                    <td colspan="6" style="font-weight:bold; font-size:1.5em;">{{ course.terms }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endif %}
 
-        {% if highlight_course_id != course.id %}
-        <tr>
-        {% else %}
-        <tr style="font-weight:bold; background:#ffffaa;">
-        {% endif %}
-          <td><a href="{{ url_for('home.search', q=course.course_group_code) }}">{{ course.course_group_code }}</a></td>
-          <td><a href="{{ url_for('home.search', q=course.course_group_code) }}">{{ course.course_group.name }}</a></td>
-          <td>{{ '必修' if course.compulsory else '选修' }}</td>
-          <td><span class="small">{{ course.exam_mode }}</span></td>
-          <td>{{ course.course_group.credits }}</td>
-          <td>{{ course.type }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-  </div> <!-- end float-element -->
-</div> <!-- end container -->
+                        {% if highlight_course_id != course.id %}
+                            <tr>
+                                {% else %}
+                            <tr style="font-weight:bold; background:#ffffaa;">
+                        {% endif %}
+                    <td>
+                        <a href="{{ url_for('home.search', q=course.course_group_code) }}">{{ course.course_group_code }}</a>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('home.search', q=course.course_group_code) }}">{{ course.course_group.name }}</a>
+                    </td>
+                    <td>{{ '必修' if course.compulsory else '选修' }}</td>
+                    <td><span class="small">{{ course.exam_mode }}</span></td>
+                    <td>{{ course.course_group.credits }}</td>
+                    <td>{{ course.type }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div> <!-- end float-element -->
+    </div> <!-- end container -->
 
 {% endblock %}

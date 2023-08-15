@@ -11,7 +11,7 @@ CKEDITOR.plugins.setLang('autosave', 'de', {
     autoSavedContent: 'Autom. Gespeicherten Inhalt (vom: \'',
     ok: 'Ja, Lade Autom. Gespeicherten Inhalt',
     no: 'Nein',
-	diffType: 'Diff Anzeigetyp:',
+    diffType: 'Diff Anzeigetyp:',
     sideBySide: 'Nebeneinander',
     inline: 'Inline'
 });

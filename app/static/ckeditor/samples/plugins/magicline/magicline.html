@@ -5,43 +5,43 @@ For licensing, see LICENSE.md or http://ckeditor.com/license
 -->
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>Using Magicline plugin &mdash; CKEditor Sample</title>
-	<script src="../../../ckeditor.js"></script>
-	<link rel="stylesheet" href="../../../samples/sample.css">
-	<meta name="ckeditor-sample-name" content="Magicline plugin">
-	<meta name="ckeditor-sample-group" content="Plugins">
-	<meta name="ckeditor-sample-description" content="Using the Magicline plugin to access difficult focus spaces.">
+    <meta charset="utf-8">
+    <title>Using Magicline plugin &mdash; CKEditor Sample</title>
+    <script src="../../../ckeditor.js"></script>
+    <link rel="stylesheet" href="../../../samples/sample.css">
+    <meta name="ckeditor-sample-name" content="Magicline plugin">
+    <meta name="ckeditor-sample-group" content="Plugins">
+    <meta name="ckeditor-sample-description" content="Using the Magicline plugin to access difficult focus spaces.">
 </head>
 <body>
-	<h1 class="samples">
-		<a href="../../../samples/index.html">CKEditor Samples</a> &raquo; Using Magicline plugin
-	</h1>
-	<div class="description">
-		<p>
-			This sample shows the advantages of <strong>Magicline</strong> plugin
-			which is to enhance the editing process. Thanks to this plugin,
-			a number of difficult focus spaces which are inaccessible due to
-			browser issues can now be focused.
-		</p>
-		<p>
-			<strong>Magicline</strong> plugin shows a red line with a handler
-			which, when clicked, inserts a paragraph and allows typing. To see this,
-			focus an editor and move your mouse above the focus space you want
-			to access. The plugin is enabled by default so no additional
-			configuration is necessary.
-		</p>
-	</div>
-	<div>
-		<label for="editor1">
-			Editor 1:
-		</label>
-		<div class="description">
-			<p>
-				This editor uses a default <strong>Magicline</strong> setup.
-			</p>
-		</div>
-		<textarea cols="80" id="editor1" name="editor1" rows="10">
+<h1 class="samples">
+    <a href="../../../samples/index.html">CKEditor Samples</a> &raquo; Using Magicline plugin
+</h1>
+<div class="description">
+    <p>
+        This sample shows the advantages of <strong>Magicline</strong> plugin
+        which is to enhance the editing process. Thanks to this plugin,
+        a number of difficult focus spaces which are inaccessible due to
+        browser issues can now be focused.
+    </p>
+    <p>
+        <strong>Magicline</strong> plugin shows a red line with a handler
+        which, when clicked, inserts a paragraph and allows typing. To see this,
+        focus an editor and move your mouse above the focus space you want
+        to access. The plugin is enabled by default so no additional
+        configuration is necessary.
+    </p>
+</div>
+<div>
+    <label for="editor1">
+        Editor 1:
+    </label>
+    <div class="description">
+        <p>
+            This editor uses a default <strong>Magicline</strong> setup.
+        </p>
+    </div>
+    <textarea cols="80" id="editor1" name="editor1" rows="10">
 			&lt;table border=&quot;1&quot; cellpadding=&quot;1&quot; cellspacing=&quot;1&quot; style=&quot;width: 100%; &quot;&gt;
 				&lt;tbody&gt;
 					&lt;tr&gt;
@@ -95,35 +95,35 @@ For licensing, see LICENSE.md or http://ckeditor.com/license
 			&lt;p&gt;This text is wrapped in a&amp;nbsp;&lt;tt&gt;DIV&lt;/tt&gt;&amp;nbsp;element. We can type after this element though.&lt;/p&gt;
 			&lt;/div&gt;
 		</textarea>
-		<script>
+    <script>
 
-			// This call can be placed at any point after the
-			// <textarea>, or inside a <head><script> in a
-			// window.onload event handler.
+        // This call can be placed at any point after the
+        // <textarea>, or inside a <head><script> in a
+        // window.onload event handler.
 
-			CKEDITOR.replace( 'editor1', {
-				extraPlugins: 'magicline',	// Ensure that magicline plugin, which is required for this sample, is loaded.
-				allowedContent: true		// Switch off the ACF, so very complex content created to
-											// show magicline's power isn't filtered.
-			} );
+        CKEDITOR.replace('editor1', {
+            extraPlugins: 'magicline',	// Ensure that magicline plugin, which is required for this sample, is loaded.
+            allowedContent: true		// Switch off the ACF, so very complex content created to
+            // show magicline's power isn't filtered.
+        });
 
-		</script>
-	</div>
-	<br>
-	<div>
-		<label for="editor2">
-			Editor 2:
-		</label>
-		<div class="description">
-			<p>
-				This editor is using a blue line.
-			</p>
-<pre class="samples">
+    </script>
+</div>
+<br>
+<div>
+    <label for="editor2">
+        Editor 2:
+    </label>
+    <div class="description">
+        <p>
+            This editor is using a blue line.
+        </p>
+        <pre class="samples">
 CKEDITOR.replace( 'editor2', {
 	magicline_color: 'blue'
 });</pre>
-		</div>
-		<textarea cols="80" id="editor2" name="editor2" rows="10">
+    </div>
+    <textarea cols="80" id="editor2" name="editor2" rows="10">
 			&lt;table border=&quot;1&quot; cellpadding=&quot;1&quot; cellspacing=&quot;1&quot; style=&quot;width: 100%; &quot;&gt;
 				&lt;tbody&gt;
 					&lt;tr&gt;
@@ -177,30 +177,31 @@ CKEDITOR.replace( 'editor2', {
 			&lt;p&gt;This text is wrapped in a&amp;nbsp;&lt;tt&gt;DIV&lt;/tt&gt;&amp;nbsp;element. We can type after this element though.&lt;/p&gt;
 			&lt;/div&gt;
 		</textarea>
-		<script>
+    <script>
 
-			// This call can be placed at any point after the
-			// <textarea>, or inside a <head><script> in a
-			// window.onload event handler.
+        // This call can be placed at any point after the
+        // <textarea>, or inside a <head><script> in a
+        // window.onload event handler.
 
-			CKEDITOR.replace( 'editor2', {
-				extraPlugins: 'magicline',	// Ensure that magicline plugin, which is required for this sample, is loaded.
-				magicline_color: 'blue',	// Blue line
-				allowedContent: true		// Switch off the ACF, so very complex content created to
-											// show magicline's power isn't filtered.
-			});
+        CKEDITOR.replace('editor2', {
+            extraPlugins: 'magicline',	// Ensure that magicline plugin, which is required for this sample, is loaded.
+            magicline_color: 'blue',	// Blue line
+            allowedContent: true		// Switch off the ACF, so very complex content created to
+            // show magicline's power isn't filtered.
+        });
 
-		</script>
-	</div>
-	<div id="footer">
-		<hr>
-		<p>
-			CKEditor - The text editor for the Internet - <a class="samples" href="http://ckeditor.com/">http://ckeditor.com</a>
-		</p>
-		<p id="copy">
-			Copyright &copy; 2003-2015, <a class="samples" href="http://cksource.com/">CKSource</a> - Frederico
-			Knabben. All rights reserved.
-		</p>
-	</div>
+    </script>
+</div>
+<div id="footer">
+    <hr>
+    <p>
+        CKEditor - The text editor for the Internet - <a class="samples"
+                                                         href="http://ckeditor.com/">http://ckeditor.com</a>
+    </p>
+    <p id="copy">
+        Copyright &copy; 2003-2015, <a class="samples" href="http://cksource.com/">CKSource</a> - Frederico
+        Knabben. All rights reserved.
+    </p>
+</div>
 </body>
 </html>

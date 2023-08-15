@@ -1,31 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
 
-    <div class="bm-pd-lg">
-      <div class="inline-h3">
-        <span class="blue h3"><a href="{{ url_for('user.view_profile', user_id=user.id) }}">{{ user.username }}</a> 关注</span>
-        （{{ user.courses_following_count }}门）
-      </div>
+            <div class="bm-pd-lg">
+                <div class="inline-h3">
+                    <span class="blue h3"><a
+                            href="{{ url_for('user.view_profile', user_id=user.id) }}">{{ user.username }}</a> 关注</span>
+                    （{{ user.courses_following_count }}门）
+                </div>
 
-      {% for course in user.courses_following %}
-      <div class="ud-pd-md dashed">
-        <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('未知') }}）</a>
-	{% if course.introduction %}
-	<span class="label label-danger">课程简介</span>
-	{% endif %}
-	{% if course in user.courses_joined %}
-        <span class="label label-info">已学过</span>
-        {% endif %}
-      </div>
-      {% endfor %}
+                {% for course in user.courses_following %}
+                    <div class="ud-pd-md dashed">
+                        <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}（{{ course.teacher.name or _('未知') }}）</a>
+                        {% if course.introduction %}
+                            <span class="label label-danger">课程简介</span>
+                        {% endif %}
+                        {% if course in user.courses_joined %}
+                            <span class="label label-info">已学过</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
 
-    </div>
+            </div>
 
 
-  </div><!-- end float-element -->
-</div><!-- end container -->
+        </div><!-- end float-element -->
+    </div><!-- end container -->
 {% endblock %}

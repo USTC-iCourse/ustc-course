@@ -8,7 +8,6 @@ Highlight.js нужен для подсветки синтаксиса в при
 Автоопределением языка можно управлять, когда оно не справляется само (см.
 дальше "Эвристика").
 
-
 ## Простое использование
 
 Подключите библиотеку и стиль на страницу и повесть вызов подсветки на
@@ -34,7 +33,6 @@ Highlight.js нужен для подсветки синтаксиса в при
 
 [cr]: http://highlightjs.readthedocs.org/en/latest/css-classes-reference.html
 
-
 ## node.js
 
 Highlight.js можно использовать в node.js. Библиотеку со всеми возможными языками можно
@@ -58,10 +56,9 @@ hljs.highlight(lang, code).value;
 hljs.highlightAuto(code).value;
 ```
 
-
 ## AMD
 
-Highlight.js можно использовать с загрузчиком AMD-модулей.  Для этого его
+Highlight.js можно использовать с загрузчиком AMD-модулей. Для этого его
 нужно собрать из исходников следующей командой:
 
 ```bash
@@ -82,7 +79,6 @@ require(["highlight.js/build/highlight.pack"], function(hljs){
 });
 ```
 
-
 ## Замена TABов
 
 Также вы можете заменить символы TAB ('\x09'), используемые для отступов, на
@@ -98,7 +94,6 @@ require(["highlight.js/build/highlight.pack"], function(hljs){
   hljs.initHighlightingOnLoad();
 </script>
 ```
-
 
 ## Инициализация вручную
 
@@ -126,7 +121,6 @@ hljs.configure({useBR: true});
 $('div.code').each(function(i, e) {hljs.highlightBlock(e)});
 ```
 
-
 ## Эвристика
 
 Определение языка, на котором написан фрагмент, делается с помощью
@@ -153,14 +147,12 @@ $('div.code').each(function(i, e) {hljs.highlightBlock(e)});
 <pre><code class="no-highlight">...</code></pre>
 ```
 
-
 ## Экспорт
 
 В файле export.html находится небольшая программка, которая показывает и дает
 скопировать непосредственно HTML-код подсветки для любого заданного фрагмента кода.
 Это может понадобится например на сайте, на котором нельзя подключить сам скрипт
 highlight.js.
-
 
 ## Координаты
 

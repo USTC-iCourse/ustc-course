@@ -1,70 +1,73 @@
 {% extends "layout-simple.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
-    {% if error %}
-    <!-- error message display -->
-    <div class="row">
-      <div class="alert alert-danger col-sm-7" role="alert">
-        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-        {{ error }}
-      </div>
+            {% if error %}
+                <!-- error message display -->
+                <div class="row">
+                    <div class="alert alert-danger col-sm-7" role="alert">
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        {{ error }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <h3 class="blue">使用评课社区账号登录 {{ from_app }}</h3>
+            <hr>
+
+            <form class="form-horizontal" method="post" action="{{ url_for('api.signin_3rdparty') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input type="hidden" name="from_app" value="{{ from_app }}"/>
+                <input type="hidden" name="next_url" value="{{ next_url }}"/>
+                <input type="hidden" name="challenge" value="{{ challenge }}"/>
+
+                <div class="form-group">
+                    <div class="col-sm-7">
+                        <p class="text-muted"><strong>您在评课社区的用户名、密码将不会分享给 {{ from_app }}。</strong></p>
+                        <p class="text-muted">登录后，您将跳转到：{{ next_url|extract_domain }}</p>
+                    </div>
+                </div>
+
+                {% if current_user.is_authenticated %}
+                    <div class="form-group">
+                        <div class="col-sm-7">
+                            <button type="submit" class="btn btn-blue btn-block">确认用 {{ current_user.email }} 登录
+                            </button>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        <label for="inputEmail" class="col-sm-3 control-label">科大邮箱（不是用户名）</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="email" class="form-control" id="inputEmail" placeholder="Email"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputPassword" class="col-sm-3 control-label">评课社区密码</label>
+                        <div class="col-sm-4">
+                            <input type="password" name="password" class="form-control" id="inputPassword"
+                                   placeholder="Password">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-4">
+                            <button type="submit" class="btn btn-blue btn-block">登录</button>
+                        </div>
+                    </div>
+                {% endif %}
+            </form>
+
+        </div>
     </div>
-    {% endif %}
-
-    <h3 class="blue">使用评课社区账号登录 {{ from_app }}</h3>
-    <hr>
-
-    <form class="form-horizontal" method="post" action="{{ url_for('api.signin_3rdparty') }}">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <input type="hidden" name="from_app" value="{{ from_app }}" />
-      <input type="hidden" name="next_url" value="{{ next_url }}" />
-      <input type="hidden" name="challenge" value="{{ challenge }}" />
-
-      <div class="form-group">
-        <div class="col-sm-7">
-	  <p class="text-muted"><strong>您在评课社区的用户名、密码将不会分享给 {{ from_app }}。</strong></p>
-          <p class="text-muted">登录后，您将跳转到：{{ next_url|extract_domain }}</p>
-	</div>
-      </div>
-
-      {% if current_user.is_authenticated %}
-      <div class="form-group">
-        <div class="col-sm-7">
-	  <button type="submit" class="btn btn-blue btn-block">确认用 {{ current_user.email }} 登录</button>
-        </div>
-      </div>
-      {% else %}
-      <div class="form-group">
-        <label for="inputEmail" class="col-sm-3 control-label">科大邮箱（不是用户名）</label>
-        <div class="col-sm-4">
-          <input type="text" name="email" class="form-control" id="inputEmail" placeholder="Email" autocomplete="off">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputPassword" class="col-sm-3 control-label">评课社区密码</label>
-        <div class="col-sm-4">
-          <input type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-4">
-          <button type="submit" class="btn btn-blue btn-block">登录</button>
-        </div>
-      </div>
-      {% endif %}
-    </form>
-
-  </div>
-</div>
 
 {% endblock %}
 
 {% block script %}
-<script>
- $('#inputEmail').focus();
-</script>
+    <script>
+        $('#inputEmail').focus();
+    </script>
 {% endblock %}

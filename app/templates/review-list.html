@@ -1,69 +1,76 @@
-      <div class="ud-pd-sm">
-	<span class="text-muted">共 {{ reviews.total }} 个点评（当前第 {{ reviews.page }} 页）</span>
-      </div>
+<div class="ud-pd-sm">
+    <span class="text-muted">共 {{ reviews.total }} 个点评（当前第 {{ reviews.page }} 页）</span>
+</div>
 
-      {% for review in reviews.items %}
-          {% if not review.is_blocked or current_user.is_admin or current_user == review.author %}
-      <div class="ud-pd-md dashed">
-        <div class="row">
-          <div class="col-sm-1 col-xs-2 right-pd-no">
-            <img class="avatar-md circle" src="{% if review.is_anonymous %}{{ review.author.default_avatar }}{% else %}{{ review.author.avatar }}{% endif %}"/>
-          </div>
-          <div class="col-sm-11 col-xs-10">
-            <div class="grey bm-pd-md">
-          {% if review.is_anonymous %}
-          <span class="blue">匿名用户</span>
-          {% else %}
-	      <a href="{{ url_for('user.view_profile', user_id=review.author.id) }}">{{ review.author.username }}</a>
-          {% endif %}
-	      {% if review.publish_time == review.update_time %}点评了{% else %}更新了点评{% endif %}
-              <a href="{{ url_for('course.view_course', course_id=review.course.id) }}">{{ review.course.name }}{% if review.course.teachers %}（{{ review.course.teacher_names_display|name_display_short }}）{% endif %}</a>
+{% for review in reviews.items %}
+    {% if not review.is_blocked or current_user.is_admin or current_user == review.author %}
+        <div class="ud-pd-md dashed">
+            <div class="row">
+                <div class="col-sm-1 col-xs-2 right-pd-no">
+                    <img class="avatar-md circle" src="
+                            {% if review.is_anonymous %}{{ review.author.default_avatar }}{% else %}{{ review.author.avatar }}{% endif %}"/>
+                </div>
+                <div class="col-sm-11 col-xs-10">
+                    <div class="grey bm-pd-md">
+                        {% if review.is_anonymous %}
+                            <span class="blue">匿名用户</span>
+                        {% else %}
+                            <a href="{{ url_for('user.view_profile', user_id=review.author.id) }}">{{ review.author.username }}</a>
+                        {% endif %}
+                        {% if review.publish_time == review.update_time %}点评了{% else %}更新了点评{% endif %}
+                        <a href="{{ url_for('course.view_course', course_id=review.course.id) }}">
+                            {{ review.course.name }}{% if review.course.teachers %}（
+                                {{ review.course.teacher_names_display|name_display_short }}）{% endif %}</a>
 
-              <span class="float-right localtime" style="display: none;">{{ review.update_time|utctime }}</span>
-            </div>
-            {% include 'review-hidden.html' %}
-            <p class="text-muted">
-	      {% if keyword %}
-	      {{ review.content|abstract_by_keyword(keyword)|safe }}
-	      {% else %}
-	      {{ review.content|abstract }}
-	      {% endif %}
-	      <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a>
-	    </p>
-          </div><!-- ./col-md-8 -->
-        </div><!-- ./row -->
-      </div><!-- ./dashed -->
-	{% endif %}
-      {% endfor %}
+                        <span class="float-right localtime"
+                              style="display: none;">{{ review.update_time|utctime }}</span>
+                    </div>
+                    {% include 'review-hidden.html' %}
+                    <p class="text-muted">
+                        {% if keyword %}
+                            {{ review.content|abstract_by_keyword(keyword)|safe }}
+                        {% else %}
+                            {{ review.content|abstract }}
+                        {% endif %}
+                        <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a>
+                    </p>
+                </div><!-- ./col-md-8 -->
+            </div><!-- ./row -->
+        </div><!-- ./dashed -->
+    {% endif %}
+{% endfor %}
 
-    <nav>
-      <ul class="pagination">
-        {% if reviews.has_prev %} 
-        <li>
-            <a href="{{ url_for(this_module, page=reviews.prev_num, q=keyword, follow_type=follow_type) }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        {% else %} 
-        <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+<nav>
+    <ul class="pagination">
+        {% if reviews.has_prev %}
+            <li>
+                <a href="{{ url_for(this_module, page=reviews.prev_num, q=keyword, follow_type=follow_type) }}"
+                   aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
         {% endif %}
-        
+
         {% for page in reviews.iter_pages(left_edge=1, right_edge=0) %}
             {% if page == reviews.page %}
-            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
+                <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
             {% elif page %}
-            <li><a href="{{ url_for(this_module, page=page, q=keyword, follow_type=follow_type) }}">{{ page }}</a></li>
+                <li><a href="{{ url_for(this_module, page=page, q=keyword, follow_type=follow_type) }}">{{ page }}</a>
+                </li>
             {% else %}
-            <li><a>...</a></li>
+                <li><a>...</a></li>
             {% endif %}
         {% endfor %}
 
         {% if reviews.has_next %}
-        <li>
-          <a href="{{ url_for(this_module, page=reviews.next_num, q=keyword, follow_type=follow_type) }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
+            <li>
+                <a href="{{ url_for(this_module, page=reviews.next_num, q=keyword, follow_type=follow_type) }}"
+                   aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
         {% endif %}
-      </ul>
-    </nav>
+    </ul>
+</nav>

@@ -18,7 +18,6 @@ This file contains styles to used by Internet Explorer 8 only.
 a.cke_dialog_ui_button_ok:focus span,
 a.cke_dialog_ui_button_ok:active span,
 a.cke_dialog_ui_button_cancel:focus span,
-a.cke_dialog_ui_button_cancel:active span
-{
-    display: block;
+a.cke_dialog_ui_button_cancel:active span {
+  display: block;
 }

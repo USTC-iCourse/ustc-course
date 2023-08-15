@@ -49,134 +49,137 @@ Special outer level classes used in this file:
    menu items. */
 
 .cke_menubutton {
-    /* The "button" inside a menu item is a <a> element.
-       Transforms it into a block. */
-    display: block;
+  /* The "button" inside a menu item is a <a> element.
+     Transforms it into a block. */
+  display: block;
 }
 
 .cke_button_icon {
-    opacity: .8;
+  opacity: .8;
 }
 
 .cke_menuitem span {
-    /* Avoid the text selection cursor inside menu items. */
-    cursor: default;
+  /* Avoid the text selection cursor inside menu items. */
+  cursor: default;
 }
 
 .cke_menubutton {
-    &:hover, &:focus, &:active {
-        background-color: #D3D3D3;
-        display: block;
-    }
+  &:hover, &:focus, &:active {
+    background-color: #D3D3D3;
+    display: block;
+  }
 }
 
 .cke_hc .cke_menubutton {
-    padding: 2px;
-    &:hover, &:focus, &:active {
-        border: 2px solid;
-        padding: 0;
-    }
+  padding: 2px;
+
+  &:hover, &:focus, &:active {
+    border: 2px solid;
+    padding: 0;
+  }
 }
 
 .cke_menubutton_inner {
-    display: table-row;
+  display: table-row;
 }
 
 .cke_menubutton_icon,
 .cke_menubutton_label,
 .cke_menuarrow {
-    display: table-cell;
+  display: table-cell;
 }
 
 /* The menu item icon. */
 .cke_menubutton_icon {
-    background-color: #D7D8D7;
-    opacity: 0.70; /* Safari, Opera and Mozilla */
-    filter: alpha(opacity=70); /* IE */
-    padding: 4px;
+  background-color: #D7D8D7;
+  opacity: 0.70; /* Safari, Opera and Mozilla */
+  filter: alpha(opacity=70); /* IE */
+  padding: 4px;
 }
 
 .cke_hc .cke_menubutton_icon {
-    height: 16px;
-    width: 0;
-    padding: 4px 0;
+  height: 16px;
+  width: 0;
+  padding: 4px 0;
 }
 
 .cke_menubutton {
-    &:hover, &:focus, &:active {
-        .cke_menubutton_icon {
-            background-color: #D0D2D0;
-        }
+  &:hover, &:focus, &:active {
+    .cke_menubutton_icon {
+      background-color: #D0D2D0;
     }
+  }
 }
 
 .cke_menubutton_disabled {
-    &:hover, &:focus, &:active {
-        .cke_menubutton_icon {
-            /* The icon will get opacity as well when hovered. */
-            opacity: 0.3;
-            filter: alpha(opacity=30);
-        }
+  &:hover, &:focus, &:active {
+    .cke_menubutton_icon {
+      /* The icon will get opacity as well when hovered. */
+      opacity: 0.3;
+      filter: alpha(opacity=30);
     }
+  }
 }
 
 /* The textual part of each menu item. */
 .cke_menubutton_label {
-    padding: 0 5px;
-    background-color: transparent;
-    width: 100%;
-    vertical-align: middle;
+  padding: 0 5px;
+  background-color: transparent;
+  width: 100%;
+  vertical-align: middle;
 }
 
 .cke_menubutton_disabled .cke_menubutton_label {
-    /* Greyed label text indicates a disabled menu item. */
-    opacity: 0.3;
-    filter: alpha(opacity=30);
+  /* Greyed label text indicates a disabled menu item. */
+  opacity: 0.3;
+  filter: alpha(opacity=30);
 }
 
 .cke_menubutton_on {
-    border: 1px solid #dedede;
-    background-color: #f2f2f2;
-    .cke_menubutton_icon {
-        padding-right: 3px;
-    }
+  border: 1px solid #dedede;
+  background-color: #f2f2f2;
+
+  .cke_menubutton_icon {
+    padding-right: 3px;
+  }
 }
 
 .cke_menubutton {
-    &:hover, &:focus, &:active {
-        background-color: #EFF0EF;
-    }
+  &:hover, &:focus, &:active {
+    background-color: #EFF0EF;
+  }
 }
 
 .cke_panel_frame .cke_menubutton_label {
-    display: none;
+  display: none;
 }
 
 /* The separator used to separate menu item groups. */
 .cke_menuseparator {
-    background-color: #D3D3D3;
-    height: 1px;
-    filter: alpha(opacity=70); /* IE */
-    opacity: 0.70; /* Safari, Opera and Mozilla */
+  background-color: #D3D3D3;
+  height: 1px;
+  filter: alpha(opacity=70); /* IE */
+  opacity: 0.70; /* Safari, Opera and Mozilla */
 }
 
 /* The small arrow shown for item with sub-menus. */
 .cke_menuarrow {
-    background-image: url(images/arrow.png);
-    background-position: 0 10px;
-    background-repeat: no-repeat;
-    padding: 0 5px;
-    span {
-        display: none;
-    }
+  background-image: url(images/arrow.png);
+  background-position: 0 10px;
+  background-repeat: no-repeat;
+  padding: 0 5px;
+
+  span {
+    display: none;
+  }
 }
 
 .cke_rtl .cke_menuarrow {
-    background-position: 5px -13px;
-    background-repeat: no-repeat;
+  background-position: 5px -13px;
+  background-repeat: no-repeat;
 }
 
 .cke_hc .cke_menuarrow span {
-    vertical-align: middle;
-    display: inline;
+  vertical-align: middle;
+  display: inline;
 }

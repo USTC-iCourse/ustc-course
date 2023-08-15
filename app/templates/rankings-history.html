@@ -1,33 +1,35 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
-    <div class="col-md-offset-1 col-md-10" style="padding: 0;">
-      <div class="center top-pd-md bm-pd-lg desktop">
-        <span class="h3 blue"><strong>评课社区历史排行榜</strong></span>
-        <span>（本排行榜仅供参考）</span>
-      </div>
-      <div class="top-pd-md bm-pd-lg mobile">
-        <span class="h3 blue"><strong>评课社区历史排行榜</strong></span>
-        <span>（本排行榜仅供参考）</span>
-      </div>
+            <div class="col-md-offset-1 col-md-10" style="padding: 0;">
+                <div class="center top-pd-md bm-pd-lg desktop">
+                    <span class="h3 blue"><strong>评课社区历史排行榜</strong></span>
+                    <span>（本排行榜仅供参考）</span>
+                </div>
+                <div class="top-pd-md bm-pd-lg mobile">
+                    <span class="h3 blue"><strong>评课社区历史排行榜</strong></span>
+                    <span>（本排行榜仅供参考）</span>
+                </div>
 
-      <div class="ud-pd-sm larger-text">
-        {% for year_month in history_files %}
-	<h3>{{ year_month }}</h3>
-	{% for history_file in history_files[year_month] %}
-        <ul>
-          <li><a href="{{ url_for('stats.rankings_history_file', path=history_file[1]) }}">{{ history_file[0] }}</a></li>
-        </ul>
-        {% endfor %}
-	{% endfor %}
-      </div>
+                <div class="ud-pd-sm larger-text">
+                    {% for year_month in history_files %}
+                        <h3>{{ year_month }}</h3>
+                        {% for history_file in history_files[year_month] %}
+                            <ul>
+                                <li>
+                                    <a href="{{ url_for('stats.rankings_history_file', path=history_file[1]) }}">{{ history_file[0] }}</a>
+                                </li>
+                            </ul>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
 
-    </div>
-  </div><!-- end float-element -->
-</div><!-- end container -->
+            </div>
+        </div><!-- end float-element -->
+    </div><!-- end container -->
 {% endblock %}
 {% block script %}
 {% endblock %}

@@ -1,200 +1,200 @@
 <script src="/static/stellarnav/js/stellarnav.js"></script>
 <script>
- $('#myTab a').click(function (e) {
-   e.preventDefault()
-   $(this).tab('show')
- })
+    $('#myTab a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+    })
 
- var action_data = {
-   'follow': {
-     'enabled': {{ 'true' if course.following else 'false' }},
-     'count': {{ course.follow_count or 0 }},
-     'do_url': "{{ url_for('course.follow', course_id=course.id) }}",
-     'undo_url': "{{ url_for('course.unfollow', course_id=course.id) }}",
-   },
-   'downvote': {
-     'enabled': {{ 'true' if course.downvoted else 'false' }},
-     'count': {{ course.downvote_count or 0 }},
-     'do_url': "{{ url_for('course.downvote', course_id=course.id) }}",
-     'undo_url': "{{ url_for('course.undo_downvote', course_id=course.id) }}",
-     'conflict': 'upvote',
-   },
-   'upvote': {
-     'enabled': {{ 'true' if course.upvoted else 'false' }},
-     'count': {{ course.upvote_count or 0 }},
-     'do_url': "{{ url_for('course.upvote', course_id=course.id) }}",
-     'undo_url': "{{ url_for('course.undo_upvote', course_id=course.id) }}",
-     'conflict': 'downvote',
-   },
-   'join': {
-     'enabled': {{ 'true' if course.joined else 'false' }},
-     'do_url': "{{ url_for('course.join', course_id=course.id) }}",
-     'undo_url': "{{ url_for('course.quit', course_id=course.id) }}",
-   },
- }
+    var action_data = {
+        'follow': {
+            'enabled': {{ 'true' if course.following else 'false' }},
+            'count': {{ course.follow_count or 0 }},
+            'do_url': "{{ url_for('course.follow', course_id=course.id) }}",
+            'undo_url': "{{ url_for('course.unfollow', course_id=course.id) }}",
+        },
+        'downvote': {
+            'enabled': {{ 'true' if course.downvoted else 'false' }},
+            'count': {{ course.downvote_count or 0 }},
+            'do_url': "{{ url_for('course.downvote', course_id=course.id) }}",
+            'undo_url': "{{ url_for('course.undo_downvote', course_id=course.id) }}",
+            'conflict': 'upvote',
+        },
+        'upvote': {
+            'enabled': {{ 'true' if course.upvoted else 'false' }},
+            'count': {{ course.upvote_count or 0 }},
+            'do_url': "{{ url_for('course.upvote', course_id=course.id) }}",
+            'undo_url': "{{ url_for('course.undo_upvote', course_id=course.id) }}",
+            'conflict': 'downvote',
+        },
+        'join': {
+            'enabled': {{ 'true' if course.joined else 'false' }},
+            'do_url': "{{ url_for('course.join', course_id=course.id) }}",
+            'undo_url': "{{ url_for('course.quit', course_id=course.id) }}",
+        },
+    }
 
- $(function() {
-   for (action in action_data) {
+    $(function () {
+        for (action in action_data) {
 
-     if (! $('.btn-' + action).length)
-       continue;
+            if (!$('.btn-' + action).length)
+                continue;
 
-     (function(action) {
-       var d = action_data[action];
+            (function (action) {
+                var d = action_data[action];
 
-       var do_btn = $('.btn-' + action).filter('.btn-do');
-       var undo_btn = $('.btn-' + action).filter('.btn-undo');
+                var do_btn = $('.btn-' + action).filter('.btn-do');
+                var undo_btn = $('.btn-' + action).filter('.btn-undo');
 
-       function update_count(count) {
-         d.count = count;
-         $('.btn-' + action + ' .count').text(count);
-       }
-       function http_post_wrapper(url) {
-         $.post(url, null, function(o) {
-           if (o.count)
-             update_count(o.count);
-           if (!o.ok)
-             alert('操作失败，请重试');
-           d.in_progress = false;
-         }, 'json')
-         .fail(function() {
-           alert('操作失败，请重试');
-           d.in_progress = false;
-         });
-       }
+                function update_count(count) {
+                    d.count = count;
+                    $('.btn-' + action + ' .count').text(count);
+                }
 
-       do_btn.click(function() {
-         {% if user.is_authenticated %}
-         if (d.enabled)
-           return;
-         if (d.in_progress) {
-           alert('操作正在进行中，请稍候再试');
-           return;
-         }
-         if (d.conflict && action_data[d.conflict].in_progress) {
-           alert('相反的操作正在进行中，请稍候再试');
-           return;
-         }
-         d.in_progress = true;
-         do_btn.hide();
-         undo_btn.show();
-         d.enabled = true;
-         update_count(d.count + 1);
-         if (d.conflict && action_data[d.conflict].enabled) {
-           var conflict_do_btn = $('.btn-' + d.conflict).filter('.btn-do');
-           var conflict_undo_btn = $('.btn-' + d.conflict).filter('.btn-undo');
-           var conflict_count = action_data[d.conflict].count - 1;
-           action_data[d.conflict].count = conflict_count;
-           action_data[d.conflict].enabled = false;
-           $('.btn-' + d.conflict + ' .count').text(conflict_count);
-           conflict_undo_btn.hide();
-           conflict_do_btn.show();
-         }
-         http_post_wrapper(d.do_url);
-         {% else %}
-         $('#signin').modal('show');
-         {% endif %}
-       });
+                function http_post_wrapper(url) {
+                    $.post(url, null, function (o) {
+                        if (o.count)
+                            update_count(o.count);
+                        if (!o.ok)
+                            alert('操作失败，请重试');
+                        d.in_progress = false;
+                    }, 'json')
+                        .fail(function () {
+                            alert('操作失败，请重试');
+                            d.in_progress = false;
+                        });
+                }
 
-       undo_btn.click(function() {
-         {% if user.is_authenticated %}
-         if (!d.enabled)
-           return;
-         if (d.in_progress) {
-           alert('操作正在进行中，请稍候再试');
-           return;
-         }
-         if (d.conflict && action_data[d.conflict].in_progress) {
-           alert('相反的操作正在进行中，请稍候再试');
-           return;
-         }
-         d.in_progress = true;
-         undo_btn.hide();
-         do_btn.show();
-         d.enabled = false;
-         update_count(d.count - 1);
-         http_post_wrapper(d.undo_url);
-         {% else %}
-         $('#signin').modal('show');
-         {% endif %}
-       });
+                do_btn.click(function () {
+                    {% if user.is_authenticated %}
+                        if (d.enabled)
+                            return;
+                        if (d.in_progress) {
+                            alert('操作正在进行中，请稍候再试');
+                            return;
+                        }
+                        if (d.conflict && action_data[d.conflict].in_progress) {
+                            alert('相反的操作正在进行中，请稍候再试');
+                            return;
+                        }
+                        d.in_progress = true;
+                        do_btn.hide();
+                        undo_btn.show();
+                        d.enabled = true;
+                        update_count(d.count + 1);
+                        if (d.conflict && action_data[d.conflict].enabled) {
+                            var conflict_do_btn = $('.btn-' + d.conflict).filter('.btn-do');
+                            var conflict_undo_btn = $('.btn-' + d.conflict).filter('.btn-undo');
+                            var conflict_count = action_data[d.conflict].count - 1;
+                            action_data[d.conflict].count = conflict_count;
+                            action_data[d.conflict].enabled = false;
+                            $('.btn-' + d.conflict + ' .count').text(conflict_count);
+                            conflict_undo_btn.hide();
+                            conflict_do_btn.show();
+                        }
+                        http_post_wrapper(d.do_url);
+                    {% else %}
+                        $('#signin').modal('show');
+                    {% endif %}
+                });
 
-       update_count(d.count);
+                undo_btn.click(function () {
+                    {% if user.is_authenticated %}
+                        if (!d.enabled)
+                            return;
+                        if (d.in_progress) {
+                            alert('操作正在进行中，请稍候再试');
+                            return;
+                        }
+                        if (d.conflict && action_data[d.conflict].in_progress) {
+                            alert('相反的操作正在进行中，请稍候再试');
+                            return;
+                        }
+                        d.in_progress = true;
+                        undo_btn.hide();
+                        do_btn.show();
+                        d.enabled = false;
+                        update_count(d.count - 1);
+                        http_post_wrapper(d.undo_url);
+                    {% else %}
+                        $('#signin').modal('show');
+                    {% endif %}
+                });
 
-       if (d.enabled) {
-         undo_btn.show();
-         do_btn.hide();
-       } else {
-         do_btn.show();
-         undo_btn.hide();
-       }
-     })(action);
-   }
-   $('#action-btn-group').show();
- });
+                update_count(d.count);
 
- function delete_review(review_id, is_admin)
- {
-     if (is_admin) {
-         if (!confirm('你正在作为管理员，删除其他用户的点评！建议使用屏蔽而非删除功能，确定删除吗？')) {
-             return;
-         }
-     } else {
-         if (!confirm('你真的要删除此点评吗？删除的点评是不可恢复的！')) {
-             return;
-         }
-     }
-     $.post("{{ url_for('review.delete_review') }}", { id: review_id }, function(o) {
-         if (o.ok)
-            window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
-         else
-            alert(o.message);
-     }, 'json')
-     .fail(function() {
-         alert('删除点评失败，请重试');
-     });
- }
+                if (d.enabled) {
+                    undo_btn.show();
+                    do_btn.hide();
+                } else {
+                    do_btn.show();
+                    undo_btn.hide();
+                }
+            })(action);
+        }
+        $('#action-btn-group').show();
+    });
 
- $('.showmore-shadow').click(function(e) {
-   $('.showmore-text').css('max-height', 'none');
-   $('.showmore-wrapper').hide();
- });
+    function delete_review(review_id, is_admin) {
+        if (is_admin) {
+            if (!confirm('你正在作为管理员，删除其他用户的点评！建议使用屏蔽而非删除功能，确定删除吗？')) {
+                return;
+            }
+        } else {
+            if (!confirm('你真的要删除此点评吗？删除的点评是不可恢复的！')) {
+                return;
+            }
+        }
+        $.post("{{ url_for('review.delete_review') }}", {id: review_id}, function (o) {
+            if (o.ok)
+                window.location.href = "{{ url_for('course.view_course', course_id=course.id) }}";
+            else
+                alert(o.message);
+        }, 'json')
+            .fail(function () {
+                alert('删除点评失败，请重试');
+            });
+    }
 
- if ($('.showmore-text').height() >= 750) {
-   $('.showmore-text').css('max-height', '400px');
-   $('.showmore-wrapper').show();
- }
+    $('.showmore-shadow').click(function (e) {
+        $('.showmore-text').css('max-height', 'none');
+        $('.showmore-wrapper').hide();
+    });
 
- // go to top floating button from Freemind theme of Hexo
- $(window).scroll(function(){  //只要窗口滚动,就触发下面代码 
-     var scrollt = document.documentElement.scrollTop + document.body.scrollTop; //获取滚动后的高度 
-     if(scrollt>200){  //判断滚动后高度超过200px
-         $("#gotop").fadeIn(400); //淡出
- 		if($(window).width() >= 1200){
- 			$(".navbar").stop().fadeTo(400, 0.2);
- 		}
-     }else{
-         $("#gotop").fadeOut(400); //如果返回或者没有超过,就淡入.必须加上stop()停止之前动画,否则会出现闪动
-         if($(window).width() >= 1200){
- 			$(".navbar").stop().fadeTo(400, 1);
-         }
-     }
- });
- $("#gotop").click(function(){ //当点击标签的时候,使用animate在200毫秒的时间内,滚到顶部        
- 	$("html,body").animate({scrollTop:"0px"},200);
- });
+    if ($('.showmore-text').height() >= 750) {
+        $('.showmore-text').css('max-height', '400px');
+        $('.showmore-wrapper').show();
+    }
 
- // stellar nav
- jQuery(document).ready(function($) {
- 	jQuery('.stellarnav').stellarNav({
- 		theme: 'light',
- 		breakpoint: 960,
-		position: 'none',
-        closeBtn: false,
-        mobileMode: true
- 	});
- });
-	
+    // go to top floating button from Freemind theme of Hexo
+    $(window).scroll(function () {  //只要窗口滚动,就触发下面代码
+        var scrollt = document.documentElement.scrollTop + document.body.scrollTop; //获取滚动后的高度
+        if (scrollt > 200) {  //判断滚动后高度超过200px
+            $("#gotop").fadeIn(400); //淡出
+            if ($(window).width() >= 1200) {
+                $(".navbar").stop().fadeTo(400, 0.2);
+            }
+        } else {
+            $("#gotop").fadeOut(400); //如果返回或者没有超过,就淡入.必须加上stop()停止之前动画,否则会出现闪动
+            if ($(window).width() >= 1200) {
+                $(".navbar").stop().fadeTo(400, 1);
+            }
+        }
+    });
+    $("#gotop").click(function () { //当点击标签的时候,使用animate在200毫秒的时间内,滚到顶部
+        $("html,body").animate({scrollTop: "0px"}, 200);
+    });
+
+    // stellar nav
+    jQuery(document).ready(function ($) {
+        jQuery('.stellarnav').stellarNav({
+            theme: 'light',
+            breakpoint: 960,
+            position: 'none',
+            closeBtn: false,
+            mobileMode: true
+        });
+    });
+
 </script>
 
 {% include 'scripts/review-ajax.html' %}

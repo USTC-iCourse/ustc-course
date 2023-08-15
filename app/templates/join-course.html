@@ -1,36 +1,38 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
 
-    <div class="bm-pd-lg">
-      <div class="inline-h3">
-          <span class="blue h3"><a href="{{ url_for('user.view_profile', user_id=user.id) }}">{{ user.username }}</a> 学过</span>
-        （{{ user.classes_joined_count }}门）
-      </div>
+            <div class="bm-pd-lg">
+                <div class="inline-h3">
+                    <span class="blue h3"><a
+                            href="{{ url_for('user.view_profile', user_id=user.id) }}">{{ user.username }}</a> 学过</span>
+                    （{{ user.classes_joined_count }}门）
+                </div>
 
-      {% for course_class in user.classes_joined %}
-      {% if course_class.course_id %}
-      <div class="ud-pd-md dashed">
-        <a href="{{ url_for('course.view_course', course_id=course_class.course_id) }}">{{ course_class.course.name }}
-        {% if course_class.course.teachers %}（{{ course_class.course.teacher_names_display|name_display_short }}）{% endif %}
-        </a>
-        {% if user != current_user and course_class.course.reviewed_by(user) %}
-        <span class="label label-success">TA已点评</span>
-        {% endif %}
-        {% if course_class.course.reviewed_by(current_user) %}
-        <span class="label label-success">我已点评</span>
-        {% endif %}
-        <span class="small grey align-bottom  float-right">{{ course_class.term|term_display }}</span>
-      </div>
-      {% endif %}
-      {% endfor %}
+                {% for course_class in user.classes_joined %}
+                    {% if course_class.course_id %}
+                        <div class="ud-pd-md dashed">
+                            <a href="{{ url_for('course.view_course', course_id=course_class.course_id) }}">{{ course_class.course.name }}
+                                {% if course_class.course.teachers %}（
+                                    {{ course_class.course.teacher_names_display|name_display_short }}）{% endif %}
+                            </a>
+                            {% if user != current_user and course_class.course.reviewed_by(user) %}
+                                <span class="label label-success">TA已点评</span>
+                            {% endif %}
+                            {% if course_class.course.reviewed_by(current_user) %}
+                                <span class="label label-success">我已点评</span>
+                            {% endif %}
+                            <span class="small grey align-bottom  float-right">{{ course_class.term|term_display }}</span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
 
-    </div>
+            </div>
 
 
-  </div><!-- end float-element -->
-</div><!-- end container -->
+        </div><!-- end float-element -->
+    </div><!-- end container -->
 {% endblock %}

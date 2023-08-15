@@ -3,7 +3,7 @@
  * For licensing, see LICENSE.html or http://ckeditor.com/license
  */
 
-(function() {
+(function () {
     if (!supportsLocalStorage()) {
         CKEDITOR.plugins.add("autosave", {}); //register a dummy plugin to pass CKEditor plugin initialization process
         return;
@@ -12,19 +12,19 @@
     CKEDITOR.plugins.add("autosave", {
         lang: 'ca,cs,de,en,es,fr,ja,pl,pt-br,sv,zh,zh-cn', // %REMOVE_LINE_CORE%
         version: 0.12,
-        init: function(editor) {
+        init: function (editor) {
             CKEDITOR.document.appendStyleSheet(CKEDITOR.getUrl(CKEDITOR.plugins.getPath('autosave') + 'css/autosave.min.css'));
 
-            editor.on('instanceReady', function(){
+            editor.on('instanceReady', function () {
                 if (typeof (jQuery) === 'undefined') {
-                    CKEDITOR.scriptLoader.load('//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js', function() {
+                    CKEDITOR.scriptLoader.load('//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js', function () {
                         jQuery.noConflict();
 
                         loadPlugin(editor);
                     });
 
                 } else {
-                    CKEDITOR.scriptLoader.load(CKEDITOR.getUrl(CKEDITOR.plugins.getPath('autosave') + 'js/extensions.min.js'), function() {
+                    CKEDITOR.scriptLoader.load(CKEDITOR.getUrl(CKEDITOR.plugins.getPath('autosave') + 'js/extensions.min.js'), function () {
                         loadPlugin(editor);
                     });
                 }
@@ -40,19 +40,19 @@
             editorInstance.config.autosave_saveDetectionSelectors != null ? editorInstance.config.autosave_saveDetectionSelectors : "a[href^='javascript:__doPostBack'][id*='Save'],a[id*='Cancel']";
 
 
-        CKEDITOR.scriptLoader.load(CKEDITOR.getUrl(CKEDITOR.plugins.getPath('autosave') + 'js/extensions.min.js'), function() {
+        CKEDITOR.scriptLoader.load(CKEDITOR.getUrl(CKEDITOR.plugins.getPath('autosave') + 'js/extensions.min.js'), function () {
             GenerateAutoSaveDialog(editorInstance, autoSaveKey);
 
             CheckForAutoSavedContent(editorInstance, autoSaveKey, notOlderThen);
         });
 
-        jQuery(saveDetectionSelectors).click(function() {
+        jQuery(saveDetectionSelectors).click(function () {
             RemoveStorage(autoSaveKey);
         });
 
         editorInstance.on('change', startTimer);
 
-        editorInstance.on('destroy', function() {
+        editorInstance.on('destroy', function () {
             if (saveOnDestroy) {
                 SaveData(autoSaveKey, editorInstance);
             }
@@ -62,14 +62,14 @@
     var timeOutId = 0,
         savingActive = false;
 
-    var startTimer = function(event) {
+    var startTimer = function (event) {
         var delay = event.editor.config.autosave_delay != null ? event.editor.config.autosave_delay : 10;
         if (!savingActive) {
             savingActive = true;
             timeOutId = setTimeout(onTimer, delay * 1000, event);
         }
     };
-    var onTimer = function(event) {
+    var onTimer = function (event) {
         if (event.editor.checkDirty() || event.editor.plugins.bbcode) {
             var editor = event.editor,
                 autoSaveKey = editor.config.autosave_SaveKey != null ? editor.config.autosave_SaveKey : 'autosave_' + window.location + "_" + editor.id;
@@ -95,16 +95,16 @@
     }
 
     function GenerateAutoSaveDialog(editorInstance, autoSaveKey) {
-        CKEDITOR.dialog.add('autosaveDialog', function() {
+        CKEDITOR.dialog.add('autosaveDialog', function () {
             return {
                 title: editorInstance.lang.autosave.title,
                 minHeight: 155,
                 height: 300,
                 width: 750,
-                onShow: function() {
+                onShow: function () {
                     RenderDiff(this, editorInstance, autoSaveKey);
                 },
-                onOk: function() {
+                onOk: function () {
                     var jsonSavedContent = LoadData(autoSaveKey);
 
                     editorInstance.loadSnapshot(jsonSavedContent.data);
@@ -112,7 +112,7 @@
                     // do not remove saved editor content after loading
                     //RemoveStorage(autoSaveKey);
                 },
-                onCancel: function() {
+                onCancel: function () {
                     RemoveStorage(autoSaveKey);
                 },
                 contents: [
@@ -126,7 +126,7 @@
                                 label: editorInstance.lang.autosave.diffType,
                                 items: [[editorInstance.lang.autosave.sideBySide, 'sideBySide'], [editorInstance.lang.autosave.inline, 'inline']],
                                 'default': 'sideBySide',
-                                onClick: function() {
+                                onClick: function () {
                                     RenderDiff(this._.dialog, editorInstance, autoSaveKey);
                                 }
                             }, {
@@ -143,9 +143,9 @@
                         type: 'button',
                         label: editorInstance.lang.autosave.ok,
                         'class': 'cke_dialog_ui_button_ok cke_dialog_autosave_ok',
-                        onClick: function(evt) {
+                        onClick: function (evt) {
                             var dialog = evt.data.dialog;
-                            if (dialog.fire('ok', { hide: true }).hide !== false)
+                            if (dialog.fire('ok', {hide: true}).hide !== false)
                                 dialog.hide();
                         }
                     },
@@ -154,9 +154,9 @@
                         type: 'button',
                         label: editorInstance.lang.autosave.no,
                         'class': 'cke_dialog_ui_button_cancel',
-                        onClick: function(evt) {
+                        onClick: function (evt) {
                             var dialog = evt.data.dialog;
-                            if (dialog.fire('cancel', { hide: true }).hide !== false)
+                            if (dialog.fire('cancel', {hide: true}).hide !== false)
                                 dialog.hide();
                         }
                     }
@@ -213,7 +213,10 @@
     }
 
     function SaveData(autoSaveKey, editorInstance) {
-        var compressedJSON = LZString.compressToUTF16(JSON.stringify({ data: editorInstance.getSnapshot(), saveTime: new Date() }));
+        var compressedJSON = LZString.compressToUTF16(JSON.stringify({
+            data: editorInstance.getSnapshot(),
+            saveTime: new Date()
+        }));
         localStorage.setItem(autoSaveKey, compressedJSON);
 
     }

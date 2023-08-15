@@ -2,18 +2,18 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <body>
 <form action="/api/upload/" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <input type="file" name="image" value=>
     <input type="submit">
 </form>
 <div>
-<form action="/api/review/new_comment/" method="post" >
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-    <input type="integer" name="review_id" value=>
-    <textarea name="content">
+    <form action="/api/review/new_comment/" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="integer" name="review_id" value=>
+        <textarea name="content">
         </textarea>
-    <input type="submit">
-</form>
+        <input type="submit">
+    </form>
 
 </div>
 </body>

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+
 sys.path.append('..')  # fix import directory
 
 from app import app, db
@@ -13,18 +14,17 @@ ctx = app.test_request_context()
 ctx.push()
 
 if sys.argv[1].isdigit():
-    user = User.query.filter(User.id == sys.argv[1]).first()
+  user = User.query.filter(User.id == sys.argv[1]).first()
 else:
-    user = User.query.filter(User.email == sys.argv[1]).first()
+  user = User.query.filter(User.email == sys.argv[1]).first()
 if not user:
-    print('user ' + sys.argv[1] + ' not found (please use User ID or email)')
-    sys.exit(1)
-
+  print('user ' + sys.argv[1] + ' not found (please use User ID or email)')
+  sys.exit(1)
 
 review_count = Review.query.filter(Review.author == user).count()
 if review_count > 0:
-    print(str(user) + ' has ' + str(review_count) + ' reviews')
-    sys.exit(1)
+  print(str(user) + ' has ' + str(review_count) + ' reviews')
+  sys.exit(1)
 
 comments = ReviewComment.query.filter(ReviewComment.author == user).all()
 print(str(user) + ' has ' + str(len(comments)) + ' comments')
@@ -40,12 +40,12 @@ print(str(user) + ' has ' + str(len(user.upvoted_reviews)) + ' upvoted reviews')
 
 confirm = input('Confirm to delete user ' + str(user) + '? (y/n): ')
 if confirm != 'y' and confirm != 'Y':
-    print('Not confirmed')
-    sys.exit(1)
+  print('Not confirmed')
+  sys.exit(1)
 
 for comment in comments:
-    record_review_comment_history(comment, 'delete')
-    comment.delete()
+  record_review_comment_history(comment, 'delete')
+  comment.delete()
 
 user.courses_following = []
 user.courses_upvoted = []

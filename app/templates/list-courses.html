@@ -1,153 +1,158 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container"">
-  <div class="row float-element">
-      {% if teacher %}
-      <span class="text-muted"> {{ teacher.name }} 共 {{ courses.total }} 门课</span></span>
+    <div class="container"">
+    <div class="row float-element">
+        {% if teacher %}
+            <span class="text-muted"> {{ teacher.name }} 共 {{ courses.total }} 门课</span></span>
         {% elif student %}
-      <span class="text-muted"> {{ student.name }} 共 {{ courses.total }} 门课</span></span>
-    {% else %}
-  {% endif %}
-    <hr>
-    <div class="select-box">
-      <ul class="list-unstyled list-inline">
-        <span><strong>学期：</strong></span>
-        <li>全部</li>
-        <li>2015春</li>
-        <li>2014秋</li>
-        <li>2014夏</li>
-        <li>2014春</li>
-        <li>2013</li>
-        <li>
-          <div class="dropdown">
-            <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2012</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2011</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2010</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2009</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2008</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2007</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2006</a></li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-
-      <ul class="list-unstyled list-inline">
-        <span><strong>老师：</strong></span>
-        <li>全部</li>
-        <li>AAA</li>
-        <li>BBB</li>
-        <li>CCC</li>
-        <li>ppp</li>
-        <li>ddd</li>
-        <li>eee</li>
-        <li>
-          <div class="dropdown">
-            <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">更多
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">fff</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">ggg</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">lll</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">iii</a></li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-    </div>
-
-
-    {% for course in courses.items %}
-    <div class="ud-pd-md dashed">
-      <div class="row">
-        <div class="col-sm-1 col-xs-2">
-          <div class="rate-box">{{ course.upvote_count }}</div>
-        </div>
-        <div class="col-md-8 col-xs-10">
-          <a class="px16" href={{ url_for('course.view_course', course_id=course.id) }}>{{ course.name }}（{{ course.teacher.name }}）</a>
-          <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
-          <br><span class="small grey align-bottom mobile">学期：{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
-          {% if course.review_count %}
-          <div class="ud-pd-sm blue">
-            {% for star in range(0,5) %}
-              {% if course.rate.average_rate >= 1.5 + star * 2 %}
-              <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-              {% elif course.rate.average_rate >= 0.5 + star * 2 %}
-              <span class="glyphicon glyphicon-star-half" aria-hidden="true"></span>
-              {% else %}
-              <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-              {% endif %}
-            {% endfor %}
-            <span class="rl-pd-sm h4">{{ course.rate.average_rate }}</span><span class="text-muted px12">({{ course.review_count }} 人评价)</span>
-          </div>
- 
-          <ul class="text-muted list-inline list-unstyled">
-              <li class="right-mg-md">课程难度：{{ course.rate.difficulty }}</li>
-              <li class="right-mg-md">作业多少：{{ course.rate.homework }}</li>
-              <li class="right-mg-md">给分好坏：{{ course.rate.grading }}</li>
-              <li class="right-mg-md">收获大小：{{ course.rate.gain }}</li>
-          </ul>
-          {% else %}
-          <div class="ud-pd-sm blue">
-            {% for star in range(0,5) %}
-              <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
-            {% endfor %}
-            <span class="rl-pd-sm h4"><span class="text-muted px12">暂无评价</span>
-          </div>
-
-          <ul class="text-muted list-inline list-unstyled">
-              <li class="right-mg-md">课程难度：你猜</li>
-              <li class="right-mg-md">作业多少：你猜</li>
-              <li class="right-mg-md">给分好坏：你猜</li>
-              <li class="right-mg-md">收获大小：你猜</li>
-          </ul>
-          {% endif %}
-          <p>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-
-    <nav>
-      <ul class="pagination">
-        {% if courses.has_prev %} 
-        <li>
-            <a href="{{ url_for('home.search', q=keyword, page=courses.prev_num) }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        {% else %} 
-        <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+            <span class="text-muted"> {{ student.name }} 共 {{ courses.total }} 门课</span></span>
+        {% else %}
         {% endif %}
-        
-        {% for page in courses.iter_pages(left_edge=1, right_edge=1) %}
-            {% if page == courses.page %}
-            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
-            {% elif page %}
-            <li><a href="{{ url_for(request.endpoint,page=page,**request.view_args)  }}">{{ page }}</a></li>
-            {% else %}
-            <li><a>...</a></li>
-            {% endif %}
+        <hr>
+        <div class="select-box">
+            <ul class="list-unstyled list-inline">
+                <span><strong>学期：</strong></span>
+                <li>全部</li>
+                <li>2015春</li>
+                <li>2014秋</li>
+                <li>2014夏</li>
+                <li>2014春</li>
+                <li>2013</li>
+                <li>
+                    <div class="dropdown">
+                        <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                           aria-expanded="true">更多
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2012</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2011</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2010</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2009</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2008</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2007</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2006</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="list-unstyled list-inline">
+                <span><strong>老师：</strong></span>
+                <li>全部</li>
+                <li>AAA</li>
+                <li>BBB</li>
+                <li>CCC</li>
+                <li>ppp</li>
+                <li>ddd</li>
+                <li>eee</li>
+                <li>
+                    <div class="dropdown">
+                        <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                           aria-expanded="true">更多
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">fff</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">ggg</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">lll</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">iii</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+
+        {% for course in courses.items %}
+            <div class="ud-pd-md dashed">
+                <div class="row">
+                    <div class="col-sm-1 col-xs-2">
+                        <div class="rate-box">{{ course.upvote_count }}</div>
+                    </div>
+                    <div class="col-md-8 col-xs-10">
+                        <a class="px16"
+                           href={{ url_for('course.view_course', course_id=course.id) }}>{{ course.name }}（{{ course.teacher.name }}）</a>
+                        <span class="small grey align-bottom left-pd-sm desktop">学期：{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
+                        <br><span class="small grey align-bottom mobile">学期：{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
+                        {% if course.review_count %}
+                            <div class="ud-pd-sm blue">
+                                {% for star in range(0,5) %}
+                                    {% if course.rate.average_rate >= 1.5 + star * 2 %}
+                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                    {% elif course.rate.average_rate >= 0.5 + star * 2 %}
+                                        <span class="glyphicon glyphicon-star-half" aria-hidden="true"></span>
+                                    {% else %}
+                                        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="rl-pd-sm h4">{{ course.rate.average_rate }}</span><span
+                                    class="text-muted px12">({{ course.review_count }} 人评价)</span>
+                            </div>
+
+                            <ul class="text-muted list-inline list-unstyled">
+                                <li class="right-mg-md">课程难度：{{ course.rate.difficulty }}</li>
+                                <li class="right-mg-md">作业多少：{{ course.rate.homework }}</li>
+                                <li class="right-mg-md">给分好坏：{{ course.rate.grading }}</li>
+                                <li class="right-mg-md">收获大小：{{ course.rate.gain }}</li>
+                            </ul>
+                        {% else %}
+                            <div class="ud-pd-sm blue">
+                                {% for star in range(0,5) %}
+                                    <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+                                {% endfor %}
+                                <span class="rl-pd-sm h4"><span class="text-muted px12">暂无评价</span>
+                            </div>
+
+                            <ul class="text-muted list-inline list-unstyled">
+                                <li class="right-mg-md">课程难度：你猜</li>
+                                <li class="right-mg-md">作业多少：你猜</li>
+                                <li class="right-mg-md">给分好坏：你猜</li>
+                                <li class="right-mg-md">收获大小：你猜</li>
+                            </ul>
+                        {% endif %}
+                        <p>
+                    </div>
+                </div>
+            </div>
         {% endfor %}
 
-        {% if courses.has_next %}
-        <li>
-          <a href="{{ url_for('home.search', q=keyword, page=courses.next_num) }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-        {% endif %}
-      </ul>
-    </nav>
+        <nav>
+            <ul class="pagination">
+                {% if courses.has_prev %}
+                    <li>
+                        <a href="{{ url_for('home.search', q=keyword, page=courses.prev_num) }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                    </li>
+                {% endif %}
 
-  </div>
-</div><!-- /.container -->
+                {% for page in courses.iter_pages(left_edge=1, right_edge=1) %}
+                    {% if page == courses.page %}
+                        <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a></li>
+                    {% elif page %}
+                        <li><a href="{{ url_for(request.endpoint,page=page,**request.view_args) }}">{{ page }}</a></li>
+                    {% else %}
+                        <li><a>...</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if courses.has_next %}
+                    <li>
+                        <a href="{{ url_for('home.search', q=keyword, page=courses.next_num) }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+    </div>
+    </div><!-- /.container -->
 {% endblock %}
 
 {% block script %}

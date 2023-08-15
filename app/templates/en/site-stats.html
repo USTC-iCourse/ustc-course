@@ -1,591 +1,592 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<script src="/static/js/highcharts/highcharts.js"></script>
-<script src="/static/js/highcharts/exporting.js"></script>
-<script src="/static/js/highcharts/export-data.js"></script>
-<script src="/static/js/highcharts/accessibility.js"></script>
+    <script src="/static/js/highcharts/highcharts.js"></script>
+    <script src="/static/js/highcharts/exporting.js"></script>
+    <script src="/static/js/highcharts/export-data.js"></script>
+    <script src="/static/js/highcharts/accessibility.js"></script>
 
-<link href="/static/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-datepicker3.min.css" rel="stylesheet">
 
-<style>
-.highcharts-figure,
-.highcharts-data-table table {
-    margin: 1em auto;
-}
-
-.highcharts-data-table table {
-    font-family: Verdana, sans-serif;
-    border-collapse: collapse;
-    border: 1px solid #ebebeb;
-    margin: 10px auto;
-    text-align: center;
-    width: 100%;
-    max-width: 500px;
-}
-
-.highcharts-data-table caption {
-    padding: 1em 0;
-    font-size: 1.2em;
-    color: #555;
-}
-
-.highcharts-data-table th {
-    font-weight: 600;
-    padding: 0.5em;
-}
-
-.highcharts-data-table td,
-.highcharts-data-table th,
-.highcharts-data-table caption {
-    padding: 0.5em;
-}
-
-.highcharts-data-table thead tr,
-.highcharts-data-table tr:nth-child(even) {
-    background: #f8f8f8;
-}
-
-.highcharts-data-table tr:hover {
-    background: #f1f7ff;
-}
-</style>
-
-<div class="container">
-  <div class="row float-element">
-
-    <div class="col-md-offset-1 col-md-10" style="padding: 0;">
-      <div class="center top-pd-md bm-pd-lg desktop">
-        <span class="h3 blue"><strong>USTC iCourse Statistics</strong></span>
-        <span>（{{ date }}）<span>
-      </div>
-      <div class="top-pd-md bm-pd-lg mobile">
-        <span class="h3 blue"><strong>USTC iCourse Statistics</strong></span>
-        <span>（{{ date }}）<span>
-      </div>
-
-      <div class="col-md-6" style="padding: 0;">
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>Statistics</strong></span>
-        </div>
-	<table class="table">
-          <tr>
-	    <td>Server Running Days</td>
-            <td>{{ site_stat['running_days'] }}</td>
-          </tr>
-          <tr>
-	    <td>Number of Users</td>
-            <td>{{ site_stat['user_count'] }}</td>
-          </tr>
-          <tr>
-	    <td>Number of Courses</td>
-            <td>{{ site_stat['course_count'] }}</td>
-          </tr>
-          <tr>
-	    <td>Number of Reviews</td>
-            <td>{{ site_stat['review_count'] }}</td>
-          </tr>
-          <tr>
-	    <td>Number of Registered Teachers</td>
-            <td>{{ site_stat['registered_teacher_count'] }}</td>
-          </tr>
-        {% if 'course_avg_rate' in site_stat %}
-          <tr>
-	    <td>Average Course Rating</td>
-            <td>{{ '%.2f' % site_stat['course_avg_rate'] }} / 10</td>
-          </tr>
-        {% endif %}
-        {% if 'course_avg_rate_count' in site_stat %}
-          <tr>
-	    <td>Average Number of Reviews per Course</td>
-            <td>{{ '%.2f' % site_stat['course_avg_rate_count'] }}</td>
-          </tr>
-        {% endif %}
-	</table>
-      </div>
-      </div>
-      <div class="clearfix"></div>
-
-      <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>Distribution of Review Ratings</strong></span>
-        </div>
-
-<figure class="highcharts-figure">
-    <div id="review-rate-dist"></div>
-</figure>
-<script>
-Highcharts.chart('review-rate-dist', {
-    chart: {
-        type: 'column'
-    },
-    exporting: {
-        filename: 'review-rate-distribution'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in review_rates %}
-	{{ tuple['rate'] }},
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: 'Number of Reviews'
+    <style>
+        .highcharts-figure,
+        .highcharts-data-table table {
+            margin: 1em auto;
         }
-    },
-    tooltip: {
-	headerFormat: '<table>',
-	pointFormat: '<tr><td style="color:{series.color};padding:0"></td>' +
-            '<td style="padding:0"><b>{point.y}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> reviews have a rating of </td>',
-        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
-	    '</tr></table>',
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
+
+        .highcharts-data-table table {
+            font-family: Verdana, sans-serif;
+            border-collapse: collapse;
+            border: 1px solid #ebebeb;
+            margin: 10px auto;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
         }
-    },
-    series: [{
-	name: 'Rating',
-        data: [
-        {% for tuple in review_rates %}
-	{{ tuple['count'] }},
-        {% endfor %}
-	]
-    }]
-});
-</script>
-      </div>
 
-      <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>Distribution of Course Ratings</strong></span>
-        </div>
-
-<figure class="highcharts-figure">
-    <div id="course-rate-dist"></div>
-</figure>
-<script>
-Highcharts.chart('course-rate-dist', {
-    chart: {
-        type: 'column'
-    },
-    exporting: {
-        filename: 'course-rate-distribution'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in course_rates %}
-	{% if tuple[0] < 10 %}
-	  "{{ tuple[0]|int }}-{{ tuple[0]|int + 1}}",
-	{% else %}
-	  {{ tuple[0] }},
-	{% endif %}
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: 'Number of Courses'
+        .highcharts-data-table caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
         }
-    },
-    tooltip: {
-	headerFormat: '<table>',
-	pointFormat: '<tr><td style="color:{series.color};padding:0"></td>' +
-            '<td style="padding:0"><b>{point.y}</b></td>' +
-	    '<td style="color:{series.color};padding:0"> courses have an average rating of </td>',
-        footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
-	    '<td style="color:{series.color};padding:0"></td>' +
-	    '</tr></table>',
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
+
+        .highcharts-data-table th {
+            font-weight: 600;
+            padding: 0.5em;
         }
-    },
-    series: [{
-	name: 'Course Average Rating',
-        data: [
-        {% for tuple in course_rates %}
-	{{ tuple[1] }},
-        {% endfor %}
-	]
-    }]
-});
-</script>
-      </div>
 
-      <div class="clearfix"></div>
-
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>Distribution of Course Rating Count</strong></span>
-        </div>
-
-<figure class="highcharts-figure">
-    <div id="num-reviews-per-course"></div>
-</figure>
-<script>
-Highcharts.chart('num-reviews-per-course', {
-    chart: {
-        type: 'line'
-    },
-    exporting: {
-        filename: 'num-reviews-per-course'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in course_review_count_dist %}
-	{{ tuple[0] }},
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: [{
-        min: 0,
-        title: {
-            text: 'Number of Courses'
+        .highcharts-data-table td,
+        .highcharts-data-table th,
+        .highcharts-data-table caption {
+            padding: 0.5em;
         }
-    }],
-    tooltip: {
-        formatter: function() {
-            var s = [];
-            var point = this.points[1];
-            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
-                   '<strong>' + point.y + '</strong> courses have <strong>at least ' + point.x + '</strong> reviews<br>');
-            point = this.points[0];
-            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
-                   '<strong>' + point.y + '</strong> courses have <strong>exactly ' + point.x + '</strong> reviews<br>');
-            return s.join('');
-        },
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
+
+        .highcharts-data-table thead tr,
+        .highcharts-data-table tr:nth-child(even) {
+            background: #f8f8f8;
         }
-    },
-    series: [{
-        name: 'Number of courses with exactly N reviews',
-        type: 'column',
-        data: [
-        {% for tuple in course_review_count_dist %}
-        {{ tuple[1] }},
-        {% endfor %}
-	    ]
-    }, {
-        name: 'Number of courses with at least N reviews',
-        type: 'spline',
-        color: '#fd7e14',
-        data: [
-        {% set total = namespace(value=0) %}
-        {% for tuple in course_review_count_dist %}
-        {% set total.value = total.value + tuple[1] %}
-        {% endfor %}
 
-        {% for tuple in course_review_count_dist %}
-        {{ total.value }},
-        {% set total.value = total.value - tuple[1] %}
-        {% endfor %}
-        ]
-    }]
-});
-</script>
-      </div>
-
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>Distribution of Review Count per User</strong></span>
-        </div>
-
-<figure class="highcharts-figure">
-    <div id="num-reviews-per-user"></div>
-</figure>
-<script>
-Highcharts.chart('num-reviews-per-user', {
-    chart: {
-        type: 'line'
-    },
-    exporting: {
-        filename: 'num-reviews-per-user'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in user_review_count_dist %}
-	{{ tuple[0] }},
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: [{
-        min: 0,
-        title: {
-            text: 'Number of Users'
+        .highcharts-data-table tr:hover {
+            background: #f1f7ff;
         }
-    }],
-    tooltip: {
-        formatter: function() {
-            var s = [];
-            var point = this.points[1];
-            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
-                   '<strong>' + point.y + '</strong> users have written <strong>at least ' + point.x + '</strong> reviews<br>');
-            point = this.points[0];
-            s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
-                   '<strong>' + point.y + '</strong> users have written <strong>exactly ' + point.x + '</strong> reviews<br>');
-            return s.join('');
-        },
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: [{
-        type: 'column',
-        name: 'Number of users who have written exactly N reviews',
-        data: [
-        {% for tuple in user_review_count_dist %}
-        {{ tuple[1] }},
-        {% endfor %}
-	    ]
-    }, {
-        type: 'spline',
-        name: 'Number of users who have written at least N reviews',
-        color: '#fd7e14',
-        data: [
-        {% set total = namespace(value=0) %}
-        {% for tuple in user_review_count_dist %}
-        {% set total.value = total.value + tuple[1] %}
-        {% endfor %}
+    </style>
 
-        {% for tuple in user_review_count_dist %}
-        {{ total.value }},
-        {% set total.value = total.value - tuple[1] %}
-        {% endfor %}
-        ]
-    }]
-});
-</script>
-      </div>
+    <div class="container">
+        <div class="row float-element">
 
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>Number of New Reviews per Month</strong></span>
-        </div>
+            <div class="col-md-offset-1 col-md-10" style="padding: 0;">
+                <div class="center top-pd-md bm-pd-lg desktop">
+                    <span class="h3 blue"><strong>XJTU iCourse Statistics</strong></span>
+                    <span>（{{ date }}）<span>
+                </div>
+                <div class="top-pd-md bm-pd-lg mobile">
+                    <span class="h3 blue"><strong>XJTU iCourse Statistics</strong></span>
+                    <span>（{{ date }}）<span>
+                </div>
 
-<figure class="highcharts-figure">
-    <div id="new-reviews-per-month"></div>
-</figure>
-<script>
-Highcharts.chart('new-reviews-per-month', {
-    chart: {
-        type: 'line'
-    },
-    exporting: {
-        filename: 'num-reviews-per-month'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in review_dates %}
-	"{{ tuple.publish_year }}-{{ tuple.publish_month if tuple.publish_month >= 10 else '0' ~ tuple.publish_month }}",
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: [{
-        min: 0,
-        title: {
-            text: 'Number of New Reviews per Month'
-        }
-    }, {
-        min: 0,
-        title: {
-            text: 'Total Number of Reviews'
-        },
-        opposite: true
-    }],
-    tooltip: {
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: [{
-	name: 'Number of New Reviews per Month',
-        yAxis: 0,
-        data: [
-        {% for tuple in review_dates %}
-	{{ tuple.review_count }},
-        {% endfor %}
-	]
-    }, {
-	name: 'Total Number of Reviews',
-        color: '#fd7e14',
-        yAxis: 1,
-        data: [
-	{% set total = namespace(value=0) %}
-        {% for tuple in review_dates %}
-	{% set total.value = total.value + tuple.review_count %}
-	{{ total.value }},
-        {% endfor %}
-	]
-    }]
-});
-</script>
-      </div>
+                <div class="col-md-6" style="padding: 0;">
+                    <div class="ud-pd-sm">
+                        <div class="bm-pd-sm">
+                            <span class="h4"><strong>Statistics</strong></span>
+                        </div>
+                        <table class="table">
+                            <tr>
+                                <td>Server Running Days</td>
+                                <td>{{ site_stat['running_days'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Number of Users</td>
+                                <td>{{ site_stat['user_count'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Number of Courses</td>
+                                <td>{{ site_stat['course_count'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Number of Reviews</td>
+                                <td>{{ site_stat['review_count'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Number of Registered Teachers</td>
+                                <td>{{ site_stat['registered_teacher_count'] }}</td>
+                            </tr>
+                            {% if 'course_avg_rate' in site_stat %}
+                                <tr>
+                                    <td>Average Course Rating</td>
+                                    <td>{{ '%.2f' % site_stat['course_avg_rate'] }} / 10</td>
+                                </tr>
+                            {% endif %}
+                            {% if 'course_avg_rate_count' in site_stat %}
+                                <tr>
+                                    <td>Average Number of Reviews per Course</td>
+                                    <td>{{ '%.2f' % site_stat['course_avg_rate_count'] }}</td>
+                                </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
 
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>Number of New Users per Month</strong></span>
-        </div>
+                <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>Distribution of Review Ratings</strong></span>
+                    </div>
 
-<figure class="highcharts-figure">
-    <div id="num-users-per-month"></div>
-</figure>
-<script>
-Highcharts.chart('num-users-per-month', {
-    chart: {
-        type: 'line'
-    },
-    exporting: {
-        filename: 'num-users-per-month'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-        {% for tuple in user_reg_dates %}
-	"{{ tuple.reg_year }}-{{ tuple.reg_month if tuple.reg_month >= 10 else '0' ~ tuple.reg_month }}",
-        {% endfor %}
-        ],
-        crosshair: true
-    },
-    yAxis: [{
-        min: 0,
-        title: {
-            text: 'Number of New Users per Month'
-        }
-    }, {
-        min: 0,
-        title: {
-            text: 'Total Number of Users'
-        },
-        opposite: true
-    }],
-    tooltip: {
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: [{
-	name: 'Number of New Users per Month',
-        yAxis: 0,
-        data: [
-        {% for tuple in user_reg_dates %}
-	{{ tuple.user_count }},
-        {% endfor %}
-	]
-    }, {
-	name: 'Total Number of Users',
-        yAxis: 1,
-        color: '#fd7e14',
-        data: [
-	{% set total = namespace(value=0) %}
-        {% for tuple in user_reg_dates %}
-	{% set total.value = total.value + tuple.user_count %}
-	{{ total.value }},
-        {% endfor %}
-	]
-    }]
-});
-</script>
-      </div>
+                    <figure class="highcharts-figure">
+                        <div id="review-rate-dist"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('review-rate-dist', {
+                            chart: {
+                                type: 'column'
+                            },
+                            exporting: {
+                                filename: 'review-rate-distribution'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in review_rates %}
+                                        {{ tuple['rate'] }},
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: 'Number of Reviews'
+                                }
+                            },
+                            tooltip: {
+                                headerFormat: '<table>',
+                                pointFormat: '<tr><td style="color:{series.color};padding:0"></td>' +
+                                    '<td style="padding:0"><b>{point.y}</b></td>' +
+                                    '<td style="color:{series.color};padding:0"> reviews have a rating of </td>',
+                                footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
+                                    '</tr></table>',
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                name: 'Rating',
+                                data: [
+                                    {% for tuple in review_rates %}
+                                        {{ tuple['count'] }},
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
 
-      <div class="ud-pd-sm">
-        <div class="bm-pd-sm">
-             <span class="h4"><strong>Historical Statistics</strong></span>
-        </div>
-	<form method="get" action="{{ url_for('stats.stats_history_en') }}">
-          <div class="input-group col-md-2">
-	    <input type="text" class="form-control" id="stats-datepicker" name="date" value="{{ date }}" required>
-	    <div class="input-group-btn">
-              <button type="submit" class="btn btn-primary">Go!</button>
-	    </div>
-	  </div>
-	</form>
-      </div>
+                <div class="ud-pd-sm col-md-6" style="padding-left: 0; padding-right: 0;">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>Distribution of Course Ratings</strong></span>
+                    </div>
 
-    </div>
-  </div><!-- end float-element -->
-</div><!-- end container -->
+                    <figure class="highcharts-figure">
+                        <div id="course-rate-dist"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('course-rate-dist', {
+                            chart: {
+                                type: 'column'
+                            },
+                            exporting: {
+                                filename: 'course-rate-distribution'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in course_rates %}
+                                        {% if tuple[0] < 10 %}
+                                            "{{ tuple[0]|int }}-{{ tuple[0]|int + 1}}",
+                                        {% else %}
+                                            {{ tuple[0] }},
+                                        {% endif %}
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: 'Number of Courses'
+                                }
+                            },
+                            tooltip: {
+                                headerFormat: '<table>',
+                                pointFormat: '<tr><td style="color:{series.color};padding:0"></td>' +
+                                    '<td style="padding:0"><b>{point.y}</b></td>' +
+                                    '<td style="color:{series.color};padding:0"> courses have an average rating of </td>',
+                                footerFormat: '<td style="padding:0"><b>{point.key}</b></td>' +
+                                    '<td style="color:{series.color};padding:0"></td>' +
+                                    '</tr></table>',
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                name: 'Course Average Rating',
+                                data: [
+                                    {% for tuple in course_rates %}
+                                        {{ tuple[1] }},
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="ud-pd-sm">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>Distribution of Course Rating Count</strong></span>
+                    </div>
+
+                    <figure class="highcharts-figure">
+                        <div id="num-reviews-per-course"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('num-reviews-per-course', {
+                            chart: {
+                                type: 'line'
+                            },
+                            exporting: {
+                                filename: 'num-reviews-per-course'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in course_review_count_dist %}
+                                        {{ tuple[0] }},
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: [{
+                                min: 0,
+                                title: {
+                                    text: 'Number of Courses'
+                                }
+                            }],
+                            tooltip: {
+                                formatter: function () {
+                                    var s = [];
+                                    var point = this.points[1];
+                                    s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                                        '<strong>' + point.y + '</strong> courses have <strong>at least ' + point.x + '</strong> reviews<br>');
+                                    point = this.points[0];
+                                    s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                                        '<strong>' + point.y + '</strong> courses have <strong>exactly ' + point.x + '</strong> reviews<br>');
+                                    return s.join('');
+                                },
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                name: 'Number of courses with exactly N reviews',
+                                type: 'column',
+                                data: [
+                                    {% for tuple in course_review_count_dist %}
+                                        {{ tuple[1] }},
+                                    {% endfor %}
+                                ]
+                            }, {
+                                name: 'Number of courses with at least N reviews',
+                                type: 'spline',
+                                color: '#fd7e14',
+                                data: [
+                                    {% set total = namespace(value=0) %}
+                                    {% for tuple in course_review_count_dist %}
+                                        {% set total.value = total.value + tuple[1] %}
+                                    {% endfor %}
+
+                                    {% for tuple in course_review_count_dist %}
+                                        {{ total.value }},
+                                        {% set total.value = total.value - tuple[1] %}
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
+
+                <div class="ud-pd-sm">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>Distribution of Review Count per User</strong></span>
+                    </div>
+
+                    <figure class="highcharts-figure">
+                        <div id="num-reviews-per-user"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('num-reviews-per-user', {
+                            chart: {
+                                type: 'line'
+                            },
+                            exporting: {
+                                filename: 'num-reviews-per-user'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in user_review_count_dist %}
+                                        {{ tuple[0] }},
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: [{
+                                min: 0,
+                                title: {
+                                    text: 'Number of Users'
+                                }
+                            }],
+                            tooltip: {
+                                formatter: function () {
+                                    var s = [];
+                                    var point = this.points[1];
+                                    s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                                        '<strong>' + point.y + '</strong> users have written <strong>at least ' + point.x + '</strong> reviews<br>');
+                                    point = this.points[0];
+                                    s.push('<span style="color:' + point.color + '">\u25CF</span> ' +
+                                        '<strong>' + point.y + '</strong> users have written <strong>exactly ' + point.x + '</strong> reviews<br>');
+                                    return s.join('');
+                                },
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                type: 'column',
+                                name: 'Number of users who have written exactly N reviews',
+                                data: [
+                                    {% for tuple in user_review_count_dist %}
+                                        {{ tuple[1] }},
+                                    {% endfor %}
+                                ]
+                            }, {
+                                type: 'spline',
+                                name: 'Number of users who have written at least N reviews',
+                                color: '#fd7e14',
+                                data: [
+                                    {% set total = namespace(value=0) %}
+                                    {% for tuple in user_review_count_dist %}
+                                        {% set total.value = total.value + tuple[1] %}
+                                    {% endfor %}
+
+                                    {% for tuple in user_review_count_dist %}
+                                        {{ total.value }},
+                                        {% set total.value = total.value - tuple[1] %}
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
+
+                <div class="ud-pd-sm">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>Number of New Reviews per Month</strong></span>
+                    </div>
+
+                    <figure class="highcharts-figure">
+                        <div id="new-reviews-per-month"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('new-reviews-per-month', {
+                            chart: {
+                                type: 'line'
+                            },
+                            exporting: {
+                                filename: 'num-reviews-per-month'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in review_dates %}
+                                        "{{ tuple.publish_year }}-{{ tuple.publish_month if tuple.publish_month >= 10 else '0' ~ tuple.publish_month }}",
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: [{
+                                min: 0,
+                                title: {
+                                    text: 'Number of New Reviews per Month'
+                                }
+                            }, {
+                                min: 0,
+                                title: {
+                                    text: 'Total Number of Reviews'
+                                },
+                                opposite: true
+                            }],
+                            tooltip: {
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                name: 'Number of New Reviews per Month',
+                                yAxis: 0,
+                                data: [
+                                    {% for tuple in review_dates %}
+                                        {{ tuple.review_count }},
+                                    {% endfor %}
+                                ]
+                            }, {
+                                name: 'Total Number of Reviews',
+                                color: '#fd7e14',
+                                yAxis: 1,
+                                data: [
+                                    {% set total = namespace(value=0) %}
+                                    {% for tuple in review_dates %}
+                                        {% set total.value = total.value + tuple.review_count %}
+                                        {{ total.value }},
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
+
+                <div class="ud-pd-sm">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>Number of New Users per Month</strong></span>
+                    </div>
+
+                    <figure class="highcharts-figure">
+                        <div id="num-users-per-month"></div>
+                    </figure>
+                    <script>
+                        Highcharts.chart('num-users-per-month', {
+                            chart: {
+                                type: 'line'
+                            },
+                            exporting: {
+                                filename: 'num-users-per-month'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            subtitle: {
+                                text: ''
+                            },
+                            xAxis: {
+                                categories: [
+                                    {% for tuple in user_reg_dates %}
+                                        "{{ tuple.reg_year }}-{{ tuple.reg_month if tuple.reg_month >= 10 else '0' ~ tuple.reg_month }}",
+                                    {% endfor %}
+                                ],
+                                crosshair: true
+                            },
+                            yAxis: [{
+                                min: 0,
+                                title: {
+                                    text: 'Number of New Users per Month'
+                                }
+                            }, {
+                                min: 0,
+                                title: {
+                                    text: 'Total Number of Users'
+                                },
+                                opposite: true
+                            }],
+                            tooltip: {
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    pointPadding: 0.2,
+                                    borderWidth: 0
+                                }
+                            },
+                            series: [{
+                                name: 'Number of New Users per Month',
+                                yAxis: 0,
+                                data: [
+                                    {% for tuple in user_reg_dates %}
+                                        {{ tuple.user_count }},
+                                    {% endfor %}
+                                ]
+                            }, {
+                                name: 'Total Number of Users',
+                                yAxis: 1,
+                                color: '#fd7e14',
+                                data: [
+                                    {% set total = namespace(value=0) %}
+                                    {% for tuple in user_reg_dates %}
+                                        {% set total.value = total.value + tuple.user_count %}
+                                        {{ total.value }},
+                                    {% endfor %}
+                                ]
+                            }]
+                        });
+                    </script>
+                </div>
+
+                <div class="ud-pd-sm">
+                    <div class="bm-pd-sm">
+                        <span class="h4"><strong>Historical Statistics</strong></span>
+                    </div>
+                    <form method="get" action="{{ url_for('stats.stats_history_en') }}">
+                        <div class="input-group col-md-2">
+                            <input type="text" class="form-control" id="stats-datepicker" name="date" value="{{ date }}"
+                                   required>
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-primary">Go!</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div><!-- end float-element -->
+    </div><!-- end container -->
 {% endblock %}
 {% block script %}
-<script src="/static/js/bootstrap-datepicker.min.js"></script>
-<script>
-$('#stats-datepicker').datepicker({
-    format: 'yyyy/mm/dd',
-    endDate: '0d'
-});
-</script>
+    <script src="/static/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $('#stats-datepicker').datepicker({
+            format: 'yyyy/mm/dd',
+            endDate: '0d'
+        });
+    </script>
 {% endblock %}

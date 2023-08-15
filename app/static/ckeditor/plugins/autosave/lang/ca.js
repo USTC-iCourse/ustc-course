@@ -9,9 +9,9 @@ CKEDITOR.plugins.setLang('autosave', 'ca', {
     title: 'Compareu el contingut auto-desat amb el contingut carregat del lloc web',
     loadedContent: 'Contingut carregat',
     autoSavedContent: 'Contingut auto-desat de: \'',
-	ok: 'Sí, carrega el contingut auto-desat',
-	no: 'No',
-	diffType: 'Esculliu el tipus de visualització:',
-	sideBySide: 'Visualització un al costat de l\'altre',
-	inline: 'Visualització en línia'
+    ok: 'Sí, carrega el contingut auto-desat',
+    no: 'No',
+    diffType: 'Esculliu el tipus de visualització:',
+    sideBySide: 'Visualització un al costat de l\'altre',
+    inline: 'Visualització en línia'
 });

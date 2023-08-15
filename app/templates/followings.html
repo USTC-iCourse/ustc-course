@@ -1,26 +1,27 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
 
-    <div class="bm-pd-lg">
-      <div class="inline-h3">
-        <span class="blue h4"><strong>{{ user.username }} 的关注 </strong></span>
-	（{{ user.following_count }} 人）
-      </div>
+            <div class="bm-pd-lg">
+                <div class="inline-h3">
+                    <span class="blue h4"><strong>{{ user.username }} 的关注 </strong></span>
+                    （{{ user.following_count }} 人）
+                </div>
 
-      {% for user in user.users_following %}
-      <div class="ud-pd-md dashed">
-	<img class="avatar-md circle" src="{{ user.avatar }}"/>
-	<a href={{ url_for('user.view_profile', user_id=user.id) }}><span class="right-pd-sm px16">{{ user.username }}</span></a>
-      </div>
-      {% endfor %}
+                {% for user in user.users_following %}
+                    <div class="ud-pd-md dashed">
+                        <img class="avatar-md circle" src="{{ user.avatar }}"/>
+                        <a href={{ url_for('user.view_profile', user_id=user.id) }}><span
+                                class="right-pd-sm px16">{{ user.username }}</span></a>
+                    </div>
+                {% endfor %}
 
-    </div>
+            </div>
 
 
-  </div><!-- end float-element -->
-</div><!-- end container -->
+        </div><!-- end float-element -->
+    </div><!-- end container -->
 {% endblock %}

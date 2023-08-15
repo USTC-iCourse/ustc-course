@@ -1,92 +1,97 @@
 {% extends "layout-simple.html" %}
 {% block content %}
 
-<div class="container">
-  <div class="row float-element">
+    <div class="container">
+        <div class="row float-element">
 
-    {{ error }}
+            {{ error }}
 
-    <h3 class="blue">Hey there!</h3>
-    <hr>
+            <h3 class="blue">Hey there!</h3>
+            <hr>
 
-    <div class="tips">
-      <p>
-        Help us fix bugs in any page. The more information you can provide us, the faster we can resolve them.
-        <br>Thanks so much!
-      </p>
+            <div class="tips">
+                <p>
+                    Help us fix bugs in any page. The more information you can provide us, the faster we can resolve
+                    them.
+                    <br>Thanks so much!
+                </p>
+            </div>
+
+
+            <form class="form-horizontal">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                <div class="form-group">
+                    <label for="inputURL" class="col-sm-2 control-label blue">URL</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="inputURL"
+                               placeholder="Please input a page link you found the bug from">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputDescription" class="col-sm-2 control-label blue">Description</label>
+                    <div class="col-sm-9">
+                        <textarea type="text" class="form-control" rows="5" id="inputDescription"
+                                  placeholder="Describe the problem you're seeing in English/Chinese"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="uploadImage" class="col-sm-2 control-label blue"></label>
+                    <div class="col-sm-9">
+                        <label class="btn btn-grey fileupload">
+                            <input type="file" class="btn btn-link" name="screenshot"
+                                   onchange="$('#screenshot-upload-btn').html('Screenshot Uploaded')"/>
+                            <span id="screenshot-upload-btn">Upload Screenshot</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputBrowser" class="col-sm-2 control-label blue">Browser</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="inputBrowser" placeholder="Browser + version">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputOS" class="col-sm-2 control-label blue">Operating system</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="inputOS" placeholder="Operating system + version">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputEmail" class="col-sm-2 control-label blue">Email</label>
+                    <div class="col-sm-4">
+                        <input name="email" class="form-control" id="inputEmail" placeholder="Your email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="input-username" class="col-sm-2 control-label blue">Username</label>
+                    <div class="col-sm-4">
+                        <input type="text" id="input-username" name="Username" class="form-control"
+                               placeholder="It's optional">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-2">
+                        <button type="submit" class="btn btn-blue btn-block">Submit</button>
+                    </div>
+                </div>
+            </form>
+
+
+        </div>
     </div>
-
-
-    <form class="form-horizontal">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-      <div class="form-group">
-        <label for="inputURL" class="col-sm-2 control-label blue">URL</label>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" id="inputURL" placeholder="Please input a page link you found the bug from">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="inputDescription" class="col-sm-2 control-label blue">Description</label>
-        <div class="col-sm-9">
-          <textarea type="text" class="form-control" rows="5" id="inputDescription" placeholder="Describe the problem you're seeing in English/Chinese"></textarea>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="uploadImage" class="col-sm-2 control-label blue"></label>
-        <div class="col-sm-9">
-          <label class="btn btn-grey fileupload">
-            <input type="file" class="btn btn-link" name="screenshot" onchange="$('#screenshot-upload-btn').html('Screenshot Uploaded')" />
-            <span id="screenshot-upload-btn">Upload Screenshot</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="inputBrowser" class="col-sm-2 control-label blue">Browser</label>
-        <div class="col-sm-4">
-          <input type="text" class="form-control" id="inputBrowser" placeholder="Browser + version">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="inputOS" class="col-sm-2 control-label blue">Operating system</label>
-        <div class="col-sm-4">
-          <input type="text" class="form-control" id="inputOS" placeholder="Operating system + version">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="inputEmail" class="col-sm-2 control-label blue">Email</label>
-        <div class="col-sm-4">
-          <input name="email" class="form-control" id="inputEmail" placeholder="Your email">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="input-username" class="col-sm-2 control-label blue">Username</label>
-        <div class="col-sm-4">
-          <input type="text" id="input-username" name="Username" class="form-control" placeholder="It's optional">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-2">
-          <button type="submit" class="btn btn-blue btn-block">Submit</button>
-        </div>
-      </div>
-    </form>
-
-
-  </div>
-</div>
 
 {% endblock %}
 
 {% block script %}
-<script>
- $('#inputURL').focus();
-</script>
+    <script>
+        $('#inputURL').focus();
+    </script>
 {% endblock %}

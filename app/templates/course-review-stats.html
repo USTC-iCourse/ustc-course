@@ -7,75 +7,75 @@
     <div id="course-review-stats"></div>
 </figure>
 <script>
-Highcharts.chart('course-review-stats', {
-    chart: {
-        type: 'column'
-    },
-    exporting: {
-        filename: 'course-{{ course.id }}-review-stats'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: [
-          {% for row in course.review_per_term_dist() %}
-	        '{{ row[0]|term_display }}',
-          {% endfor %}
-        ],
-        labels: {
-            autoRotation: [0, -30, -45, -60, -90]
+    Highcharts.chart('course-review-stats', {
+        chart: {
+            type: 'column'
         },
-        crosshair: true
-    },
-    yAxis: [{
-        min: 0,
-        title: {
-            text: '平均分'
-        }
-    }, {
-        min: 0,
-        title: {
-            text: '点评数量'
+        exporting: {
+            filename: 'course-{{ course.id }}-review-stats'
         },
-        opposite: true
-    }],
-    tooltip: {
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
-        }
-    },
-    series: [{
-	    name: '平均分',
-        type: 'spline',
-        yAxis: 0,
-        index: 1,
-        legendIndex: 0,
-        data: [
-          {% for row in course.review_per_term_dist() %}
-	        {{ '%.1f' % row[2] }},
-          {% endfor %}
-        ]
-    }, {
-        name: '点评数量',
-        type: 'column',
-        yAxis: 1,
-        index: 0,
-        legendIndex: 1,
-        data: [
-          {% for row in course.review_per_term_dist() %}
-	        {{ row[1] }},
-          {% endfor %}
-        ]
-    }],
-    colors: ['#434348', '#7cb5ec']
-});
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: [
+                {% for row in course.review_per_term_dist() %}
+                    '{{ row[0]|term_display }}',
+                {% endfor %}
+            ],
+            labels: {
+                autoRotation: [0, -30, -45, -60, -90]
+            },
+            crosshair: true
+        },
+        yAxis: [{
+            min: 0,
+            title: {
+                text: '平均分'
+            }
+        }, {
+            min: 0,
+            title: {
+                text: '点评数量'
+            },
+            opposite: true
+        }],
+        tooltip: {
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: '平均分',
+            type: 'spline',
+            yAxis: 0,
+            index: 1,
+            legendIndex: 0,
+            data: [
+                {% for row in course.review_per_term_dist() %}
+                    {{ '%.1f' % row[2] }},
+                {% endfor %}
+            ]
+        }, {
+            name: '点评数量',
+            type: 'column',
+            yAxis: 1,
+            index: 0,
+            legendIndex: 1,
+            data: [
+                {% for row in course.review_per_term_dist() %}
+                    {{ row[1] }},
+                {% endfor %}
+            ]
+        }],
+        colors: ['#434348', '#7cb5ec']
+    });
 </script>

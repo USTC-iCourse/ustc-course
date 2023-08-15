@@ -1,4 +1,4 @@
-CKEDITOR.plugins.setLang('simpleuploads','en',{
+CKEDITOR.plugins.setLang('simpleuploads', 'en', {
     "addFile": "Upload a file",
     "addImage": "Upload an image",
     "processing": "Processing...",

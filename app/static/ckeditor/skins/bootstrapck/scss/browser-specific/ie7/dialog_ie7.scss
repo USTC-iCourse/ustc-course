@@ -13,38 +13,33 @@ This file contains styles to used by Internet Explorer 7 only.
 /* Base it on dialog_ie.css, overriding it with styles defined in this file. */
 @import "../../dialog/dialog";
 
-.cke_dialog_title
-{
-    /* gradient fix */
-    zoom: 1;
+.cke_dialog_title {
+  /* gradient fix */
+  zoom: 1;
 }
 
-.cke_dialog_footer
-{
-    /* IE7 ignores footer's outline. Use border instead. */
-    border-top: 1px solid #bfbfbf;
+.cke_dialog_footer {
+  /* IE7 ignores footer's outline. Use border instead. */
+  border-top: 1px solid #bfbfbf;
 }
 
 /* IE7 needs position static #6806 */
-.cke_dialog_footer_buttons
-{
-    position: static;
+.cke_dialog_footer_buttons {
+  position: static;
 }
 
 /* IE7 crops the bottom pixels of footer buttons (#9491) */
-.cke_dialog_footer_buttons a.cke_dialog_ui_button
-{
-    vertical-align: top;
+.cke_dialog_footer_buttons a.cke_dialog_ui_button {
+  vertical-align: top;
 }
 
 /* IE7 margin loose on float. */
-.cke_dialog .cke_resizer_ltr
-{
-    padding-left: 4px;
+.cke_dialog .cke_resizer_ltr {
+  padding-left: 4px;
 }
-.cke_dialog .cke_resizer_rtl
-{
-    padding-right: 4px;
+
+.cke_dialog .cke_resizer_rtl {
+  padding-right: 4px;
 }
 
 /*  IE7 doesn't support box-sizing and therefore we cannot
@@ -52,9 +47,8 @@ This file contains styles to used by Internet Explorer 7 only.
 .cke_dialog_ui_input_text,
 .cke_dialog_ui_input_password,
 .cke_dialog_ui_input_textarea,
-.cke_dialog_ui_input_select
-{
-    padding: 0 !important;
+.cke_dialog_ui_input_select {
+  padding: 0 !important;
 }
 
 /* Predefined border to avoid visual size change impact. */
@@ -62,7 +56,6 @@ This file contains styles to used by Internet Explorer 7 only.
 .cke_dialog_ui_ratio_input,
 .cke_btn_reset,
 .cke_btn_locked,
-.cke_btn_unlocked
-{
-    border: 1px solid transparent !important;
+.cke_btn_unlocked {
+  border: 1px solid transparent !important;
 }

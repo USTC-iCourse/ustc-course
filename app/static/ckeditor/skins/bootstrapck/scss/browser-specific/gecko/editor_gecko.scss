@@ -13,13 +13,11 @@ This file contains styles to used by all Gecko based browsers (Firefox) only.
 /* Base it on editor.css, overriding it with styles defined in this file. */
 @import "../../components/editor";
 
-.cke_bottom
-{
-    padding-bottom: 3px;
+.cke_bottom {
+  padding-bottom: 3px;
 }
 
-.cke_combo_text
-{
-    margin-bottom: -1px;
-    margin-top: 1px;
+.cke_combo_text {
+  margin-bottom: -1px;
+  margin-top: 1px;
 }

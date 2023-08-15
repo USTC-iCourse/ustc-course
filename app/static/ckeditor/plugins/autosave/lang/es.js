@@ -9,9 +9,9 @@ CKEDITOR.plugins.setLang('autosave', 'es', {
     title: 'Compara el contenido auto-guardado con el cargado del sitio web',
     loadedContent: 'Contenido cargado',
     autoSavedContent: 'Contenido auto-guardado de: \'',
-	ok: 'Si, carga el contenido auto-guardado',
-	no: 'No',
-	diffType: 'Escoge el tipo de visualización:',
-	sideBySide: 'Visualización uno al lado del otro',
-	inline: 'Visualización en línea'
+    ok: 'Si, carga el contenido auto-guardado',
+    no: 'No',
+    diffType: 'Escoge el tipo de visualización:',
+    sideBySide: 'Visualización uno al lado del otro',
+    inline: 'Visualización en línea'
 });

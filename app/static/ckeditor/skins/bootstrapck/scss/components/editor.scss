@@ -50,7 +50,7 @@ other files.
    To avoid showing the editor UI while its styles are still not available, the
    editor creates it with visibility:hidden. Here, we restore the UI visibility. */
 .cke_chrome {
-    visibility: inherit;
+  visibility: inherit;
 }
 
 /* For accessibility purposes, several "voice labels" are present in the UI.
@@ -58,9 +58,9 @@ other files.
    used by screen-readers to announce other elements. Here, we hide these
    <spans>, in fact. */
 .cke_voice_label {
-    display: none;
+  display: none;
 }
 
 legend.cke_voice_label {
-    display: none;
+  display: none;
 }

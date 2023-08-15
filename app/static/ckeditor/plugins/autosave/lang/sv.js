@@ -10,9 +10,9 @@ CKEDITOR.plugins.setLang('autosave', 'sv', {
     title: 'Jämför Temporärt sparat innehåll med det inladdade innehållet från sidan',
     loadedContent: 'Inladdat innehåll',
     autoSavedContent: 'Autosparat innehåll (från: \'',
-	ok: 'Läs in Autosparat innehåll',
-	no: 'Nej tack',
-	diffType: 'Visa skillnader:',
-	sideBySide: 'Sida vid sida',
-	inline: 'Ihop'
+    ok: 'Läs in Autosparat innehåll',
+    no: 'Nej tack',
+    diffType: 'Visa skillnader:',
+    sideBySide: 'Sida vid sida',
+    inline: 'Ihop'
 });
