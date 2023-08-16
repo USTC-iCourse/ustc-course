@@ -91,6 +91,13 @@ class CourseTerm(db.Model):
   id = db.Column(db.Integer, unique=True, primary_key=True)
   course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
   term = db.Column(db.String(10), index=True)  # 学年学期，例如 20142 表示 2015 年春季学期
+  has_grade_graph = db.Column(db.Boolean)  # 区间分数统计图
+
+  grade_u60 = db.Column(db.Integer)  # 60 分以下人数
+  grade_61_70 = db.Column(db.Integer)  # 60-69 分人数
+  grade_71_80 = db.Column(db.Integer)  # 70-79 分人数
+  grade_81_90 = db.Column(db.Integer)  # 80-89 分人数
+  grade_91_100 = db.Column(db.Integer)  # 90-100 分人数
 
   courseries = db.Column(db.String(20))  # course_series, 课程编号，长的，例如 CS1001A.01
   code = db.Column(db.String(20))  # 课程编号，短的，例如 CS1001A

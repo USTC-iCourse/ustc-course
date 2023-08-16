@@ -122,6 +122,15 @@ def load_courses(insert=True):
 
       course_term.course = course
       course_term.term = c.semester
+      if c.df_course is not None:
+        course_term.has_grade_graph = True
+        course_term.grade_u60 = c.grade_range_student_count[0]
+        course_term.grade_61_70 = c.grade_range_student_count[1]
+        course_term.grade_71_80 = c.grade_range_student_count[2]
+        course_term.grade_81_90 = c.grade_range_student_count[3]
+        course_term.grade_91_100 = c.grade_range_student_count[4]
+      else:
+        course_term.has_grade_graph = False
       course_term.courseries = c.id
       course_term.code = c.id
       # course_term.class_numbers = '2'
@@ -130,6 +139,7 @@ def load_courses(insert=True):
       # update course class info
       course_class.course = course
       course_class.term = c.semester
+
       # course_class.cno = '1'
       db.session.add(course_class)
 
@@ -138,6 +148,7 @@ def load_courses(insert=True):
         review = Review()
         db.session.add(review)
         review.course = course
+
         review.term = c.semester
         review.difficulty = 2
         review.homework = 2

@@ -163,6 +163,13 @@
                         </tr>
                     </table>
 
+{#                    {% if course.has_grade_graph %}#}
+                        <div class="ud-pd-sm">
+                            {{ div_placeholder|safe }}
+                        </div>
+{#                    {% endif %}#}
+
+
                     <div class="ud-pd-sm">
                         <strong>课程主页</strong>：{% if course.homepage and course.homepage != 'http://' %}
                         <a href="{{ course.homepage }}">{{ course.homepage }}</a>{% else %}

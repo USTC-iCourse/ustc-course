@@ -1,3 +1,7 @@
+import logging
+
+import numpy as np
+import pandas as pd
 from flask import Blueprint, render_template, abort, redirect, url_for, request, abort, jsonify
 from flask_login import login_required
 from flask_babel import gettext as _
@@ -6,6 +10,7 @@ from app.forms import ReviewForm, CourseForm
 from app import db
 from app.utils import sanitize
 from sqlalchemy import or_, func
+import plotly.express as px
 
 course = Blueprint('course', __name__)
 
@@ -39,6 +44,59 @@ course_type_dict = {
   '其他选修': ['其他选修'],
   '必修': ['必修'],
 }
+
+
+def plot_row(plot_term, course_name):
+  average, lowest, highest, semester = plot_term.grade_average, plot_term.grade_lowest, plot_term.grade_highest, plot_term.term
+  try:
+    if semester[4] == '1':
+      semester = semester[0:4] + '秋'
+    elif semester[4] == '2':
+      semester = str(int(semester[0:4]) + 1) + '春'
+    elif semester[4] == '3':
+      semester = str(int(semester[0:4]) + 1) + '夏'
+    else:
+      semester = ''
+    arr = [[55, plot_term.grade_u60, '<60'],
+           [65, plot_term.grade_61_70, '61-70'],
+           [75, plot_term.grade_71_80, '71-80'],
+           [85, plot_term.grade_81_90, '81-90'],
+           [95, plot_term.grade_91_100, '91-100']]
+    class_headcount = sum([i[1] for i in arr])
+    arr = [[i[0], i[1], i[2], f'{(i[1] / class_headcount * 100):.2f}%'] for i in arr]
+    arr[0][2] = '< 60'
+    df_course = pd.DataFrame(arr, columns=['区间分数代表', '人数', '分数段', '百分比'])
+    grade_range_student_count = [i[1] for i in arr]
+    counts, bins = np.histogram(df_course['区间分数代表'], bins=range(50, 100, 10))
+    counts = np.array(df_course['人数'])
+    bins = np.array([55, 65, 75, 85, 95])
+    # bins = 0.5 * (bins[:-1] + bins[1:])
+
+    fig = px.bar(df_course, y=bins, x=counts, labels={'x': '人数', 'y': '分数段'},
+                 hover_data=['分数段', '百分比'], text='百分比', orientation='h', )
+    fig.update_traces(marker_color='rgba(50, 171, 96, 0.6)', marker_line_color='rgba(50, 171, 96, 1.0)')
+    fig.update_layout(bargap=0.)
+    yaxis = dict(autorange="reversed")
+    fig.update_layout(yaxis=yaxis)
+    fig.add_hline(average, line_width=1, line_dash="dash", line_color='blue',
+                  annotation_text=f'平均分: {average:.2f}')
+    fig.add_hline(highest, line_width=1, line_dash="dash", line_color='orange',
+                  annotation_text=f'最高分: {highest:.0f}')
+    if lowest != 0.:
+      fig.add_hline(lowest, line_width=1, line_dash="dash", line_color='red', annotation_text=f'最低分: {lowest:.0f}')
+    else:
+      fig.add_hline(50., line_width=1, line_dash="dash", line_color='red', annotation_text=f'最低分: {lowest:.0f}')
+
+    fig.update_layout(title_text=f'{course_name} 区间分数统计 {semester}', title_x=0.5)
+    height = 400
+    fig.update_layout(
+      autosize=False,
+      width=int(height / 0.7),
+      height=height, )
+    return fig.to_html(full_html=False, include_plotlyjs='https://xjtu.live/xjtumen-g/cdn/plotly-2.17.1.min.js')
+  except:
+    logging.warning(f'plot failed for {course.name} {semester}')
+    return ''
 
 
 @course.route('/')
@@ -90,6 +148,8 @@ def view_course(course_id):
   ordering = request.args.get('sort_by', 'upvote', type=str)
   term = request.args.get('term', None, type=str)
   rating = request.args.get('rating', None, type=int)
+  if term is None:
+    plot_term = course.latest_term
 
   sort_dict = {
     'upvote': '点赞最多',
@@ -127,13 +187,18 @@ def view_course(course_id):
 
   reviews = query.all()
   review_num = len(reviews)
-
+  if plot_term.has_grade_graph:
+    div = plot_row(plot_term, course.name)
+  else:
+    div = ''
+    # div = '<div></div>'
   return render_template('course.html', course=course, course_rate=course.course_rate, reviews=reviews,
                          related_courses=related_courses, teacher=teacher, same_teacher_courses=same_teacher_courses,
                          user=current_user, sort_by=ordering, term=term, rating=rating, sort_dict=sort_dict,
                          review_num=review_num, _anchor='my_anchor',
                          title=course.name_with_teachers_short,
-                         description=str(course.rate.average_rate) + ' 分，' + str(course.rate.review_count) + ' 人评价')
+                         description=str(course.rate.average_rate) + ' 分，' + str(course.rate.review_count) + ' 人评价',
+                         div_placeholder=div)
 
 
 @course.route('/<int:course_id>/upvote/', methods=['POST'])
