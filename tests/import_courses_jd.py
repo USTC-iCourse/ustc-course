@@ -138,6 +138,7 @@ def load_courses(insert=True):
         review = Review()
         db.session.add(review)
         review.course = course
+        review.term = c.semester
         review.difficulty = 2
         review.homework = 2
         review.grading = 2

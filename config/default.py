@@ -2,8 +2,12 @@ import os
 import sys
 
 # Server config
-SERVER_NAME = None
+# SERVER_NAME = 'c.xjtu.live'
+# DEBUG = False
+
 DEBUG = True
+SERVER_NAME = 'localhost'
+
 for arg in sys.argv:
   if arg == '-d':
     DEBUG = True
@@ -57,7 +61,7 @@ DEBUG_TB_TEMPLATE_EDITOR_ENABLED = True
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 
 # URL to return to after signing on
-RETURN_URL = "https://courses.xjtu.live/signincallback/"
+RETURN_URL = "https://c.xjtu.live/signincallback/"
 # URL to Discourse
 DISCOURSE_URL = "https://xjtu.live"
 # replace with your own secret
