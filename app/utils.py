@@ -28,39 +28,12 @@ def rand_str():
   return hash_fac.hexdigest()
 
 
-def send_confirm_mail(email):
-  subject = 'Confirm your email.'
-  token = ts.dumps(email, salt=app.config['EMAIL_CONFIRM_SECRET_KEY'])
-
-  confirm_url = url_for(
-    'home.confirm_email',
-    action='confirm',
-    token=token,
-    _external=True,
-    _scheme='https')
-  html = render_template('email/activate.html',
-                         confirm_url=confirm_url)
-
-  msg = Message(subject=subject, html=html, recipients=[email])
-  mail.send(msg)
 
 
 
 
-def send_block_review_email(review):
-  email = review.author.email
-  subject = '您在课程「' + review.course.name + '」中的点评因违反社区规范，已被屏蔽'
-  html = render_template('email/block-review.html', review=review)
-  msg = Message(subject=subject, html=html, recipients=[email])
-  mail.send(msg)
 
 
-def send_unblock_review_email(review):
-  email = review.author.email
-  subject = '您在课程「' + review.course.name + '」中的点评已被解除屏蔽'
-  html = render_template('email/unblock-review.html', review=review)
-  msg = Message(subject=subject, html=html, recipients=[email])
-  mail.send(msg)
 
 
 def allowed_file(filename, type):

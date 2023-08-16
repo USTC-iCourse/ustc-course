@@ -58,7 +58,6 @@ course_teachers = db.Table('course_teachers',
                            )
 
 
-# course crawled from teach.ustc.edu.cn
 class CourseClass(db.Model):
   __tablename__ = 'course_classes'
 

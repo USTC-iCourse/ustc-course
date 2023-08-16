@@ -8,15 +8,12 @@ import uuid
 from urllib import parse
 import requests
 
-# corresponding meta thread:
-# https://meta.discourse.org/t/use-discourse-as-an-identity-provider-sso-discourseconnect/32974
-
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
 from app.models import User, RevokedToken, Course, CourseRate, CourseTerm, Teacher, Review, Notification, follow_course, \
   follow_user, SearchLog, ThirdPartySigninHistory, Announcement, PasswordResetToken
-from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
-from app.utils import ts, send_confirm_mail
+from app.forms import LoginForm
+from app.utils import ts
 from flask_babel import gettext as _
 from datetime import datetime, timedelta
 from sqlalchemy import union, or_
@@ -111,6 +108,7 @@ def follow_reviews():
 def signincallback():
   url_params = parse.parse_qs(parse.urlsplit(request.url).query)
   error = None
+  # https://meta.discourse.org/t/use-discourse-as-an-identity-provider-sso-discourseconnect/32974
   if "sso" not in url_params:
     error = 'oauth error: no sso'
     pass  # handle error, with "sso" in url
@@ -220,68 +218,6 @@ def signin():
     return jsonify(status=200, next=disurl)
   else:
     return redirect(disurl)
-
-
-@home.route('/signup/', methods=['GET', 'POST'])
-def signup():
-  if current_user.is_authenticated:
-    return redirect(request.args.get('next') or gen_index_url())
-  form = RegisterForm()
-  if form.validate_on_submit():
-    username = request.form.get('username')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    user = User(username=username, email=email, password=password)
-    email_suffix = email.split('@')[-1]
-    if email_suffix == 'mail.ustc.edu.cn':
-      user.identity = 'Student'
-    elif email_suffix == 'ustc.edu.cn':
-      user.identity = 'Teacher'
-      ok, message = user.bind_teacher(email)
-      # TODO: deal with bind feedback
-    else:
-      abort(403, "必须使用交大学生或教师邮箱注册")
-    send_confirm_mail(user.email)
-    user.save()
-    # login_user(user)
-    '''注册完毕后显示一个需要激活的页面'''
-    return render_template('feedback.html', status=True, message=_(
-      '我们已经向您发送了激活邮件，请在邮箱中点击激活链接。如果您没有收到邮件，有可能是在垃圾箱中。'), title='注册')
-  return render_template('signup.html', form=form, title='注册')
-
-
-@home.route('/confirm-email/')
-def confirm_email():
-  if current_user.is_authenticated:
-    # logout_user()
-    return redirect(request.args.get('next') or gen_index_url())
-  action = request.args.get('action')
-  if action == 'confirm':
-    token = request.args.get('token')
-    if not token:
-      return render_template('feedback.html', status=False, message=_('此激活链接无效，请准确复制邮件中的链接。'))
-    if RevokedToken.query.get(token):
-      return render_template('feedback.html', status=False, message=_('此激活链接已被使用过。'))
-    RevokedToken.add(token)
-    email = None
-    try:
-      email = ts.loads(token, salt=app.config['EMAIL_CONFIRM_SECRET_KEY'], max_age=3600)
-    except:
-      abort(404)
-
-    user = User.query.filter_by(email=email).first_or_404()
-    user.confirm()
-    flash(_('Your email has been confirmed'))
-    login_user(user)
-    return redirect_to_index()
-  elif action == 'send':
-    email = request.args.get('email')
-    user = User.query.filter_by(email=email).first_or_404()
-    if not user.confirmed:
-      send_confirm_mail(email)
-    return render_template('feedback.html', status=True, message=_('邮件已经发送，请查收！'), title='发送验证邮件')
-  else:
-    abort(404)
 
 
 @home.route('/logout/')

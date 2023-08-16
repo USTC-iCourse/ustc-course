@@ -4,7 +4,6 @@ import sys
 sys.path.append('..')  # fix import directory
 
 from app import app
-from app.utils import send_confirm_mail
 from app.models import *
 
 # require an app context to work

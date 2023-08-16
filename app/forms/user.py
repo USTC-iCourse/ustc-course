@@ -51,28 +51,6 @@ class RegisterForm(FlaskForm):
       raise ValidationError(res)
 
 
-class PasswordForm(FlaskForm):
-  old_password = PasswordField('Old password', validators=[DataRequired()])
-  password = PasswordField('password', validators=[DataRequired(),
-                                                   EqualTo('confirm_password', message='passwords must match')])
-  confirm_password = PasswordField('confirm password')
-
-  def validate_old_password(form, field):
-    if not current_user.check_password(field.data):
-      raise ValidationError('Verify password failed')
-
-
-class ForgotPasswordForm(FlaskForm):
-  email = StringField('Email', validators=[DataRequired('必须输入邮箱地址'),
-                                           Email()])
-
-
-class ResetPasswordForm(FlaskForm):
-  password = PasswordField('password', validators=[DataRequired(),
-                                                   EqualTo('confirm_password', message='passwords must match')])
-  confirm_password = PasswordField('confirm password')
-
-
 class ProfileForm(FlaskForm):
   username = UsernameField('Username', validators=[DataRequired(), Length(max=30, message='The length must under 30')])
   # gender = SelectField('Gender',choices=[('male',_('male')),('female',_('female')),('unkown',_('unkown'))],validators=[DataRequired()])

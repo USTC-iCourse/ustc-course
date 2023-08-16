@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, abort, redirect, url_for, request, abort, flash, make_response
 from app.models import *
-from app.forms import LoginForm, ProfileForm, PasswordForm
+from app.forms import LoginForm, ProfileForm
 from flask_login import login_user, current_user, login_required
 from app.utils import handle_upload, resize_avatar, sanitize, cal_validation_code
 from flask_babel import gettext as _

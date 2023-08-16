@@ -270,27 +270,18 @@ class User(db.Model, UserMixin):
 
   @classmethod
   def authenticate_email(cls, email, password):
-    expanded_email_student = email + '@mail.ustc.edu.cn'
-    expanded_email_teacher = email + '@ustc.edu.cn'
+    expanded_email_student = email + '@stu.xjtu.edu.cn'
+    expanded_email_teacher1 = email + '@xjtu.edu.cn'
+    expanded_email_teacher2 = email + '@mail.xjtu.edu.cn'
     user = cls.query.filter(db.or_(User.email == email,
                                    User.email == expanded_email_student,
-                                   User.email == expanded_email_teacher)).first()
+                                   User.email == expanded_email_teacher1,
+                                   User.email == expanded_email_teacher2)).first()
     if user:
       authenticated = user.check_password(password)
     else:
       authenticated = False
     return user, authenticated, user.confirmed if user else False
-
-  def bind_student(self, sno):
-    if self.identity == 'Student':
-      student = Student.query.get(sno)
-      if student:
-        self._student_info = student
-        return True, _('成功绑定！')
-      else:
-        return False, _('找不到这个学号：%(sno)s！', sno=sno)
-    else:
-      return False, _('无法绑定学号。')
 
   def bind_teacher(self, email):
     if self.identity == 'Teacher':
