@@ -16,21 +16,20 @@
                         <label class="col-sm-2 control-label">头像</label>
                         <div class="col-sm-5">
                             <img class="avatar-lg circle rl-mg-md" src="{{ user.avatar }}"/>
-                            <label class="btn btn-grey radius4 fileupload">
-                                <input type="file" name="avatar"
-                                       onchange="$('#avatar-upload-btn').html('选择'); $('#avatar-upload-msg').show()"/>
-                                <span id="avatar-upload-btn">选择</span>
-                            </label>
-                            <button id="avatar-upload-msg" type="submit" class="btn btn-blue" style="display:none">
-                                上传
-                            </button>
                         </div>
+                        <p>头像可在<a href="https://xjtu.live/my/preferences/">交大門用户设置</a>中修改</p>
+
                     </div>
+
 
                     <div class="form-group">
                         <label class="col-sm-2 control-label">评课社区用户名</label>
                         <div class="col-sm-5">
                             <input type="text" class="form-control" value="
+
+
+
+
 
 
 
@@ -52,13 +51,19 @@
                             <input type="text" class="form-control" value="{{ user.email }}" disabled>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">用户身份</label>
+                        <div class="col-sm-5">
+                            <p>{{ user.role }}</p>
+                        </div>
+                    </div>
 
                     <div class="form-group">
-                        <a class="col-sm-2 control-label"
-                           href="https://xjtu.live/u/{{ user.xjtumen_username }}">交大門用户主页</a>
+                        <label class="col-sm-2 control-label">交大門用户主页</label>
                         <div class="col-sm-5">
-                            <input type="text" class="form-control"
-                                   value="https://xjtu.live/u/{{ user.xjtumen_username }}" disabled>
+                            <p>
+                                <a href="https://xjtu.live/u/{{ user.xjtumen_username }}">https://xjtu.live/u/{{ user.xjtumen_username }}</a>
+                            </p>
                         </div>
                     </div>
 

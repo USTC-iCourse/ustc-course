@@ -132,6 +132,7 @@ def signincallback():
   response = parse.parse_qs(decoded)
 
   get_res = lambda x: got[0] if (got := response.get(x)) else None
+  get_res_bool = lambda x: get_res(x) == 'true'
 
   if "nonce" not in response or session['nonce'] != get_res("nonce"):
     error = 'oauth error, nonce not match'
@@ -146,8 +147,8 @@ def signincallback():
     # 检查用户是否已经注册
     if not User.query.filter_by(email=email).first():
       logging.warning(f'not registered user {email}')
-      is_admin = get_res("admin")
-      is_mod = get_res("moderator")
+      is_admin = get_res_bool("admin")
+      is_mod = get_res_bool("moderator")
       avatar_url = get_res("avatar_url")
       username = get_res("username")
       groups = get_res(
@@ -161,6 +162,8 @@ def signincallback():
 
       if is_admin or is_mod or is_course_review_admin:
         user.role = 'Admin'
+      else:
+        user.role = 'User'
 
       try:
         email_suffix = email.split('@')[-1].strip()
