@@ -14,7 +14,8 @@ from cachelib.simple import SimpleCache
 from .review import Review
 
 Roles = ['Admin',
-         'User']
+         'User',
+         'Bot']
 
 follow_course = db.Table('follow_course',
                          db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
