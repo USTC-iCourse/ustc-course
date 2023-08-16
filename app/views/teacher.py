@@ -72,7 +72,7 @@ def edit_profile(teacher_id):
     # teacher.gender = form['gender'].data
     form['homepage'].data = form['homepage'].data.strip()
     if not form['homepage'].data.startswith('http'):
-      form['homepage'].data = 'http://' + form['homepage'].data
+      form['homepage'].data = 'https://' + form['homepage'].data
     teacher.homepage = form['homepage'].data.strip()
     teacher.research_interest = form['research_interest'].data.strip()
     if request.files.get('avatar'):

@@ -13,6 +13,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_babel import Babel
 from datetime import datetime
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.config.from_object('config.default')
@@ -29,6 +30,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'home.signin'
 
+migrate = Migrate(app, db)
 
 def get_locale():
   return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
@@ -73,12 +75,12 @@ def inject_global_banner():
 
 @app.errorhandler(404)
 def page_not_found(e):
-  return render_template('error-page.html', code=404), 404
+  return render_template('error-page.html', code=404, error=e), 404
 
 
 @app.errorhandler(403)
 def page_not_found(e):
-  return render_template('error-page.html', code=403), 403
+  return render_template('error-page.html', code=403, error=e), 403
 
 
 @app.errorhandler(400)
@@ -88,12 +90,12 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def page_not_found(e):
-  return render_template('error-page.html', code=500), 500
+  return render_template('error-page.html', code=500, error=e), 500
 
 
 @app.errorhandler(502)
 def page_not_found(e):
-  return render_template('error-page.html', code=502), 502
+  return render_template('error-page.html', code=502, error=e), 502
 
 
 from app.views import *

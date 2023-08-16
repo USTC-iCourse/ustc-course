@@ -145,6 +145,7 @@ def signincallback():
     session['nonce'] = None
     # 检查用户是否已经注册
     if not User.query.filter_by(email=email).first():
+      logging.warning(f'not registered user {email}')
       is_admin = get_res("admin")
       is_mod = get_res("moderator")
       avatar_url = get_res("avatar_url")
@@ -153,6 +154,7 @@ def signincallback():
         "groups")  # 'moderators,trust_level_3,trust_level_4,talents,PartialDevelopers,trust_level_1,trust_level_2,trust_level_0,admins,staff'
       is_course_review_admin = 'CourseReviewAdmin' in groups.split(',') if groups else False
       user = User(username=username, email=email, password=str(uuid.uuid4().hex))
+      user.xjtumen_username = username
 
       if avatar_url:
         user.set_avatar(avatar_url)
@@ -177,10 +179,11 @@ def signincallback():
 
       user.save()
       user.confirm()
-      login_user(user, remember=session['remember'])
+      login_user(user, remember=not session['remember'])
     else:
+      logging.warning(f'already registered: {email}')
       user = User.query.filter_by(email=email).first()
-      login_user(user, remember=session['remember'])
+      login_user(user, remember=not session['remember'])
     return redirect(session['next_url'])
   else:
     return render_template('signin.html', error=error, title='登录')
@@ -283,41 +286,6 @@ def confirm_email():
 def logout():
   logout_user()
   return redirect_to_index()
-
-
-
-
-@home.route('/change-password/', methods=['GET'])
-def change_password():
-  '''在控制面板里发邮件修改密码'''
-  if not current_user.is_authenticated:
-    return redirect(url_for('home.signin', _external=True, _scheme='https'))
-  token = generate_reset_password_token(current_user)
-  send_reset_password_mail(current_user.email, token)
-  return render_template('feedback.html', status=True, message=_('密码重置邮件已经发送。'), title='修改密码')
-
-
-@home.route('/reset-password/', methods=['GET', 'POST'])
-def forgot_password():
-  ''' 忘记密码'''
-  if current_user.is_authenticated:
-    return redirect(request.args.get('next') or gen_index_url())
-  form = ForgotPasswordForm()
-  if form.validate_on_submit():
-    email = form['email'].data
-    user = User.query.filter_by(email=email).first()
-    if user:
-      token = generate_reset_password_token(user)
-      send_reset_password_mail(user.email, token)
-      message = _('密码重置邮件已发送。')  # 一个反馈信息
-      status = True
-    else:
-      message = _('此邮件地址尚未被注册。')
-      status = False
-    return render_template('feedback.html', status=status, message=message)
-  return render_template('forgot-password.html', title='忘记密码')
-
-
 
 class MyPagination(object):
   def __init__(self, page, per_page, total, items):

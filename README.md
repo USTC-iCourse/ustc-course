@@ -79,7 +79,7 @@ GRANT ALL ON icourse.* to 'ustc_course'@'localhost';
 来测试；如果 Python 有报异常，则可根据异常信息排查。
 
 在生产服务器上，需要把 nginx 配置文件（```/etc/nginx/sites-available/default```）中的 8080 替换成
-3000，把 ```config/default.py``` 和 ```run.py``` 中的 ```DEBUG=True``` 改为 ```DEBUG=False```。
+3010，把 ```config/default.py``` 和 ```run.py``` 中的 ```DEBUG=True``` 改为 ```DEBUG=False```。
 
 ## 开发
 

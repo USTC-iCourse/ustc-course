@@ -28,11 +28,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">用户名</label>
+                        <label class="col-sm-2 control-label">评课社区用户名</label>
                         <div class="col-sm-5">
                             <input type="text" class="form-control" value="
+
+
+
                                     {% if form.username.data %}{{ form.username.data }}{% else %}{{ user.username }}{% endif %}"
-                                   name="username" disabled>
+                                   name="username">
                             <span class="help-block" style="display:none"></span>
                             {% if form.errors.get('username') %}
                                 {% for info in form.errors.get('username') %}
@@ -47,6 +50,15 @@
                         <label class="col-sm-2 control-label">交大邮箱</label>
                         <div class="col-sm-5">
                             <input type="text" class="form-control" value="{{ user.email }}" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <a class="col-sm-2 control-label"
+                           href="https://xjtu.live/u/{{ user.xjtumen_username }}">交大門用户主页</a>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control"
+                                   value="https://xjtu.live/u/{{ user.xjtumen_username }}" disabled>
                         </div>
                     </div>
 

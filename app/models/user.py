@@ -60,6 +60,7 @@ class User(db.Model, UserMixin):
   role = db.Column(db.String(20), default='User')  # 用户或者管理员
   gender = db.Column(db.Enum('male', 'female', 'unknown'), default='unknown')
   identity = db.Column(db.Enum('Teacher', 'Student'))  # 学生或者教师
+  xjtumen_username = db.Column(db.String(255), unique=True)
 
   register_time = db.Column(db.DateTime(), default=datetime.utcnow)
   confirmed_at = db.Column(db.DateTime())

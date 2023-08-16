@@ -98,12 +98,16 @@ def account_settings():
   errors = []
   if form.validate_on_submit():
     username = form['username'].data.strip()
-    if username != user.username:
-      errors.append(_(f"You cannot change your {username} yourself, please contact admin"))
+    if username == user.username:
+      pass
+    elif User.query.filter_by(username=username).all():
+      errors.append(_("对不起，该用户名`" + username + "`已被使用"))
+    else:
+      user.username = username
 
     user.homepage = form['homepage'].data.strip()
     if not user.homepage.startswith('http'):
-      user.homepage = 'http://' + user.homepage
+      user.homepage = 'https://' + user.homepage
     user.description = form['description'].data.strip()
     if request.files.get('avatar'):
       avatar = request.files['avatar']

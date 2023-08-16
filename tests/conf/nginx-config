@@ -10,7 +10,7 @@ server {
     error_page 502 /static/error-pages/502.html;
 
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:3010;
         proxy_set_header Host $http_host;
         proxy_redirect default;
         proxy_intercept_errors on;
