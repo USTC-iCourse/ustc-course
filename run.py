@@ -17,7 +17,7 @@ def start():
     app.run(port=3010, threaded=True, host='127.0.0.1')
   else:
     from waitress import serve
-    serve(app, host="127.0.0.1", port=3010)
+    serve(app, host="127.0.0.1", port=8110)
     # serve(app, host="127.0.0.1", port=8030)
     # app.run(port=8030, threaded=True)
 

@@ -88,10 +88,10 @@ def plot_row(plot_term, course_name):
       fig.add_hline(50., line_width=1, line_dash="dash", line_color='red', annotation_text=f'最低分: {lowest:.0f}')
 
     fig.update_layout(title_text=f'{course_name} 区间分数统计 {semester}', title_x=0.5)
-    height = 400
+    height = 300
     fig.update_layout(
       autosize=False,
-      width=int(height / 0.7),
+      width=int(400), # height / 0.7
       height=height, )
     return fig.to_html(full_html=False, include_plotlyjs='https://xjtu.live/xjtumen-g/cdn/plotly-2.17.1.min.js')
   except:
