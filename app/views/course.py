@@ -15,33 +15,41 @@ import plotly.express as px
 course = Blueprint('course', __name__)
 
 deptlist = [
-  [27, '体育'],
-  [73, '外语'],
-  [70, '数院'],
-  [40, '信院'],
-  [34, '物院'],
-  [20, '化院'],
-  [38, '地空'],
-  [37, '生院'],
-  [72, '精仪'],
-  [18, '统计'],
-  [74, '计院'],
-  [30, '人文'],
-  [4, '近代物理'],
-  [24, '电子'],
-  [31, '马克思'],
-  [53, '教务处'],
-  [71, '近代力学'],
-  [7, '电子工程'],
-  [13, '化学物理'],
-  [11, '自动化'],
-  [26, '科技传播'],
-  [23, '天文'],
+  [1, "人居环境与建筑工程学院"],
+  [2, "人文社会科学学院"],
+  [3, "体育中心"],
+  [4, "公共政策与管理学院"],
+  [5, "军事教研室"],
+  [6, "前沿科学技术研究院"],
+  [7, "化学学院"],
+  [8, "化学工程与技术学院"],
+  [9, "医学部"],
+  [10, "团委"],
+  [11, "外国语学院"],
+  [12, "学工部"],
+  [13, "学生就业创业指导服务中心"],
+  [14, "实践教学中心"],
+  [15, "教务处"],
+  [16, "数学与统计学院"],
+  [17, "新闻与新媒体学院"],
+  [18, "机械工程学院"],
+  [19, "材料学院"],
+  [20, "法学院"],
+  [21, "物理学院"],
+  [22, "生命学院"],
+  [23, "生命科学与技术学院"],
+  [24, "电信学部"],
+  [25, "电气工程学院"],
+  [26, "管理学院"],
+  [27, "经济与金融学院"],
+  [28, "能源与动力工程学院"],
+  [29, "航天航空学院"],
+  [30, "金禾经济研究中心"],
+  [31, "马克思主义学院"],
 ]
-
 course_type_dict = {
-  '核心选修': ['核心选修'],
-  '其他选修': ['其他选修'],
+  '基础通识类核心课': ['基础通识类核心课'],
+  '基础通识类选修课': ['基础通识类核心课'],
   '必修': ['必修'],
 }
 
@@ -71,11 +79,31 @@ def plot_row(plot_term, course_name):
     counts = np.array(df_course['人数'])
     bins = np.array([55, 65, 75, 85, 95])
     # bins = 0.5 * (bins[:-1] + bins[1:])
-
     fig = px.bar(df_course, y=bins, x=counts, labels={'x': '人数', 'y': '分数段'},
-                 hover_data=['分数段', '百分比'], text='百分比', orientation='h', )
-    fig.update_traces(marker_color='rgba(50, 171, 96, 0.6)', marker_line_color='rgba(50, 171, 96, 1.0)')
+                 hover_data=['分数段', '百分比'], text='百分比', orientation='h')
+    fig.update_traces(insidetextanchor="middle", # textposition='inside'
+                      insidetextfont=dict( family="sans serif", color='red'), # size=18
+                      outsidetextfont=dict( family="sans serif", color='red'))
+    # needed if use `textposition='outside'`
+    # x_mins = []
+    # y_mins = []
+    # x_maxs = []
+    # y_maxs = []
+    # for trace_data in fig.data:
+    #   x_mins.append(min(trace_data.x))
+    #   y_mins.append(min(trace_data.y))
+    #   x_maxs.append(max(trace_data.x))
+    #   y_maxs.append(max(trace_data.y))
+    # x_min = min(x_mins)
+    # y_min = min(y_mins)
+    # x_max = max(x_maxs)
+    # y_max = max(y_maxs)
+    # fig.update_layout(xaxis_range=[x_min, int(x_max*1.2)])
+    green = 'rgba(50, 171, 96, 0.6)'
+
+    fig.update_traces(marker_color=green, marker_line_color='blue')
     fig.update_layout(bargap=0.)
+
     yaxis = dict(autorange="reversed")
     fig.update_layout(yaxis=yaxis)
     fig.add_hline(average, line_width=1, line_dash="dash", line_color='blue',
@@ -87,15 +115,16 @@ def plot_row(plot_term, course_name):
     else:
       fig.add_hline(50., line_width=1, line_dash="dash", line_color='red', annotation_text=f'最低分: {lowest:.0f}')
 
-    fig.update_layout(title_text=f'{course_name} 区间分数统计 {semester}', title_x=0.5)
-    height = 300
+    fig.update_annotations(font=dict(family="sans serif", color='rgba(97, 37, 16, 0.99)'))
+    fig.update_layout(title_text=f'区间分数统计 {semester}', title_x=0.5)
+    height = 400
     fig.update_layout(
       autosize=False,
-      width=int(400), # height / 0.7
-      height=height, )
+      width=int(height / 0.7),
+      height=height)
     return fig.to_html(full_html=False, include_plotlyjs='https://xjtu.live/xjtumen-g/cdn/plotly-2.17.1.min.js')
-  except:
-    logging.warning(f'plot failed for {course.name} {semester}')
+  except Exception as e:
+    logging.warning(f'plot failed for {plot_term.course.name} {semester}: {e}')
     return ''
 
 
