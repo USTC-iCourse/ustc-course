@@ -221,6 +221,7 @@ def view_course(course_id):
   else:
     div = ''
     # div = '<div></div>'
+  # print(course.credit)
   return render_template('course.html', course=course, course_rate=course.course_rate, reviews=reviews,
                          related_courses=related_courses, teacher=teacher, same_teacher_courses=same_teacher_courses,
                          user=current_user, sort_by=ordering, term=term, rating=rating, sort_dict=sort_dict,

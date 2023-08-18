@@ -2,11 +2,10 @@ import os
 import sys
 
 # Server config
-# SERVER_NAME = 'c.xjtu.live'
-# DEBUG = False
-
-DEBUG = True
-SERVER_NAME = 'localhost'
+SERVER_NAME = 'c.xjtu.live'
+DEBUG = False
+# DEBUG = True
+# SERVER_NAME = 'localhost'
 
 for arg in sys.argv:
   if arg == '-d':

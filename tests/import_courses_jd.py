@@ -21,6 +21,10 @@ import pandas as pd
 client = MongoClient('127.0.0.1', 27017, connectTimeoutMS=3000)
 mongoclient = client['courses']
 colall = mongoclient['all']  # offical+review
+#
+# mongoclient = client['test']
+# colall = mongoclient['all_elective_courses']  # offical+review
+
 
 dept_str_to_name = {
 "人居环境与建筑工程学院": 1,
@@ -146,7 +150,7 @@ def load_courses(insert=True):
     user.confirm()
 
   for doc in colall.find():
-    print(doc)
+    # print(doc)
 
     course = Course()
     course.name = doc['课程名']
@@ -166,7 +170,7 @@ def load_courses(insert=True):
     db.session.add(course)
     this_course_teachers = set()
     course.teachers = [all_teachers[t] for t in set(doc['teachers'])]
-    print(set(doc['teachers']))
+    # print(set(doc['teachers']))
     db.session.commit()
 
     course_rate = CourseRate()
@@ -200,6 +204,7 @@ def load_courses(insert=True):
       course_term.join_type = doc['现在模块']  # 选课类别
       if doc.get('学时') is not None:
         course_term.hours = doc['学时']
+      if doc.get('学分') is not None:
         course_term.credit = doc['学分']
       course_term.term = sem_cls['semester']
       if sem_cls.get('grade_range_student_count_list') is not None:
