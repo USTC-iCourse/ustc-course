@@ -17,7 +17,7 @@
                             style="outline:none" data-toggle="modal" data-target="#signin">登录
                     </button>
                 {% endif %}
-                <a class="navbar-brand" href="{{ url_for('home.index') }}">交大門评课社区</a>
+                <a class="navbar-brand" href="{{ url_for('home.index') }}">交大评课社区</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -32,7 +32,7 @@
                                 href="{{ url_for('home.follow_reviews') }}">关注</a></li>
                     {% endif %}
                     <li><a href="https://xjtu.live/c/teachers/15" target="_blank">导师</a></li>
-                    <li><a href="https://xjtu.live/" target="_blank">交大門</a></li>
+                    <li><a href="https://xjtu.live/" target="_blank">交大</a></li>
                 </ul>
 
                 {% if this_module == 'home.search_reviews' %}
@@ -119,11 +119,11 @@
                     <form id="signin-form" class="form-signin">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <div class="form-signin-heading">
-                            <span class="h2">使用交大門账户登录</span>
+                            <span class="h2">使用交大账户登录</span>
                         </div>
                         <div id="signin-alert" role="alert" class="display: none"></div>
-                        <p>如果您已在交大門网站<strong>登录</strong>，点击登录按钮将<em>直接</em>使用您的交大門账户登录评课社区</p>
-                        <p>如果您尚未登录/注册交大門账户，点击登录按钮将跳转到交大門网站进行登录/注册</p>
+                        <p>如果您已在交大网站<strong>登录</strong>，点击登录按钮将<em>直接</em>使用您的交大账户登录评课社区</p>
+                        <p>如果您尚未登录/注册交大账户，点击登录按钮将跳转到交大网站进行登录/注册</p>
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox" name="remember">不要记住我（浏览器退出后也将退出评课社区登录）

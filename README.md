@@ -1,6 +1,6 @@
-# 交大門评课社区
+# 交大评课社区
 
-交大門评课社区是使用 Python 3 + Flask + SQLAlchemy 开发的 Web 系统。
+交大评课社区是使用 Python 3 + Flask + SQLAlchemy 开发的 Web 系统。
 
 ## 安装
 

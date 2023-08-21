@@ -119,7 +119,7 @@ def load_courses(args):
       course_type=c["courseCategory"]["cn"],
       course_level=c["courseGradation"]["cn"] if c["courseGradation"] else None,
       join_type=c["classType"]["cn"] if c["classType"] else None,
-      teaching_type=c["courseType"]["cn"] if c["courseType"] else None,
+      teaching_classes=c["courseType"]["cn"] if c["courseType"] else None,
     )
 
     if "period" in c and "periodsPerWeek" in c:

@@ -27,40 +27,43 @@ colall = mongoclient['all']  # offical+review
 
 
 dept_str_to_name = {
-"人居环境与建筑工程学院": 1,
-"人文社会科学学院": 2,
-"体育中心": 3,
-"公共政策与管理学院": 4,
-"军事教研室": 5,
-"前沿科学技术研究院": 6,
-"化学学院": 7,
-"化学工程与技术学院": 8,
-"医学部": 9,
-"团委": 10,
-"外国语学院": 11,
-"学工部": 12,
-"学生就业创业指导服务中心": 13,
-"实践教学中心": 14,
-"教务处": 15,
-"数学与统计学院": 16,
-"新闻与新媒体学院": 17,
-"机械工程学院": 18,
-"材料学院": 19,
-"法学院": 20,
-"物理学院": 21,
-"生命学院": 22,
-"生命科学与技术学院": 23,
-"电信学部": 24,
-"电气工程学院": 25,
-"管理学院": 26,
-"经济与金融学院": 27,
-"能源与动力工程学院": 28,
-"航天航空学院": 29,
-"金禾经济研究中心": 30,
-"马克思主义学院": 31,
+  "航天航空学院": 1,
+  "化学学院": 2,
+  "人居环境与建筑工程学院": 3,
+  "体育中心": 4,
+  "法学院": 5,
+  "实践教学中心/工程坊": 6,
+  "数学与统计学院": 7,
+  "化学工程与技术学院": 8,
+  "管理学院": 9,
+  "军事教研室": 10,
+  "生命科学与技术学院": 11,
+  "前沿科学技术研究院": 12,
+  "电气工程学院": 13,
+  "电子与信息学部": 14,
+  "医学部": 15,
+  "新闻与新媒体学院": 16,
+  "人文社会科学学院": 17,
+  "学生就业创业指导服务中心": 18,
+  "材料科学与工程学院": 19,
+  "经济与金融学院": 20,
+  "公共政策与管理学院": 21,
+  "外国语学院": 22,
+  "物理学院": 23,
+  "金禾经济研究中心": 24,
+  "教务处": 25,
+  "机械工程学院": 26,
+  "能源与动力工程学院": 27,
+  "马克思主义学院": 28,
+  "学工部/学生处/武装部": 29,
+  "团委": 30,
+  "国际教育学院": 31,
+  "人工智能学院": 32,
+  "中国西部高等教育评估中心": 33,
+  "西安交通大学米兰理工联合设计与创新学院": 34,
+  "西浦交流学院": 35,
+  "钱学森学院/钱学森书院": 36,
 }
-
-
 
 
 @dataclasses.dataclass
@@ -109,6 +112,7 @@ def load_courses(insert=True):
       if teacher not in all_teachers:
         t = Teacher()
         t.name = teacher
+        t.dept_id = TODO
         db.session.add(t)
         all_teachers[teacher] = t
   db.session.commit()
@@ -140,7 +144,7 @@ def load_courses(insert=True):
   course_kcbh = {}
   print('Data loaded with %d courses' % colall.count_documents({}))
 
-  user =  User.query.filter_by(username='initbot1').first()
+  user = User.query.filter_by(username='initbot1').first()
   if user is None:
     user = User(username='initbot', email='initbot@xjtumen.nonexists', password=str(uuid.uuid4().hex))
     user.xjtumen_username = 'course_init_bot'

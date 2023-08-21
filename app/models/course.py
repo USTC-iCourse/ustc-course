@@ -112,7 +112,7 @@ class CourseTerm(db.Model):
 
   course_level = db.Column(db.String(20))  # 课程层次
   join_type = db.Column(db.String(20))  # 选课类别
-  teaching_type = db.Column(db.String(20))  # 教学类型
+  teaching_classes = db.Column(db.String(20))  # 选课班级, orig: 教学类型
   grading_type = db.Column(db.String(20))  # 评分制
   teaching_material = db.Column(db.Text)  # 教材
   reference_material = db.Column(db.Text)  # 参考书
@@ -635,8 +635,8 @@ class Course(db.Model):
     return self.latest_term.join_type
 
   @property
-  def teaching_type(self):
-    return self.latest_term.teaching_type
+  def teaching_classes(self):
+    return self.latest_term.teaching_classes
 
   @property
   def teaching_material(self):

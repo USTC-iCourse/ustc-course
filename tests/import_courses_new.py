@@ -100,7 +100,7 @@ def load_courses(insert=True):
       course_type=c['courseCategory']['nameZh'],
       course_level=c['courseGradation']['nameZh'] if c['courseGradation'] else None,
       join_type=c['classType']['nameZh'] if c['classType'] else None,
-      teaching_type=c['courseType']['nameZh'] if c['courseType'] else None
+      teaching_classes=c['courseType']['nameZh'] if c['courseType'] else None
     )
 
     if 'PeriodInfo' in course:
