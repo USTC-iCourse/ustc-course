@@ -1,6 +1,36 @@
 # XJ课评
 
-XJ课评是使用 Python 3 + Flask + SQLAlchemy 开发的 Web 系统。
+XJ课评，fork自[USTC评课社区](https://github.com/USTC-iCourse/ustc-course)。
+
+## 特色功能：
+在USTC评课社区源码的基础上做了些许修改：
+* 支持OAuth，也即只要你在xjtu.live登录，点击评课社区的登录键即可一键登录。
+  
+-> 为什么多此一举非要点一下登录按键呢？
+  
+-> 因为我本来是想开发Discourse插件，将本站的一个类别打造成评课社区。无奈 Ruby+Ember.js 的技术栈没有基于USTC评课社区代码 Python+Flask+Plotly 开发效率高。至于后面是否要切换成Discourse插件的方式还需要斟酌。
+
+* 区间分数可视化，以及显示均分、最高分、最低分。
+  
+-> 当然，现在这个图表做得还是很粗糙的，后续需要改进配色、文字位置等等细节。
+![Vis|690x472, 75%](https://xjtu.live/uploads/default/original/2X/4/4976829c6e9b1ad583c4f934b936c44c043a34dd.webp)
+
+* (Ongoing) 使用 NLP 对现有评论数据进行情感分析和理解，以对“ 课程难度、作业多少、 给分好坏、收获大小”等 目前**空缺的**指标进行定性。
+  
+-> 不如把USTC评课社区的数据爬下来，训练一个情感/语义分析模型
+
+更新：
+
+* 完善课程的自身属性：课程编号、开课单位、任课教师、学分（学时）、选修课板块类别、课程简介。去除了一些无用评价。
+
+-> 可以和现有的“导师信息”有机地结合起来。
+
+* (Ongoing) 调`gpt-3.5-turbo-16k`接口summarize某个课程/教学班的评论
+  
+## 交大門上的相关话题
+https://xjtu.live/t/topic/4919
+https://xjtu.men/t/topic/4880/
+https://xjtu.men/t/topic/4881/
 
 ## 安装
 
@@ -9,6 +39,7 @@ XJ课评是使用 Python 3 + Flask + SQLAlchemy 开发的 Web 系统。
 1. Python 3
 2. MySQL 5.5+
 3. Nginx
+
 
 ### 配置和创建数据库
 
