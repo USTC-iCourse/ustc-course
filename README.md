@@ -1,6 +1,6 @@
-# 交大评课社区
+# XJ课评
 
-交大评课社区是使用 Python 3 + Flask + SQLAlchemy 开发的 Web 系统。
+XJ课评是使用 Python 3 + Flask + SQLAlchemy 开发的 Web 系统。
 
 ## 安装
 
