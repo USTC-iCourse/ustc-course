@@ -472,13 +472,13 @@ a.nounderline:active { text-decoration: none; }
 }
 
 .review-content h1 {
-  font-size: 120%;
+  font-size: 140%;
 }
 
 .review-content h2 {
-  font-size: 110%;
+  font-size: 130%;
 }
 
 .review-content h3, .review-content h4, .review-content h5 {
-  font-size: 100%;
+  font-size: 120%;
 }
