@@ -22,7 +22,7 @@
               <span class="float-right localtime" style="display: none;">{{ review.update_time|utctime }}</span>
             </div>
             {% include 'review-hidden.html' %}
-            <p class="text-muted">
+            <p class="text-muted review-content">
 	      {% if keyword %}
 	      {{ review.content|abstract_by_keyword(keyword)|safe }}
 	      {% else %}
@@ -35,6 +35,8 @@
       </div><!-- ./dashed -->
 	{% endif %}
       {% endfor %}
+
+    {% include 'scripts/review-filter.html' %}
 
     <nav>
       <ul class="pagination">
