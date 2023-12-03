@@ -270,5 +270,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     # we have merge now, do not drop existing data
-    db.create_all()
-    load_courses(args)
+    with app.app_context():
+        db.create_all()
+        load_courses(args)

@@ -26,20 +26,21 @@ token_json = requests.get(site_root + 'get_token', headers=headers)
 access_token = json.loads(token_json.text)['access_token']
 
 # load existing data
-existing_majors = Major.query.all()
-majors_map = { major.code : major for major in existing_majors }
+with app.app_context():
+    existing_majors = Major.query.all()
+    majors_map = { major.code : major for major in existing_majors }
 
-existing_programs = Program.query.all()
-programs_map = { program.id : program for program in existing_programs }
+    existing_programs = Program.query.all()
+    programs_map = { program.id : program for program in existing_programs }
 
-existing_course_groups = CourseGroup.query.all()
-course_groups_map = { course_group.code : course_group for course_group in existing_course_groups }
+    existing_course_groups = CourseGroup.query.all()
+    course_groups_map = { course_group.code : course_group for course_group in existing_course_groups }
 
-existing_program_courses = ProgramCourse.query.all()
-program_courses_map = { str(program_course.program_id) + '|' + str(program_course.course_group_code) : program_course for program_course in existing_program_courses }
+    existing_program_courses = ProgramCourse.query.all()
+    program_courses_map = { str(program_course.program_id) + '|' + str(program_course.course_group_code) : program_course for program_course in existing_program_courses }
 
-existing_depts = Dept.query.all()
-depts_map = { dept.code : dept for dept in existing_depts }
+    existing_depts = Dept.query.all()
+    depts_map = { dept.code : dept for dept in existing_depts }
 
 
 def load_course_group(course):
@@ -165,8 +166,8 @@ def load_tree():
 
                 print('Loaded ' + str(count) + ' courses in ' + program.train_type + ' ' + dept_name + ' ' + major.name + ' ' + str(program.grade) + ' ' + program.name)
 
-
-load_tree()
+with app.app_context():
+    load_tree()
 
 subprocess.run(['python3', 'update_course_group_relation.py'])
 print('Updated course group relations')

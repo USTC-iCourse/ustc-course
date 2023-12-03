@@ -68,4 +68,5 @@ def get_summary_of_all_courses():
 
 
 print("Start summarizing reviews of all courses...")
-get_summary_of_all_courses()
+with app.app_context():
+    get_summary_of_all_courses()

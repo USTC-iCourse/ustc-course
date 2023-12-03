@@ -2,7 +2,7 @@
 #!/usr/bin/python3
 import sys
 sys.path.append('..')
-from app import db
+from app import app, db
 from app.models import Review, ReviewComment
 from app.views.review import record_review_history
 from app.views.api import record_review_comment_history
@@ -31,6 +31,6 @@ def update_comments():
     db.session.commit()
 
 
-
-update_reviews()
-update_comments()
+with app.app_context():
+    update_reviews()
+    update_comments()

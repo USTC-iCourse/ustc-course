@@ -259,5 +259,6 @@ def load_courses(insert=True):
     print('%d new departments loaded' % new_dept_count)
 
 # we have merge now, do not drop existing data
-db.create_all()
-load_courses()
+with app.app_context():
+    db.create_all()
+    load_courses()
