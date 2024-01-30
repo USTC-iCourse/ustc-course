@@ -60,10 +60,10 @@ def index():
     # 排序方式
     if sort_by == 'popular':
         # sort by review_count
-        courses_page = course_query.join(CourseRate).order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc()).paginate(page,per_page=per_page)
+        courses_page = course_query.join(CourseRate).order_by(CourseRate.review_count.desc(), CourseRate._rate_average.desc()).paginate(page=page, per_page=per_page)
     else:
         # default sort by rating
-        courses_page = course_query.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page,per_page=per_page)
+        courses_page = course_query.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page=page, per_page=per_page)
 
     return render_template('course-index.html', courses=courses_page,
             course_type=course_type, course_type_dict=course_type_dict, sort_by=sort_by,
