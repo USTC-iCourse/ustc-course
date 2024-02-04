@@ -94,7 +94,7 @@ git submodule update --init --recursive
 
 ## License
 
-AGPLv3（不包含 TinyMCE 与 Highcharts）
+AGPLv3（不包含 CKEditor 5 与 Highcharts）
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
