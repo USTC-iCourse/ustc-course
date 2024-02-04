@@ -1,0 +1,196 @@
+<script src="https://registry.npmmirror.com/ckeditor5/40.2.0/files/build/ckeditor5-dll.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-editor-classic/40.2.0/files/build/editor-classic.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-essentials/40.2.0/files/build/essentials.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-adapter-ckfinder/40.2.0/files/build/adapter-ckfinder.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-autoformat/40.2.0/files/build/autoformat.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-basic-styles/40.2.0/files/build/basic-styles.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-block-quote/40.2.0/files/build/block-quote.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-ckfinder/40.2.0/files/build/ckfinder.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-easy-image/40.2.0/files/build/easy-image.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-heading/40.2.0/files/build/heading.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-image/40.2.0/files/build/image.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-indent/40.2.0/files/build/indent.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-link/40.2.0/files/build/link.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-list/40.2.0/files/build/list.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-media-embed/40.2.0/files/build/media-embed.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-paste-from-office/40.2.0/files/build/paste-from-office.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-table/40.2.0/files/build/table.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-code-block/40.2.0/files/build/code-block.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-markdown-gfm/40.2.0/files/build/markdown-gfm.js"></script>
+<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-word-count/40.2.0/files/build/word-count.js"></script>
+<script src="https://registry.npmmirror.com/@isaul32/ckeditor5-math/40.2.0/files/build/math.js"></script>
+<script src="/static/ckeditor5/file-upload.js"></script>
+
+<script>
+    var uploadImageApi = document.location.origin + "/api/upload/image";
+    var uploadFileApi = document.location.origin + "/api/upload/file";
+    var selector_1 = document.querySelector('#content-editor');
+    var selector_2 = document.querySelector('.content-editor');
+
+    function initEditor(selector) {
+        if (!selector) {
+            return;
+        }
+        CKEditor5.editorClassic.ClassicEditor.create(selector, {
+            heading: {
+                options: [
+                    {model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph'},
+                    {model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1'},
+                    {model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2'},
+                    {model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3'}
+                ]
+            },
+            plugins: [
+                CKEditor5.essentials.Essentials,
+                CKEditor5.autoformat.Autoformat,
+                CKEditor5.basicStyles.Bold,
+                CKEditor5.basicStyles.Italic,
+                CKEditor5.basicStyles.Underline,
+                CKEditor5.basicStyles.Code,
+                CKEditor5.blockQuote.BlockQuote,
+                CKEditor5.heading.Heading,
+                CKEditor5.image.Image,
+                CKEditor5.image.ImageCaption,
+                CKEditor5.image.ImageStyle,
+                CKEditor5.image.ImageToolbar,
+                CKEditor5.image.ImageUpload,
+                CKEditor5.image.ImageResize,
+                CKEditor5.image.ImageInsert,
+                CKEditor5.image.AutoImage,
+                CKEditor5.image.PictureEditing,
+                CKEditor5.indent.Indent,
+                CKEditor5.link.Link,
+                CKEditor5.list.List,
+                CKEditor5.mediaEmbed.MediaEmbed,
+                CKEditor5.pasteFromOffice.PasteFromOffice,
+                CKEditor5.table.Table,
+                CKEditor5.table.TableCaption,
+                CKEditor5.table.TableProperties,
+                CKEditor5.table.TableCellProperties,
+                CKEditor5.table.TableToolbar,
+                CKEditor5.typing.TextTransformation,
+                CKEditor5.adapterCkfinder.UploadAdapter,
+                CKEditor5.ckfinder.CKFinder,
+                CKEditor5.codeBlock.CodeBlock,
+                CKEditor5.markdownGfm.PasteFromMarkdownExperimental,
+                CKEditor5.wordCount.WordCount,
+                CKEditor5.math.Math,
+                CKEditor5.math.AutoformatMath,
+                CKEditor5.fileUpload.FileUpload,
+                CKEditor5.fileUpload.SimpleFileUploadAdapter
+            ],
+            toolbar: {
+                items: [
+                    'heading',
+                    '|',
+                    'bold',
+                    'italic',
+                    'underline',
+                    'link',
+                    'bulletedList',
+                    'numberedList',
+                    '|',
+                    'outdent',
+                    'indent',
+                    '|',
+                    'code',
+                    'codeBlock',
+                    'uploadImage',
+                    'fileUpload',
+                    'blockQuote',
+                    'insertTable',
+                    'undo',
+                    'redo',
+                    'math',
+                ],
+                shouldNotGroupWhenFull: true
+            },
+            math: {
+                engine: 'mathjax', // or katex or function. E.g. (equation, element, display) => { ... }
+                lazyLoad: undefined, // async () => { ... }, called once before rendering first equation if engine doesn't exist. After resolving promise, plugin renders equations.
+                outputType: 'span', // or span
+                className: 'math-tex', // class name to use with span output type, change e.g. MathJax processClass (v2) / processHtmlClass (v3) is set
+                forceOutputType: false, // forces output to use outputType
+                enablePreview: true, // Enable preview view
+                previewClassName: [], // Class names to add to previews
+                popupClassName: [], // Class names to add to math popup balloon
+                katexRenderOptions: {}  // KaTeX only options for katex.render(ToString)
+            },
+            simpleFileUpload: {
+                url: uploadFileApi,
+                withCredentials: true,
+                fileTypes: ['.pdf'],
+            },
+            language: 'en',
+            image: {
+                resizeOptions: [
+                    {
+                        name: 'resizeImage:original',
+                        value: null,
+                        icon: 'original'
+                    },
+                    {
+                        name: 'resizeImage:50',
+                        value: '50',
+                        icon: 'medium'
+                    },
+                    {
+                        name: 'resizeImage:75',
+                        value: '75',
+                        icon: 'large'
+                    }
+                ],
+                toolbar: [
+                    'resizeImage:50',
+                    'resizeImage:75',
+                    'resizeImage:original',
+                    'toggleImageCaption',
+                    'imageTextAlternative'
+                ]
+            },
+            ckfinder: {
+                uploadUrl: uploadImageApi,
+            },
+            table: {
+                tableProperties: {
+                    defaultProperties: {
+                        borderStyle: 'dashed',
+                        borderColor: 'hsl(0, 0%, 90%)',
+                        borderWidth: '3px',
+                        alignment: 'left'
+                    }
+                },
+                contentToolbar: [
+                    'tableColumn',
+                    'tableRow',
+                    'mergeTableCells'
+                ]
+            },
+            wordCount: {
+                // onUpdate: stats => {
+                //     //console.log( 'Characters: ' + stats.characters );
+                //     var wordCountElement = document.getElementById('word-count');
+                //     // 更新元素的内容
+                //     wordCountElement.textContent = '字数: ' + stats.characters;
+                // }
+            },
+            licenseKey: '',
+        })
+            .then(editor => {
+                window.editor = editor;
+                editor.editing.view.change(writer => {
+                    writer.setStyle('min-height', '350px', editor.editing.view.document.getRoot());
+                });
+            })
+            .catch(error => {
+                console.error('Oops, something gone wrong!');
+                console.error('Please, report the following error in the https://github.com/ckeditor/ckeditor5 with the build id and the error stack trace:');
+                console.warn('Build id: k2i30chx32nf-8o65j7c6blw0');
+                console.error(error);
+            });
+    }
+
+    initEditor(selector_1);
+    initEditor(selector_2);
+</script>
+

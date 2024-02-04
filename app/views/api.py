@@ -229,14 +229,20 @@ def unfollow_user():
         return jsonify(ok=False, message='User does not exist')
 
 def generic_upload(file, type):
-    ok,message = handle_upload(file, type)
-    script_head = '<script type="text/javascript">window.parent.CKEDITOR.tools.callFunction(2,'
-    script_tail = ');</script>'
+    ok, message = handle_upload(file, type)
     if ok:
         url = '/uploads/' + type + 's/' + message
-        return script_head + '"' + url + '"' + script_tail
+        return jsonify({
+            "uploaded": 1,
+            "url": url
+        })
     else:
-        return script_head + '""' + ',' + '"' + message + '"' + script_tail
+        return jsonify({
+            "uploaded": 0,
+            "error": {
+                "message": message
+            }
+        })
 
 @api.route('/upload/image',methods=['POST'])
 @login_required

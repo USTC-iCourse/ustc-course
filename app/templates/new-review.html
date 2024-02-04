@@ -61,18 +61,10 @@
         </div>
       </div>
 
-      <div class="desktop">
+      <div>
         <h4 class="grey">说几句吧！</h4>
         <div class="ud-pd-sm">
           <textarea id="content-editor" name="content">{% if review.content %}{{ review.content|safe }}{% endif %}</textarea>
-        </div>
-      </div>
-
-      <div class="mobile">
-        <h4 class="grey">说几句吧！</h4>
-        <div class="ud-pd-sm">
-          <input type="hidden" name="is_mobile" value="1">
-          <textarea type="text" class="form-control" rows="8" name="content">{% if review.content %}{{ review.content_text }}{% endif %}</textarea>
         </div>
       </div>
 
@@ -198,5 +190,5 @@ $(function(){
     });
 });
 </script>
-{% include 'ckeditor.html' %}
+{% include 'richeditor.html' %}
 {% endblock %}
