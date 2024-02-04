@@ -16,7 +16,7 @@
       {% for announcement in announcements %}
       <div class="ud-pd-md dashed" id="announcement-{{ announcement.id }}">
         <h3>{{ announcement.title }} <a class="grey nounderline" href="{{ url_for('home.announcements', _external=True) }}#announcement-{{ announcement.id }}">#</a></h3>
-        <p class="text-muted">{{ announcement.content|safe }}</p>
+        <p class="text-muted ck-content">{{ announcement.content|safe }}</p>
 
         <div class="grey bm-pd-md">
 	      <a href="{{ url_for('user.view_profile', user_id=announcement.author.id) }}">{{ announcement.author.username }}</a> 发表于
