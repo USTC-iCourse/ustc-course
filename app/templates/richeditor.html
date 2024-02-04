@@ -1,11 +1,9 @@
 <script src="https://registry.npmmirror.com/ckeditor5/40.2.0/files/build/ckeditor5-dll.js"></script>
 <script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-editor-classic/40.2.0/files/build/editor-classic.js"></script>
 <script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-essentials/40.2.0/files/build/essentials.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-adapter-ckfinder/40.2.0/files/build/adapter-ckfinder.js"></script>
 <script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-autoformat/40.2.0/files/build/autoformat.js"></script>
 <script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-basic-styles/40.2.0/files/build/basic-styles.js"></script>
 <script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-block-quote/40.2.0/files/build/block-quote.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-ckfinder/40.2.0/files/build/ckfinder.js"></script>
 <script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-easy-image/40.2.0/files/build/easy-image.js"></script>
 <script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-heading/40.2.0/files/build/heading.js"></script>
 <script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-image/40.2.0/files/build/image.js"></script>
@@ -69,8 +67,6 @@
                 CKEditor5.table.TableCellProperties,
                 CKEditor5.table.TableToolbar,
                 CKEditor5.typing.TextTransformation,
-                CKEditor5.adapterCkfinder.UploadAdapter,
-                CKEditor5.ckfinder.CKFinder,
                 CKEditor5.codeBlock.CodeBlock,
                 CKEditor5.markdownGfm.PasteFromMarkdownExperimental,
                 CKEditor5.wordCount.WordCount,
@@ -119,7 +115,6 @@
             simpleFileUpload: {
                 url: uploadFileApi,
                 withCredentials: true,
-                // config.simpleuploads_acceptedExtensions = '7z|avi|csv|doc|docx|flv|gif|gz|gzip|jpeg|jpg|mov|mp3|mp4|mpc|mpeg|mpg|ods|odt|pdf|png|ppt|pptx|ps|pxd|rar|rtf|tar|tgz|txt|vsd|wav|wma|wmv|xls|xlsx|xml|zip';
                 fileTypes: ['.7z', '.avi', '.csv', '.doc', '.docx', '.flv', '.gif', '.gz', '.gzip', '.jpeg', '.jpg', '.mov', '.mp3', '.mp4', '.mpc', '.mpeg', '.mpg', '.ods', '.odt', '.pdf', '.png', '.ppt', '.pptx', '.ps', '.pxd', '.rar', '.rtf', '.tar', '.tgz', '.txt', '.vsd', '.wav', '.wma', '.wmv', '.xls', '.xlsx', '.xml', '.zip'],
             },
             language: 'en',
@@ -148,9 +143,6 @@
                     'toggleImageCaption',
                     'imageTextAlternative'
                 ]
-            },
-            ckfinder: {
-                uploadUrl: uploadImageApi,
             },
             table: {
                 tableProperties: {

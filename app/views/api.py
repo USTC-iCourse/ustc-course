@@ -244,11 +244,11 @@ def generic_upload(file, type):
             }
         })
 
-@api.route('/upload/image',methods=['POST'])
-@login_required
-@app.csrf.exempt
-def upload_image():
-    return generic_upload(request.files['upload'], 'image')
+# @api.route('/upload/image',methods=['POST'])
+# @login_required
+# @app.csrf.exempt
+# def upload_image():
+#     return generic_upload(request.files['upload'], 'image')
 
 @api.route('/upload/file', methods=['POST'])
 @login_required
