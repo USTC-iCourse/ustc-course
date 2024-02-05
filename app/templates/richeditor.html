@@ -1,22 +1,22 @@
-<script src="https://registry.npmmirror.com/ckeditor5/40.2.0/files/build/ckeditor5-dll.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-editor-classic/40.2.0/files/build/editor-classic.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-essentials/40.2.0/files/build/essentials.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-autoformat/40.2.0/files/build/autoformat.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-basic-styles/40.2.0/files/build/basic-styles.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-block-quote/40.2.0/files/build/block-quote.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-easy-image/40.2.0/files/build/easy-image.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-heading/40.2.0/files/build/heading.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-image/40.2.0/files/build/image.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-indent/40.2.0/files/build/indent.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-link/40.2.0/files/build/link.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-list/40.2.0/files/build/list.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-media-embed/40.2.0/files/build/media-embed.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-paste-from-office/40.2.0/files/build/paste-from-office.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-table/40.2.0/files/build/table.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-code-block/40.2.0/files/build/code-block.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-markdown-gfm/40.2.0/files/build/markdown-gfm.js"></script>
-<script src="https://registry.npmmirror.com/@ckeditor/ckeditor5-word-count/40.2.0/files/build/word-count.js"></script>
-<script src="https://registry.npmmirror.com/@isaul32/ckeditor5-math/40.2.0/files/build/math.js"></script>
+<script src="/static/ckeditor5/ckeditor5-dll.js"></script>
+<script src="/static/ckeditor5/editor-classic.js"></script>
+<script src="/static/ckeditor5/essentials.js"></script>
+<script src="/static/ckeditor5/autoformat.js"></script>
+<script src="/static/ckeditor5/basic-styles.js"></script>
+<script src="/static/ckeditor5/block-quote.js"></script>
+<script src="/static/ckeditor5/easy-image.js"></script>
+<script src="/static/ckeditor5/heading.js"></script>
+<script src="/static/ckeditor5/image.js"></script>
+<script src="/static/ckeditor5/indent.js"></script>
+<script src="/static/ckeditor5/link.js"></script>
+<script src="/static/ckeditor5/list.js"></script>
+<script src="/static/ckeditor5/media-embed.js"></script>
+<script src="/static/ckeditor5/paste-from-office.js"></script>
+<script src="/static/ckeditor5/table.js"></script>
+<script src="/static/ckeditor5/code-block.js"></script>
+<script src="/static/ckeditor5/markdown-gfm.js"></script>
+<script src="/static/ckeditor5/word-count.js"></script>
+<script src="/static/ckeditor5/math.js"></script>
 <script src="/static/ckeditor5/file-upload.js"></script>
 
 <script>
@@ -103,7 +103,19 @@
             },
             math: {
                 engine: 'mathjax', // or katex or function. E.g. (equation, element, display) => { ... }
-                lazyLoad: undefined, // async () => { ... }, called once before rendering first equation if engine doesn't exist. After resolving promise, plugin renders equations.
+                lazyLoad: async () => {
+                    // a dirty hack for ckeditor math plugin loaded before async mathjax
+                    return new Promise((resolve, reject) => {
+                        // if MathJax is not loaded, wait 1s and try again
+                        var interval = setInterval(() => {
+                            console.log("waiting for MathJax")
+                            if (window.MathJax.version) {
+                                clearInterval(interval);
+                                resolve();
+                            }
+                        }, 1000);
+                    })
+                },
                 outputType: 'span', // or span
                 className: 'math-tex', // class name to use with span output type, change e.g. MathJax processClass (v2) / processHtmlClass (v3) is set
                 forceOutputType: false, // forces output to use outputType
