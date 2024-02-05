@@ -185,7 +185,7 @@ def abstract_by_keyword(content, keyword):
     abstract = plaintext[first_index:(abstract_len + first_index)]
 
     for word in words:
-        abstract = re.sub(r'(' + word + ')', '<span style="color:#B22222;font-weight:bold;">\\1</span>', abstract, flags=re.IGNORECASE)
+        abstract = re.sub(r'(' + re.escape(word) + ')', '<span style="color:#B22222;font-weight:bold;">\\1</span>', abstract, flags=re.IGNORECASE)
     return content_filter(abstract)
 
 
