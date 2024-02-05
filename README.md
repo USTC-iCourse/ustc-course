@@ -73,13 +73,17 @@ GRANT ALL ON icourse.* to 'ustc_course'@'localhost';
 
 在生产服务器上，需要把 nginx 配置文件（```/etc/nginx/sites-available/default```）中的 8080 替换成 3000，把 ```config/default.py``` 和 ```run.py``` 中的 ```DEBUG=True``` 改为 ```DEBUG=False```。
 
-#### 数学公式 (MathJax)
+### 数学公式 (MathJax)
 
 MathJax 仓库使用 submodules 形式引入，如果需要调试/部署数学公式支持，需要运行以下命令：
 
 ```console
 git submodule update --init --recursive
 ```
+
+### 富文本编辑器 (CKEditor 5)
+
+相关内容详见 [app/static/ckeditor5/README.md](app/static/ckeditor5/README.md)。
 
 ## 开发
 
