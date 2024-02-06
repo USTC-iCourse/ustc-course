@@ -545,7 +545,7 @@ def about():
     today = datetime.now()
     running_days = (today - first_user.register_time).days
     num_users = User.query.count()
-    review_count = Review.query.count()
+    review_count = Review.query.filter(Review.is_hidden == False).filter(Review.is_blocked == False).count()
     course_count = CourseRate.query.filter(CourseRate.review_count > 0).count()
     return render_template('about.html', running_days=running_days, num_users=num_users, review_count=review_count, course_count=course_count, title='关于我们')
 
