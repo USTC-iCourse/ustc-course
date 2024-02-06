@@ -26,6 +26,7 @@ wget https://unpkg.com/@ckeditor/ckeditor5-code-block@40.2.0/build/code-block.js
 wget https://unpkg.com/@ckeditor/ckeditor5-markdown-gfm@40.2.0/build/markdown-gfm.js
 wget https://unpkg.com/@ckeditor/ckeditor5-word-count@40.2.0/build/word-count.js
 wget https://unpkg.com/@isaul32/ckeditor5-math@40.2.0/build/math.js
+wget https://raw.githubusercontent.com/taoky/ckeditor5-file-upload/master/build/file-upload.js
 ```
 
 文件上传 (ckeditor5-file-upload) 模块使用了 https://github.com/taoky/ckeditor5-file-upload 修改后的 DLL build（位于 build 目录下），
