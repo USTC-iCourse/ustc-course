@@ -184,7 +184,7 @@
               {% endif %}
             </span>
           </div>
-          <div class="showmore-text" id="course-intro">{{ course.introduction|safe }}</div>
+          <div class="showmore-text ck-content" id="course-intro">{{ course.introduction|safe }}</div>
           <div class="showmore-wrapper"> <!-- TODO: 减少套娃层数 -->
             <div class="showmore-shadow">
               <div class="showmore-btn-wrapper">
@@ -325,7 +325,7 @@
             <li>收获：{{ review.gain_display }}</li>
           </ul>
 
-          <div class="review-content" id="review-content-{{ review.id }}"><p>{{ review.content|my_urlize(nofollow=true)|safe }}</p></div>
+          <div class="review-content ck-content" id="review-content-{{ review.id }}"><p>{{ review.content|my_urlize(nofollow=true)|safe }}</p></div>
 
           {% if review.filter_rule %}
           <div style="display:none;" class="review-filter-rule" id="review-filter-rule-{{ review.id }}">{{ review.filter_rule }}</div>
@@ -355,7 +355,7 @@
 
             <span class="pull-right">
               {% if review.author == user %}
-              <a class="nounderline desktop" href="{{ url_for('course.new_review',course_id=course.id) }}">
+              <a class="nounderline" href="{{ url_for('course.new_review',course_id=course.id) }}">
                 <span class="glyphicon glyphicon-pencil grey left-pd-sm small" aria-hidden="true"></span>
                 编辑
               </a>

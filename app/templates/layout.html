@@ -50,9 +50,11 @@
             </a>
             <ul class="dropdown-menu" role="menu">
               {% if current_user.latest_notifications_text|length == 0 %}
-              <p>还没有消息哦！</p>
+              {% set notification_text_list = ["还没有消息哦！"] %}
+              {% else %}
+              {% set notification_text_list = current_user.latest_notifications_text %}
               {% endif %}
-              {% for notification_text in current_user.latest_notifications_text %}
+              {% for notification_text in notification_text_list %}
               <li class="ud-pd-sm dashed">
                 <div class="notice">{{ notification_text|safe }}</div>
               </li>
@@ -150,7 +152,7 @@
   <script src="/static/js/jquery.min.js"></script>
   <script src="/static/js/bootstrap.min.js"></script>
   <script src="/static/js/clipboard.min.js"></script>
-  <script async src="/static/MathJax/es5/tex-chtml.js?config=TeX-AMS_HTML"></script>
+  <script type="text/javascript" id="MathJax-script" async src="/static/MathJax/es5/tex-svg.js"></script>
   {% include 'common-scripts.html' %}
   <script>
    $('#signin').on('shown.bs.modal', function () {
