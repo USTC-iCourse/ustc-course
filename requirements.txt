@@ -12,7 +12,7 @@ flask-migrate==3.1.0
 flask-mysqldb==0.2.0
 flask-babel==2.0.0
 # for debug only
-flask-debugtoolbar==0.13.1
+flask-debugtoolbar==0.14.1
 html2text==2020.1.16
 markdown==3.4.1
 pytz==2021.1
