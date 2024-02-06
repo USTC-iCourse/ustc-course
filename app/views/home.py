@@ -361,6 +361,10 @@ def search_reviews():
     per_page = request.args.get('per_page', 10, type=int)
 
     keywords = re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', query_str).split()
+    if not keywords:
+        return render_template('search-reviews.html', keyword=query_str,
+                               reviews=MyPagination(page=0, per_page=0, total=0, items=[]),
+                               title="无效的搜索关键词")
     max_keywords_allowed = 10
     if len(keywords) > max_keywords_allowed:
         keywords = keywords[:max_keywords_allowed]
@@ -428,6 +432,10 @@ def search():
     #    course_query = course_query.filter(Course.campus==campus)
 
     keywords = re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', query_str).split()
+    if not keywords:
+        return render_template('search.html', keyword=query_str,
+                               courses=MyPagination(page=0, per_page=0, total=0, items=[]),
+                               title="无效的搜索关键词")
     max_keywords_allowed = 10
     if len(keywords) > max_keywords_allowed:
         keywords = keywords[:max_keywords_allowed]
