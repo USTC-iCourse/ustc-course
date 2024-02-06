@@ -26,11 +26,26 @@ headers = {
     'accept': 'application/json, text/javascript, */*; q=0.01',
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36',
     'x-requested-with': 'XMLHttpRequest',
-    'authority': 'jw.ustc.edu.cn',
-    'referer': 'https://jw.ustc.edu.cn/for-std/lesson-search/index/4367'
+    'authority': 'jw.ustc.edu.cn'
 }
 
-index_url = 'https://jw.ustc.edu.cn/for-std/lesson-search/index/4367'
+# get user ID
+program_url = 'https://jw.ustc.edu.cn/for-std/program'
+# will redirect to /for-std/program/info/<int:id>
+r = requests.get(program_url, headers=headers)
+if len(r.history) < 2:
+    print('Failed to get user ID from program redirect: no redirect found')
+    sys.exit(1)
+redirect_url = r.history[1].url
+user_id = redirect_url.split('/')[-1]
+if not user_id.isnumeric():
+    print('Failed to get user ID from program redirect: user ID is not numeric')
+    sys.exit(1)
+print('User ID: ' + user_id)
+headers['referer'] = 'https://jw.ustc.edu.cn/for-std/lesson-search/index/' + user_id
+
+# fetch all semesters
+index_url = 'https://jw.ustc.edu.cn/for-std/lesson-search/index/' + user_id
 r = requests.get(index_url, headers=headers)
 doc = lxml.html.fromstring(r.text)
 options = doc.xpath('//select[@id="semester"]/option')
@@ -55,11 +70,13 @@ for option in options:
     save_file_path = os.path.join(folder, semester_name + '.json')
     if need_download(save_file_path):
         print('Downloading ' + echo_text)
-        lesson_url = 'https://jw.ustc.edu.cn/for-std/lesson-search/semester/' + semester_id + '/search/4367?courseCodeLike=&codeLike=&educationAssoc=&courseNameZhLike=&teacherNameLike=&schedulePlace=&classCodeLike=&courseTypeAssoc=&classTypeAssoc=&campusAssoc=&teachLangAssoc=&roomTypeAssoc=&examModeAssoc=&requiredPeriodInfo.totalGte=&requiredPeriodInfo.totalLte=&requiredPeriodInfo.weeksGte=&requiredPeriodInfo.weeksLte=&requiredPeriodInfo.periodsPerWeekGte=&requiredPeriodInfo.periodsPerWeekLte=&limitCountGte=&limitCountLte=&majorAssoc=&majorDirectionAssoc=&queryPage__=1%2C100000&_=1656750360507'
+        lesson_url = 'https://jw.ustc.edu.cn/for-std/lesson-search/semester/' + semester_id + '/search/' + user_id + '?courseCodeLike=&codeLike=&educationAssoc=&courseNameZhLike=&teacherNameLike=&schedulePlace=&classCodeLike=&courseTypeAssoc=&classTypeAssoc=&campusAssoc=&teachLangAssoc=&roomTypeAssoc=&examModeAssoc=&requiredPeriodInfo.totalGte=&requiredPeriodInfo.totalLte=&requiredPeriodInfo.weeksGte=&requiredPeriodInfo.weeksLte=&requiredPeriodInfo.periodsPerWeekGte=&requiredPeriodInfo.periodsPerWeekLte=&limitCountGte=&limitCountLte=&majorAssoc=&majorDirectionAssoc=&queryPage__=1%2C100000&_=1656750360507'
         for repeat in range(5):
             try:
                 r = requests.get(lesson_url, headers=headers)
                 break
+            except KeyboardInterrupt:
+                sys.exit(1)
             except:
                 print('Failed to download ' + echo_text + ', retry...')
                 continue
