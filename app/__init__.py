@@ -22,6 +22,14 @@ toolbar = DebugToolbarExtension(app)
 
 db = SQLAlchemy(app)
 app.csrf = CSRFProtect(app)
+
+# exempt SQLAlchemy explain view from CSRF protection
+# workaround for https://github.com/pallets-eco/flask-debugtoolbar/issues/156
+# Also this is not working with new SQLAlchemy,
+# so please apply this patch locally if you need to debug SQL performance:
+# https://github.com/pallets-eco/flask-debugtoolbar/issues/232
+app.csrf.exempt('flask_debugtoolbar.panels.sqlalchemy.sql_select')
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'home.signin'
