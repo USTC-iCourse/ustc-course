@@ -74,4 +74,5 @@ def import_photos():
 
     db.session.commit()
 
-import_photos()
+with app.app_context():
+    import_photos()
