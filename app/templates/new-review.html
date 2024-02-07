@@ -108,6 +108,9 @@ function submit_review() {
         return obj;
     }, {});
     data['rate'] = Math.round(data['rate'] * 2);
+    if (data['rate'] == 0) {
+        data['rate'] = undefined;
+    }
     data['is_ajax'] = true;
     console.log(url);
     console.log(data);
@@ -152,6 +155,9 @@ $(function(){
         $('.mobile').remove();
     }
 
+    var allowUnrated = false;
+    var unratedClickCount = 0;
+
     $('#review-form').submit(function(e) {
         e.preventDefault();
 
@@ -159,26 +165,41 @@ $(function(){
             alert('请选择学期，如果不记得了，可以随便选一个 :)');
             return;
         }
-        if ($('input[name=difficulty]:radio:checked').length == 0) {
-            alert('请选择课程难度！');
-            return;
+        var difficultyUnrated = ($('input[name=difficulty]:radio:checked').length == 0);
+        var homeworkUnrated = ($('input[name=homework]:radio:checked').length == 0);
+        var gradingUnrated = ($('input[name=grading]:radio:checked').length == 0);
+        var gainUnrated = ($('input[name=gain]:radio:checked').length == 0);
+        var overallUnrated = ($('input[name=rate]').val() <= 0 || $('input[name=rate]').val() > 5);
+        if (!allowUnrated) {
+            if (difficultyUnrated) {
+                alert('请选择课程难度！');
+                return;
+            }
+            if (homeworkUnrated) {
+                alert('请选择作业多少！');
+                return;
+            }
+            if (gradingUnrated) {
+                alert('请选择给分好坏！');
+                return;
+            }
+            if (gainUnrated) {
+                alert('请选择收获多少！');
+                return;
+            }
+            if (overallUnrated) {
+                alert('请评分！');
+                return;
+            }
+        } else {
+            if (difficultyUnrated || homeworkUnrated || gradingUnrated || gainUnrated || overallUnrated) {
+                if (!(difficultyUnrated && homeworkUnrated && gradingUnrated && gainUnrated && overallUnrated)) {
+                    alert('如果要评分，请完整评分，不能只评总分，也不能只评课程难度、作业多少、给分好坏、收获多少 :)');
+                    return;
+                }
+            }
         }
-        if ($('input[name=homework]:radio:checked').length == 0) {
-            alert('请选择作业多少！');
-            return;
-        }
-        if ($('input[name=grading]:radio:checked').length == 0) {
-            alert('请选择给分好坏！');
-            return;
-        }
-        if ($('input[name=gain]:radio:checked').length == 0) {
-            alert('请选择收获多少！');
-            return;
-        }
-        if ($('input[name=rate]').val() <= 0 || $('input[name=rate]').val() > 5) {
-            alert('请评分！');
-            return;
-        }
+
         var content_html = $('textarea[name=content]').val();
         var content_text = content_html.replace(/(<([^>]+)>)/ig, "");
         if (content_text.trim().length < 10) {
@@ -187,6 +208,16 @@ $(function(){
         }
 
         submit_review();
+    });
+
+    // allow not rating a course after 5 consecutive clicks
+    $('.star-rating .caption').click(function(e) {
+        e.preventDefault();
+        ++unratedClickCount;
+        if (unratedClickCount >= 5) {
+            allowUnrated = true;
+            $('.star-rating .caption .blue').text("你可以提交没有评分的点评 :)");
+        }
     });
 });
 </script>
