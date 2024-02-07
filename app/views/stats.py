@@ -44,7 +44,7 @@ def index(lang_en=False):
     user_reg_dates = db.session.query(func.year(User.register_time).label('reg_year'), func.month(User.register_time).label('reg_month'), func.count().label('user_count')).group_by(db.text('reg_year'), db.text('reg_month')).order_by(db.text('reg_year'), db.text('reg_month')).all()
 
     # find the distribution of review rates
-    review_rates = db.session.query(func.count(Review.id).label('count'), Review.rate).group_by(Review.rate).order_by(Review.rate).all()
+    review_rates = db.session.query(func.count(Review.id).label('count'), Review.rate).filter(Review.rate > 0).group_by(Review.rate).order_by(Review.rate).all()
 
     # find the distribution of course rates
     course_rates = db.session.query(func.floor(CourseRate._rate_average).label('rate'), func.count(func.floor(CourseRate._rate_average)).label('count')).filter(CourseRate._rate_average > 0).group_by(db.text('rate')).order_by(db.text('rate')).all()

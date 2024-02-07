@@ -100,7 +100,7 @@ def view_course(course_id):
             'score': '评分: 低-高',
             }
 
-    query = Review.query.filter_by(course_id=course.id)
+    query = Review.query.filter_by(course_id=course.id).filter_by(is_hidden=False)
 
     # get terms list which have review
     review_term_list = course.review_term_list

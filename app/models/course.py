@@ -288,10 +288,10 @@ class Course(db.Model):
         return db.session.query(db.func.count(db.distinct(ReviewHistory.author_id))).filter(ReviewHistory.course_id == self.id).filter(ReviewHistory.operation == 'delete').first()[0]
 
     def review_per_year_dist(self):
-        return db.session.query(db.extract('year', Review.publish_time).label('year'), db.func.count(Review.id), db.func.avg(Review.rate)).filter(Review.course_id == self.id).group_by(db.text('year')).order_by(db.text('year')).all()
+        return db.session.query(db.extract('year', Review.publish_time).label('year'), db.func.count(Review.id), db.func.avg(Review.rate)).filter(Review.course_id == self.id).filter(Review.is_hidden == False).filter(Review.rate > 0).group_by(db.text('year')).order_by(db.text('year')).all()
 
     def review_per_term_dist(self):
-        return db.session.query(Review.term, db.func.count(Review.id), db.func.avg(Review.rate)).filter(Review.course_id == self.id).group_by(Review.term).order_by(Review.term).all()
+        return db.session.query(Review.term, db.func.count(Review.id), db.func.avg(Review.rate)).filter(Review.course_id == self.id).filter(Review.is_hidden == False).filter(Review.rate > 0).group_by(Review.term).order_by(Review.term).all()
 
     @property
     def teacher(self):
@@ -637,7 +637,7 @@ class Course(db.Model):
 
     def update_rate(self, commit_db=True):
         course_rate = self.course_rate
-        reviews = self.reviews.filter(Review.is_hidden == False).filter(Review.is_blocked == False).all()
+        reviews = self.reviews.filter(Review.is_hidden == False).filter(Review.is_blocked == False).filter(Review.rate > 0).all()
 
         course_rate.review_count = len(reviews)
         course_rate._difficulty_total = sum([review.difficulty for review in reviews])

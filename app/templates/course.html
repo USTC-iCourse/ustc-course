@@ -285,6 +285,7 @@
               {% endif %}
             </span>
 
+            {% if review.rate %}
             {% for star in range(0,5) %}
               {% if review.rate >= 1.5 + star * 2 %}
               <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
@@ -294,6 +295,7 @@
               <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
               {% endif %}
             {% endfor %}
+            {% endif %}
 
             <span class="left-pd-md">{{ review.term|term_display }}</span>
 
@@ -312,6 +314,8 @@
           </div>
           {% include 'review-hidden.html' %}
 
+          <!-- If a review is not rated, it does not have any ratings of diffuculty, homework, etc. -->
+          {% if review.rate %}
           <ul class="text-muted list-inline list-unstyled top-pd-sm desktop">
             <li class="right-mg-md">课程难度：{{ review.difficulty_display }}</li>
             <li class="right-mg-md">作业多少：{{ review.homework_display }}</li>
@@ -324,6 +328,7 @@
             <li>给分：{{ review.grading_display }}</li>
             <li>收获：{{ review.gain_display }}</li>
           </ul>
+          {% endif %}
 
           <div class="review-content ck-content" id="review-content-{{ review.id }}"><p>{{ review.content|my_urlize(nofollow=true)|safe }}</p></div>
 
