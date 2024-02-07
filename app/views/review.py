@@ -77,6 +77,14 @@ def new_review(course_id):
             review.content, mentioned_users = editor_parse_at(review.content)
             review.content = sanitize(review.content)
 
+            # check review ratings
+            if review.difficulty and review.homework and review.grading and review.gain and review.rate:
+                pass
+            elif not review.difficulty and not review.homework and not review.grading and not review.gain and not review.rate:
+                pass
+            else: # reject partial ratings
+                abort(403)
+
             if review.is_hidden or review.is_blocked:
                 users_to_notify = []
                 mentioned_users = []
