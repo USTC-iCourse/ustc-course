@@ -2,25 +2,22 @@ import sys
 
 # Server config
 SERVER_NAME = None
-DEBUG = False
+DEBUG = True
 for arg in sys.argv:
     if arg == '-d':
         DEBUG = True
-
 SECRET_KEY = 'secret-key'
-EMAIL_CONFIRM_SECRET_KEY = 'secret-key'
-PASSWORD_RESET_SECRET_KEY = 'secret-key'
 
 
 # available languages
 LANGUAGES = {
-        'en': 'English',
-        'zh': '中文'
-        }
+    'en': 'English',
+    'zh': '中文'
+}
 
 
 # SQL config
-SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://icourse:your-db-password@localhost/icourse?charset=utf8mb4'
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://ustc_course:ustc_course@127.0.0.1:5001/icourse?charset=utf8mb4'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Flask mail
@@ -37,13 +34,13 @@ MAIL_MAX_EMAILS = None
 MAIL_ASCII_ATTACHMENTS = False
 
 # Upload config
-UPLOAD_FOLDER = '/srv/ustc-course/uploads'
+UPLOAD_FOLDER = '/tmp/ustc-course/uploads'
 # Alowed extentsions for a filetype
 # for example 'image': set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = {
-        'image':set(['png', 'jpg', 'jpeg', 'gif']),
-        'file':set('7z|avi|csv|doc|docx|flv|gif|gz|gzip|jpeg|jpg|mov|mp3|mp4|mpc|mpeg|mpg|ods|odt|pdf|png|ppt|pptx|ps|pxd|rar|rtf|tar|tgz|txt|vsd|wav|wma|wmv|xls|xlsx|xml|zip'.split('|')),
-        }
+    'image':set(['png', 'jpg', 'jpeg', 'gif']),
+    'file':set('7z|avi|csv|doc|docx|flv|gif|gz|gzip|jpeg|jpg|mov|mp3|mp4|mpc|mpeg|mpg|ods|odt|pdf|png|ppt|pptx|ps|pxd|rar|rtf|tar|tgz|txt|vsd|wav|wma|wmv|xls|xlsx|xml|zip'.split('|')),
+}
 MAX_CONTENT_LENGTH = 100 * 1024 * 1024
 
 

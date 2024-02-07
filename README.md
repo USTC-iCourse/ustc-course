@@ -7,12 +7,17 @@ USTC 评课社区是使用 Python 3 + Flask + SQLAlchemy 开发的 Web 系统。
 安装此系统前，请首先安装：
 
 1. Python 3
-2. MySQL 5.5+
+2. MySQL 5.7+
 3. Nginx
 
 ### 配置和创建数据库
 
-在 MySQL 配置文件（如 ```/etc/mysql/my.cnf```）末尾加入如下几行，重启数据库（如 ```service mysql restart```）。这几行是设置数据库使用 utf8mb4 作为默认连接字符集和存储字符集，以免出现乱码，并且支持 emoji。
+在 MySQL 配置文件（如 ```/etc/mysql/my.cnf```）末尾加入如下几行，重启数据库（如 ```service mysql restart```）。
+
+这几行的作用是：
+
+- 设置数据库使用 utf8mb4 作为默认连接字符集和存储字符集，以免出现乱码，并且支持 emoji。
+- 设置 MySQL 全文搜索的最小词长度为 1，以支持中文搜索。
 
 ```
 [client]
@@ -23,6 +28,8 @@ default-character-set=utf8mb4
 collation-server = utf8mb4_unicode_ci
 init-connect='SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci'
 character-set-server = utf8mb4
+innodb_ft_min_token_size = 1
+ft_min_word_len = 1
 ```
 
 然后创建数据库：```mysql -u root -p``` 进入 mysql 控制台。
