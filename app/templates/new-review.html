@@ -40,7 +40,7 @@
         </div>
 
         {% for poll in polls %}
-        <div class="ud-pd-sm">
+        <div class="review-poll ud-pd-sm">
           <span class="right-pd-sm weight-heavy">{{ poll['display'] }}</span>
           <div class="btn-group btn-group-inv" data-toggle="buttons">
             {% for option in poll['options'] %}
@@ -56,7 +56,9 @@
         <link rel="stylesheet" href="/static/css/star-rating.min.css" media="all" rel="stylesheet" type="text/css">
         <div class="ud-pd-sm">
           <span class="weight-heavy pull-left">评个分吧？</span>
-          <input id="rate-star" name="rate" value="{{ review.rate / 2.0 if review.rate else 0 }}">
+          <div id="rate-star-container">
+            <input id="rate-star" name="rate" value="{{ review.rate / 2.0 if review.rate else 0 }}">
+          </div>
           <span class="clearfix"></span>
         </div>
       </div>
@@ -130,22 +132,6 @@ function submit_review() {
     });
 }
 
-$('#rate-star').rating({
-    min: 0,
-    max: 5,
-    step: 0.5,
-    size: "xs",
-    showClear: false,
-    glyphicon: false,
-    ratingClass: 'glyphicon glyphicon-star',
-    starCaptions: function(val) {
-        return val*2;
-    },
-    starCaptionClasses: function(val) {
-        return "blue";
-    },
-});
-
 $(function(){
     // remove desktop/mobile-only elements to avoid name conflicts
     if ($('.desktop').css('display') == 'none') {
@@ -157,6 +143,42 @@ $(function(){
 
     var allowUnrated = false;
     var unratedClickCount = 0;
+
+    function startStarRating() {
+        $('#rate-star').rating({
+            min: 0,
+            max: 5,
+            step: 0.5,
+            size: "xs",
+            showClear: false,
+            glyphicon: false,
+            ratingClass: 'glyphicon glyphicon-star',
+            starCaptions: function(val) {
+                return val*2;
+            },
+            starCaptionClasses: function(val) {
+                return "blue";
+            },
+        });
+    
+        // allow not rating a course after 5 consecutive clicks
+        $('.star-rating .caption').click(function(e) {
+            e.preventDefault();
+            ++unratedClickCount;
+            if (unratedClickCount >= 5) {
+                allowUnrated = true;
+                unratedClickCount = 0;
+                // reset star rating
+                $('.rating-container').remove();
+                $('#rate-star-container').html('<input id="rate-star" name="rate" value="0">');
+                startStarRating();
+                // display a special caption
+                $('.star-rating .caption .blue').text("你可以提交没有评分的点评 :)");
+            }
+        });
+    }
+
+    startStarRating();
 
     $('#review-form').submit(function(e) {
         e.preventDefault();
@@ -210,15 +232,15 @@ $(function(){
         submit_review();
     });
 
-    // allow not rating a course after 5 consecutive clicks
-    $('.star-rating .caption').click(function(e) {
-        e.preventDefault();
-        ++unratedClickCount;
-        if (unratedClickCount >= 5) {
-            allowUnrated = true;
-            $('.star-rating .caption .blue').text("你可以提交没有评分的点评 :)");
+    /*
+    $('.review-poll .btn').click(function(e) {
+        if ($(this).hasClass('active')) {
+            setTimeout(function() {
+                $(this).removeClass('active');
+            }.bind(this), 10);
         }
     });
+    */
 });
 </script>
 {% include 'richeditor.html' %}
