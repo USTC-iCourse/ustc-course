@@ -12,6 +12,10 @@ from app.models import (
     Teacher,
     Review,
 )
+import re
+
+
+filter = lambda x: re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', x)
 
 
 def search(keywords: List[str], page: int, per_page: int) -> MyPagination:

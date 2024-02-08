@@ -9,9 +9,8 @@ from sqlalchemy import or_
 from app import db
 from app import app
 from .course import deptlist
-from .search import sqllike_search, sqllike_search_reviews, sqlcache_search, sqlcache_search_reviews
+from .search import search as search_, search_reviews as search_reviews_, filter
 from .search.pagination import MyPagination
-import re
 from itsdangerous import URLSafeTimedSerializer
 
 
@@ -327,7 +326,7 @@ def search_reviews():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
 
-    keywords = re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', query_str).split()
+    keywords = filter(query_str).split()
     if not keywords:
         return render_template('search-reviews.html', keyword=query_str,
                                reviews=MyPagination.empty(),
@@ -336,7 +335,7 @@ def search_reviews():
     if len(keywords) > max_keywords_allowed:
         keywords = keywords[:max_keywords_allowed]
 
-    reviews_paged = sqlcache_search_reviews(keywords, page, per_page, current_user)
+    reviews_paged = search_reviews_(keywords, page, per_page, current_user)
 
     if reviews_paged.total > 0:
         title = '搜索点评「' + query_str + '」'
@@ -378,7 +377,7 @@ def search():
     #    # 开课地点
     #    course_query = course_query.filter(Course.campus==campus)
 
-    keywords = re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', query_str).split()
+    keywords = filter(query_str).split()
     if not keywords:
         return render_template('search.html', keyword=query_str,
                                courses=MyPagination.empty(),
@@ -392,7 +391,7 @@ def search():
     if page <= 1:
         page = 1
     
-    pagination = sqllike_search(keywords, page, per_page)
+    pagination = search_(keywords, page, per_page)
 
     if pagination.total > 0:
         title = '搜索课程「' + query_str + '」'
