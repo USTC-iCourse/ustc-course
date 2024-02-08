@@ -28,8 +28,12 @@ class CourseSearchCache(db.Model):
     def process_text(course: Course) -> str:
         # Course name + teacher name(s) + Course ID (courseries)
         course_name = list(jieba.cut_for_search(course.name))
-        # well, we don't have to use jieba for teacher names.
-        teacher_names = [teacher.name for teacher in course.teachers]
+        # use jieba for name, to make it more flexible
+        # teacher_names = [teacher.name for teacher in course.teachers]
+        teacher_names = []
+        for teacher in course.teachers:
+            teacher_names.append(teacher.name)
+            teacher_names.extend(jieba.cut_for_search(teacher.name))
         # also not for courseries
         courseries = [course.courseries]
         return " ".join(course_name + teacher_names + courseries)
