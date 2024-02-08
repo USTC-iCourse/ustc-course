@@ -232,15 +232,14 @@ $(function(){
         submit_review();
     });
 
-    /*
     $('.review-poll .btn').click(function(e) {
         if ($(this).hasClass('active')) {
             setTimeout(function() {
                 $(this).removeClass('active');
+                $(this).find('input').removeAttr('checked');
             }.bind(this), 10);
         }
     });
-    */
 });
 </script>
 {% include 'richeditor.html' %}

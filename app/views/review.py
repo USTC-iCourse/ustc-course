@@ -77,7 +77,19 @@ def new_review(course_id):
             review.content, mentioned_users = editor_parse_at(review.content)
             review.content = sanitize(review.content)
 
-            # check review ratings
+            # allow cancel rating of an existing review
+            if not request.form.get('difficulty'):
+                review.difficulty = None
+            if not request.form.get('homework'):
+                review.homework = None
+            if not request.form.get('grading'):
+                review.grading = None
+            if not request.form.get('gain'):
+                review.gain = None
+            if not request.form.get('rate'):
+                review.rate = None
+
+            # check review ratings and reject partial ratings
             if review.difficulty and review.homework and review.grading and review.gain and review.rate:
                 pass
             elif not review.difficulty and not review.homework and not review.grading and not review.gain and not review.rate:
