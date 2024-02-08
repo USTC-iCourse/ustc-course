@@ -1,7 +1,8 @@
-from typing import List, Tuple
+from typing import List
 from app import db
 from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import or_
+from .pagination import MyPagination
 from sqlalchemy.sql.expression import literal_column, text
 from app.models import (
     User,
@@ -13,7 +14,7 @@ from app.models import (
 )
 
 
-def search(keywords: List[str], page: int, per_page: int) -> Tuple[List[Course], int]:
+def search(keywords: List[str], page: int, per_page: int) -> MyPagination:
     def course_query_with_meta(meta):
         return db.session.query(Course, literal_column(str(meta)).label("_meta"))
 
@@ -80,11 +81,15 @@ def search(keywords: List[str], page: int, per_page: int) -> Tuple[List[Course],
         else:
             union_keywords = union_courses
     ordered_courses = ordering(union_keywords, keywords).group_by(Course.id)
+
+    # manual pagination -- it's too much trouble to use flask_sqlalchemy's Pagination in this specific case
     num_results = ordered_courses.count()
     selections = ordered_courses.offset((page - 1) * per_page).limit(per_page).all()
     course_objs = [s[0] for s in selections]
 
-    return course_objs, num_results
+    pagination = MyPagination(page=page, per_page=per_page, total=num_results, items=course_objs)
+
+    return pagination
 
 
 def search_reviews(keywords: List[str], page: int, per_page: int, current_user) -> Pagination:

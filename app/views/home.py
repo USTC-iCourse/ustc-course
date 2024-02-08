@@ -10,6 +10,7 @@ from app import db
 from app import app
 from .course import deptlist
 from .search import sqllike_search, sqllike_search_reviews, sqlcache_search, sqlcache_search_reviews
+from .search.pagination import MyPagination
 import re
 from itsdangerous import URLSafeTimedSerializer
 
@@ -316,40 +317,6 @@ def reset_password(token):
     return render_template('reset-password.html', form=form, title='重设密码')
 
 
-class MyPagination(object):
-
-    def __init__(self, page, per_page, total, items):
-        self.page = page
-        self.per_page = per_page
-        self.total = total
-        self.items = items
-
-    @property
-    def pages(self):
-        return int((self.total + self.per_page - 1) / self.per_page)
-
-    @property
-    def has_prev(self):
-        return self.page > 1
-
-    @property
-    def has_next(self):
-        return self.page < self.pages
-
-    def iter_pages(self, left_edge=2, left_current=2,
-                   right_current=5, right_edge=2):
-        last = 0
-        for num in range(1, self.pages + 1):
-            if num <= left_edge or \
-               (num > self.page - left_current - 1 and \
-                num < self.page + right_current) or \
-               num > self.pages - right_edge:
-                if last + 1 != num:
-                    yield None
-                yield num
-                last = num
-
-
 @home.route('/search-reviews/')
 def search_reviews():
     ''' 搜索点评内容 '''
@@ -363,7 +330,7 @@ def search_reviews():
     keywords = re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', query_str).split()
     if not keywords:
         return render_template('search-reviews.html', keyword=query_str,
-                               reviews=MyPagination(page=0, per_page=0, total=0, items=[]),
+                               reviews=MyPagination.empty(),
                                title="无效的搜索关键词")
     max_keywords_allowed = 10
     if len(keywords) > max_keywords_allowed:
@@ -414,7 +381,7 @@ def search():
     keywords = re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', query_str).split()
     if not keywords:
         return render_template('search.html', keyword=query_str,
-                               courses=MyPagination(page=0, per_page=0, total=0, items=[]),
+                               courses=MyPagination.empty(),
                                title="无效的搜索关键词")
     max_keywords_allowed = 10
     if len(keywords) > max_keywords_allowed:
@@ -425,9 +392,7 @@ def search():
     if page <= 1:
         page = 1
     
-    course_objs, num_results = sqlcache_search(keywords, page, per_page)
-
-    pagination = MyPagination(page=page, per_page=per_page, total=num_results, items=course_objs)
+    pagination = sqllike_search(keywords, page, per_page)
 
     if pagination.total > 0:
         title = '搜索课程「' + query_str + '」'
