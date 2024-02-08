@@ -30,6 +30,8 @@ init-connect='SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci'
 character-set-server = utf8mb4
 innodb_ft_min_token_size = 1
 ft_min_word_len = 1
+innodb_ft_enable_stopword = OFF
+ft_stopword_file = ''
 ```
 
 然后创建数据库：```mysql -u root -p``` 进入 mysql 控制台。
