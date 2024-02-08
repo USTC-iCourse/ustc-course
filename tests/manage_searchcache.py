@@ -7,7 +7,8 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Search cache manage")
     parser.add_argument("--nuke", action="store_true", help="remove search cache tables")
-    parser.add_argument("--init", action="store_true", help="initialize/override search cache")
+    parser.add_argument("--init-course", action="store_true", help="initialize course cache")
+    parser.add_argument("--init-review", action="store_true", help="initialize review cache")
     args = parser.parse_args()
 
     with app.app_context():
@@ -18,9 +19,13 @@ if __name__ == "__main__":
             print("search cache tables removed")
             print("Run tests.init_db to recreate them.")
 
-        if args.init:
+        if args.init_course or args.init_review:
             print("initializing")
-            for course in Course.query.all():
-                CourseSearchCache.update(course)
-            for review in Review.query.all():
-                ReviewSearchCache.update(review)
+            if args.init_course:
+                print("course cache")
+                for course in Course.query.all():
+                    CourseSearchCache.update(course)
+            if args.init_review:
+                print("review cache")
+                for review in Review.query.all():
+                    ReviewSearchCache.update(review)
