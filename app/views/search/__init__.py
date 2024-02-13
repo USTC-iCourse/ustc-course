@@ -8,8 +8,13 @@ from app import app
 backend = app.config.get("SEARCH_BACKEND", "sql-like")
 if backend not in ["sql-like", "sql-cache"]:
     raise ValueError("Invalid SEARCH_BACKEND value: " + backend)
+if backend == "sql-like":
+    sqllike.init()
+else:
+    sqlcache.init()
 
-def filter(x):
+
+def filter(x: str) -> str:
     if backend == "sql-like":
         return sqllike.filter(x)
     else:

@@ -1,5 +1,5 @@
 from typing import List
-from app.models import Course, CourseSearchCache, Review, ReviewSearchCache
+from app.models import Course, CourseSearchCache, CourseRate, Review, ReviewSearchCache
 from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import or_
 import jieba
@@ -9,18 +9,25 @@ import re
 filter = lambda x: re.sub(r"""[~`!@#$%^&*{}\[\]\\:\";'<>,/\+\-\~\(\)><]""", " ", x)
 
 
+def init() -> None:
+    jieba.initialize()
+
+
 def search(keywords: List[str], page: int, per_page: int) -> Pagination:
     # use jieba to cut keywords
     keywords = " ".join(
         # enforce keyword in search result
         ["+" + i.strip() for i in jieba.cut(" ".join(keywords)) if i.strip()]
     )
-    results = CourseSearchCache.query.filter(
-        CourseSearchCache.text.match(keywords)
-    ).paginate(page=page, per_page=per_page)
-    # CourseSearchCache -> Course
-    ids = [result.id for result in results.items]
-    results.items = Course.query.filter(Course.id.in_(ids)).all()
+    # results = CourseSearchCache.query.filter(
+    #     CourseSearchCache.text.match(keywords)
+    # ).paginate(page=page, per_page=per_page)
+    # # CourseSearchCache -> Course
+    # ids = [result.id for result in results.items]
+    # results.items = Course.query.filter(Course.id.in_(ids)).all()
+    results = CourseSearchCache.query.filter(CourseSearchCache.text.match(keywords))
+    ids = [result.id for result in results]
+    results = Course.query.filter(Course.id.in_(ids)).join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page=page, per_page=per_page)
 
     return results
 

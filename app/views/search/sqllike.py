@@ -18,6 +18,10 @@ import re
 filter = lambda x: re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', x)
 
 
+def init() -> None:
+    pass
+
+
 def search(keywords: List[str], page: int, per_page: int) -> MyPagination:
     def course_query_with_meta(meta):
         return db.session.query(Course, literal_column(str(meta)).label("_meta"))
