@@ -1,8 +1,10 @@
 # python -m tests.update_searchcache
 # initialize needs time, be patient.
-from app import app
+from app import app, db
 from app.models import Course, CourseSearchCache, Review, ReviewSearchCache
 import argparse
+from tqdm import tqdm
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Search cache manage")
@@ -23,9 +25,11 @@ if __name__ == "__main__":
             print("initializing")
             if args.init_course:
                 print("course cache")
-                for course in Course.query.all():
-                    CourseSearchCache.update(course)
+                for course in tqdm(Course.query.all()):
+                    CourseSearchCache.update(course, commit=False)
+                db.session.commit()
             if args.init_review:
                 print("review cache")
-                for review in Review.query.all():
-                    ReviewSearchCache.update(review)
+                for review in tqdm(Review.query.all()):
+                    ReviewSearchCache.update(review, commit=False)
+                db.session.commit()
