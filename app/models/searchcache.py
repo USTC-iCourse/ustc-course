@@ -35,7 +35,11 @@ class CourseSearchCache(db.Model):
             teacher_names.append(teacher.name)
             teacher_names.extend(jieba.cut_for_search(teacher.name))
         # also not for courseries
-        courseries = [course.courseries]
+        try:
+            courseries = [course.courseries]
+        except AttributeError:
+            # it is possible that course has no terms data
+            courseries = []
         return " ".join(course_name + teacher_names + courseries)
 
     @staticmethod
