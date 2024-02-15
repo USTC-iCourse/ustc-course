@@ -10,6 +10,8 @@ try:
     from flask_login import current_user
 except:
     current_user=None
+from functools import lru_cache
+import time
 
 class CourseTimeLocation(db.Model):
     __tablename__ = 'course_time_locations'
@@ -299,11 +301,28 @@ class Course(db.Model):
             return self.teachers[0]
         else:
             return None
+    
+    @classmethod
+    # updates once an hour, as this is only used when sorting, it's okay to be cached
+    def avg_rate_cached(self) -> float:
+        @lru_cache(maxsize=1)
+        def avg_rate(ttl_hash=None) -> float:
+            query = db.session.query(db.func.avg(Review.rate))
+            return query.scalar()
+        return avg_rate(ttl_hash=time.time() / 3600)
+    
+    @classmethod
+    def avg_rate_count_cached(self) -> float:
+        @lru_cache(maxsize=1)
+        def avg_rate_count(ttl_hash=None) -> float:
+            query = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id)))
+            return query.scalar()
+        return avg_rate_count(ttl_hash=time.time() / 3600)
 
     @classmethod
     def generic_query_order(self, rate_total, review_count):
-        avg_rate = db.session.query(db.func.avg(Review.rate)).as_scalar()
-        avg_rate_count = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).as_scalar()
+        avg_rate = Course.avg_rate_cached()
+        avg_rate_count = Course.avg_rate_count_cached()
         normalized_rate = (rate_total + avg_rate * avg_rate_count) / (review_count + avg_rate_count)
         return normalized_rate
 

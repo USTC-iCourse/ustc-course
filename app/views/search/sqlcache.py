@@ -71,7 +71,9 @@ def search(keywords: List[str], page: int, per_page: int) -> Pagination:
         results = CourseSearchCache.query.filter(CourseSearchCache.text.match(allchars))
         ids = [result.id for result in results]
         results = Course.query.filter(Course.id.in_(ids))
-    results = results.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page=page, per_page=per_page)
+    results = results.join(CourseRate).order_by(Course.QUERY_ORDER())
+    # print_sqlalchemy_statement(results)
+    results = results.paginate(page=page, per_page=per_page)
 
     return results
 
