@@ -26,21 +26,17 @@ class CourseSearchCache(db.Model):
 
     @staticmethod
     def process_text(course: Course) -> str:
-        # Course name + teacher name(s) + Course ID (courseries)
-        course_name = list(jieba.cut_for_search(course.name))
+        # Course name + teacher name(s)
+        course_name = jieba.lcut_for_search(course.name)
         # use jieba for name, to make it more flexible
         # teacher_names = [teacher.name for teacher in course.teachers]
         teacher_names = []
         for teacher in course.teachers:
             teacher_names.append(teacher.name)
-            teacher_names.extend(jieba.cut_for_search(teacher.name))
-        # also not for courseries
-        try:
-            courseries = [course.courseries]
-        except AttributeError:
-            # it is possible that course has no terms data
-            courseries = []
-        return " ".join(course_name + teacher_names + courseries)
+            cutted = jieba.lcut_for_search(teacher.name)
+            if len(cutted) > 1:
+                teacher_names.extend(cutted)
+        return " ".join(course_name + teacher_names)
 
     @staticmethod
     def update(course: Course, follow_config=False, commit=True):
