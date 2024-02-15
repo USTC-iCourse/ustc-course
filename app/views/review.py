@@ -111,10 +111,7 @@ def new_review(course_id):
                         user.notify('mention', review)
                 record_review_history(review, 'update')
 
-            if is_new or old_review.content != review.content or \
-               old_review.only_visible_to_student != review.only_visible_to_student or \
-               old_review.is_hidden != review.is_hidden or \
-               old_review.is_blocked != review.is_blocked:
+            if is_new or old_review.content != review.content:
                 ReviewSearchCache.update(review, follow_config=True)
 
             next_url = url_for('course.view_course', course_id=course_id, _external=True) + '#review-' + str(review.id)

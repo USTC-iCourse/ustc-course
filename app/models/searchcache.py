@@ -76,12 +76,6 @@ class ReviewSearchCache(db.Model):
     )
     text = db.Column(db.Text(collation="utf8mb4_unicode_ci"), nullable=False)
 
-    # permission-related fields
-    only_visible_to_student = db.Column(db.Boolean, default=False)
-    is_hidden = db.Column(db.Boolean, default=False)
-    is_blocked = db.Column(db.Boolean, default=False)
-    author = db.Column(db.Integer, db.ForeignKey("users.id"))
-
     # mysql full text search index
     __table_args__ = (
         db.Index(
@@ -101,11 +95,8 @@ class ReviewSearchCache(db.Model):
             return
         cache = ReviewSearchCache.query.get(review.id)
         if cache is None:
-            cache = ReviewSearchCache(id=review.id, author=review.author.id)
+            cache = ReviewSearchCache(id=review.id)
         cache.text = ReviewSearchCache.process_text(review)
-        cache.is_blocked = review.is_blocked
-        cache.is_hidden = review.is_hidden
-        cache.only_visible_to_student = review.only_visible_to_student
         db.session.add(cache)
         if commit:
             db.session.commit()

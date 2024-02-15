@@ -1,10 +1,12 @@
 from typing import List
-from app.models import Course, CourseSearchCache, CourseRate, Review, ReviewSearchCache, CourseTerm
+from app.models import Course, CourseSearchCache, CourseRate, Review, ReviewSearchCache, CourseTerm, ReviewComment
 from app.models.searchcache import is_chinese_stop_char
 from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import or_
+from sqlalchemy.orm import lazyload
 import jieba
 import re
+# from app.utils import print_sqlalchemy_statement
 
 
 filter = lambda x: re.sub(r"""[~`!@#$%^&*{}\[\]\\:\";'<>,/\+\-\~\(\)><\x00-\x1F\x7F]""", " ", x)
@@ -79,16 +81,20 @@ def search_reviews(
 ) -> Pagination:
     # use jieba to cut keywords
     keywords = " ".join([i.strip() for i in jieba.cut(" ".join(keywords)) if i.strip()])
-    results = ReviewSearchCache.query.filter(ReviewSearchCache.text.match(keywords))
-    results = results.filter(ReviewSearchCache.is_blocked == False).filter(ReviewSearchCache.is_hidden == False)
+    match_expr = ReviewSearchCache.text.match(keywords)
+    # Don't load comments and teachers -- avoid duplication in SQL response
+    # some extra fields are loaded when being joined...
+    results = Review.query.options(lazyload(Review.comments), lazyload(Review.course, Course.teachers))
+    results = results.join(ReviewSearchCache).filter(match_expr)
+    results = results.filter(Review.is_blocked == False).filter(Review.is_hidden == False)
     if not current_user.is_authenticated or current_user.identity != 'Student':
         if current_user.is_authenticated:
-            results = results.filter(or_(ReviewSearchCache.only_visible_to_student == False, ReviewSearchCache.author == current_user.id))
+            results = results.filter(or_(Review.only_visible_to_student == False, Review.author == current_user.id))
         else:
-            results = results.filter(ReviewSearchCache.only_visible_to_student == False)
+            results = results.filter(Review.only_visible_to_student == False)
+    results = results.order_by(match_expr.desc(), Review.update_time.desc())
+    # print_sqlalchemy_statement(results)
+
     results = results.paginate(page=page, per_page=per_page)
-    # ReviewSearchCache -> Review
-    ids = [result.id for result in results.items]
-    results.items = Review.query.filter(Review.id.in_(ids)).all()
 
     return results
