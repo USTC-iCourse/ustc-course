@@ -48,4 +48,4 @@ if __name__ == "__main__":
             # ANSI escape code for red and bold
             text = re.sub(r'<span style="color:#B22222;font-weight:bold;">(.*?)</span>',
               '\033[1m\033[31m\\1\033[0m', text, flags=re.IGNORECASE)
-            print(f"{idx} (from {user} in {i.course}): {text}")
+            print(f"{idx} (from {user} in {i.course}, {i.update_time}): {text}")

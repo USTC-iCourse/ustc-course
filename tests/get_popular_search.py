@@ -15,7 +15,7 @@ if __name__ == "__main__":
     print("Please note that SearchLog is usually very large (300M+) and this is a bit slow.", file=sys.stderr)
     with app.app_context():
         for log in tqdm(SearchLog.query):
-            data[log.keyword.strip()][log.module] += 1
+            data[log.keyword.replace("\n", " ").replace("\r", "").strip()][log.module] += 1
 
     # output sorted data
     for keyword, count_dict in sorted(data.items(), key=lambda x: x[1]["search_course"] + x[1]["search_reviews"], reverse=True):
