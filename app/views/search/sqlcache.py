@@ -1,7 +1,7 @@
 from typing import List
 from app.models import Course, CourseSearchCache, CourseRate, Review, ReviewSearchCache, CourseTerm
+from app.models.searchcache import is_chinese_stop_char
 from flask_sqlalchemy.pagination import Pagination
-from .pagination import MyPagination
 from sqlalchemy import or_
 import jieba
 import re
@@ -45,26 +45,31 @@ def search(keywords: List[str], page: int, per_page: int) -> Pagination:
     # use jieba to cut keywords
     natural_keywords = " ".join(
         # enforce keyword in search result
-        ["+" + i.strip() for i in jieba.cut(" ".join(natural_keywords)) if i.strip()]
+        ["+" + i.strip() for i in jieba.cut(" ".join(natural_keywords)) if i.strip() and not is_chinese_stop_char(i.strip())]
         + cid_keywords
     )
 
-    if natural_keywords:
-        results = CourseSearchCache.query.filter(CourseSearchCache.text.match(natural_keywords))
+    results = CourseSearchCache.query.filter(CourseSearchCache.text.match(natural_keywords))
+    ids = [result.id for result in results]
+    results = Course.query.filter(Course.id.in_(ids))
+    if cid_query is not None:
+        if "+" in natural_keywords:
+            results = results.intersect(cid_query)
+        else:
+            results = results.union(cid_query)
+
+    if results.count() == 0:
+        # fallback: search with every single char
+        allchars = set()
+        for word in keywords:
+            for char in word:
+                if not is_chinese_stop_char(char):
+                    allchars.add("+" + char)
+        allchars = " ".join(allchars)
+        results = CourseSearchCache.query.filter(CourseSearchCache.text.match(allchars))
         ids = [result.id for result in results]
         results = Course.query.filter(Course.id.in_(ids))
-        if cid_query is not None:
-            if "+" in natural_keywords:
-                results = results.intersect(cid_query)
-            else:
-                results = results.union(cid_query)
-    else:
-        results = cid_query.distinct(Course.id)
-
-    if results is None:
-        results = MyPagination.empty()
-    else:
-        results = results.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page=page, per_page=per_page)
+    results = results.join(CourseRate).order_by(Course.QUERY_ORDER()).paginate(page=page, per_page=per_page)
 
     return results
 

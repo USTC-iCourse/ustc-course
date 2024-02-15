@@ -18,6 +18,7 @@ USTC 评课社区是使用 Python 3 + Flask + SQLAlchemy 开发的 Web 系统。
 
 - 设置数据库使用 utf8mb4 作为默认连接字符集和存储字符集，以免出现乱码，并且支持 emoji。
 - 设置 MySQL 全文搜索的最小词长度为 1，以支持中文搜索。
+- 取消停用词设置。
 
 ```
 [client]
