@@ -302,22 +302,26 @@ class Course(db.Model):
         else:
             return None
     
+    @lru_cache(maxsize=1)
+    @staticmethod
+    def _avg_rate_cached(ttl_hash=None) -> float:
+        query = db.session.query(db.func.avg(Review.rate))
+        return query.scalar()
+    
     @classmethod
     # updates once an hour, as this is only used when sorting, it's okay to be cached
     def avg_rate_cached(self) -> float:
-        @lru_cache(maxsize=1)
-        def avg_rate(ttl_hash=None) -> float:
-            query = db.session.query(db.func.avg(Review.rate))
-            return query.scalar()
-        return avg_rate(ttl_hash=time.time() / 3600)
+        return Course._avg_rate_cached(ttl_hash=time.time() // 3600)
     
+    @lru_cache(maxsize=1)
+    @staticmethod
+    def _avg_rate_count_cached(ttl_hash=None) -> float:
+        query = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id)))
+        return query.scalar()
+
     @classmethod
     def avg_rate_count_cached(self) -> float:
-        @lru_cache(maxsize=1)
-        def avg_rate_count(ttl_hash=None) -> float:
-            query = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id)))
-            return query.scalar()
-        return avg_rate_count(ttl_hash=time.time() / 3600)
+        return Course._avg_rate_count_cached(ttl_hash=time.time() // 3600)
 
     @classmethod
     def generic_query_order(self, rate_total, review_count):
