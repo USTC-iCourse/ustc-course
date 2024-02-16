@@ -3,7 +3,7 @@ from app.models import Course, CourseSearchCache, CourseRate, Review, ReviewSear
 from app.models.searchcache import is_chinese_stop_char
 from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import or_
-from sqlalchemy.orm import lazyload
+from sqlalchemy.orm import lazyload, load_only
 import jieba
 import re
 # from app.utils import print_sqlalchemy_statement
@@ -51,7 +51,7 @@ def search(keywords: List[str], page: int, per_page: int) -> Pagination:
         + cid_keywords
     )
 
-    results = CourseSearchCache.query.filter(CourseSearchCache.text.match(natural_keywords))
+    results = CourseSearchCache.query.filter(CourseSearchCache.text.match(natural_keywords)).options(load_only(CourseSearchCache.id))
     ids = [result.id for result in results]
     results = Course.query.filter(Course.id.in_(ids))
     if cid_query is not None:
@@ -68,7 +68,7 @@ def search(keywords: List[str], page: int, per_page: int) -> Pagination:
                 if not is_chinese_stop_char(char):
                     allchars.add("+" + char)
         allchars = " ".join(allchars)
-        results = CourseSearchCache.query.filter(CourseSearchCache.text.match(allchars))
+        results = CourseSearchCache.query.filter(CourseSearchCache.text.match(allchars)).options(load_only(CourseSearchCache.id))
         ids = [result.id for result in results]
         results = Course.query.filter(Course.id.in_(ids))
     results = results.join(CourseRate).order_by(Course.QUERY_ORDER())
