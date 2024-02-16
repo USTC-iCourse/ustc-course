@@ -5,6 +5,8 @@ from decimal import Decimal
 from sqlalchemy import orm
 from .review import Review, ReviewHistory
 from .user import Teacher
+from .program import ProgramCourse, Program
+from werkzeug.utils import cached_property
 from collections import Counter
 try:
     from flask_login import current_user
@@ -75,7 +77,7 @@ class CourseClass(db.Model):
     def __repr__(self):
         return self.cno + '@' + self.term
 
-    @property
+    @cached_property
     def time_locations_display(self):
         return '; '.join([
             row.time_location_display for row in self.time_locations
@@ -511,18 +513,18 @@ class Course(db.Model):
     def terms_count(self):
         return self.terms.count()
 
-    @property
+    @cached_property
     def review_term_list(self):
-        review_term_list = list(set([review.term for review in self.reviews]))
+        review_term_list = list(set([review.term for review in self.reviews.with_entities(Review.term)]))
         return sorted(review_term_list, reverse=True)
 
-    @property
+    @cached_property
     def review_term_dist(self):
-        return Counter([review.term for review in self.reviews])
+        return Counter([review.term for review in self.reviews.with_entities(Review.term)])
 
-    @property
+    @cached_property
     def review_rate_dist(self):
-        return Counter([review.rate for review in self.reviews])
+        return Counter([review.rate for review in self.reviews.with_entities(Review.rate)])
 
     @property
     def teacher_names_display(self):
@@ -583,16 +585,16 @@ class Course(db.Model):
         cls = self.joined_class(user)
         return cls.term if cls else None
 
-    @property
+    @cached_property
     def latest_term(self):
         try:
             return self.terms[0]
         except:
             return None
 
-    @property
+    @cached_property
     def term_ids(self):
-        return [ t.term for t in self.terms ]
+        return [ t.term for t in self.terms.with_entities(CourseTerm.term) ]
 
     # sqlalchemy uses __getattr__, so we cannot use it
     # copy properties from latest_term
@@ -682,11 +684,15 @@ class Course(db.Model):
         else:
             root[key1] = {key2: [value]}
 
-    @property
+    @cached_property
     def sorted_program_courses(self):
         program_courses = []
         for course_group in self.course_groups:
-            program_courses += course_group.program_courses
+            program_courses += [i.id for i in course_group.program_courses]
+        program_courses = ProgramCourse.query.filter(ProgramCourse.id.in_(program_courses)).options(
+            orm.joinedload(ProgramCourse.program),
+            orm.joinedload(ProgramCourse.program).joinedload(Program.dept)
+        )
         depts = {}
         for program_course in program_courses:
             program = program_course.program
