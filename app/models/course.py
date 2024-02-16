@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import url_for, Markup
 from app import db
 from decimal import Decimal
-from sqlalchemy import orm
+from sqlalchemy import orm, cast, Float
 from .review import Review, ReviewHistory
 from .user import Teacher
 from .program import ProgramCourse, Program
@@ -327,8 +327,8 @@ class Course(db.Model):
 
     @classmethod
     def generic_query_order(self, rate_total, review_count):
-        avg_rate = Course.avg_rate_cached()
-        avg_rate_count = Course.avg_rate_count_cached()
+        avg_rate = cast(Course.avg_rate_cached(), Float)
+        avg_rate_count = cast(Course.avg_rate_count_cached(), Float)
         normalized_rate = (rate_total + avg_rate * avg_rate_count) / (review_count + avg_rate_count)
         return normalized_rate
 
