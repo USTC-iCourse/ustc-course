@@ -477,7 +477,7 @@ class Course(db.Model):
     @property
     def students(self):
         from .user import Student, join_course
-        return Student.query.join(join_course).join(CourseClass).filter(CourseClass.course_id == self.id).all()
+        return Student.query.join(join_course).join(CourseClass).filter(CourseClass.course_id == self.id).options(orm.load_only(Student.sno)).all()
 
     def join(self, user=current_user):
         from .user import join_course
