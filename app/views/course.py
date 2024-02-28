@@ -100,7 +100,13 @@ def view_course(course_id):
             'score': '评分: 低-高',
             }
 
-    query = Review.query.filter_by(course_id=course.id).filter_by(is_hidden=False)
+    query = Review.query.filter_by(course_id=course.id)
+
+    # filter hidden reviews to get correct review count
+    if not current_user.is_authenticated:
+        query = query.filter_by(is_hidden=False)
+    elif not current_user.is_admin:
+        query = query.filter(or_(Review.is_hidden==False, Review.author_id==current_user.id))
 
     # get terms list which have review
     review_term_list = course.review_term_list
