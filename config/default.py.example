@@ -46,10 +46,9 @@ ALLOWED_EXTENSIONS = {
         }
 MAX_CONTENT_LENGTH = 100 * 1024 * 1024
 
-
-
-IMAGE_PATH = 'uploads/images'
-
+# Search settings
+SEARCH_BACKEND = "sql-like"  # "sql-like" or "sql-cache"
+UPDATE_SEARCH_CACHE = True
 
 # Debugbar Settings
 # Enable the profiler on all requests

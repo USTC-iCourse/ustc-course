@@ -229,7 +229,7 @@ class ReviewHistory(db.Model):
     update_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     author_id = db.Column(db.Integer)
-    course_id = db.Column(db.Integer)
+    course_id = db.Column(db.Integer, index=True)
     term = db.Column(db.String(10))
 
     is_anonymous = db.Column(db.Boolean, default=False)

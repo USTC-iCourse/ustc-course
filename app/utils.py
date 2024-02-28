@@ -427,3 +427,12 @@ def get_rankings_history_file_list():
         return year_months
     except:
         return []
+
+# Print query/statement with parameters replaced in output
+def print_sqlalchemy_statement(statement) -> None:
+    from sqlalchemy.dialects import mysql
+    import sqlalchemy.orm
+    import flask_sqlalchemy.query
+    if type(statement) == sqlalchemy.orm.Query or flask_sqlalchemy.query.Query:
+        statement = statement.statement
+    print(statement.compile(dialect=mysql.dialect(), compile_kwargs={"literal_binds": True}))

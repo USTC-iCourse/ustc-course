@@ -1,6 +1,6 @@
 from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify
 from flask_security import current_user,login_required
-from app.models import Course, Review, ReviewHistory
+from app.models import Course, Review, ReviewHistory, ReviewSearchCache
 from app.forms import ReviewForm
 from app.utils import sanitize, editor_parse_at
 from flask_babel import gettext as _
@@ -62,6 +62,9 @@ def new_review(course_id):
         old_review.grading = review.grading
         old_review.gain = review.gain
         old_review.rate = review.rate
+        old_review.only_visible_to_student = review.only_visible_to_student
+        old_review.is_hidden = review.is_hidden
+        old_review.is_blocked = review.is_blocked
 
     message = ''
     form = ReviewForm(formdata=request.form, obj=review)
@@ -127,6 +130,9 @@ def new_review(course_id):
                     for user in mentioned_users:
                         user.notify('mention', review)
                 record_review_history(review, 'update')
+
+            if is_new or old_review.content != review.content:
+                ReviewSearchCache.update(review, follow_config=True)
 
             next_url = url_for('course.view_course', course_id=course_id, _external=True) + '#review-' + str(review.id)
             if form.is_ajax.data:
