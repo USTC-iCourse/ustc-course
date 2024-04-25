@@ -126,7 +126,7 @@ def sanitize(text):
     text = re.sub(r'<img ([^>]*) style="width:[0-9]+px; height:[0-9]+px"', r'<img \1', text)
     # add new rules for CKEditor 5
     text = re.sub(r'<img ([^>]*) width="[0-9]+" height="[0-9]+"', r'<img \1', text)
-    text = re.sub(r'<img ([^>]*) height="[0-9]+" height="[0-9]+"', r'<img \1', text)
+    text = re.sub(r'<img ([^>]*) height="[0-9]+" width="[0-9]+"', r'<img \1', text)
     return text
 
 
