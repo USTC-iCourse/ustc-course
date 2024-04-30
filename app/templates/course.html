@@ -28,15 +28,15 @@
   height: 200px;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5));
 }
-.read-more::after {
+.read-more::after, .display-folded .fold-button::after {
   content: "\e114";
   font-family: 'Glyphicons Halflings';
   font-style: normal;
   font-weight: 400;
   line-height: 1;
+  position: relative;
   top: 2px;
   left: 2px;
-  position: relative;
 }
 .display-folded .read-more {
   display: none !important;
@@ -46,12 +46,19 @@
 }
 .display-folded .fold-button {
   display: inline !important;
+  background: unset;
+  border: 0;
+  color: #337ab7;
+}
+.display-folded .fold-button::after {
+  content: "\e113";
 }
 .fixed-bottom-bar {
   position: fixed;
   width: 100%;
   bottom: 0;
-  padding-top: 15px;
+  padding-top: 1em;
+  padding-right: 2em;
   background-color: #fff;
 }
 </style>
