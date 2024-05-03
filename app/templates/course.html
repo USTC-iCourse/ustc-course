@@ -53,8 +53,8 @@
 .display-folded .fold-button::after {
   content: "\e113";
 }
-.fixed-bottom-bar {
-  position: fixed;
+.display-folded .bm-pd-md.grey {
+  position: sticky;
   width: 100%;
   bottom: 0;
   padding-top: 1em;
@@ -509,26 +509,7 @@
                     wrapperDiv.nextElementSibling.appendChild(foldButton);
                 }
             }
-            let requestId;
-            function checkContentPosition() {
-                const reviewContents = document.querySelectorAll('.review-wrapper');
-                const pageBottom = window.innerHeight;
-                reviewContents.forEach(reviewContent => {
-                    const reviewContentRect = reviewContent.getBoundingClientRect();
-                    const reviewContentTop = reviewContentRect.top;
-                    const reviewContentBottom = reviewContentRect.bottom;
-                    const bottomBar = reviewContent.nextElementSibling;
-                    const isOpen = reviewContent.parentNode.classList.contains('display-folded');
-                    if (reviewContentTop < pageBottom && reviewContentBottom > pageBottom && isOpen) {
-                        bottomBar.classList.add('fixed-bottom-bar');
-                    } else {
-                        bottomBar.classList.remove('fixed-bottom-bar');
-                    }
-                });
-                requestId = window.requestAnimationFrame(checkContentPosition);
-            }
             initFoldedElements();
-            requestId = window.requestAnimationFrame(checkContentPosition);
       </script>
 
       <!-- 右边栏 -->
