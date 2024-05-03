@@ -1,6 +1,68 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<style>
+.folded {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 20;
+  overflow: hidden;
+}
+.display-folded .review-content {
+  -webkit-line-clamp: unset !important;
+}
+.read-more {
+  position: relative;
+  margin: 10px 0;
+  border: 0;
+  color: #337ab7;
+  width: 100%;
+  background: unset;
+}
+.read-more::before {
+  content: "";
+  position: absolute;
+  display: block;
+  top: -200px;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5));
+}
+.read-more::after, .display-folded .fold-button::after {
+  content: "\e114";
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  position: relative;
+  top: 2px;
+  left: 2px;
+}
+.display-folded .read-more {
+  display: none !important;
+}
+.fold-button {
+  display: none;
+}
+.display-folded .fold-button {
+  display: inline !important;
+  background: unset;
+  border: 0;
+  color: #337ab7;
+}
+.display-folded .fold-button::after {
+  content: "\e113";
+}
+.fixed-bottom-bar {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  padding-top: 1em;
+  padding-right: 2em;
+  background-color: #fff;
+}
+</style>
+
 <div class="container">
 
   <div class="row float-element">
@@ -408,6 +470,64 @@
 
         {% endif %} <!-- 点评结束 -->
       </div>
+      <script>
+            function initFoldedElements() {
+                const reviewContents = document.querySelectorAll('.review-content');
+
+                for (const reviewContent of reviewContents) {
+                    const reviewContentHeight = reviewContent.scrollHeight;
+                    if (reviewContentHeight < 30 * parseFloat(window.getComputedStyle(reviewContent).lineHeight)) {
+                        continue;
+                    }
+                    const wrapperDiv = document.createElement('div');
+                    wrapperDiv.className = 'review-wrapper';
+
+                    // 移动到 wrapper 内，限制行数
+                    reviewContent.parentNode.insertBefore(wrapperDiv, reviewContent);
+                    wrapperDiv.appendChild(reviewContent);
+                    reviewContent.classList.add('folded');
+
+                    const readMoreButton = document.createElement('button');
+                    readMoreButton.classList.add('read-more');
+                    readMoreButton.textContent = '查看更多';
+	            // 默认展示
+		    wrapperDiv.parentNode.classList.add('display-folded');
+                    readMoreButton.addEventListener('click', () => {
+                        wrapperDiv.parentNode.classList.add('display-folded');
+                    });
+                    wrapperDiv.appendChild(readMoreButton);
+
+                    const foldButton = document.createElement('button');
+                    foldButton.classList.add('fold-button');
+                    foldButton.textContent = '折叠';
+                    foldButton.addEventListener('click', () => {
+                        wrapperDiv.parentNode.classList.remove('display-folded');
+                        window.scrollTo({top: wrapperDiv.offsetTop, left: 0});
+                    });
+                    wrapperDiv.nextElementSibling.appendChild(foldButton);
+                }
+            }
+            let requestId;
+            function checkContentPosition() {
+                const reviewContents = document.querySelectorAll('.review-wrapper');
+                const pageBottom = window.innerHeight;
+                reviewContents.forEach(reviewContent => {
+                    const reviewContentRect = reviewContent.getBoundingClientRect();
+                    const reviewContentTop = reviewContentRect.top;
+                    const reviewContentBottom = reviewContentRect.bottom;
+                    const bottomBar = reviewContent.nextElementSibling;
+                    const isOpen = reviewContent.parentNode.classList.contains('display-folded');
+                    if (reviewContentTop < pageBottom && reviewContentBottom > pageBottom && isOpen) {
+                        bottomBar.classList.add('fixed-bottom-bar');
+                    } else {
+                        bottomBar.classList.remove('fixed-bottom-bar');
+                    }
+                });
+                requestId = window.requestAnimationFrame(checkContentPosition);
+            }
+            initFoldedElements();
+            requestId = window.requestAnimationFrame(checkContentPosition);
+      </script>
 
       <!-- 右边栏 -->
 
