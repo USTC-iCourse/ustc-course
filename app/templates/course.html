@@ -3,13 +3,11 @@
 
 <style>
 .folded {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 20;
+  max-height: 100vh;
   overflow: hidden;
 }
 .display-folded .review-content {
-  -webkit-line-clamp: unset !important;
+  max-height: unset;
 }
 .read-more {
   position: relative;
@@ -476,7 +474,7 @@
 
                 for (const reviewContent of reviewContents) {
                     const reviewContentHeight = reviewContent.scrollHeight;
-                    if (reviewContentHeight < 30 * parseFloat(window.getComputedStyle(reviewContent).lineHeight)) {
+                    if (reviewContentHeight < 1.5 * window.innerHeight) {
                         continue;
                     }
                     const wrapperDiv = document.createElement('div');
