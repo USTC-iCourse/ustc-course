@@ -80,13 +80,13 @@ html, body { height: 100%; }
         margin: 20px 0;
         border: 1px #ddd dashed;
         border-radius: 4px;
-    }  
+    }
 }
 @media (max-width: 767px) {
     .select-box {
         padding-left: 8px;
         margin: 15px 0;
-    } 
+    }
 }
 
 p { line-height: 25px; word-wrap: break-word; }
@@ -99,6 +99,10 @@ p { line-height: 25px; word-wrap: break-word; }
 .rl-pd-sm, .rl-pd-md, .rl-pd-lg {
     overflow: hidden;
     word-wrap: break-word;
+}
+
+.ud-pd-md.display-folded {
+    overflow: visible;
 }
 
 .top-pd-sm { padding-top: 8px; }
@@ -405,7 +409,7 @@ a.nounderline:active { text-decoration: none; }
     right:30px;
     border-radius:7px;
     text-decoration:none;
-    display:none; 
+    display:none;
 }
 #gotop span {
     display:block;
