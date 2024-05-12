@@ -1,5 +1,7 @@
-# python -m tests.update_searchcache
+#!/usr/bin/python3
 # initialize needs time, be patient.
+import sys
+sys.path.append('..')
 from app import app, db
 from app.models import Course, CourseSearchCache, Review, ReviewSearchCache
 import argparse

@@ -304,8 +304,8 @@ class Course(db.Model):
         else:
             return None
     
-    @lru_cache(maxsize=1)
     @staticmethod
+    @lru_cache(maxsize=1)
     def _avg_rate_cached(ttl_hash=None) -> float:
         query = db.session.query(db.func.avg(Review.rate))
         return query.scalar()
@@ -315,8 +315,8 @@ class Course(db.Model):
     def avg_rate_cached(self) -> float:
         return Course._avg_rate_cached(ttl_hash=time.time() // 3600)
     
-    @lru_cache(maxsize=1)
     @staticmethod
+    @lru_cache(maxsize=1)
     def _avg_rate_count_cached(ttl_hash=None) -> float:
         query = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id)))
         return query.scalar()
