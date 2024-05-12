@@ -2,14 +2,18 @@ from datetime import datetime
 from flask import url_for, Markup
 from app import db
 from decimal import Decimal
-from sqlalchemy import orm
+from sqlalchemy import orm, cast, Float
 from .review import Review, ReviewHistory
 from .user import Teacher
+from .program import ProgramCourse, Program
+from werkzeug.utils import cached_property
 from collections import Counter
 try:
     from flask_login import current_user
 except:
     current_user=None
+from functools import lru_cache
+import time
 
 class CourseTimeLocation(db.Model):
     __tablename__ = 'course_time_locations'
@@ -73,7 +77,7 @@ class CourseClass(db.Model):
     def __repr__(self):
         return self.cno + '@' + self.term
 
-    @property
+    @cached_property
     def time_locations_display(self):
         return '; '.join([
             row.time_location_display for row in self.time_locations
@@ -90,7 +94,7 @@ class CourseTerm(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
     term = db.Column(db.String(10), index=True) # 学年学期，例如 20142 表示 2015 年春季学期
 
-    courseries = db.Column(db.String(20)) # course_series, 课程编号，长的，例如 CS1001A.01
+    courseries = db.Column(db.String(20), index=True) # course_series, 课程编号，长的，例如 CS1001A.01
     code = db.Column(db.String(20)) # 课程编号，短的，例如 CS1001A
     kcid = db.Column(db.Integer)    # 课程id
 
@@ -299,11 +303,32 @@ class Course(db.Model):
             return self.teachers[0]
         else:
             return None
+    
+    @lru_cache(maxsize=1)
+    @staticmethod
+    def _avg_rate_cached(ttl_hash=None) -> float:
+        query = db.session.query(db.func.avg(Review.rate))
+        return query.scalar()
+    
+    @classmethod
+    # updates once an hour, as this is only used when sorting, it's okay to be cached
+    def avg_rate_cached(self) -> float:
+        return Course._avg_rate_cached(ttl_hash=time.time() // 3600)
+    
+    @lru_cache(maxsize=1)
+    @staticmethod
+    def _avg_rate_count_cached(ttl_hash=None) -> float:
+        query = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id)))
+        return query.scalar()
+
+    @classmethod
+    def avg_rate_count_cached(self) -> float:
+        return Course._avg_rate_count_cached(ttl_hash=time.time() // 3600)
 
     @classmethod
     def generic_query_order(self, rate_total, review_count):
-        avg_rate = db.session.query(db.func.avg(Review.rate)).as_scalar()
-        avg_rate_count = db.session.query(db.func.count(Review.id) / db.func.count(db.func.distinct(Review.course_id))).as_scalar()
+        avg_rate = cast(Course.avg_rate_cached(), Float)
+        avg_rate_count = cast(Course.avg_rate_count_cached(), Float)
         normalized_rate = (rate_total + avg_rate * avg_rate_count) / (review_count + avg_rate_count)
         return normalized_rate
 
@@ -454,7 +479,7 @@ class Course(db.Model):
     @property
     def students(self):
         from .user import Student, join_course
-        return Student.query.join(join_course).join(CourseClass).filter(CourseClass.course_id == self.id).all()
+        return Student.query.join(join_course).join(CourseClass).filter(CourseClass.course_id == self.id).options(orm.load_only(Student.sno)).all()
 
     def join(self, user=current_user):
         from .user import join_course
@@ -488,18 +513,18 @@ class Course(db.Model):
     def terms_count(self):
         return self.terms.count()
 
-    @property
+    @cached_property
     def review_term_list(self):
-        review_term_list = list(set([review.term for review in self.reviews]))
+        review_term_list = list(set([review.term for review in self.reviews.with_entities(Review.term)]))
         return sorted(review_term_list, reverse=True)
 
-    @property
+    @cached_property
     def review_term_dist(self):
-        return Counter([review.term for review in self.reviews])
+        return Counter([review.term for review in self.reviews.with_entities(Review.term)])
 
-    @property
+    @cached_property
     def review_rate_dist(self):
-        return Counter([review.rate for review in self.reviews])
+        return Counter([review.rate for review in self.reviews.with_entities(Review.rate)])
 
     @property
     def teacher_names_display(self):
@@ -560,16 +585,16 @@ class Course(db.Model):
         cls = self.joined_class(user)
         return cls.term if cls else None
 
-    @property
+    @cached_property
     def latest_term(self):
         try:
             return self.terms[0]
         except:
             return None
 
-    @property
+    @cached_property
     def term_ids(self):
-        return [ t.term for t in self.terms ]
+        return [ t.term for t in self.terms.with_entities(CourseTerm.term) ]
 
     # sqlalchemy uses __getattr__, so we cannot use it
     # copy properties from latest_term
@@ -659,11 +684,15 @@ class Course(db.Model):
         else:
             root[key1] = {key2: [value]}
 
-    @property
+    @cached_property
     def sorted_program_courses(self):
         program_courses = []
         for course_group in self.course_groups:
-            program_courses += course_group.program_courses
+            program_courses += [i.id for i in course_group.program_courses]
+        program_courses = ProgramCourse.query.filter(ProgramCourse.id.in_(program_courses)).options(
+            orm.joinedload(ProgramCourse.program),
+            orm.joinedload(ProgramCourse.program).joinedload(Program.dept)
+        )
         depts = {}
         for program_course in program_courses:
             program = program_course.program

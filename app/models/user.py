@@ -12,6 +12,7 @@ from flask_babel import gettext as _
 from .notification import Notification
 from cachelib.simple import SimpleCache
 from .review import Review
+from typing import List
 
 Roles = ['Admin',
         'User']
@@ -110,12 +111,16 @@ class User(db.Model, UserMixin):
     def link(self):
         return Markup('<a href="' + self.url + '">') + Markup.escape(self.username) + Markup('</a>')
 
+    def get_latest_notifications(self, lim : int = 5) -> List[Notification]:
+        # self.notifications[0:5] will load all notifications from database, which is slow
+        return Notification.query.filter_by(to_user_id=self.id).order_by(Notification.time.desc()).limit(lim).all()
+
     @property
     def latest_notifications_text(self):
         text = latest_notifications_cache.get(self.id)
         if text is None:
             text = []
-            for notice in self.notifications[0:5]:
+            for notice in self.get_latest_notifications():
                 text.append(notice.display_text)
             latest_notifications_cache.set(self.id, text)
         return text

@@ -14,7 +14,7 @@ class Notification(db.Model):
     __tablename__ = 'notifications'
 
     id = db.Column(db.Integer, primary_key=True)
-    to_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    to_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
     from_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     date = db.Column(db.DateTime, default=datetime.utcnow().date())
     time = db.Column(db.DateTime, default=datetime.utcnow())
