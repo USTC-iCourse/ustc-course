@@ -111,7 +111,7 @@ def resize_avatar(old_file):
         # generate thumbnail if the avatar is too large
         new_filename = rand_str() + '.png'
         try:
-            img.thumbnail((thumbnail_width, thumbnail_height), Image.ANTIALIAS)
+            img.thumbnail((thumbnail_width, thumbnail_height), Image.LANCZOS)
             img.save(os.path.join(upload_base, new_filename), "PNG")
         except IOError:
             print("Failed to create thumbnail from '" + old_file + "' to '" + new_filename + "'")
