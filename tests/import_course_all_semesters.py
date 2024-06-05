@@ -30,8 +30,8 @@ headers = {
 }
 
 # get user ID
-program_url = 'https://jw.ustc.edu.cn/for-std/program'
-# will redirect to /for-std/program/info/<int:id>
+program_url = 'https://jw.ustc.edu.cn/for-std/course-select'
+# will redirect to /for-std/course-select/turns/<int:user_id>
 r = requests.get(program_url, headers=headers)
 if len(r.history) < 2:
     print('Failed to get user ID from program redirect: no redirect found')
