@@ -16,7 +16,7 @@ def view_profile(user_id):
     if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
-    if user.is_profile_hidden and current_user != user:
+    if user.is_profile_hidden and current_user != user and not current_user.is_admin:
         message = '此用户的个人主页未公开！'
         return render_template('feedback.html', status=False, message=message)
 
@@ -38,7 +38,7 @@ def reviews(user_id):
     if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
-    if user.is_profile_hidden and current_user != user:
+    if user.is_profile_hidden and current_user != user and not current_user.is_admin:
         message = '此用户的个人主页未公开！'
         return render_template('feedback.html', status=False, message=message)
 
@@ -56,7 +56,7 @@ def follow_course(user_id):
     if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
-    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
+    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user and not current_user.is_admin:
         message = '此用户关注的课程未公开！'
         return render_template('feedback.html', status=False, message=message)
 
@@ -76,7 +76,7 @@ def join_course(user_id):
     if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
-    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
+    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user and not current_user.is_admin:
         message = '此用户学过的课程未公开！'
         return render_template('feedback.html', status=False, message=message)
 
@@ -207,7 +207,7 @@ def followers(user_id):
     if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
-    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
+    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user and not current_user.is_admin:
         message = '此用户的粉丝列表未公开！'
         return render_template('feedback.html', status=False, message=message)
 
@@ -223,7 +223,7 @@ def followings(user_id):
     if not user or user.is_deleted:
         message = '用户不存在！'
         return render_template('feedback.html', status=False, message=message)
-    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user:
+    if (user.is_profile_hidden or user.is_following_hidden) and current_user != user and not current_user.is_admin:
         message = '此用户关注的人未公开！'
         return render_template('feedback.html', status=False, message=message)
 
