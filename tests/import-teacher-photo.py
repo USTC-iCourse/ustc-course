@@ -30,7 +30,7 @@ def import_one(name, url):
             img = img.crop((0, 0, width, width))
         if width > height:
             img = img.crop((int((width - height)/2), 0, int((width + height)/2), height))
-        img.thumbnail((MAX_SIZE, MAX_SIZE), Image.ANTIALIAS)
+        img.thumbnail((MAX_SIZE, MAX_SIZE), Image.LANCZOS)
     except:
         print("Failed to thumbnail " + path)
 

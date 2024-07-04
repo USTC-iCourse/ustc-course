@@ -22,7 +22,7 @@ for u in users:
             # generate thumbnail if the avatar is too large
             new_filename = rand_str() + '.png'
             try:
-                img.thumbnail((thumbnail_width, thumbnail_height), Image.ANTIALIAS)
+                img.thumbnail((thumbnail_width, thumbnail_height), Image.LANCZOS)
                 img.save('../uploads/images/' + new_filename, "PNG")
             except IOError:
                 print("Failed to create thumbnail from '" + u._avatar + "' to '" + new_filename + "'")
