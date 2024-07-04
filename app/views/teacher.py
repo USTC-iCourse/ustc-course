@@ -54,6 +54,24 @@ def profile_history(teacher_id):
         abort(403)
     return render_template('teacher-profile-history.html', teacher=teacher, title='教师信息编辑历史 - ' + teacher.name)
 
+@teacher.route('/<int:teacher_id>/delete_image/', methods=['GET','POST'])
+@login_required
+def delete_image(teacher_id):
+    teacher = Teacher.query.get(teacher_id)
+    if current_user.is_blocked_now:
+        abort(403)
+    if not teacher:
+        abort(404)
+    if teacher.image_locked:
+        abort(403)
+
+    teacher.set_image(None)
+    teacher.save()
+
+    info_history = TeacherInfoHistory()
+    info_history.save(teacher, current_user)
+    return redirect(url_for('teacher.view_profile', teacher_id=teacher.id))
+
 @teacher.route('/<int:teacher_id>/edit_profile/', methods=['GET','POST'])
 @login_required
 def edit_profile(teacher_id):

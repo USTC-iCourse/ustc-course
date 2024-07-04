@@ -23,8 +23,11 @@
               <span id="avatar-upload-btn">选择</span>
             </label>
             <button id="avatar-upload-msg" type="submit" class="btn btn-blue" style="display:none">上传</button>
+            {% if teacher._image %}
+            <a class="btn btn-default float-right" href="{{ url_for('teacher.delete_image', teacher_id=teacher.id) }}">删除现有照片</a>
+            {% endif %}
             {% if current_user.is_admin %}
-            <a class="btn btn-danger float-right" href="{{ url_for('teacher.lock_avatar', teacher_id=teacher.id) }}">锁定教师照片</a>
+            <a class="btn btn-danger float-right rl-mg-md" href="{{ url_for('teacher.lock_avatar', teacher_id=teacher.id) }}">锁定教师照片</a>
             {% endif %}
             {% else %}
             <a class="btn btn-grey">教师照片已被锁定</a>
