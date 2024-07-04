@@ -1,10 +1,10 @@
 from markdownify import markdownify
 
 
-PROMPT_LENGTH_LIMIT = 2800
-PROMPT_HEADROOM = 200
+PROMPT_LENGTH_LIMIT = 16384
+PROMPT_HEADROOM = 500
 CUTOFF_MIN_MESSAGE_LENGTH = 140
-SUMMARY_EXPECTED_LENGTH = 500
+SUMMARY_EXPECTED_LENGTH = 800
 
 
 def get_user(review):
@@ -53,7 +53,7 @@ def generate_short_prompt(reviews, full_prompt):
 
 
 def generate_summary_prompt(reviews):
-    header = '根据下列点评，尽可能详细、全面地总结' + get_course(reviews[0].course) + '课程的考试、给分、作业、上课水平、课程内容、选课建议等，大约800字，可以引用点评中的原句：\n'
+    header = '根据下列点评，尽可能详细、全面地总结' + get_course(reviews[0].course) + '课程的考试、给分、作业、教学水平、课程内容等，800 字左右，以便让同学们更好地选课。尽量忠于点评内容，可以引用点评中的原句，点评中如果有写得特别精彩的句子建议引用。如果有冲突的观点，应客观总结双方的观点。\n\n'
     contents = [get_user(review) + '的点评：' + html2markdown(review.content).strip() for review in reviews]
 
     joined_contents = '\n'.join(contents)

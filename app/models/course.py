@@ -215,6 +215,11 @@ class Course(db.Model):
     def registered_teacher_id_list(self):
         return [ teacher.user_id for teacher in self.teachers if teacher.user_id ]
 
+    @property
+    def summary_html(self):
+        lines = ['<p>' + line + '</p>' for line in self.summary.split('\n')]
+        return '\n'.join(lines)
+
     def __repr__(self):
         return self.name + '(' + ','.join(sorted(self.teacher_name_list)) + ')'
 
