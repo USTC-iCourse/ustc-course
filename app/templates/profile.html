@@ -163,6 +163,13 @@
       </div>
       {% endif %}
 
+      {% if user == current_user and user.is_blocked_now %}
+      <div class="ud-pd-md dashed">
+        <p><strong>您已被禁言。</strong></p>
+        <p>您于 {{ user.blocked_time|localtime }} 被禁言，将于 {{ user.time_to_unblock|localtime }} 解除禁言。</p>
+      </div>
+      {% endif %}
+
       {% if current_user.is_admin %}
       <div class="ud-pd-md dashed">
         {% if user.is_blocked_now %}
