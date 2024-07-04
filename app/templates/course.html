@@ -73,7 +73,7 @@
         <span class="small grey align-bottom left-pd-sm desktop">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
         <br><span class="small grey align-bottom mobile">{{ course.term_ids|term_display }} &nbsp;课程号：{{ course.courseries }}</span>
 
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_active %}
         <button class="btn btn-link float-right"><a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程信息</a></button>
         {% endif %}
 
@@ -234,7 +234,7 @@
           <div class="solid ud-pd-sm inline-h3">
             <span class="blue h3">简介</span>
             <span class="text-muted pull-right small" style="padding-top: 1em;">
-              {% if user.is_authenticated %}
+              {% if user.is_active %}
               <span class="glyphicon glyphicon-pencil grey left-pd-sm" aria-hidden="true"></span>
               <a href="{{ url_for('course.edit_course', course_id=course.id) }}">编辑课程简介</a>
               {% endif %}
@@ -264,10 +264,14 @@
 
         <div class="solid ud-pd-md inline-h3">
           <span class="blue h3" id="review-anchor">点评</span>
-          {% if current_user.is_authenticated %}
+          {% if current_user.is_active %}
           <a type="button" href="{{ url_for('course.new_review',course_id=course.id) }}" class="btn btn-white float-right blue">
             <span class="glyphicon glyphicon-pencil glyphicon-sm right-pd-sm" aria-hidden="true"></span>
             {% if not course.reviewed %}写点评{% else %}编辑点评{% endif %}
+          </a>
+          {% elif current_user.is_blocked_now %}
+          <a type="button" href="#" class="btn btn-white float-right">
+            您已经被禁言
           </a>
           {% else %}
           <a type="button" data-toggle="modal" data-target="#signin" class="btn btn-white float-right blue">
@@ -516,7 +520,7 @@
         {% for teacher in course.teachers %}
         <div class="ud-pd-md dashed">
           <img class="avatar-lg circle" src="{{ teacher.image }}"/>
-          {% if current_user.is_authenticated %}
+          {% if current_user.is_active %}
             {% if not teacher.info_locked %}
             <btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
             {% else %}

@@ -73,6 +73,9 @@ class User(db.Model, UserMixin):
     is_following_hidden = db.Column(db.Boolean, default=False)
     is_profile_hidden = db.Column(db.Boolean, default=False)
     is_deleted = db.Column(db.Boolean, default=False) # deleted account
+    is_blocked = db.Column(db.Boolean, default=False)
+    blocked_time = db.Column(db.DateTime())
+    time_to_unblock = db.Column(db.DateTime())
     
     following_count = db.Column(db.Integer, default=0)
     follower_count = db.Column(db.Integer, default=0)
@@ -110,6 +113,10 @@ class User(db.Model, UserMixin):
     @property
     def link(self):
         return Markup('<a href="' + self.url + '">') + Markup.escape(self.username) + Markup('</a>')
+
+    @property
+    def is_blocked_now(self):
+        return self.is_blocked and datetime.utcnow() < self.time_to_unblock
 
     def get_latest_notifications(self, lim : int = 5) -> List[Notification]:
         # self.notifications[0:5] will load all notifications from database, which is slow
@@ -233,10 +240,9 @@ class User(db.Model, UserMixin):
     def is_admin(self):
         return self.role == 'Admin'
 
+    @property
     def is_active(self):
-        if self.active:
-            return True
-        return False
+        return (self.active and not self.is_blocked_now)
 
     def confirm(self):
         self.confirmed_at = datetime.utcnow()

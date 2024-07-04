@@ -13,7 +13,7 @@ import hashlib
 import urllib
 import re
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 api = Blueprint('api',__name__)
 
@@ -70,6 +70,8 @@ def record_review_comment_history(comment, operation, commit=True):
 @api.route('/review/new_comment/',methods=['POST'])
 @login_required
 def review_new_comment():
+    if current_user.is_blocked_now:
+        return jsonify(ok=False, message="您已经被禁言")
     form = ReviewCommentForm(formdata=request.form)
     if form.validate_on_submit():
         review_id = request.form.get('review_id')
@@ -373,3 +375,44 @@ def example_3rdparty_verify():
     except Exception as e:
         error = 'Unknown error: ' + str(e)
     return render_template('example-3rdparty/after_login.html', error=error)
+
+@api.route('/block_user', methods=['POST'])
+@login_required
+def block_user():
+    '''管理员禁言用户'''
+    if not current_user.is_admin:
+        message = '没有权限操作'
+        return render_template('feedback.html', status=False, message=message)
+    user_id = int(request.form.get('user_id'))
+    block_days = int(request.form.get('block_days'))
+    user = User.query.get(user_id)
+    if not user or user.is_deleted:
+        message = '用户不存在！'
+        return jsonify(ok=False, message=message)
+    if block_days <= 0:
+        message = '没有指定封禁天数'
+        return jsonify(ok=False, message=message)
+
+    user.is_blocked = True
+    user.blocked_time = datetime.utcnow()
+    user.time_to_unblock = datetime.utcnow() + timedelta(days=block_days)
+    user.save_without_edit()
+    return jsonify(ok=True)
+
+@api.route('/unblock_user', methods=['POST'])
+@login_required
+def unblock_user():
+    '''管理员解除禁言用户'''
+    if not current_user.is_admin:
+        message = '没有权限操作'
+        return jsonify(ok=False, message=message)
+    user_id = int(request.form.get('user_id'))
+    user = User.query.get(user_id)
+    if not user or user.is_deleted:
+        message = '用户不存在！'
+        return jsonify(ok=False, message=message)
+
+    user.is_blocked = False
+    user.time_to_unblock = datetime.utcnow()
+    user.save_without_edit()
+    return jsonify(ok=True)

@@ -163,10 +163,57 @@
       </div>
       {% endif %}
 
+      {% if current_user.is_admin %}
+      <div class="ud-pd-md dashed">
+        {% if user.is_blocked_now %}
+        <p><strong>用户已被禁言。</strong></p>
+        <p>用户于 {{ user.blocked_time|localtime }} 被禁言，将于 {{ user.time_to_unblock|localtime }} 解除禁言。</p>
+        <button type="button" class="btn btn-small btn-default" onclick="unblock_user({{ user.id }})">立即解除禁言</button>
+        {% elif user.is_blocked %}
+        <p><strong>用户禁言期已过。</strong></p>
+        <p>用户上次于 {{ user.blocked_time|localtime }} 被禁言，于 {{ user.time_to_unblock|localtime }} 解除禁言。</p>
+        <button type="button" class="btn btn-small btn-default" data-toggle="modal" data-target="#block-user">禁言此用户</button>
+        {% else %}
+        <p><strong>用户未被禁言。</strong></p>
+        {% if user.blocked_time %}
+          <p>用户上次于 {{ user.blocked_time|localtime }} 被禁言，于 {{ user.time_to_unblock|localtime }} 解除禁言。</p>
+        {% endif %}
+        <button type="button" class="btn btn-small btn-default" data-toggle="modal" data-target="#block-user">禁言此用户</button>
+        {% endif %}
+      </div>
+      {% endif %}
+
     </div><!-- end col-md-4 -->
   </div><!-- end float-element -->
 </div><!-- end container -->
+
+<div class="modal fade" id="block-user" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-signin">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">禁言用户</h4>
+      </div>
+      <div class="modal-body" id="block-user-form">
+        <div class="form-group">
+          <label class="control-label">用户 ID</label>
+          <input class="form-control" type="text" name="user_id" disabled value="{{ user.id }}" />
+        </div>
+        <div class="form-group">
+          <label class="control-label">用户名</label>
+          <input class="form-control" type="text" name="username" disabled value="{{ user.username }}" />
+        </div>
+        <div class="form-group">
+          <label class="control-label">禁言天数</label>
+          <input class="form-control" type="text" name="block_days" />
+        </div>
+        <button type="button" class="btn btn-small btn-primary" onclick="block_user()">禁言此用户</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
+
 {% block script %}
 <script>
 $(function() {
@@ -196,6 +243,36 @@ function unfollow_user(user_id) {
         }
         else
             alert('取消关注用户失败：' + o.message);
+    }, 'json');
+}
+
+function block_user() {
+    var user_id = $('#block-user-form input[name=user_id]').val();
+    var block_days = $('#block-user-form input[name=block_days]').val();
+    if (!user_id) {
+      alert('User ID not specified!');
+      return;
+    }
+    if (!block_days) {
+      alert('请输入禁言天数');
+      return;
+    }
+    $.post("{{ url_for('api.block_user') }}", { user_id: user_id, block_days: block_days }, function(o) {
+      if (o.ok) {
+          location.reload();
+      } else {
+          alert('禁言用户失败：' + o.message);
+      }
+    }, 'json');
+}
+
+function unblock_user(user_id) {
+    $.post("{{ url_for('api.unblock_user') }}", { user_id: user_id }, function(o) {
+      if (o.ok) {
+          location.reload();
+      } else {
+          alert('解除禁言失败：' + o.message);
+      }
     }, 'json');
 }
 </script>

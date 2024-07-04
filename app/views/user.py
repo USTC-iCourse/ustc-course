@@ -30,6 +30,7 @@ def view_profile(user_id):
                            title=user.username,
                            description=user.username + ' 写了 ' + str(user.reviews_count) + ' 条点评，关注了 ' + str(user.courses_following_count) + ' 门课')
 
+
 @user.route('/<int:user_id>/reviews')
 def reviews(user_id):
     '''用户点评过的所有课程'''
@@ -232,6 +233,7 @@ def followings(user_id):
 
 @user.route('/<int:user_id>/feed/<string:validation_code>')
 def notice_rss(user_id, validation_code):
+    '''RSS 订阅通知消息'''
     user = User.query.get(user_id)
     if not user or user.is_deleted:
         abort(404)

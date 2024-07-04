@@ -314,6 +314,8 @@ def edit_course(course_id=None):
         course = Course()
     if not course:
         abort(404)
+    if current_user.is_blocked_now:
+        return jsonify(ok=False, message="您已经被禁言")
     course_form = CourseForm(formdata=request.form, obj=course)
     if course_form.validate_on_submit():
         course_form.introduction.data = sanitize(course_form.introduction.data)
@@ -365,6 +367,8 @@ def remove_teacher(course_id):
 def add_teacher(course_id):
     if not current_user.is_admin:
         abort(403)
+    if current_user.is_blocked_now:
+        return jsonify(ok=False, message="您已经被禁言")
     teacher_id = request.form.get('teacher_id')
     if not teacher_id:
         return jsonify(ok=False, message=_('Teacher ID Not Specified'))

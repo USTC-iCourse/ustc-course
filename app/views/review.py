@@ -45,6 +45,8 @@ def new_review(course_id):
     course = Course.query.get(course_id)
     if not course:
         abort(404)
+    if current_user.is_blocked_now:
+        return jsonify(ok=False, message="您已经被禁言")
     user = current_user
     review = Review.query.with_for_update().filter_by(course=course, author=user).first()
     old_review = None
