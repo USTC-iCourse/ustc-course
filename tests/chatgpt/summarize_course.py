@@ -7,14 +7,17 @@ from app.models import Review, Course, CourseRate
 from openai_helper import openai
 from prompt_generator import generate_summary_prompt, SUMMARY_EXPECTED_LENGTH
 
+import sys
 import os
 import traceback
 import time
+import subprocess
+from multiprocessing import Pool
 
 
 def get_chatgpt_completion(prompt):
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4-1106-preview",
         messages=[
             { "role": "user", "content": prompt }
         ]
@@ -51,20 +54,26 @@ def get_summary_of_course(course):
     if len(public_reviews) == 0:
         return None
     prompt = generate_summary_prompt(public_reviews)
-    if len(prompt) <= SUMMARY_EXPECTED_LENGTH:  # too short, no need to summarize
-        return prompt
-    else:
-        return get_chatgpt_summary(course, prompt)
+    return get_chatgpt_summary(course, prompt)
+
+
+def handle_summarize_course(course_id):
+    course = Course.query.filter_by(id=course_id).first()
+    if not course.summary:
+        get_summary_of_course(course)
+        db.session.commit()
+
+
+def invoke_summarize_course(course):
+    subprocess.run(["python3", sys.argv[0], str(course.id)])
 
 
 def get_summary_of_all_courses():
     print('Summarizing all courses...')
     courses = Course.query.join(CourseRate).filter(Course.id == CourseRate.id).order_by(CourseRate.review_count.desc()).filter(CourseRate.review_count > 0).all()
     print('Iterating over ' + str(len(courses)) + ' courses...')
-    for course in courses:
-        if not course.summary:
-            course.summary = get_summary_of_course(course)
-            db.session.commit()
+    with Pool(16) as p:
+        p.map(invoke_summarize_course, courses)
 
 
 print("Start summarizing reviews of all courses...")

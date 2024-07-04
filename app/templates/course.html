@@ -255,6 +255,13 @@
         </div>
         {% endif %}
 
+        {% if course.summary %}
+        <div class="ud-pd-md">
+          <div class="solid ud-pd-sm inline-h3"><span class="blue h3">AI Summary (demo)</span></div>
+          <div>{{ course.summary_html|safe }}</div>
+        </div>
+        {% endif %}
+
         {% if course.admin_announcement %}
         <div class="ud-pd-md">
           <div class="solid ud-pd-sm inline-h3"><span class="blue h3">管理员公告</span></div>
