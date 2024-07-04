@@ -423,7 +423,7 @@
             <span class="left-pd-md small review-links" style="cursor:pointer;" data-clipboard-action="copy" data-clipboard-text="{{ url_for('course.view_course', course_id=course.id, _external=True) }}#review-{{ review.id }}" data-toggle="tooltip" data-trigger="click" data-placement="top" title="链接已复制">复制链接</span>
 
             <span class="pull-right">
-              {% if review.author == user %}
+              {% if review.author == user and not user.is_blocked_now %}
               <a class="nounderline" href="{{ url_for('course.new_review',course_id=course.id) }}">
                 <span class="glyphicon glyphicon-pencil grey left-pd-sm small" aria-hidden="true"></span>
                 编辑
