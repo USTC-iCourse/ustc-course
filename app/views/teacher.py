@@ -61,7 +61,7 @@ def edit_profile(teacher_id):
     form = TeacherProfileForm(formdata=request.form, obj=teacher)
     errors = []
     if current_user.is_blocked_now:
-        return jsonify(ok=False, message="您已经被禁言")
+        abort(403)
     if teacher.info_locked:
         errors.append(_("Teacher info is locked, please contact administrator to unlock"))
     elif form.validate_on_submit():
