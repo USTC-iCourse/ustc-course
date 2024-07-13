@@ -13,17 +13,21 @@ import subprocess
 domain = 'catalog.ustc.edu.cn'
 site_root = 'https://' + domain + '/'
 
+if len(sys.argv) != 2:
+    print("Usage: Please login to catalog.ustc.edu.cn and get the cookie, then run 'python3" + sys.argv[0] + " <cookie>'")
+    sys.exit(-1)
+cookie = sys.argv[1]
+if cookie.startswith('Cookie:'):
+    cookie = cookie[len('Cookie:'):].strip()
+
 headers = {
     'accept': 'application/json, text/javascript, */*; q=0.01',
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36',
     'x-requested-with': 'XMLHttpRequest',
     'authority': domain,
+    'cookie': cookie,
     'referer': site_root + 'plan'
 }
-
-# get access token
-token_json = requests.get(site_root + 'get_token', headers=headers)
-access_token = json.loads(token_json.text)['access_token']
 
 # load existing data
 with app.app_context():
@@ -119,15 +123,14 @@ def load_program_recursive(program_id, tree):
 
 def load_program(program_id):
     url = site_root + 'api/teach/program/info/' + str(program_id)
-    param = 'access_token=' + access_token
-    tree_json = requests.get(url + '?' + param, headers=headers)
+    tree_json = requests.get(url, headers=headers)
     tree = json.loads(tree_json.text)
     module_tree = tree['moduleTree']
     return load_program_recursive(program_id, module_tree)
 
 
 def load_tree():
-    tree_json = requests.get(site_root + 'api/teach/program/tree?access_token=' + access_token, headers=headers)
+    tree_json = requests.get(site_root + 'api/teach/program/tree', headers=headers)
     tree = json.loads(tree_json.text)
     
     for json_dept_id in tree:
