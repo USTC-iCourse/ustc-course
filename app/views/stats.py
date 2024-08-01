@@ -271,18 +271,12 @@ def stats_history_en():
 
 @stats.route('/rankings-history-list/', methods=['GET'])
 def rankings_history():
-    if True:
-        return render_template('error-page.html', code=404), 404
-
     history_files = get_rankings_history_file_list()
     return render_template('rankings-history.html', history_files=history_files, title='排行榜历史')
 
 
 @stats.route('/rankings-history/<path:path>', methods=['GET'])
 def rankings_history_file(path):
-    if True:
-        return render_template('error-page.html', code=404), 404
-
     return send_from_directory(get_rankings_history_base(), path)
 
 
