@@ -15,6 +15,7 @@ from email.utils import format_datetime
 import lxml.html
 from hashlib import sha256
 import pdfkit
+from app.views.search import filter
 
 
 mail = Mail(app)
@@ -166,7 +167,11 @@ def abstract_by_keyword(content, keyword):
     plaintext = Markup(content).striptags()
     lower_plaintext = plaintext.lower()
     keyword = keyword.lower()
-    words = keyword.split()
+    # remove English and Chinese sentence separators
+    sentence = filter(keyword)
+    # split sentence into English and Chinese parts
+    words = re.findall(r'[A-Za-z0-9]+|[\u4e00-\u9fff]+', sentence)
+
     first_index = len(plaintext)
     for word in words:
         index = lower_plaintext.find(word)
