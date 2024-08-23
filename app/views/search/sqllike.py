@@ -15,7 +15,7 @@ from app.models import (
 import re
 
 
-filter = lambda x: re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./]''', ' ', x)
+filter = lambda x: re.sub(r'''[~`!@#$%^&*{}[]|\\:";'<>?,./，、。：【】（）？“”「」·]''', ' ', x)
 
 
 def init() -> None:

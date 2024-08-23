@@ -16,7 +16,7 @@ auto_update = app.config.get("UPDATE_SEARCH_CACHE", False)
 # "数据分析与实践" -> "数据分析及实践"
 # "概率论和数理统计" -> "概率论与数理统计"
 def is_chinese_stop_char(c: str) -> bool:
-    STOP = ["与", "和", "及"]
+    STOP = ["与", "和", "及", "，", "、", "。", "：", "（", "）", "【", "】"]
     return c in STOP
 
 

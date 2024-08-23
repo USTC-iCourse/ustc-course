@@ -9,7 +9,7 @@ import re
 # from app.utils import print_sqlalchemy_statement
 
 
-filter = lambda x: re.sub(r"""[~`!@#$%^&*{}\[\]\\:\";'<>,/\+\-\~\(\)><\x00-\x1F\x7F]""", " ", x)
+filter = lambda x: re.sub(r"""[~`!@#$%^&*{}\[\]\\:\";'<>,/\+\-\~\(\)><，、。：【】（）？“”「」·\x00-\x1F\x7F]""", " ", x)
 
 
 def init() -> None:

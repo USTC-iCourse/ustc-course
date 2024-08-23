@@ -6,6 +6,7 @@ from app import app, db
 from app.models import *
 from datetime import datetime
 
+
 def parse_file(filename):
     data = []
     with open(filename) as f:
@@ -249,6 +250,9 @@ def load_courses(insert=True):
         course_class.course = course
         course_class.term = term
         course_class.cno = class_code
+
+        # update course search cache
+        CourseSearchCache.update(course, commit=False)
 
     print('load complete, committing changes to database')
     db.session.commit()
