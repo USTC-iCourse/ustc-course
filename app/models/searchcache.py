@@ -85,9 +85,14 @@ class ReviewSearchCache(db.Model):
 
     @staticmethod
     def process_text(review: Review) -> str:
+        if review.course:
+            course_metadata_keywords = CourseSearchCache.process_text(review.course)
+        else:
+            course_metadata_keywords = ""
         # convert HTML to plain text
         content = html2text.html2text(review.content)
-        return " ".join(jieba.cut_for_search(content))
+        review_keywords = " ".join(jieba.cut_for_search(content))
+        return course_metadata_keywords + " " + review_keywords
 
     @staticmethod
     def update(review: Review, follow_config=False, commit=True):
