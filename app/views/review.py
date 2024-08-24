@@ -53,6 +53,7 @@ def _update_course_summary(course_id):
         summary = get_summary_of_course(course)
         if summary:
             course.summary = summary
+            course.summary_update_time = datetime.utcnow()
             session.commit()
             session.flush()
 

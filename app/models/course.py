@@ -176,6 +176,7 @@ class Course(db.Model):
     _image = db.Column(db.String(100))
 
     summary = db.Column(db.Text) # AI generated summary
+    summary_update_time = db.Column(db.DateTime)
 
     terms = db.relationship('CourseTerm', backref='course', order_by='desc(CourseTerm.term)', lazy='dynamic')
     classes = db.relationship('CourseClass', backref='course', lazy='dynamic', order_by='desc(CourseClass.term)')

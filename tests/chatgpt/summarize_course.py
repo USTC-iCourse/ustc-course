@@ -23,7 +23,7 @@ def handle_summarize_course(course_id):
     session = Session()
     course = session.query(Course).filter_by(id=course_id).first()
     if course.summary_update_time:
-        non_summarized_reviews = session.query(Review).filter_by(course_id=course_id).filter(last_edit_time >= course.summary_update_time).count()
+        non_summarized_reviews = session.query(Review).filter_by(course_id=course_id).filter(Review.update_time >= course.summary_update_time).count()
     else:
         non_summarized_reviews = session.query(Review).filter_by(course_id=course_id).count()
 
