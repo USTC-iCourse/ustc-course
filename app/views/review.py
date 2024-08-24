@@ -201,7 +201,9 @@ def delete_review():
         return jsonify(ok=ok,message=message)
 
     record_review_history(review, 'delete')
+    course = review.course
     review.delete()
+    async_update_course_summary(course)
     ok = True
     message = _('The review has been deleted.')
     return jsonify(ok=ok,message=message)
