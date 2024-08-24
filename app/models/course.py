@@ -8,6 +8,7 @@ from .user import Teacher
 from .program import ProgramCourse, Program
 from werkzeug.utils import cached_property
 from collections import Counter
+import markdown
 try:
     from flask_login import current_user
 except:
@@ -217,8 +218,7 @@ class Course(db.Model):
 
     @property
     def summary_html(self):
-        lines = ['<p>' + line + '</p>' for line in self.summary.split('\n')]
-        return '\n'.join(lines)
+        return markdown.markdown(self.summary)
 
     def __repr__(self):
         return self.name + '(' + ','.join(sorted(self.teacher_name_list)) + ')'

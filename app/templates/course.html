@@ -257,8 +257,18 @@
 
         {% if course.summary %}
         <div class="ud-pd-md">
-          <div class="solid ud-pd-sm inline-h3"><span class="blue h3">AI Summary (demo)</span></div>
-          <div>{{ course.summary_html|safe }}</div>
+          <div class="solid ud-pd-sm inline-h3">
+            <span class="blue h3">AI 总结</span>
+            <span class="grey float-right">AI 总结为根据点评内容自动生成，仅供参考</span>
+          </div>
+          <div class="showmore-text ck-content" id="course-summary">{{ course.summary_html|safe }}</div>
+          <div class="showmore-wrapper"> <!-- TODO: 减少套娃层数 -->
+            <div class="showmore-shadow">
+              <div class="showmore-btn-wrapper">
+                <button class="showmore-btn">展开全部 AI 总结 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></button>
+              </div>
+            </div>
+          </div>
         </div>
         {% endif %}
 
