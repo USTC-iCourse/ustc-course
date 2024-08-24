@@ -22,11 +22,17 @@ def handle_summarize_course(course_id):
     Session = sessionmaker(bind=db.engine)
     session = Session()
     course = session.query(Course).filter_by(id=course_id).first()
-    if not course.summary:
+    if course.summary_update_time:
+        non_summarized_reviews = session.query(Review).filter_by(course_id=course_id).filter(last_edit_time >= course.summary_update_time).count()
+    else:
+        non_summarized_reviews = session.query(Review).filter_by(course_id=course_id).count()
+
+    if not course.summary or non_summarized_reviews > 0:
         print("Summarizing course:", course, flush=True)
         summary = get_summary_of_course(course)
         if summary:
             course.summary = summary
+            course.summary_update_time = datetime.utcnow()
             session.commit()
             session.flush()
 
