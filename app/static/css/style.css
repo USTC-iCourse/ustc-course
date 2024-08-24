@@ -486,3 +486,9 @@ a.nounderline:active { text-decoration: none; }
 .review-content h3, .review-content h4, .review-content h5 {
   font-size: 120%;
 }
+
+.review-content li {
+  line-height: 25px;
+  margin-bottom: 5px;
+  word-wrap: break-word;
+}
