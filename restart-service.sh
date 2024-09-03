@@ -7,7 +7,8 @@ getpid()
 
 getpid
 echo "Original PID: $PID"
-cd /srv/ustc-course && pkill gunicorn && nohup /home/icourse/.local/bin/gunicorn -w 8 -b 127.0.0.1:3000 app:app >/dev/null 2>&1 &
+cd /srv/ustc-course && pkill gunicorn
+nohup /home/icourse/.local/bin/gunicorn -w 16 -b 127.0.0.1:3000 app:app >>nohup.out 2>&1 &
 echo "Original process killed, spawning new process..."
 sleep 3
 getpid
