@@ -1,0 +1,15 @@
+[Unit]
+Description=USTC iCourse - a popular course rating platform for USTC students
+Requires=mysql.service
+After=network-online.target nss-lookup.target
+
+[Service]
+Type=exec
+WorkingDirectory=/srv/ustc-course
+ExecStart=/home/icourse/.local/bin/gunicorn -w 8 -b 127.0.0.1:3000 app:app
+StandardOutput=null
+StandardError=null
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

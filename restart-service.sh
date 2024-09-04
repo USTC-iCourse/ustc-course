@@ -2,12 +2,12 @@
 
 getpid()
 {
-  PID=$(ps aux | grep gunicorn | grep -v grep | awk '{print $2}' | sort | head -n 1)
+  PID=$(systemctl show --property=MainPID --value ustc-course.service)
 }
 
 getpid
 echo "Original PID: $PID"
-cd /srv/ustc-course && pkill gunicorn && nohup /home/icourse/.local/bin/gunicorn -w 8 -b 127.0.0.1:3000 app:app >/dev/null 2>&1 &
+systemctl restart ustc-course.service
 echo "Original process killed, spawning new process..."
 sleep 3
 getpid
