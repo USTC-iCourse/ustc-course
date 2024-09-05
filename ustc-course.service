@@ -17,7 +17,6 @@ KillMode=mixed
 Restart=on-failure
 TimeoutStopSec=5
 PrivateTmp=true
-ProtectSystem=strict
 
 [Install]
 WantedBy=multi-user.target
