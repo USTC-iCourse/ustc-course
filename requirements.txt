@@ -1,7 +1,7 @@
 Flask==2.3.2
 Flask-WTF==1.2.1
 Flask-SQLAlchemy==3.1.1
-Flask-login==0.6.2
+Flask-login==0.6.3
 flask-security-too==5.3.3
 itsdangerous==2.1.2
 flask-mail==0.9.1
@@ -17,7 +17,7 @@ flask-debugtoolbar==0.14.1
 html2text==2020.1.16
 markdown==3.4.1
 pytz==2021.1
-werkzeug==2.3.8
+werkzeug==3.0.3
 cachelib==0.10.2
 email_validator==2.0.0
 gunicorn==22.0.0
