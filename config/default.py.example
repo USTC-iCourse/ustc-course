@@ -56,3 +56,6 @@ DEBUG_TB_PROFILER_ENABLED = True
 # Enable the template editor
 DEBUG_TB_TEMPLATE_EDITOR_ENABLED =True
 DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+# OpenAI API key to generate AI summary and responses
+OPENAI_API_KEY = None

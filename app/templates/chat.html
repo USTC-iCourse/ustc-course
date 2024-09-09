@@ -1,0 +1,156 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element chatbox">
+
+   <section id="app">
+      <div class="messages">
+         <div class="ai-content">
+            <img src="/static/image/favicon.png">
+            <p class="ai-message">我是 USTC 评课社区小助手，有什么问题欢迎来问我！比如：X老师的Y课怎么样？X课哪个老师讲得好？</p>
+         </div>
+      </div>
+
+      <div class="textarea-container">
+         <textarea id="prompt" rows="1" placeholder="请输入你的问题" autofocus></textarea>
+         <button class="send-icon"><img src="/static/image/send-icon.svg"></button>
+      </div>
+
+   </section>
+
+  </div><!-- end float-element -->
+</div><!-- end container -->
+{% endblock %}
+
+{% block script %}
+<script>
+var textarea = $("#prompt");
+var divMessages = $(".messages");
+var sendIcon = $(".send-icon");
+
+textarea.on("input", updateTextareaHeight);
+textarea.on("keydown", getUserMessage);
+sendIcon.on("click", sendOnClick);
+
+function updateTextareaHeight() {
+   textarea.css("height", "auto");
+   textarea.css("height", textarea.css("scrollHeight") + "px");
+
+   if (textarea.attr("offsetHeight") >= 200) {
+       textarea.css("overflowY", "scroll");
+   } else {
+       textarea.css("overflowY", "hidden");
+   }
+}
+
+function cleanTextarea() {
+   textarea.attr("value", "");
+   textarea.css("height", "initial");
+}
+
+function getUserMessage(event) {
+   if (event.key === "Enter" && !event.shiftKey && this.value.trim()) {
+      event.preventDefault();
+      const message = this.value.trim();
+      cleanTextarea();
+      createAndSendUserMessage(message);
+   }
+}
+
+function sendOnClick() {
+   if (textarea.attr("value").trim()) {
+      createAndSendUserMessage(textarea.attr("value"));
+      cleanTextarea();
+   }
+}
+
+function createAndSendUserMessage(message) {
+   const div = document.createElement("div");
+   div.classList.add("user-message");
+   div.innerText = message;
+   divMessages.appendChild(div);
+   div.scrollIntoView({ behavior: "smooth" });
+
+   setTimeout(() => {
+      sendMessageToApi(message);
+   }, 100);
+}
+
+function createAndSendAiMessage(message, ellipsis) {
+   const aiContent = document.createElement("div");
+   aiContent.classList.add("ai-content");
+
+   const img = document.createElement("img");
+   img.setAttribute("src", "./src/assets/img/avatar.png");
+
+   const p = document.createElement("p");
+   p.classList.add("ai-message");
+
+   if (ellipsis && !message) {
+      p.innerHTML = ellipsis;
+      p.style.whiteSpace = "normal";
+   } else {
+      p.innerText = message;
+      p.style.whiteSpace = "pre-wrap";
+   }
+
+   aiContent.append(img, p);
+   divMessages.appendChild(aiContent);
+
+   if (window.innerWidth > 700) textarea.focus();
+   aiContent.scrollIntoView({ behavior: "smooth" });
+}
+
+function setTextareaPlaceholder(text, disabled) {
+   textarea.attr("placeholder", text);
+   textarea.attr("disabled", disabled);
+}
+
+function createEllipsis() {
+   return `
+   <div class="dot"></div>
+   <div class="dot"></div>
+   <div class="dot"></div>
+   `;
+}
+
+async function sendMessageToApi(message) {
+   try {
+      const ellipsisTimeout = setTimeout(() => {
+         setTextareaPlaceholder("正在生成响应...", true);
+         createAndSendAiMessage(null, createEllipsis());
+      }, 200);
+
+      const response = await fetch(
+         "https://chat.icourse.club/chat",
+         {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message }),
+         }
+      );
+
+      clearTimeout(ellipsisTimeout);
+      divMessages.lastChild.remove();
+
+      if (response.status === 429) {
+         setTextareaPlaceholder("消息数量过多。", true);
+         createAndSendAiMessage("抱歉，您已经达到每天的消息限制。");
+      } else {
+         setTextareaPlaceholder("请输入你的问题", false);
+         const answer = await response.json();
+         createAndSendAiMessage(answer);
+      }
+   } catch (error) {
+      console.log("错误: " + error.message);
+      setTextareaPlaceholder("请尝试重新加载页面。", true);
+      divMessages.lastChild.remove();
+
+      createAndSendAiMessage("抱歉，OpenAI API 似乎有点问题。");
+   }
+}
+</script>
+{% endblock %}

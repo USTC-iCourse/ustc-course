@@ -1,6 +1,7 @@
 # This module has two classes: CourseSearchCache and ReviewSearchCache
 # Data inside shall be preprocessed with jieba, and stored in the database.
 # For now as we have jieba, we don't use ngram.
+import os
 from app import db, app
 from .course import Course
 from .review import Review
@@ -9,6 +10,8 @@ import html2text
 
 
 auto_update = app.config.get("UPDATE_SEARCH_CACHE", False)
+jieba.dt.tmp_dir = os.path.expanduser("~/.cache/jieba")
+os.makedirs(jieba.dt.tmp_dir, exist_ok=True)
 
 
 # To handle these queries:

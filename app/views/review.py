@@ -7,6 +7,12 @@ from flask_babel import gettext as _
 from .course import course
 import markdown
 from datetime import datetime
+import threading
+
+from app import app, db
+from sqlalchemy.orm import sessionmaker
+from app.views.ai.summarize_course import get_summary_of_course
+
 
 review = Blueprint('review',__name__)
 
@@ -37,6 +43,25 @@ def record_review_history(review, operation, commit=True):
     if commit:
         history.add()
     return history
+
+
+def _update_course_summary(course_id):
+    with app.app_context():
+        Session = sessionmaker(bind=db.engine)
+        session = Session()
+        course = session.query(Course).filter_by(id=course_id).first()
+        summary = get_summary_of_course(course)
+        if summary:
+            course.summary = summary
+            course.summary_update_time = datetime.utcnow()
+            session.commit()
+            session.flush()
+
+
+def async_update_course_summary(course):
+    thread = threading.Thread(target=_update_course_summary, args=(course.id, ))
+    thread.start()
+    print('async get summary', course)
 
 
 @course.route('/<int:course_id>/review/',methods=['GET','POST'])
@@ -135,6 +160,7 @@ def new_review(course_id):
 
             if is_new or old_review.content != review.content:
                 ReviewSearchCache.update(review, follow_config=True)
+                async_update_course_summary(review.course)
 
             next_url = url_for('course.view_course', course_id=course_id, _external=True) + '#review-' + str(review.id)
             if form.is_ajax.data:
@@ -175,7 +201,9 @@ def delete_review():
         return jsonify(ok=ok,message=message)
 
     record_review_history(review, 'delete')
+    course = review.course
     review.delete()
+    async_update_course_summary(course)
     ok = True
     message = _('The review has been deleted.')
     return jsonify(ok=ok,message=message)

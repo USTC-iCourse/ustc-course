@@ -1,11 +1,12 @@
 from typing import List
+import os
+import re
 from app.models import Course, CourseSearchCache, CourseRate, Review, ReviewSearchCache, CourseTerm, ReviewComment
 from app.models.searchcache import is_chinese_stop_char
 from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import or_
 from sqlalchemy.orm import lazyload, load_only
 import jieba
-import re
 # from app.utils import print_sqlalchemy_statement
 
 
@@ -13,6 +14,8 @@ filter = lambda x: re.sub(r"""[~`!@#$%^&*{}\[\]\\:\";'<>,/\+\-\~\(\)><，、。�
 
 
 def init() -> None:
+    jieba.dt.tmp_dir = os.path.expanduser("~/.cache/jieba")
+    os.makedirs(jieba.dt.tmp_dir, exist_ok=True)
     jieba.initialize()
 
 

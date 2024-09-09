@@ -8,6 +8,7 @@ from .user import Teacher
 from .program import ProgramCourse, Program
 from werkzeug.utils import cached_property
 from collections import Counter
+import markdown
 try:
     from flask_login import current_user
 except:
@@ -175,6 +176,7 @@ class Course(db.Model):
     _image = db.Column(db.String(100))
 
     summary = db.Column(db.Text) # AI generated summary
+    summary_update_time = db.Column(db.DateTime)
 
     terms = db.relationship('CourseTerm', backref='course', order_by='desc(CourseTerm.term)', lazy='dynamic')
     classes = db.relationship('CourseClass', backref='course', lazy='dynamic', order_by='desc(CourseClass.term)')
@@ -214,6 +216,10 @@ class Course(db.Model):
     @property
     def registered_teacher_id_list(self):
         return [ teacher.user_id for teacher in self.teachers if teacher.user_id ]
+
+    @property
+    def summary_html(self):
+        return markdown.markdown(self.summary)
 
     def __repr__(self):
         return self.name + '(' + ','.join(sorted(self.teacher_name_list)) + ')'
