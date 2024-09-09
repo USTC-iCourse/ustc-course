@@ -63,13 +63,11 @@ def generate_summary_prompt(reviews, expected_summary_length):
         contents.append(content)
 
     joined_contents = '\n\n'.join(contents)
-    if len(joined_contents) <= SUMMARY_EXPECTED_LENGTH:
-        return joined_contents
-
     full_prompt = header + joined_contents
     if len(full_prompt) <= PROMPT_LENGTH_LIMIT:
         user_prompt = full_prompt
     else:
         user_prompt = header + generate_short_prompt(reviews, full_prompt)
+
     system_prompt = '你是 USTC 评课社区的一个课程总结助手，旨在为每门课程的点评生成简洁、客观、全面的总结。'
     return system_prompt, user_prompt
