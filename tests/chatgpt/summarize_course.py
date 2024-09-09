@@ -3,6 +3,7 @@ sys.path.append('../..')  # fix import directory
 
 from app import app, db
 from app.models import Review, Course, CourseRate
+from datetime import datetime
 
 import sys
 import os

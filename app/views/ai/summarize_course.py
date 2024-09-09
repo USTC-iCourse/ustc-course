@@ -53,16 +53,14 @@ def get_expected_summary_length(reviews):
     total_length = 0
     for review in reviews:
         total_length += len(review.content)
-    if total_length < 500:
-        return None
-    elif len(reviews) == 1 and total_length < 1000:
+    if len(reviews) < 5 and total_length < 3000:
         return None
     elif total_length < 2000:
         return 200
-    elif total_length < 10000:
+    elif total_length < 5000:
         return round(total_length / 10)
     else:
-        return 1000
+        return 500
 
 
 def get_summary_of_course(course):

@@ -54,7 +54,7 @@ def generate_short_prompt(reviews, full_prompt):
 
 def generate_summary_prompt(reviews, expected_summary_length):
     course_name = get_course(reviews[0].course)
-    header = f'根据下列点评，尽可能简洁、全面、客观地总结{course_name}课程的考试、给分、作业、教学水平、课程内容等，以便让同学们更好地选课。注意字数限制，{expected_summary_length} 字左右。尽量忠于点评内容，可以引用点评中的原句，点评中如果有写得特别精彩的句子建议引用。如果有冲突的观点，应客观总结双方的观点。不要说废话，不要胡编乱造。\n\n'
+    header = f'根据下列点评，尽可能简洁、全面、客观地总结{course_name}课程的考试、给分、作业、教学水平、课程内容等，以便让同学们更好地选课。注意字数限制，{expected_summary_length} 字左右。尽量忠于点评内容，可以引用点评中的原句，点评中如果有写得特别精彩的句子建议引用。如果有冲突的观点，应客观总结双方的观点。不要说废话，不要胡编乱造。不需要全文大标题，只要分段小标题。\n\n'
     contents = []
     for review in reviews:
         markdown = html2markdown(review.content).strip()
@@ -71,5 +71,5 @@ def generate_summary_prompt(reviews, expected_summary_length):
         user_prompt = full_prompt
     else:
         user_prompt = header + generate_short_prompt(reviews, full_prompt)
-    system_prompt = '你是 USTC 评课社区的一个课程总结助手，旨在为每门课程的点评生成客观全面的总结。'
+    system_prompt = '你是 USTC 评课社区的一个课程总结助手，旨在为每门课程的点评生成简洁、客观、全面的总结。'
     return system_prompt, user_prompt
