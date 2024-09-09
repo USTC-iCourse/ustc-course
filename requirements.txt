@@ -12,8 +12,6 @@ flask-mysqldb==0.2.0
 flask-babel==2.0.0
 jieba==0.42.1
 tqdm==4.66.3
-# for debug only
-flask-debugtoolbar==0.14.1
 html2text==2020.1.16
 markdown==3.4.1
 pytz==2021.1
@@ -22,9 +20,11 @@ cachelib==0.10.2
 email_validator==2.0.0
 gunicorn==22.0.0
 pdfkit==1.0.0
-# don't know why these dependencies fail...
+markdownify==0.11.6
 click==8.1.7
 wtforms==3.0.1
 pillow==10.3.0
 MarkupSafe==2.1.2
 openai==1.30.4
+# for debug only
+flask-debugtoolbar==0.14.1
