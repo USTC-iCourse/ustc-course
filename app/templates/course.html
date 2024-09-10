@@ -263,7 +263,7 @@
               AI 总结为根据点评内容自动生成，仅供参考
             </span>
           </div>
-          <div class="showmore-text ck-content review-content" id="course-summary">{{ course.summary_html|safe }}</div>
+          <div class="showmore-text ck-content review-content" id="course-summary" fold-threshold="500" folded-height="400">{{ course.summary_html|safe }}</div>
           <div class="showmore-wrapper"> <!-- TODO: 减少套娃层数 -->
             <div class="showmore-shadow">
               <div class="showmore-btn-wrapper">

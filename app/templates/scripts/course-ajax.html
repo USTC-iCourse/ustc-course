@@ -160,10 +160,16 @@
    $('.showmore-wrapper').hide();
  });
 
- if ($('.showmore-text').height() >= 750) {
-   $('.showmore-text').css('max-height', '400px');
-   $('.showmore-wrapper').show();
- }
+ $('.showmore-text').each((index, element) => {
+     const $element = $(element);
+     const foldThreshold = $element.attr('fold-threshold') || 750;
+     const foldedHeight = $element.attr('folded-height') || 400;
+
+     if ($element.height() >= foldThreshold) {
+           $element.css('max-height', foldedHeight.toString() + 'px');
+           $element.parent().find('.showmore-wrapper').show();
+     }
+ });
 
  // go to top floating button from Freemind theme of Hexo
  $(window).scroll(function(){  //只要窗口滚动,就触发下面代码 
