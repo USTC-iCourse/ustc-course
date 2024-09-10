@@ -7,3 +7,4 @@ from .teacher import teacher
 from .admin import admin
 from .stats import stats
 from .program import program
+from .chat import chat

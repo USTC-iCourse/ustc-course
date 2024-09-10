@@ -105,3 +105,10 @@ app.register_blueprint(teacher, url_prefix='/teacher')
 app.register_blueprint(admin, url_prefix='/admin')
 app.register_blueprint(stats, url_prefix='/stats')
 app.register_blueprint(program, url_prefix='/program')
+app.register_blueprint(chat, url_prefix='/chat')
+
+
+def init_db():
+    with app.app_context():
+        db.create_all()
+
