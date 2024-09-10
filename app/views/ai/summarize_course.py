@@ -63,15 +63,25 @@ def get_expected_summary_length(reviews):
         return 500
 
 
-# return Tuple[bool, str | None]):
-# bool: whether or not a summary is needed
-# str | None: the summary. If generation failed, return None
-def get_summary_of_course(course):
+def get_public_reviews(course):
     public_reviews = (Review.query.filter_by(course_id=course.id)
         .filter(Review.is_hidden == False).filter(Review.is_blocked == False).filter(Review.only_visible_to_student == False)
         .order_by(Review.upvote_count.desc(), Review.publish_time.desc())
         .all()
         )
+    return public_reviews
+
+
+def check_course_need_summary(course):
+    public_reviews = get_public_reviews(course)
+    return get_expected_summary_length(public_reviews) is not None
+
+
+# return Tuple[bool, str | None]):
+# bool: whether or not a summary is needed
+# str | None: the summary. If generation failed, return None
+def get_summary_of_course(course):
+    public_reviews = get_public_reviews(course)
     expected_summary_length = get_expected_summary_length(public_reviews)
     if expected_summary_length:
         system_prompt, user_prompt = generate_summary_prompt(public_reviews, expected_summary_length)
