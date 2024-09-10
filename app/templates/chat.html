@@ -2,155 +2,551 @@
 {% block content %}
 
 <div class="container">
-  <div class="row float-element chatbox">
-
-   <section id="app">
-      <div class="messages">
-         <div class="ai-content">
-            <img src="/static/image/favicon.png">
-            <p class="ai-message">我是 USTC 评课社区小助手，有什么问题欢迎来问我！比如：X老师的Y课怎么样？X课哪个老师讲得好？</p>
-         </div>
+  <div class="row">
+    <!-- Left sidebar -->
+    <div class="col-md-3 col-lg-2 d-md-block bg-light">
+      <div class="position-sticky pt-3">
+        <button id="new-conversation" class="btn btn-primary btn-block mb-3 w-100">
+          <i class="fas fa-plus-circle me-2"></i>New Conversation
+        </button>
+        <ul class="nav flex-column" id="conversation-list">
+          <!-- Conversations will be dynamically added here -->
+        </ul>
       </div>
+    </div>
 
-      <div class="textarea-container">
-         <textarea id="prompt" rows="1" placeholder="请输入你的问题" autofocus></textarea>
-         <button class="send-icon"><img src="/static/image/send-icon.svg"></button>
+    <!-- Main content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="chat-container shadow-sm rounded" id="chat-container">
+        <!-- Chat messages will be dynamically added here -->
       </div>
+      <div class="input-group mb-3 sticky-bottom mt-3">
+        <textarea id="user-input" class="form-control" placeholder="请输入你的问题..." rows="1" autofocus></textarea>
+        <button class="btn btn-primary" type="button" id="send-button">
+          <i class="fas fa-paper-plane me-2"></i>Send
+        </button>
+      </div>
+    </main>
+  </div>
+</div>
 
-   </section>
+<!-- Include necessary libraries -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/2.0.3/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/github.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
-  </div><!-- end float-element -->
-</div><!-- end container -->
-{% endblock %}
-
-{% block script %}
 <script>
-var textarea = $("#prompt");
-var divMessages = $(".messages");
-var sendIcon = $(".send-icon");
+$(document).ready(function() {
+  let currentConversationId = null;
 
-textarea.on("input", updateTextareaHeight);
-textarea.on("keydown", getUserMessage);
-sendIcon.on("click", sendOnClick);
-
-function updateTextareaHeight() {
-   textarea.css("height", "auto");
-   textarea.css("height", textarea.css("scrollHeight") + "px");
-
-   if (textarea.attr("offsetHeight") >= 200) {
-       textarea.css("overflowY", "scroll");
-   } else {
-       textarea.css("overflowY", "hidden");
-   }
-}
-
-function cleanTextarea() {
-   textarea.attr("value", "");
-   textarea.css("height", "initial");
-}
-
-function getUserMessage(event) {
-   if (event.key === "Enter" && !event.shiftKey && this.value.trim()) {
-      event.preventDefault();
-      const message = this.value.trim();
-      cleanTextarea();
-      createAndSendUserMessage(message);
-   }
-}
-
-function sendOnClick() {
-   if (textarea.attr("value").trim()) {
-      createAndSendUserMessage(textarea.attr("value"));
-      cleanTextarea();
-   }
-}
-
-function createAndSendUserMessage(message) {
-   const div = document.createElement("div");
-   div.classList.add("user-message");
-   div.innerText = message;
-   divMessages.appendChild(div);
-   div.scrollIntoView({ behavior: "smooth" });
-
-   setTimeout(() => {
-      sendMessageToApi(message);
-   }, 100);
-}
-
-function createAndSendAiMessage(message, ellipsis) {
-   const aiContent = document.createElement("div");
-   aiContent.classList.add("ai-content");
-
-   const img = document.createElement("img");
-   img.setAttribute("src", "./src/assets/img/avatar.png");
-
-   const p = document.createElement("p");
-   p.classList.add("ai-message");
-
-   if (ellipsis && !message) {
-      p.innerHTML = ellipsis;
-      p.style.whiteSpace = "normal";
-   } else {
-      p.innerText = message;
-      p.style.whiteSpace = "pre-wrap";
-   }
-
-   aiContent.append(img, p);
-   divMessages.appendChild(aiContent);
-
-   if (window.innerWidth > 700) textarea.focus();
-   aiContent.scrollIntoView({ behavior: "smooth" });
-}
-
-function setTextareaPlaceholder(text, disabled) {
-   textarea.attr("placeholder", text);
-   textarea.attr("disabled", disabled);
-}
-
-function createEllipsis() {
-   return `
-   <div class="dot"></div>
-   <div class="dot"></div>
-   <div class="dot"></div>
-   `;
-}
-
-async function sendMessageToApi(message) {
-   try {
-      const ellipsisTimeout = setTimeout(() => {
-         setTextareaPlaceholder("正在生成响应...", true);
-         createAndSendAiMessage(null, createEllipsis());
-      }, 200);
-
-      const response = await fetch(
-         "https://chat.icourse.club/chat",
-         {
-            method: "POST",
-            headers: {
-               "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ message }),
-         }
-      );
-
-      clearTimeout(ellipsisTimeout);
-      divMessages.lastChild.remove();
-
-      if (response.status === 429) {
-         setTextareaPlaceholder("消息数量过多。", true);
-         createAndSendAiMessage("抱歉，您已经达到每天的消息限制。");
+  if (!currentConversationId) {
+    $.get('/chat/conversations', function(data) {
+      if (data.length > 0) {
+        const latestConversation = data[0];
+        loadConversation(latestConversation.id);
+        currentConversationId = latestConversation.id;
       } else {
-         setTextareaPlaceholder("请输入你的问题", false);
-         const answer = await response.json();
-         createAndSendAiMessage(answer);
+        createNewConversation();
       }
-   } catch (error) {
-      console.log("错误: " + error.message);
-      setTextareaPlaceholder("请尝试重新加载页面。", true);
-      divMessages.lastChild.remove();
+    });
+  }
 
-      createAndSendAiMessage("抱歉，OpenAI API 似乎有点问题。");
-   }
-}
+  function createNewConversation() {
+    $.ajax({
+      url: '/chat/new_conversation',
+      type: 'POST',
+      success: function(response) {
+        if (response.status === 'success') {
+          currentConversationId = response.conversation_id;
+          $('#chat-container').empty();
+          loadConversations();
+          setTimeout(() => {
+            $('.nav-link').removeClass('active');
+            $(`#conversation-${currentConversationId}`).addClass('active');
+          }, 100);
+        } else {
+          console.error('Failed to create new conversation:', response.message);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error creating new conversation:', error);
+      }
+    });
+  }
+
+  $('#new-conversation').on('click', function() {
+    createNewConversation();
+  });
+
+  function loadConversations() {
+    $.get('/chat/conversations', function(data) {
+      $('#conversation-list').empty();
+      data.forEach(function(conversation, index) {
+        const li = $('<li class="nav-item">').appendTo('#conversation-list');
+        const a = $('<a class="nav-link d-flex justify-content-between align-items-center">')
+          .attr('id', `conversation-${conversation.id}`)
+          .appendTo(li);
+        const conversationTitle = conversation.first_query || `Conversation ${index + 1}`;
+        $('<span>').text(conversationTitle).css({
+          'max-width': '200px',
+          'white-space': 'nowrap',
+          'overflow': 'hidden',
+          'text-overflow': 'ellipsis',
+          'display': 'inline-block'
+        }).appendTo(a);
+        const deleteIcon = $('<i class="fas fa-trash-alt delete-conversation" style="display:none; margin-left: auto;">').appendTo(a);
+        
+        a.on('click', function() {
+          loadConversation(conversation.id);
+          $('.nav-link').removeClass('active');
+          a.addClass('active');
+        });
+        
+        li.hover(
+          function() { deleteIcon.show(); },
+          function() { deleteIcon.hide(); }
+        );
+        
+        deleteIcon.on('click', function(e) {
+          e.stopPropagation();
+          deleteConversation(conversation.id);
+        });
+      });
+    });
+  }
+
+  function loadConversation(conversationId) {
+    currentConversationId = conversationId;
+    console.log(currentConversationId);
+    $.get(`/chat/chat_history/${conversationId}`, function(data) {
+      $('#chat-container').empty();
+      data.forEach(function(message) {
+        appendMessage(message.role, message.content, message.search_results);
+        // Show stats for assistant messages
+        if (message.role === 'assistant') {
+          handleTimingInfo(message, $('#chat-container').children().last());
+        }
+      });
+      // Highlight the active conversation
+      $('.nav-link').removeClass('active');
+      $(`#conversation-${conversationId}`).addClass('active');
+
+      // Scroll to bottom after loading history
+      // Scroll after markdown is parsed
+      setTimeout(scrollToBottom, 1000);
+    });
+  }
+
+  function deleteConversation(conversationId) {
+    $.ajax({
+      url: `/chat/delete_conversation/${conversationId}`,
+      type: 'DELETE',
+      success: function() {
+        loadConversations();
+        if (currentConversationId === conversationId) {
+          $('#chat-container').empty();
+          currentConversationId = null;
+        }
+      }
+    });
+  }
+
+  function appendReferences(messageDiv, search_results) {
+    try {
+      if (typeof search_results === 'string') {
+        search_results = JSON.parse(search_results);
+      }
+    } catch (error) {
+      console.error('Error parsing search results:', error);
+      console.log(search_results);
+      search_results = [];
+    }
+    if (search_results.length > 0) {
+      const resultsHtml = search_results.map(result => {
+        let authorLink = result.author_id ? `<a href="/user/${result.author_id}" target="_blank">${result.author_name}</a>` : result.author_name;
+        return `<li style="list-style-type: disc; margin-left: 25px;">${authorLink} 在《<a href="/course/${result.course_id}#review-${result.review_id}" target="_blank">${result.course_name_with_teachers}</a>》的点评 (${result.rate} 分)</li>`;
+      }).join('');
+      const referencesDiv = $('<div>').addClass('message-references');
+      referencesDiv.html(`<h4>References:</h4><ul class="list-unstyled">${resultsHtml}</ul>`);
+      messageDiv.prepend(referencesDiv);
+    }
+  }
+
+  function appendMessage(role, content, search_results = null) {
+    const messageDiv = $('<div>').addClass(`message ${role}-message animate__animated animate__fadeIn`);
+    const contentDiv = $('<div>').addClass('message-content');
+    
+    if (role === 'assistant' && search_results) {
+      appendReferences(messageDiv, search_results);
+    }
+
+    if (role === 'assistant') {
+      const loadingDiv = $('<div>').addClass('typing-indicator').html('<span></span><span></span><span></span>');
+      contentDiv.append(loadingDiv);
+      messageDiv.append(contentDiv);
+      $('#chat-container').append(messageDiv);
+
+      setTimeout(() => {
+        loadingDiv.remove();
+        content = marked(content);
+        contentDiv.html(content);
+        hljs.highlightAll();
+      }, 500);
+    } else {
+      contentDiv.html(content);
+      messageDiv.append(contentDiv);
+      $('#chat-container').append(messageDiv);
+      hljs.highlightAll();
+    }
+  }
+
+  $('#send-button').on('click', function() {
+    sendMessage();
+  });
+
+  $('#user-input').on('keydown', function(e) {
+    if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey || e.shiftKey)) {
+      e.preventDefault();
+      const start = this.selectionStart;
+      const end = this.selectionEnd;
+      const value = this.value;
+      this.value = value.slice(0, start) + '\n' + value.slice(end);
+      this.selectionStart = this.selectionEnd = start + 1;
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    }
+  });
+
+  $('#user-input').on('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+
+  function sendMessage() {
+    const userInput = $('#user-input').val().trim();
+    if (!userInput || !currentConversationId) return;
+
+    appendMessage('user', userInput);
+    $('#user-input').val('');
+    const waitingDiv = createWaitingDiv();
+    $('#chat-container').append(waitingDiv);
+
+    fetchChatResponse(userInput, currentConversationId)
+      .then(response => handleChatResponse(response, waitingDiv))
+      .catch(error => handleFetchError(error, waitingDiv))
+      .finally(() => {
+        if (!currentConversationId) {
+          loadConversations();
+        }
+      });
+  }
+
+  function createWaitingDiv() {
+    return $('<div class="message assistant-message animate__animated animate__fadeIn"><div class="message-content"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>');
+  }
+
+  function fetchChatResponse(userInput, conversationId) {
+    return fetch('/chat/new_message', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token() }}',
+      },
+      body: JSON.stringify({ 
+        message: userInput,
+        conversation_id: conversationId
+      }),
+    });
+  }
+
+  function handleChatResponse(response, waitingDiv) {
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let assistantResponse = '';
+
+    function readStream() {
+      reader.read().then(({ done, value }) => {
+        if (done) {
+          waitingDiv.find('.typing-indicator').remove();
+          return;
+        }
+        const chunk = decoder.decode(value, { stream: true });
+        assistantResponse = processChunk(chunk, waitingDiv, assistantResponse);
+        readStream();
+      }).catch(error => {
+        console.error('Error reading stream:', error);
+        handleStreamError(waitingDiv);
+      });
+    }
+
+    readStream();
+  }
+
+  function processChunk(chunk, waitingDiv, assistantResponse) {
+    const lines = chunk.split('\n\n');
+    lines.forEach(line => {
+      if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.slice(6));
+          switch (data.type) {
+            case 'search_results':
+              handleSearchResults(data, waitingDiv);
+              break;
+            case 'ai_response':
+              assistantResponse = handleAIResponse(data, waitingDiv, assistantResponse);
+              break;
+            case 'timing_info':
+              handleTimingInfo(data, waitingDiv);
+              break;
+          }
+        } catch (error) {
+          console.error('Error parsing JSON:', error, line);
+        }
+      }
+    });
+    return assistantResponse;
+  }
+
+  function handleSearchResults(data, waitingDiv) {
+    appendReferences(waitingDiv, data.content);
+    waitingDiv.find('ul').addClass('animate__animated animate__pulse');
+    scrollToBottom();
+  }
+  function handleAIResponse(data, waitingDiv, assistantResponse) {
+    if (assistantResponse === '') {
+      if (!waitingDiv.find('.ai-response').length) {
+        waitingDiv.find('.message-content').prepend('<div class="ai-response"></div>');
+      }
+    }
+    assistantResponse += data.content;
+    waitingDiv.find('.ai-response').html(marked(assistantResponse));
+    hljs.highlightAll();
+    
+    // Ensure the loading animation is after the AI response
+    const loadingAnimation = waitingDiv.find('.typing-indicator');
+    if (loadingAnimation.length) {
+      waitingDiv.find('.message-content').append(loadingAnimation);
+    }
+    
+    return assistantResponse;
+  }
+
+  function handleTimingInfo(data, waitingDiv) {
+    const timingHtml = `
+      <div class="timing-info text-muted mt-2">
+        <span>Search time: ${data.search_time.toFixed(2)}s</span>
+        <span>Time to first token: ${data.time_to_first_token.toFixed(2)}s</span>
+        <span>Total response time: ${data.total_response_time.toFixed(2)}s</span>
+      </div>
+    `;
+    waitingDiv.append(timingHtml);
+  }
+
+  function handleFetchError(error, waitingDiv) {
+    console.error('Fetch error:', error);
+    handleStreamError(waitingDiv);
+  }
+
+  function handleStreamError(waitingDiv) {
+    waitingDiv.remove();
+    appendMessage('assistant', 'Sorry, there was an error processing your request.');
+  }
+
+  function scrollToBottom() {
+    $('#chat-container').animate({ scrollTop: $('#chat-container')[0].scrollHeight }, 500);
+  }
+
+  $('#new-conversation').on('click', function() {
+    currentConversationId = null;
+    $('#chat-container').empty();
+    $('.nav-link').removeClass('active');
+  });
+
+  // Load initial conversations
+  loadConversations();
+});
 </script>
+
+<style>
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  padding: 48px 0 0;
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+.chat-container {
+  height: calc(100vh - 150px);
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+.message {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 80%;
+}
+
+.user-message {
+  background-color: #007bff;
+  color: white;
+  margin-left: auto;
+}
+
+.assistant-message {
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+}
+
+.message-content {
+  word-wrap: break-word;
+}
+
+.typing-indicator {
+  display: inline-block;
+  padding: 10px;
+}
+
+.typing-indicator span {
+  height: 10px;
+  width: 10px;
+  float: left;
+  margin: 0 1px;
+  background-color: #9E9EA1;
+  display: block;
+  border-radius: 50%;
+  opacity: 0.4;
+}
+
+.typing-indicator span:nth-of-type(1) {
+  animation: 1s blink infinite 0.3333s;
+}
+
+.typing-indicator span:nth-of-type(2) {
+  animation: 1s blink infinite 0.6666s;
+}
+
+.typing-indicator span:nth-of-type(3) {
+  animation: 1s blink infinite 0.9999s;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 1;
+  }
+}
+
+pre {
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+code {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.nav-link {
+  transition: background-color 0.3s ease;
+  background-color: #eee;
+}
+
+.nav-link.active, .nav-link:hover {
+  background-color: #999;
+  color: white;
+}
+
+.animate__animated {
+  animation-duration: 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate__fadeIn {
+  animation-name: fadeIn;
+}
+
+.animate__fadeInUp {
+  animation-name: fadeInUp;
+}
+
+.timing-info {
+  font-size: 0.8em;
+  font-style: italic;
+}
+
+.timing-info span {
+  margin-right: 1em;
+}
+
+.input-group {
+  position: sticky;
+  bottom: 0;
+  background-color: #f8f9fa;
+  padding: 15px 0;
+  z-index: 1000;
+  display: flex;
+  gap: 10px;
+}
+
+#user-input {
+  flex-grow: 1;
+  resize: none;
+  overflow-y: hidden;
+  min-height: 38px;
+  max-height: 200px;
+}
+
+#send-button {
+  width: auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+</style>
+
 {% endblock %}
