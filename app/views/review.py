@@ -6,7 +6,7 @@ from app.utils import sanitize, editor_parse_at
 from flask_babel import gettext as _
 from .course import course
 import markdown
-from datetime import datetime
+from datetime import datetime, timedelta
 import threading
 
 from app import app, db
@@ -45,21 +45,31 @@ def record_review_history(review, operation, commit=True):
     return history
 
 
-def _update_course_summary(course_id):
+def _update_course_summary(course_id, update_immediately=False):
     with app.app_context():
         Session = sessionmaker(bind=db.engine)
         session = Session()
         course = session.query(Course).filter_by(id=course_id).first()
-        summary = get_summary_of_course(course)
-        if summary:
+
+        if not update_immediately and course.summary_update_time:
+            time_24_hours_ago = datetime.now() - timedelta(hours=24)
+            if course.summary_update_time > time_24_hours_ago:
+                # sumary was updated with 24 hours, do not update again
+                return
+
+        need_summary, summary = get_summary_of_course(course)
+        if not need_summary:
+            course.summary = None
+            session.commit()
+        # if a summary is needed but generation failed, do not update the database
+        if need_summary and summary:
             course.summary = summary
             course.summary_update_time = datetime.utcnow()
             session.commit()
-            session.flush()
 
 
-def async_update_course_summary(course):
-    thread = threading.Thread(target=_update_course_summary, args=(course.id, ))
+def async_update_course_summary(course, update_immediately=False):
+    thread = threading.Thread(target=_update_course_summary, args=(course.id, update_immediately))
     thread.start()
     print('async get summary', course)
 
@@ -158,7 +168,9 @@ def new_review(course_id):
                         user.notify('mention', review)
                 record_review_history(review, 'update')
 
-            if is_new or old_review.content != review.content:
+            if old_review and not old_review.only_visible_to_student and review.only_visible_to_student:
+                async_update_course_summary(review.course, update_immediately=True)
+            elif is_new or old_review.content != review.content:
                 ReviewSearchCache.update(review, follow_config=True)
                 async_update_course_summary(review.course)
 
@@ -203,7 +215,7 @@ def delete_review():
     record_review_history(review, 'delete')
     course = review.course
     review.delete()
-    async_update_course_summary(course)
+    async_update_course_summary(course, update_immediately=True)
     ok = True
     message = _('The review has been deleted.')
     return jsonify(ok=ok,message=message)

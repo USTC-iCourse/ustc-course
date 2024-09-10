@@ -30,12 +30,15 @@ def handle_summarize_course(course_id):
 
     if not course.summary or non_summarized_reviews > 0:
         print("Summarizing course:", course, flush=True)
-        summary = get_summary_of_course(course)
-        if summary:
+        need_summary, summary = get_summary_of_course(course)
+        if not need_sumary:
+            course.summary = None
+            session.commit()
+        # if a summary is needed but generation failed, do not update the database
+        if need_summary and summary:
             course.summary = summary
             course.summary_update_time = datetime.utcnow()
             session.commit()
-            session.flush()
 
 
 def invoke_summarize_course(course_id):

@@ -63,6 +63,9 @@ def get_expected_summary_length(reviews):
         return 500
 
 
+# return Tuple[bool, str | None]):
+# bool: whether or not a summary is needed
+# str | None: the summary. If generation failed, return None
 def get_summary_of_course(course):
     public_reviews = (Review.query.filter_by(course_id=course.id)
         .filter(Review.is_hidden == False).filter(Review.is_blocked == False).filter(Review.only_visible_to_student == False)
@@ -76,7 +79,9 @@ def get_summary_of_course(course):
         for i in range(retry):
             summary = get_chatgpt_summary(course, system_prompt, user_prompt, expected_summary_length)
             if summary:
-                return summary
+                return True, summary
+        # failed to generate summary
+        return True, None
     else:
-        return None
+        return False, None
 

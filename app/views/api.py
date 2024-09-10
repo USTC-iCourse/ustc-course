@@ -7,6 +7,7 @@ from app.utils import rand_str, handle_upload, validate_username, validate_email
 from app.utils import editor_parse_at
 from app.utils import send_block_review_email, send_unblock_review_email
 from app.views.review import record_review_history
+from app.views.review import async_update_course_summary
 from flask_babel import gettext as _
 from app import app
 import hashlib
@@ -129,6 +130,7 @@ def block_review():
                     review.author.notify('block-review', review)
                     send_block_review_email(review)
                     record_review_history(review, 'block')
+                    async_update_course_summary(review.course, update_immediately=True)
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
@@ -151,6 +153,7 @@ def unblock_review():
                     review.author.notify('unblock-review', review)
                     send_unblock_review_email(review)
                     record_review_history(review, 'unblock')
+                    async_update_course_summary(review.course, update_immediately=True)
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
@@ -171,6 +174,7 @@ def hide_review():
                 if ok:
                     review.course.update_rate()
                     record_review_history(review, 'hide')
+                    async_update_course_summary(review.course, update_immediately=True)
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
@@ -191,6 +195,7 @@ def unhide_review():
                 if ok:
                     review.course.update_rate()
                     record_review_history(review, 'unhide')
+                    async_update_course_summary(review.course)
                 return jsonify(ok=ok,message=message)
             else:
                 return jsonify(ok=False,message="Forbidden")
