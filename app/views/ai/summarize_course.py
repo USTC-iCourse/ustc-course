@@ -15,9 +15,15 @@ from sqlalchemy.orm import sessionmaker
 
 
 def get_chatgpt_completion(system_prompt, user_prompt):
-    client = OpenAI(
-        api_key=app.config['OPENAI_API_KEY'],
-    )
+    if 'OPENAI_BASE_URL' in app.config:
+        client = OpenAI(
+            base_url=app.config['OPENAI_BASE_URL'],
+            api_key=app.config['OPENAI_API_KEY'],
+        )
+    else:
+        client = OpenAI(
+            api_key=app.config['OPENAI_API_KEY'],
+        )
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
