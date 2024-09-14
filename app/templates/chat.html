@@ -58,8 +58,8 @@ $(document).ready(function() {
       url: '/chat/new_conversation',
       type: 'POST',
       success: function(response) {
-        if (response.status === 'success') {
-          currentConversationId = response.conversation_id;
+        if (response.id) {
+          currentConversationId = response.id;
           $('#chat-container').empty();
           loadConversations();
           setTimeout(() => {
@@ -67,7 +67,7 @@ $(document).ready(function() {
             $(`#conversation-${currentConversationId}`).addClass('active');
           }, 100);
         } else {
-          console.error('Failed to create new conversation:', response.message);
+          console.error('Failed to create new conversation: No conversation ID returned');
         }
       },
       error: function(xhr, status, error) {
@@ -123,10 +123,30 @@ $(document).ready(function() {
     $.get(`/chat/chat_history/${conversationId}`, function(data) {
       $('#chat-container').empty();
       data.forEach(function(message) {
-        appendMessage(message.role, message.content, message.search_results);
-        // Show stats for assistant messages
-        if (message.role === 'assistant') {
-          handleTimingInfo(message, $('#chat-container').children().last());
+        // Append an empty message first
+        if (message.role === 'user') {
+          const messageDiv = appendMessage(message.role, message.content);
+        }
+        else if (message.role === 'assistant') {
+          const messageDiv = appendEmptyMessage(message.role);
+          if (message.intent_analysis) {
+            try {
+              handleIntentAnalysis({ content: JSON.parse(message.intent_analysis) }, messageDiv);
+            } catch (error) {
+              handleIntentAnalysis({ content: message.intent_analysis }, messageDiv);
+            }
+          }
+          if (message.search_results) {
+            try {
+              handleAPIResults({ content: JSON.parse(message.search_results) }, messageDiv);
+            } catch (error) {
+              handleAPIResults({ content: message.search_results }, messageDiv);
+            }
+          }
+          if (message.content) {
+            updateAIResponse(messageDiv, message.content);
+          }
+          handleTimingInfo(message, messageDiv);
         }
       });
       // Highlight the active conversation
@@ -172,6 +192,14 @@ $(document).ready(function() {
       referencesDiv.html(`<h4>References:</h4><ul class="list-unstyled">${resultsHtml}</ul>`);
       messageDiv.prepend(referencesDiv);
     }
+  }
+
+  function appendEmptyMessage(role) {
+    const messageDiv = $('<div>').addClass(`message ${role}-message animate__animated animate__fadeIn`);
+    const contentDiv = $('<div>').addClass('message-content');
+    messageDiv.append(contentDiv);
+    $('#chat-container').append(messageDiv);
+    return messageDiv;
   }
 
   function appendMessage(role, content, search_results = null) {
@@ -298,8 +326,14 @@ $(document).ready(function() {
         try {
           const data = JSON.parse(line.slice(6));
           switch (data.type) {
-            case 'search_results':
-              handleSearchResults(data, waitingDiv);
+            case 'intent_analysis':
+              handleIntentAnalysis(data, waitingDiv);
+              break;
+            case 'api_results':
+              handleAPIResults(data, waitingDiv);
+              break;
+            case 'context':
+              handleContext(data, waitingDiv);
               break;
             case 'ai_response':
               assistantResponse = handleAIResponse(data, waitingDiv, assistantResponse);
@@ -316,26 +350,46 @@ $(document).ready(function() {
     return assistantResponse;
   }
 
-  function handleSearchResults(data, waitingDiv) {
-    appendReferences(waitingDiv, data.content);
-    waitingDiv.find('ul').addClass('animate__animated animate__pulse');
+  function handleIntentAnalysis(data, waitingDiv) {
+    const intentDiv = $('<div>').addClass('intent-analysis');
+    intentDiv.html('<h4>Intent Analysis:</h4><pre>' + JSON.stringify(data.content, null, 2) + '</pre>');
+    waitingDiv.find('.message-content').append(intentDiv);
+    updateStatus(waitingDiv, 'Analyzing intent...');
     scrollToBottom();
   }
-  function handleAIResponse(data, waitingDiv, assistantResponse) {
+
+  function handleAPIResults(data, waitingDiv) {
+    const apiResultsDiv = $('<div>').addClass('api-results');
+    apiResultsDiv.html('<h4>API Results:</h4><pre>' + JSON.stringify(data.content, null, 2) + '</pre>');
+    waitingDiv.find('.message-content').append(apiResultsDiv);
+    updateStatus(waitingDiv, 'Searching database...');
+    scrollToBottom();
+  }
+
+  function handleContext(data, waitingDiv) {
+    const contextDiv = $('<div>').addClass('context');
+    contextDiv.html('<h4>Context:</h4><pre>' + data.content + '</pre>');
+    waitingDiv.find('.message-content').append(contextDiv);
+    updateStatus(waitingDiv, 'Generating response...');
+    scrollToBottom();
+  }
+
+  function updateAIResponse(waitingDiv, assistantResponse) {
     if (assistantResponse === '') {
       if (!waitingDiv.find('.ai-response').length) {
-        waitingDiv.find('.message-content').prepend('<div class="ai-response"></div>');
+        waitingDiv.find('.message-content').append('<div class="ai-response"></div>');
       }
     }
-    assistantResponse += data.content;
     waitingDiv.find('.ai-response').html(marked(assistantResponse));
     hljs.highlightAll();
+  }
+
+  function handleAIResponse(data, waitingDiv, assistantResponse) {
+    assistantResponse += data.content;
+    updateAIResponse(waitingDiv, assistantResponse);
     
-    // Ensure the loading animation is after the AI response
-    const loadingAnimation = waitingDiv.find('.typing-indicator');
-    if (loadingAnimation.length) {
-      waitingDiv.find('.message-content').append(loadingAnimation);
-    }
+    // Remove the status message when AI starts responding
+    waitingDiv.find('.status-message').remove();
     
     return assistantResponse;
   }
@@ -343,9 +397,11 @@ $(document).ready(function() {
   function handleTimingInfo(data, waitingDiv) {
     const timingHtml = `
       <div class="timing-info text-muted mt-2">
-        <span>Search time: ${data.search_time.toFixed(2)}s</span>
-        <span>Time to first token: ${data.time_to_first_token.toFixed(2)}s</span>
-        <span>Total response time: ${data.total_response_time.toFixed(2)}s</span>
+        ${data.intent_analysis_time ? `<span>Intent analysis time: ${data.intent_analysis_time.toFixed(2)}s</span>` : ''}
+        ${data.search_time ? `<span>Search time: ${data.search_time.toFixed(2)}s</span>` : ''}
+        ${data.context_length ? `<span>Context length: ${data.context_length}</span>` : ''}
+        ${data.time_to_first_token ? `<span>Time to first token: ${data.time_to_first_token.toFixed(2)}s</span>` : ''}
+        ${data.total_time ? `<span>Total response time: ${data.total_time.toFixed(2)}s</span>` : ''}
       </div>
     `;
     waitingDiv.append(timingHtml);
@@ -359,6 +415,12 @@ $(document).ready(function() {
   function handleStreamError(waitingDiv) {
     waitingDiv.remove();
     appendMessage('assistant', 'Sorry, there was an error processing your request.');
+  }
+
+  function updateStatus(waitingDiv, status) {
+    waitingDiv.find('.status-message').remove();
+    const statusDiv = $('<div>').addClass('status-message').text(status);
+    waitingDiv.find('.message-content').append(statusDiv);
   }
 
   function scrollToBottom() {

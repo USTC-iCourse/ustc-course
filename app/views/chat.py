@@ -1,40 +1,54 @@
-from flask import Blueprint, request, jsonify, session, Response
+from flask import Blueprint, request, jsonify, session, Response, stream_with_context
 from flask_login import current_user
-from app import app
-from app import db
+from app import app, db
 from app.models.chat import ChatHistory, ChatMessage
-from app.views.search import search_reviews
+from app.models.course import Course
+from app.models.review import Review
+from app.models.user import Teacher
+from app.views.search import search_reviews, search as search_courses
+from app.models.course import course_teachers
 from flask import render_template
 import json
 import openai
 import traceback
 import time
+from sqlalchemy import func
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 chat = Blueprint('chat', __name__)
 
-
 def get_chat_messages(user_query, context, chat_histories):
     messages = [
-        {"role": "system", "content": "You are a helpful assistant for iCourse.club, a course review website for USTC students. Use the provided context to answer questions about courses and reviews."},
+        {"role": "system", "content": "You are a helpful assistant for iCourse.club, a course review website for USTC students. Use the provided context to answer questions about courses and reviews. Answer questions elaborately. Include all relevant information in the context. If the provided context is not enough, tell the user that you don't know."},
     ]
 
-    # Add chat histories to the messages
     for message in chat_histories:
         messages.append({"role": message.role, "content": message.content})
 
-    messages.append({"role": "user", "content": f"Context: {context}\n\nUser query: {user_query}"})
+    user_prompt = ""
+    if context:
+        user_prompt += f"Context for the query:\n=== BEGIN CONTEXT ===\n{context}\n=== END CONTEXT ===\n\n"
+    user_prompt += f"User query: {user_query}"
+    messages.append({"role": "user", "content": user_prompt})
 
     return messages
 
-
-def call_openai(messages):
+def call_openai(messages, json_response=False):
     try:
         client = openai.OpenAI(api_key=app.config['OPENAI_API_KEY'])
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages,
-            stream=True
-        )
+        if json_response:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages,
+                stream=True,
+                response_format={ "type": "json_object" },
+            )
+        else:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages,
+                stream=True,
+            )
 
         for chunk in response:
             if chunk.choices[0].finish_reason is not None:
@@ -45,190 +59,201 @@ def call_openai(messages):
         print(f"Error in call_openai: {str(e)}")
         yield "I'm sorry, but I encountered an error while processing your request. Please try again later."
 
+def analyze_intent(user_query):
+    messages = [
+        {"role": "system", "content": "You are an AI assistant that analyzes user queries and generates appropriate API calls in JSON format. The available API calls are:\n"
+                                      "a) fetch_courses(course_name): Fetch a list of courses and review summary by course name. If the keyword looks like a course name, use this function.\n"
+                                      "b) fetch_reviews(course_name=None, author=None): Fetch a list of reviews by course name or author.\n"
+                                      "c) fetch_reviews_by_keyword(keyword): Fetch a list of reviews by keyword in review content\n"
+                                      "d) fetch_courses_by_teacher(teacher_name): Fetch a list of courses by teacher name. If the keyword looks like a teacher name, use this function.\n"
+                                      "If the query doesn't require additional context, return 'direct_response'.\n"
+                                      "If the query involves multiple courses or teachers, return a list of API calls instead of a single one.\n"
+                                      "Example output: [{\"function\": \"fetch_courses\", \"params\": {\"course_name\": \"Database\"}}]\n"},
+        {"role": "user", "content": f"Analyze this query and generate appropriate API call(s) in JSON format: {user_query}"}
+    ]
 
-@chat.route('/new_conversation', methods=['POST'])
-def new_conversation():
-    # Get user ID or session ID
-    user_id = current_user.id if current_user.is_authenticated else None
-    session_id = session.get('session_id') if user_id is None else None
+    response_gen = call_openai(messages)
+    response = ""
+    for token in response_gen:
+        response += token
+    print(response)
     
     try:
-        # Create a new chat history
-        new_chat = ChatHistory(user_id=user_id, session_id=session_id)
-        db.session.add(new_chat)
-        db.session.commit()
-        
-        return jsonify({
-            'status': 'success',
-            'message': 'New conversation created successfully',
-            'conversation_id': new_chat.id
-        }), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({
-            'status': 'error',
-            'message': f'Failed to create new conversation: {str(e)}'
-        }), 500
+        # Remove headers and footers before parsing JSON
+        cleaned_response = response.strip().lstrip('```json').rstrip('```')
+        json_response = json.loads(cleaned_response)
+        return json_response
+    except json.JSONDecodeError:
+        print(f"Invalid JSON response: {response}")
+        return "direct_response"
 
+
+def execute_api_calls(api_calls):
+    results = []
+    for call in api_calls:
+        print(call)
+        if call['function'] == 'fetch_courses':
+            courses = search_courses(call['params']['course_name'].split(" "), 1, 10)
+            results.extend([{
+                'function': 'fetch_courses',
+                'course_id': course.id,
+                'course_name': course.name,
+                'name_with_teachers_short': course.name_with_teachers_short,
+                'summary': course.summary
+            } for course in courses.items if course.summary])
+        elif call['function'] == 'fetch_reviews':
+            reviews = []
+            if call['params'].get('course_name'):
+                reviews = search_reviews(call['params']['course_name'].split(" "), 1, 10)
+            elif call['params'].get('author'):
+                reviews = search_reviews(call['params']['author'].split(" "), 1, 10)
+            review_max_length = 1000
+            results.extend([{
+                'function': 'fetch_reviews',
+                'id': review.id,
+                'title': review.title,
+                'content': review.content[:review_max_length] + '...' if len(review.content) > review_max_length else review.content,
+                'rating': review.rating,
+                'author': review.author,
+                'course_name': review.course_name,
+            } for review in reviews.items])
+        elif call['function'] == 'fetch_reviews_by_keyword':
+            keyword_reviews = search_reviews(call['params']['keyword'].split(" "), 1, 10, current_user)
+            results.extend([{
+                'function': 'fetch_reviews_by_keyword',
+                'id': review.id,
+                'title': review.title,
+                'content': review.content[:review_max_length] + '...' if len(review.content) > review_max_length else review.content,
+                'rating': review.rating,
+                'author': review.author,
+                'course_name': review.course_name,
+            } for review in keyword_reviews.items])
+        elif call['function'] == 'fetch_courses_by_teacher':
+            courses = search_courses(call['params']['teacher_name'].split(" "), 1, 10)
+            results.extend([{
+                'function': 'fetch_courses_by_teacher',
+                'id': course.id,
+                'name': course.name,
+                'name_with_teachers_short': course.name_with_teachers_short,
+                'summary': course.summary
+            } for course in courses.items if course.summary])
+    return results
+
+def generate_context(api_results):
+    if isinstance(api_results, dict):
+        api_results = [api_results]
+    context = ""
+    for result in api_results:
+        function = result.get('function', '')
+        if function == 'fetch_courses':
+            context += f"Course: {result.get('course_name', 'N/A')}\n"
+            context += f"Course ID: {result.get('course_id', 'N/A')}\n"
+            context += f"Course with Teachers: {result.get('name_with_teachers_short', 'N/A')}\n"
+            context += f"Course Summary: {result.get('summary', 'N/A')}\n"
+        elif function in ['fetch_reviews', 'fetch_reviews_by_keyword']:
+            context += f"Review ID: {result.get('id', 'N/A')}\n"
+            context += f"Title: {result.get('title', 'N/A')}\n"
+            context += f"Rating: {result.get('rating', 'N/A')}\n"
+            context += f"Author: {result.get('author', 'N/A')}\n"
+            context += f"Course: {result.get('course_name', 'N/A')}\n"
+            context += f"=== Begin review content ===\n"
+            context += f"{result.get('content', 'N/A')}\n"
+            context += f"=== End review content ===\n"
+        elif function == 'fetch_courses_by_teacher':
+            context += f"Teacher: {result.get('name', 'N/A')}\n"
+            context += f"Teacher ID: {result.get('id', 'N/A')}\n"
+            context += f"Associated Course: {result.get('name_with_teachers_short', 'N/A')}\n"
+            context += f"Course Summary: {result.get('summary', 'N/A')}\n"
+        context += "\n"
+    return context
 
 @chat.route('/new_message', methods=['POST'])
 def new_message():
     try:
-        data = validate_request()
-        user_id, session_id = get_user_info()
-        check_ongoing_chat()
+        data = request.get_json()
+        user_id = current_user.id if current_user.is_authenticated else None
+        session_id = session.get('session_id') if user_id is None else None
+
+        chat_history = ChatHistory.query.filter_by(id=data['conversation_id'], user_id=user_id, session_id=session_id).first()
+        if not chat_history:
+            return jsonify({'error': 'Conversation not found'}), 404
+
+        chat_histories = ChatMessage.query.filter_by(chat_history_id=chat_history.id).order_by(ChatMessage.created_at).all()
         
-        session['chat_in_progress'] = True
-        
-        chat_history = get_or_create_chat_history(user_id, session_id, data['conversation_id'])
-        chat_histories = get_chat_histories(chat_history.id)
-        
-        is_first_query = len(chat_histories) == 0
-        add_user_message(chat_history.id, data['message'])
-        
-        if is_first_query:
-            save_first_query(chat_history, data['message'])
-        
-        search_results, search_time = perform_search(data['message'], current_user)
-        
-        context = generate_context(search_results)
-        chat_messages = get_chat_messages(data['message'], context, chat_histories)
-        
-        return Response(generate_response(chat_history.id, chat_messages, search_results, search_time, context), content_type='text/event-stream')
-    
+        user_message = ChatMessage(chat_history_id=chat_history.id, role='user', content=data['message'])
+        db.session.add(user_message)
+        db.session.commit()
+
+        def generate():
+            start_time = time.time()
+            
+            # Analyze intent
+            intent_analysis_start = time.time()
+            intent_analysis = analyze_intent(data['message'])
+            intent_analysis_time = time.time() - intent_analysis_start
+            yield f"data: {json.dumps({'type': 'intent_analysis', 'content': intent_analysis, 'time': intent_analysis_time})}\n\n"
+
+            if isinstance(intent_analysis, str) or intent_analysis[0]['function'] == "direct_response":
+                chat_messages = get_chat_messages(data['message'], "", chat_histories)
+                ai_response = ""
+                first_token_time = None
+                for token in call_openai(chat_messages):
+                    if first_token_time is None:
+                        first_token_time = time.time() - start_time
+                    ai_response += token
+                    yield f"data: {json.dumps({'type': 'ai_response', 'content': token})}\n\n"
+
+                total_time = time.time() - start_time
+                save_ai_response(chat_history.id, ai_response, 0, 0, first_token_time, total_time, "", [], intent_analysis_time)
+                yield f"data: {json.dumps({'type': 'timing_info', 'intent_analysis_time': intent_analysis_time, 'search_time': 0, 'context_length': 0, 'time_to_first_token': first_token_time, 'total_time': total_time})}\n\n"
+            else:
+                # Execute API calls
+                api_start_time = time.time()
+                api_results = execute_api_calls(intent_analysis)
+                api_time = time.time() - api_start_time
+                yield f"data: {json.dumps({'type': 'api_results', 'content': api_results})}\n\n"
+
+                # Generate context
+                context = generate_context(api_results)
+                context_length = len(context)
+
+                # Generate AI response
+                chat_messages = get_chat_messages(data['message'], context, chat_histories)
+                ai_response = ""
+                first_token_time = None
+                for token in call_openai(chat_messages):
+                    if first_token_time is None:
+                        first_token_time = time.time() - start_time - api_time
+                    ai_response += token
+                    yield f"data: {json.dumps({'type': 'ai_response', 'content': token})}\n\n"
+
+                total_time = time.time() - start_time
+                save_ai_response(chat_history.id, intent_analysis, ai_response, api_time, context_length, first_token_time, total_time, context, api_results, intent_analysis_time)
+                yield f"data: {json.dumps({'type': 'timing_info', 'intent_analysis_time': intent_analysis_time, 'search_time': api_time, 'context_length': context_length, 'time_to_first_token': first_token_time, 'total_time': total_time})}\n\n"
+
+        return Response(stream_with_context(generate()), content_type='text/event-stream')
+
     except Exception as e:
-        return handle_error(e)
-    
-    finally:
-        session['chat_in_progress'] = False
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 400
 
 
-def validate_request():
-    if not request.is_json:
-        raise ValueError('Request must be JSON')
-    
-    data = request.get_json()
-    if not data.get('message') or not data.get('conversation_id'):
-        raise ValueError('Invalid request')
-    
-    return data
-
-
-def get_user_info():
-    user_id = current_user.id if current_user.is_authenticated else None
-    session_id = session.get('session_id') if user_id is None else None
-    return user_id, session_id
-
-
-def check_ongoing_chat():
-    if session.get('chat_in_progress'):
-        raise ValueError('A chat request is already in progress')
-
-
-def get_or_create_chat_history(user_id, session_id, conversation_id):
-    chat_history = ChatHistory.query.filter_by(user_id=user_id, session_id=session_id, id=conversation_id).first()
-    if not chat_history:
-        raise ValueError('Conversation not found')
-    return chat_history
-
-
-def get_chat_histories(chat_history_id):
-    return ChatMessage.query.filter_by(chat_history_id=chat_history_id).order_by(ChatMessage.created_at).all()
-
-
-def add_user_message(chat_history_id, user_query):
-    user_message = ChatMessage(chat_history_id=chat_history_id, role='user', content=user_query)
-    db.session.add(user_message)
+def save_ai_response(chat_history_id, intent_analysis, ai_response, api_time, context_length, time_to_first_token, total_time, context, api_results, intent_analysis_time):
+    ai_message = ChatMessage(
+        chat_history_id=chat_history_id,
+        role='assistant',
+        content=ai_response,
+        intent_analysis=intent_analysis,
+        search_time=api_time,
+        context_length=context_length,
+        time_to_first_token=time_to_first_token,
+        total_response_time=total_time,
+        context=context,
+        search_results=json.dumps(api_results),
+        intent_analysis_time=intent_analysis_time
+    )
+    db.session.add(ai_message)
     db.session.commit()
-    return user_message
-
-
-def save_first_query(chat_history, query):
-    chat_history.first_query = query
-    db.session.commit()
-
-
-def perform_search(user_query, current_user):
-    search_start_time = time.time()
-    keywords = user_query.split()
-    search_results = search_reviews(keywords, 1, 5, current_user)
-    search_results = format_search_results(search_results)
-    search_time = time.time() - search_start_time
-    return search_results, search_time
-
-
-def format_search_results(search_results):
-    return [{
-        'review_id': result.id,
-        'author_name': result.author.username if result.author and not result.is_anonymous else 'Anonymous',
-        'author_id': result.author.id if result.author and not result.is_anonymous else None,
-        'course_name': result.course.name,
-        'course_id': result.course.id,
-        'content': result.content,
-        'course_name_with_teachers': result.course.name_with_teachers_short,
-        'rate': result.rate,
-        'publish_time': result.publish_time.strftime('%Y-%m-%d %H:%M:%S'),
-        'update_time': result.update_time.strftime('%Y-%m-%d %H:%M:%S'),
-    } for result in search_results.items]
-
-
-def generate_context(search_results):
-    return "\n".join("\n".join([
-        f"Review {i+1}:",
-        f"Author: {result['author_name']}",
-        f"Course: {result['course_name_with_teachers']}",
-        f"Rate: {result['rate']}/10",
-        f"=== Begin of Review ===",
-        f"{result['content']}",
-        f"=== End of Review ===",
-        f"\n",
-    ]) for i, result in enumerate(search_results))
-
-def generate_response(chat_history_id, chat_messages, search_results, search_time, context):
-    first_token_time = None
-    start_time = time.time()
-
-    # Remove content from search results before sending and saving
-    search_results_without_content = [{**result, 'content': None} for result in search_results]
-
-    yield f"data: {json.dumps({'type': 'search_results', 'content': search_results_without_content, 'search_time': search_time})}\n\n"
-
-    ai_response = ""
-    for token in call_openai(chat_messages):
-        if first_token_time is None:
-            first_token_time = time.time() - start_time
-        ai_response += token
-        yield f"data: {json.dumps({'type': 'ai_response', 'content': token})}\n\n"
-    
-    total_response_time = time.time() - start_time + search_time
-
-    yield f"data: {json.dumps({'type': 'timing_info', 'search_time': search_time, 'time_to_first_token': first_token_time, 'total_response_time': total_response_time})}\n\n"
-
-    save_ai_response(chat_history_id, ai_response, search_time, first_token_time, total_response_time, context, search_results_without_content)
-
-
-def save_ai_response(chat_history_id, ai_response, search_time, first_token_time, total_response_time, context, search_results):
-    with app.app_context():
-        new_db_session = db.session()
-        try:
-            ai_message = ChatMessage(chat_history_id=chat_history_id, role='assistant', content=ai_response)
-            ai_message.search_time = search_time
-            ai_message.time_to_first_token = first_token_time
-            ai_message.total_response_time = total_response_time
-            ai_message.context = context
-            ai_message.search_results = json.dumps(search_results)
-            new_db_session.add(ai_message)
-            new_db_session.commit()
-        except Exception as e:
-            new_db_session.rollback()
-            print(f"Error saving AI response: {str(e)}")
-        finally:
-            new_db_session.close()
-
-def handle_error(e):
-    traceback.print_exc()
-    return jsonify({'error': str(e)}), 400
-
 
 @chat.route('/chat_history/<int:conversation_id>', methods=['GET'])
 def get_chat_history(conversation_id):
@@ -240,15 +265,19 @@ def get_chat_history(conversation_id):
         return jsonify([])
     
     messages = ChatMessage.query.filter_by(chat_history_id=chat_history.id).order_by(ChatMessage.created_at).all()
-    return jsonify([{
+    result = [{
         'role': msg.role, 
         'content': msg.content,
+        'intent_analysis_time': msg.intent_analysis_time,
         'search_time': msg.search_time,
         'time_to_first_token': msg.time_to_first_token,
         'total_response_time': msg.total_response_time,
+        'context_length': msg.context_length,
         'search_results': msg.search_results,
-    } for msg in messages])
+        'intent_analysis': msg.intent_analysis,
+    } for msg in messages]
 
+    return jsonify(result)
 
 @chat.route('/conversations', methods=['GET'])
 def get_conversations():
@@ -259,7 +288,7 @@ def get_conversations():
     
     result = []
     for conv in conversations:
-        message_count = conv.messages.count()
+        message_count = ChatMessage.query.filter_by(chat_history_id=conv.id).count()
         if message_count > 0 or conv == conversations[0]:
             result.append({
                 'id': conv.id,
@@ -271,8 +300,7 @@ def get_conversations():
     
     return jsonify(result)
 
-
-@chat.route('/conversation', methods=['POST'])
+@chat.route('/new_conversation', methods=['POST'])
 def create_conversation():
     user_id = current_user.id if current_user.is_authenticated else None
     session_id = session.get('session_id') if user_id is None else None
@@ -281,12 +309,13 @@ def create_conversation():
     db.session.add(new_conversation)
     db.session.commit()
     
-    return jsonify({
+    result = {
         'id': new_conversation.id,
         'created_at': new_conversation.created_at,
         'updated_at': new_conversation.updated_at
-    }), 201
+    }
 
+    return jsonify(result), 201
 
 @chat.route('/conversation/<int:conversation_id>', methods=['DELETE'])
 def delete_conversation(conversation_id):
@@ -306,8 +335,6 @@ def delete_conversation(conversation_id):
     
     return '', 204
 
-
 @chat.route('/', methods=['GET'])
 def chat_index():
     return render_template('chat.html')
-

@@ -25,8 +25,11 @@ class ChatMessage(db.Model):
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    intent_analysis = db.Column(db.Text, nullable=True)
     context = db.Column(db.Text, nullable=True)
     search_time = db.Column(db.Float, nullable=True)
+    intent_analysis_time = db.Column(db.Float, nullable=True)
+    context_length = db.Column(db.Integer, nullable=True)
     time_to_first_token = db.Column(db.Float, nullable=True)
     total_response_time = db.Column(db.Float, nullable=True)
     search_results = db.Column(db.Text, nullable=True)
