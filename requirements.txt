@@ -5,7 +5,7 @@ Flask-login==0.6.3
 flask-security-too==5.3.3
 itsdangerous==2.1.2
 flask-mail==0.9.1
-jinja2==3.1.4
+jinja2==3.1.5
 lxml==4.9.1
 flask-migrate==3.1.0
 flask-mysqldb==0.2.0
