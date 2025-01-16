@@ -108,10 +108,9 @@
     <p class="text-danger">{{ _('唔，出错了！') }}</p>
     {% endif %}
     {% else %}
-    <p class="text-success">{{ _('你还没有绑定学号，<a  href="%(url)s">戳这里</a>绑定。', url=url_for('user.bind_identity')) }}
+    <p class="text-success">{{ _('你还没有绑定学号，<a href="%(url)s">戳这里</a> 绑定。', url=url_for('user.bind_identity')) }}
       {% endif %}
-      <p class="text-success">你可以通过发送邮件修改密码，<a href="{{ url_for('home.change_password')
-                                                             }}">戳这里</a> 发邮件</p>
+      <p class="text-success">你可以通过发送邮件修改密码，<a href="{{ url_for('home.change_password') }}">戳这里 </a>发邮件</p>
   </div> <!-- end float-element -->
 </div> <!-- end container -->
 
