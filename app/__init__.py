@@ -94,10 +94,6 @@ def page_not_found(e):
 def page_not_found(e):
     return render_template('error-page.html', code=502), 502
 
-@app.route('/ads.txt')
-def serve_ads_txt():
-    return 'google.com, pub-2875393290104787, DIRECT, f08c47fec0942fa0', 200, {'Content-Type': 'text/plain'}
-
 from app.views import *
 app.register_blueprint(home,url_prefix='')
 app.register_blueprint(course,url_prefix='/course')
