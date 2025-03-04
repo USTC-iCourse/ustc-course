@@ -386,7 +386,7 @@ def my_urlize(text, trim_url_limit=None, nofollow=False, target=None):
                 # Check if this is a link to an uploaded file (not an image)
                 is_file_link = '/uploads/files/' in middle
                 is_image_link = '/uploads/images/' in middle or middle.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'))
-                is_external_link = not ('ustc-course' in middle)
+                is_external_link = not ('icourse.club' in middle)
                 
                 # For non-logged-in users, replace file links with login modal
                 if is_file_link and not (current_user and current_user.is_authenticated):
