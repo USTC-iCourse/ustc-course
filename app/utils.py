@@ -16,6 +16,7 @@ import lxml.html
 from hashlib import sha256
 import pdfkit
 from app.views.search import filter
+from flask_login import current_user
 
 
 mail = Mail(app)
@@ -346,8 +347,24 @@ def my_urlize(text, trim_url_limit=None, nofollow=False, target=None):
                     nofollow_attr, target_attr, trim_url(middle))
             if middle.startswith('http://') or \
                middle.startswith('https://'):
-                middle = '<a href="%s"%s%s>%s</a>' % (middle,
-                    nofollow_attr, target_attr, trim_url(middle))
+                # Check if this is a link to an uploaded file (not an image)
+                is_file_link = '/uploads/files/' in middle
+                is_image_link = '/uploads/images/' in middle or middle.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'))
+                is_external_link = not ('/uploads/' in middle)
+                
+                # For non-logged-in users, replace file links with login modal
+                if is_file_link and not (current_user and current_user.is_authenticated):
+                    # Get the text between the tags
+                    link_text = trim_url(middle)
+                    # If the link text is the same as the URL, replace it
+                    if link_text == middle:
+                        link_text = "Please login to download the attachment"
+                    
+                    # Create a link that opens the login modal
+                    middle = '<a href="#" data-toggle="modal" data-target="#signin">%s</a>' % link_text
+                else:
+                    middle = '<a href="%s"%s%s>%s</a>' % (middle,
+                        nofollow_attr, target_attr, trim_url(middle))
             if '@' in middle and not middle.startswith('www.') and \
                not ':' in middle and _simple_email_re.match(middle):
                 middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
