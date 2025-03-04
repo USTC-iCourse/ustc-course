@@ -17,6 +17,7 @@ from hashlib import sha256
 import pdfkit
 from app.views.search import filter
 from flask_login import current_user
+from flask import request
 
 
 mail = Mail(app)
@@ -321,40 +322,43 @@ def my_urlize(text, trim_url_limit=None, nofollow=False, target=None):
     If target is not None, a target attribute will be added to the link.
     """
     from flask_login import current_user
+    from flask import request
     import re
     
     # First, process existing <a> tags that link to uploaded files
-    if not (current_user and current_user.is_authenticated):
-        # Regular expression to find <a> tags
-        a_tag_pattern = re.compile(r'<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)</a>', re.IGNORECASE | re.DOTALL)
+    # Regular expression to find <a> tags
+    a_tag_pattern = re.compile(r'<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)</a>', re.IGNORECASE | re.DOTALL)
+    
+    # Process all <a> tags in the text
+    def replace_link(match):
+        url = match.group(1)
+        link_text = match.group(2)
         
-        # Process all <a> tags in the text
-        def replace_link(match):
-            url = match.group(1)
-            link_text = match.group(2)
+        # Check if this is a file link (not an image or external link)
+        is_file_link = '/uploads/files/' in url
+        is_image_link = '/uploads/images/' in url or url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'))
+        is_external_link = not (url.startswith('/') or url.startswith('#') or 'ustc-course' in url)
+        
+        # Replace file links with login modal link for non-logged-in users
+        if is_file_link and not (current_user and current_user.is_authenticated):
+            # If the link text is the same as the URL, replace it
+            if link_text == url:
+                link_text = "Please login to download the attachment"
             
-            # Check if this is a file link (not an image or external link)
-            is_file_link = '/uploads/files/' in url
-            is_image_link = '/uploads/images/' in url or url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'))
-            is_external_link = not ('/uploads/' in url)
+            return f'<a href="#" data-toggle="modal" data-target="#signin">{link_text}</a>'
+        elif is_external_link:
+            # For external links, add target="_blank"
+            return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{link_text}</a>'
+        else:
+            # Keep other links as they are
+            return match.group(0)
             
-            # Replace file links with login modal link
-            if is_file_link:
-                # If the link text is the same as the URL, replace it
-                if link_text == url:
-                    link_text = "Please login to download the attachment"
-                
-                return f'<a href="#" data-toggle="modal" data-target="#signin">{link_text}</a>'
-            else:
-                # Keep other links as they are
-                return match.group(0)
-                
-        text = a_tag_pattern.sub(replace_link, text)
+    text = a_tag_pattern.sub(replace_link, text)
     
     # Then process plain URLs
     trim_url = lambda x, limit=trim_url_limit: limit is not None \
-                         and (x[:limit] + (len(x) >=limit and '...'
-                         or '')) or x
+                        and (x[:limit] + (len(x) >=limit and '...'
+                        or '')) or x
     words = _word_split_re.split(text)
     nofollow_attr = nofollow and ' rel="nofollow"' or ''
     if target is not None and isinstance(target, string_types):
@@ -375,14 +379,14 @@ def my_urlize(text, trim_url_limit=None, nofollow=False, target=None):
                     middle.endswith('.net') or
                     middle.endswith('.com')
                 )):
-                middle = '<a href="http://%s"%s%s>%s</a>' % (middle,
-                    nofollow_attr, target_attr, trim_url(middle))
+                # External link - add target="_blank"
+                middle = '<a href="http://%s" target="_blank" rel="noopener noreferrer">%s</a>' % (middle, trim_url(middle))
             if middle.startswith('http://') or \
                middle.startswith('https://'):
                 # Check if this is a link to an uploaded file (not an image)
                 is_file_link = '/uploads/files/' in middle
                 is_image_link = '/uploads/images/' in middle or middle.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'))
-                is_external_link = not ('/uploads/' in middle)
+                is_external_link = not ('ustc-course' in middle)
                 
                 # For non-logged-in users, replace file links with login modal
                 if is_file_link and not (current_user and current_user.is_authenticated):
@@ -394,6 +398,9 @@ def my_urlize(text, trim_url_limit=None, nofollow=False, target=None):
                     
                     # Create a link that opens the login modal
                     middle = '<a href="#" data-toggle="modal" data-target="#signin">%s</a>' % link_text
+                elif is_external_link:
+                    # External link - add target="_blank"
+                    middle = '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>' % (middle, trim_url(middle))
                 else:
                     middle = '<a href="%s"%s%s>%s</a>' % (middle,
                         nofollow_attr, target_attr, trim_url(middle))
