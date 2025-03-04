@@ -320,6 +320,38 @@ def my_urlize(text, trim_url_limit=None, nofollow=False, target=None):
     attribute.
     If target is not None, a target attribute will be added to the link.
     """
+    from flask_login import current_user
+    import re
+    
+    # First, process existing <a> tags that link to uploaded files
+    if not (current_user and current_user.is_authenticated):
+        # Regular expression to find <a> tags
+        a_tag_pattern = re.compile(r'<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)</a>', re.IGNORECASE | re.DOTALL)
+        
+        # Process all <a> tags in the text
+        def replace_link(match):
+            url = match.group(1)
+            link_text = match.group(2)
+            
+            # Check if this is a file link (not an image or external link)
+            is_file_link = '/uploads/files/' in url
+            is_image_link = '/uploads/images/' in url or url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'))
+            is_external_link = not ('/uploads/' in url)
+            
+            # Replace file links with login modal link
+            if is_file_link:
+                # If the link text is the same as the URL, replace it
+                if link_text == url:
+                    link_text = "Please login to download the attachment"
+                
+                return f'<a href="#" data-toggle="modal" data-target="#signin">{link_text}</a>'
+            else:
+                # Keep other links as they are
+                return match.group(0)
+                
+        text = a_tag_pattern.sub(replace_link, text)
+    
+    # Then process plain URLs
     trim_url = lambda x, limit=trim_url_limit: limit is not None \
                          and (x[:limit] + (len(x) >=limit and '...'
                          or '')) or x
