@@ -41,9 +41,15 @@ UPLOAD_FOLDER = '/srv/ustc-course/uploads'
 # Alowed extentsions for a filetype
 # for example 'image': set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = {
-        'image':set(['png', 'jpg', 'jpeg', 'gif']),
-        'file':set('7z|avi|csv|doc|docx|flv|gif|gz|gzip|jpeg|jpg|mov|mp3|mp4|mpc|mpeg|mpg|ods|odt|pdf|png|ppt|pptx|ps|pxd|rar|rtf|tar|tgz|txt|vsd|wav|wma|wmv|xls|xlsx|xml|zip'.split('|')),
-        }
+    'image':set(['png', 'jpg', 'jpeg', 'gif']),
+    'file':set([
+        '7z', 'aac', 'avi', 'csv', 'doc', 'docx', 'flac', 'flv', 'gif', 'gz', 'gzip',
+        'jpeg', 'jpg', 'json', 'key', 'md', 'mkv', 'mov', 'mp3', 'mp4', 'mpc',
+        'mpeg', 'mpg', 'numbers', 'ods', 'odt', 'odp', 'ogg', 'pages', 'pdf',
+        'png', 'ppt', 'pptx', 'ps', 'pxd', 'rar', 'rtf', 'svg', 'tar', 'tgz',
+        'txt', 'vsd', 'wav', 'webm', 'webp', 'wma', 'wmv', 'xls', 'xlsx', 'xml', 'zip'
+    ]),
+}
 MAX_CONTENT_LENGTH = 100 * 1024 * 1024
 
 # Search settings
