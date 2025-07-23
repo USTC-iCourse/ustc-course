@@ -24,11 +24,17 @@ def filter(x: str) -> str:
     else:
         return sqlcache.filter(x)
 
-def search(keywords: List[str], page: int, per_page: int) -> Union[Pagination, MyPagination]:
-    if get_backend() == "sql-like":
-        return sqllike.search(keywords, page, per_page)
+def search(keywords: List[str], page: int, per_page: int, exact: bool) -> Union[Pagination, MyPagination]:
+    if get_backend() == "sql-like" or exact: # exact search only needs sql-like backend
+        return sqllike.search(keywords, page, per_page, exact)
     else:
         return sqlcache.search(keywords, page, per_page)
+
+def search_courses(keyword: List[str]) -> List[str]:
+    if get_backend() == "sql-like":
+        return sqllike.search_courses(keyword)
+    else:
+        return sqlcache.search_courses(keyword)
 
 def search_reviews(keywords: List[str], page: int, per_page: int, current_user) -> Union[Pagination, MyPagination]:
     if get_backend() == "sql-like":
