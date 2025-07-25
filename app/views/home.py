@@ -9,7 +9,7 @@ from sqlalchemy import or_
 from app import db
 from app import app
 from .course import deptlist
-from .search import search as search_, search_reviews as search_reviews_, filter
+from .search import search as search_, search_courses as search_courses_, search_reviews as search_reviews_, filter
 from .search.pagination import MyPagination
 from itsdangerous import URLSafeTimedSerializer
 
@@ -362,6 +362,7 @@ def search():
     if not query_str:
         return redirect_to_index()
     noredirect = request.args.get('noredirect')
+    exact = request.args.get('exact', type=bool, default=False)
 
     course_type = request.args.get('type',None,type=int)
     department = request.args.get('dept',None,type=int)
@@ -377,7 +378,7 @@ def search():
     #    # 开课地点
     #    course_query = course_query.filter(Course.campus==campus)
 
-    keywords = filter(query_str).split()
+    keywords = [filter(query_str)] if exact else filter(query_str).split()
     if not keywords:
         return render_template('search.html', keyword=query_str,
                                courses=MyPagination.empty(),
@@ -391,7 +392,7 @@ def search():
     if page <= 1:
         page = 1
     
-    pagination = search_(keywords, page, per_page)
+    pagination = search_(keywords, page, per_page, exact)
 
     if pagination.total > 0:
         title = '搜索课程「' + query_str + '」'
@@ -412,6 +413,12 @@ def search():
                 dept=department, deptlist=deptlist,
                 title=title,
                 this_module='home.search')
+
+
+@home.route('/search-courses/')
+def search_courses():
+    query_str = request.args.get('q')
+    return search_courses_(query_str)
 
 
 @home.route('/announcements/')

@@ -81,6 +81,33 @@ def search(keywords: List[str], page: int, per_page: int) -> Pagination:
     return results
 
 
+def search_courses(keyword: str) -> List[str]:
+    if not keyword.strip():
+        return []
+
+    processed_keyword = " ".join([
+        "+" + i.strip() 
+        for i in jieba.cut(keyword.strip()) 
+        if i.strip() and not is_chinese_stop_char(i.strip())
+    ])
+
+    if not processed_keyword:
+        allchars = set()
+        for char in keyword:
+            if not is_chinese_stop_char(char):
+                allchars.add("+" + char)
+        processed_keyword = " ".join(allchars)
+
+    results = CourseSearchCache.query.filter(
+        CourseSearchCache.text.match(processed_keyword)
+    ).options(load_only(CourseSearchCache.id))
+
+    ids = [result.id for result in results]
+    courses = Course.query.filter(Course.id.in_(ids)).with_entities(Course.name).distinct().order_by(Course.name).limit(5).all()
+
+    return [course[0] for course in courses]
+
+
 def search_reviews(
     keywords: List[str], page: int, per_page: int, current_user
 ) -> Pagination:
