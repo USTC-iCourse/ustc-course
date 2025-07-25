@@ -16,17 +16,7 @@ import lxml.html
 from hashlib import sha256
 import pdfkit
 from app.views.search import filter
-from flask_login import current_user
-from flask import request
-import bleach
-import logging
 import os
-import unicodedata
-import subprocess
-import uuid
-import requests
-from lxml.html.clean import Cleaner
-import lxml.html
 
 
 mail = Mail(app)
