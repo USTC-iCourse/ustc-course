@@ -219,7 +219,9 @@ class Course(db.Model):
 
     @property
     def summary_html(self):
-        return markdown.markdown(self.summary)
+        from app.utils import sanitize
+        html = markdown.markdown(self.summary)
+        return sanitize(html)
 
     def __repr__(self):
         return self.name + '(' + ','.join(sorted(self.teacher_name_list)) + ')'
