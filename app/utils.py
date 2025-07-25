@@ -18,6 +18,15 @@ import pdfkit
 from app.views.search import filter
 from flask_login import current_user
 from flask import request
+import bleach
+import logging
+import os
+import unicodedata
+import subprocess
+import uuid
+import requests
+from lxml.html.clean import Cleaner
+import lxml.html
 
 
 mail = Mail(app)
@@ -123,13 +132,39 @@ def resize_avatar(old_file):
     return old_file
 
 def sanitize(text):
-    cleaner = Cleaner(safe_attrs_only=False, style=False)
+    # First pass: use lxml cleaner to remove dangerous elements  
+    # style=True removes ALL style attributes, preventing any CSS-based hiding
+    cleaner = Cleaner(
+        safe_attrs_only=False, 
+        style=True,
+        remove_tags=['style', 'script'],
+        kill_tags=['noscript', 'object', 'embed'],
+    )
     text = cleaner.clean_html(text)
+
+    # Remove zero-width characters and other Unicode hiding tricks
+    zero_width_chars = [
+        '\u200b',  # Zero-width space
+        '\u200c',  # Zero-width non-joiner  
+        '\u200d',  # Zero-width joiner
+        '\ufeff',  # Zero-width no-break space
+        '\u2060',  # Word joiner
+        '\u180e',  # Mongolian vowel separator
+        '\u2061',  # Function application
+        '\u2062',  # Invisible times
+        '\u2063',  # Invisible separator
+        '\u2064',  # Invisible plus
+    ]
+    for char in zero_width_chars:
+        text = text.replace(char, '')
+
+    # Apply existing image dimension removal rules
     text = re.sub(r'<img ([^>]*) style="height:[0-9]+px; width:[0-9]+px"', r'<img \1', text)
     text = re.sub(r'<img ([^>]*) style="width:[0-9]+px; height:[0-9]+px"', r'<img \1', text)
     # add new rules for CKEditor 5
     text = re.sub(r'<img ([^>]*) width="[0-9]+" height="[0-9]+"', r'<img \1', text)
     text = re.sub(r'<img ([^>]*) height="[0-9]+" width="[0-9]+"', r'<img \1', text)
+    
     return text
 
 
