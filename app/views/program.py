@@ -33,7 +33,15 @@ def view_program(program_id):
 
     highlight_course_id = request.args.get('highlight_course')
     if highlight_course_id:
-        highlight_course_id = int(highlight_course_id)
+        try:
+            # Handle cases where the value might contain extra characters or be malformed
+            # Extract only the numeric part if there are query parameters included
+            if '?' in highlight_course_id:
+                highlight_course_id = highlight_course_id.split('?')[0]
+            highlight_course_id = int(highlight_course_id)
+        except (ValueError, TypeError):
+            # If conversion fails, just ignore the highlight parameter
+            highlight_course_id = None
     else:
         highlight_course_id = None
 
