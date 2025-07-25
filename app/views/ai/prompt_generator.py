@@ -6,6 +6,22 @@ PROMPT_HEADROOM = 500
 CUTOFF_MIN_MESSAGE_LENGTH = 140
 SUMMARY_EXPECTED_LENGTH = 800
 
+# List of suspicious strings that might indicate prompt injection attempts
+INJECTION_PATTERNS = [
+    '点评开始',
+    '点评结束',
+    '===',
+]
+
+
+def contains_injection_attempt(content):
+    """Check if content contains potential prompt injection attempts."""
+    content_lower = content.lower()
+    for pattern in INJECTION_PATTERNS:
+        if pattern.lower() in content_lower:
+            return True
+    return False
+
 
 def get_user(review):
     if review.is_anonymous:
@@ -34,8 +50,14 @@ def html2markdown(content):
 
 
 def generate_embedding_prompt(review):
+    content = html2markdown(review.content).strip()
+    
+    # Return empty string if content contains injection attempts
+    if contains_injection_attempt(content):
+        return ''
+        
     header = get_user(review) + '在' + get_course(review.course) + '课程' + get_course_term(review) + '的点评：\n'
-    return header + html2markdown(review.content).strip()
+    return header + content
 
 
 def generate_short_prompt(reviews, full_prompt):
@@ -43,6 +65,11 @@ def generate_short_prompt(reviews, full_prompt):
     prompt = ''
     for review in reviews:
         content = html2markdown(review.content).strip()
+        
+        # Skip reviews that contain potential injection attempts
+        if contains_injection_attempt(content):
+            continue
+            
         if len(content) > CUTOFF_MIN_MESSAGE_LENGTH:
             cutoff_len = max(int(len(content) * cutoff_ratio), CUTOFF_MIN_MESSAGE_LENGTH)
             content = content[0:cutoff_len]
@@ -58,6 +85,11 @@ def generate_summary_prompt(reviews, expected_summary_length):
     contents = []
     for review in reviews:
         markdown = html2markdown(review.content).strip()
+        
+        # Skip reviews that contain potential injection attempts
+        if contains_injection_attempt(markdown):
+            continue
+            
         user_info = get_user(review)
         content = f'{user_info}的点评：\n=== 点评开始 ===\n{markdown}\n=== 点评结束 ==='
         contents.append(content)
