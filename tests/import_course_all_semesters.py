@@ -6,6 +6,7 @@ import lxml.html
 import subprocess
 import time
 import datetime
+import traceback
 
 os.chdir(os.path.dirname(__file__))
 sys.path.append('..')  # fix import directory
@@ -74,12 +75,33 @@ for option in options:
         for repeat in range(5):
             try:
                 r = requests.get(lesson_url, headers=headers)
+                r.raise_for_status()  # Raise exception for bad status codes
                 break
             except KeyboardInterrupt:
                 sys.exit(1)
-            except:
+            except Exception as e:
                 print('Failed to download ' + echo_text + ', retry...')
+                print('Error details:', str(e))
+                print('Traceback:')
+                traceback.print_exc()
+                if repeat == 4:  # Last retry
+                    print('Failed to download ' + echo_text + ' after 5 attempts, giving up.')
+                    sys.exit(1)
                 continue
+        # Validate response content before saving
+        try:
+            import json
+            json.loads(r.text)  # Validate JSON
+        except json.JSONDecodeError as e:
+            print('Failed to download ' + echo_text + ': Server response is not valid JSON')
+            print('JSON decode error:', str(e))
+            print('Response content preview (first 500 chars):')
+            print(repr(r.text[:500]))
+            sys.exit(1)
+        except Exception as e:
+            print('Failed to validate response for ' + echo_text + ':', str(e))
+            sys.exit(1)
+        
         with open(save_file_path, 'w') as f:
             f.write(r.text)
     else:

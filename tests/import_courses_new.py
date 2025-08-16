@@ -24,9 +24,66 @@ def parse_file(filename):
     return data
 
 def parse_json(filename):
-    with open(filename, encoding='utf-8') as f:
-        import json
-        return json.load(f)
+    import json
+    import os
+    
+    # Check if file exists
+    if not os.path.exists(filename):
+        print(f"Error: File '{filename}' does not exist.")
+        sys.exit(1)
+    
+    # Check if file is readable
+    if not os.access(filename, os.R_OK):
+        print(f"Error: Cannot read file '{filename}'. Permission denied.")
+        sys.exit(1)
+    
+    try:
+        with open(filename, encoding='utf-8') as f:
+            content = f.read().strip()
+            
+            # Check if file is empty
+            if not content:
+                print(f"Error: File '{filename}' is empty.")
+                print("This usually means the download failed or the server returned an empty response.")
+                sys.exit(1)
+            
+            # Try to parse JSON
+            try:
+                return json.loads(content)
+            except json.JSONDecodeError as e:
+                print(f"Error: File '{filename}' contains invalid JSON.")
+                print(f"JSON decode error: {str(e)}")
+                print(f"Error occurred at line {e.lineno}, column {e.colno}")
+                
+                # Show preview of problematic content
+                lines = content.split('\n')
+                if e.lineno <= len(lines):
+                    print(f"Problematic line content: {repr(lines[e.lineno - 1])}")
+                
+                print("\nFile content preview (first 500 characters):")
+                print(repr(content[:500]))
+                
+                print("\nThis usually indicates:")
+                print("1. The download failed and returned an error page instead of JSON")
+                print("2. The server response was truncated")
+                print("3. The file got corrupted during download")
+                print("\nSuggestion: Delete the file and try downloading again.")
+                sys.exit(1)
+                
+    except UnicodeDecodeError as e:
+        print(f"Error: Cannot decode file '{filename}' as UTF-8.")
+        print(f"Encoding error: {str(e)}")
+        print("The file may be corrupted or in a different encoding.")
+        sys.exit(1)
+    except IOError as e:
+        print(f"Error: Cannot read file '{filename}'.")
+        print(f"IO error: {str(e)}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Unexpected error while reading file '{filename}': {str(e)}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
 depts_code_map = dict()
 classes_map = dict()
