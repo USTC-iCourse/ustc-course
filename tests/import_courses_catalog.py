@@ -91,10 +91,15 @@ def load_courses(args):
                 "Found semester: %s (from %s to %s)"
                 % (semester["nameZh"], semester["start"], semester["end"])
             )
-            _ = input("Is it correct? [y/N] ")
-            if _ == "y":
+            if args.yes:
+                print("Auto-confirming semester (--yes flag provided)")
                 semester_code = semester["code"]
                 break
+            else:
+                _ = input("Is it correct? [y/N] ")
+                if _ == "y":
+                    semester_code = semester["code"]
+                    break
     if semester_code is None:
         print("Cannot find semester with id %s" % semester_id)
         exit(-1)
@@ -165,13 +170,18 @@ def load_courses(args):
         # example: a course has several "特邀教师", which breaks following assumption
         if len(teacher_names) != len(set(teacher_names)):
             print("Duplicated teacher names: %s" % teacher_names)
-            _ = input("Do you wanna deduplicate teacher names list? [y/N] ")
-            if _ == "y":
+            if args.yes:
+                print("Auto-deduplicating teacher names (--yes flag provided)")
                 teacher_names = list(set(teacher_names))
                 print("Deduplicated teachers: %s" % teacher_names)
             else:
-                print("Abort.")
-                exit(-1)
+                _ = input("Do you wanna deduplicate teacher names list? [y/N] ")
+                if _ == "y":
+                    teacher_names = list(set(teacher_names))
+                    print("Deduplicated teachers: %s" % teacher_names)
+                else:
+                    print("Abort.")
+                    exit(-1)
 
         course_key = course["cn"] + "(" + ",".join(sorted(teacher_names)) + ")"
         if course_key in courses_map:
@@ -266,6 +276,11 @@ if __name__ == "__main__":
         "--import-stopped-course",
         action="store_true",
         help="import stopped (停开) courses",
+    )
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="automatically confirm prompts (non-interactive mode)",
     )
 
     args = parser.parse_args()

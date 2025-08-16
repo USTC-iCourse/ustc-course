@@ -173,7 +173,8 @@ def main():
                 'import_courses_catalog.py',
                 '--id', str(semester_id),
                 '--semester', str(semester_file),
-                '--lesson', str(lesson_file)
+                '--lesson', str(lesson_file),
+                '--yes'  # Non-interactive mode
             ]
             
             # Ensure we're in the correct directory and import script exists
