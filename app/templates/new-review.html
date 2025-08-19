@@ -56,7 +56,11 @@
         <link rel="stylesheet" href="/static/css/star-rating.min.css" media="all" rel="stylesheet" type="text/css">
         <div class="ud-pd-sm">
           <span class="weight-heavy pull-left">评个分吧？</span>
-          <div id="rate-star-container">
+          <div class="pull-right">
+            <input id="clear-rating-checkbox" type="checkbox" style="margin-right: 5px;">
+            <label for="clear-rating-checkbox" style="font-weight: normal; margin-bottom: 0; cursor: pointer;">只写点评不评分</label>
+          </div>
+          <div id="rate-star-container" style="clear: both; padding-top: 5px;">
             <input id="rate-star" name="rate" value="{{ review.rate / 2.0 if review.rate else 0 }}">
           </div>
           <span class="clearfix"></span>
@@ -142,7 +146,6 @@ $(function(){
     }
 
     var allowUnrated = false;
-    var unratedClickCount = 0;
 
     function startStarRating() {
         $('#rate-star').rating({
@@ -160,25 +163,46 @@ $(function(){
                 return "blue";
             },
         });
+    }
     
-        // allow not rating a course after 5 consecutive clicks
-        $('.star-rating .caption').click(function(e) {
-            e.preventDefault();
-            ++unratedClickCount;
-            if (unratedClickCount >= 5) {
-                allowUnrated = true;
-                unratedClickCount = 0;
-                // reset star rating
-                $('.rating-container').remove();
-                $('#rate-star-container').html('<input id="rate-star" name="rate" value="0">');
-                startStarRating();
-                // display a special caption
-                $('.star-rating .caption .blue').text("你可以提交没有评分的点评 :)");
+    function toggleRatingMode() {
+        if ($('#clear-rating-checkbox').is(':checked')) {
+            // Show confirm dialog to encourage rating
+            var confirmed = confirm('评分能帮助其他同学更好地选课，建议您为课程评个分哦！\n\n确定要只写点评不评分吗？');
+            
+            if (!confirmed) {
+                // User cancelled, uncheck the checkbox
+                $('#clear-rating-checkbox').prop('checked', false);
+                return;
             }
-        });
+            
+            // Enable "review only" mode
+            allowUnrated = true;
+            // Clear existing rating and disable star rating
+            $('#rate-star').val(0).trigger('change');
+            $('.rating-container .star').addClass('disabled').css('pointer-events', 'none').css('opacity', '0.5');
+            
+            // Clear all poll selections (课程难度, 作业多少, 给分好坏, 收获多少)
+            $('.review-poll input[type="radio"]:checked').prop('checked', false);
+            $('.review-poll .btn.active').removeClass('active');
+            
+            // Update caption to show review-only mode
+            $('.star-rating .caption .blue').text("你可以提交没有评分的点评 :)");
+        } else {
+            // Re-enable rating mode
+            allowUnrated = false;
+            $('.rating-container .star').removeClass('disabled').css('pointer-events', 'auto').css('opacity', '1');
+            // Reset caption
+            $('.star-rating .caption .blue').text("0");
+        }
     }
 
     startStarRating();
+    
+    // Handle checkbox for clearing rating
+    $('#clear-rating-checkbox').on('change', function() {
+        toggleRatingMode();
+    });
 
     $('#review-form').submit(function(e) {
         e.preventDefault();
