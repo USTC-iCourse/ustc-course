@@ -84,10 +84,54 @@ def edit_profile(teacher_id):
         errors.append(_("Teacher info is locked, please contact administrator to unlock"))
     elif form.validate_on_submit():
         #teacher.gender = form['gender'].data
-        form['homepage'].data = form['homepage'].data.strip()
-        if not form['homepage'].data.startswith('http'):
-            form['homepage'].data = 'http://' + form['homepage'].data
-        teacher.homepage = form['homepage'].data.strip()
+        # 处理多个主页URL，每行一个
+        homepage_data = form['homepage'].data.strip()
+        if homepage_data:
+            # 分割成多行并处理每个URL
+            homepages = []
+            invalid_urls = []
+            # URL验证的正则表达式
+            url_pattern = re.compile(
+                r'^https?://'  # http:// 或 https://
+                r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # 域名
+                r'localhost|'  # localhost
+                r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # IP地址
+                r'(?::\d+)?'  # 可选的端口
+                r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+            
+            for line_num, line in enumerate(homepage_data.split('\n'), 1):
+                homepage = line.strip()
+                if homepage:  # 忽略空行
+                    # 检查URL中是否包含空格（可能是多个URL写在同一行）
+                    if ' ' in homepage or '\t' in homepage:
+                        invalid_urls.append(f"第{line_num}行包含空白字符，可能包含多个URL或格式错误：{homepage}")
+                        continue
+                    
+                    # 为没有协议的URL添加http://
+                    if not homepage.startswith(('http://', 'https://')):
+                        homepage = 'http://' + homepage
+                    
+                    # 使用正则表达式验证URL格式
+                    if not url_pattern.match(homepage):
+                        invalid_urls.append(f"第{line_num}行URL格式无效：{homepage}")
+                        continue
+                    
+                    # 检查URL长度（避免过长的URL）
+                    if len(homepage) > 500:
+                        invalid_urls.append(f"第{line_num}行URL过长（超过500字符）：{homepage[:50]}...")
+                        continue
+                    
+                    homepages.append(homepage)
+            
+            # 如果有无效的URL，显示错误
+            if invalid_urls:
+                errors.extend(invalid_urls)
+                return render_template('teacher-settings.html', teacher=teacher, errors=errors, form=form, title='编辑教师信息 - ' + teacher.name)
+            
+            # 用换行符连接所有主页URL存储
+            teacher.homepage = '\n'.join(homepages) if homepages else ''
+        else:
+            teacher.homepage = ''
         teacher.research_interest = form['research_interest'].data.strip()
         if request.files.get('avatar'):
             if teacher.image_locked:

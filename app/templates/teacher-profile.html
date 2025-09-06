@@ -68,7 +68,24 @@
 	<h3 class="blue">{{ teacher.name }}</h3>
 	<p>{{ teacher.dept.name }}</p>
         {% if teacher.homepage and teacher.homepage != 'http://' %}
-	<p>教师主页：<a href="{{ teacher.homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> 戳这里</a></p>
+          {% set homepages = teacher.homepage.split('\n') %}
+          {% set valid_homepages = [] %}
+          {% for homepage in homepages %}
+            {% if homepage.strip() and homepage.strip() != 'http://' %}
+              {% set _ = valid_homepages.append(homepage.strip()) %}
+            {% endif %}
+          {% endfor %}
+          {% if valid_homepages %}
+            {% if valid_homepages|length == 1 %}
+            <p>教师主页：<a href="{{ valid_homepages[0] }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> {{ valid_homepages[0] }}</a></p>
+            {% else %}
+            <p>教师主页：
+              {% for homepage in valid_homepages %}
+              <br><a href="{{ homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> {{ homepage }}</a>
+              {% endfor %}
+            </p>
+            {% endif %}
+          {% endif %}
 	{% endif %}
 	{% if teacher.research_interest %}
 	<p>研究方向：{{ teacher.research_interest }}</p>

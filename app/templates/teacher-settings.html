@@ -10,6 +10,17 @@
       {% if current_user.is_admin or not teacher.info_locked %}
       <p><a href="{{ url_for('teacher.profile_history', teacher_id=teacher.id) }}">查看编辑历史（共 {{ teacher.info_history_count }} 次）</a></p>
       {% endif %}
+      
+      {% if errors %}
+      <div class="alert alert-danger">
+        <strong>错误：</strong>
+        <ul style="margin-bottom: 0;">
+        {% for error in errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
 
       <form class="form-horizontal" method="post" enctype="multipart/form-data">
         {{ form.csrf_token }}
@@ -49,7 +60,8 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">教师主页</label>
           <div class="col-sm-5">
-            <input type="text" class="form-control" name="homepage" {% if form.homepage.data %}value="{{ form.homepage.data }}"{% else %}placeholder="教师介绍网页"{% endif %}>
+            <textarea class="form-control" name="homepage" rows="3" placeholder="教师介绍网页（支持多个主页，每行一个URL）">{% if form.homepage.data %}{{ form.homepage.data }}{% endif %}</textarea>
+            <small class="text-muted">可输入多个主页地址，每行一个</small>
           </div>
         </div>
 
