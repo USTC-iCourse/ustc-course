@@ -51,6 +51,15 @@ def index():
     per_page = request.args.get('per_page', 10, type=int)
     sort_by = request.args.get('sort_by', None, type=str)
     course_type = request.args.get('course_type', None, type=str)
+    
+    # Clean up course_type parameter - remove any query string parts that might be incorrectly appended
+    if course_type and '?' in course_type:
+        course_type = course_type.split('?')[0]
+    
+    # Validate course_type is in allowed values
+    if course_type and course_type not in course_type_dict.keys():
+        course_type = None
+    
     course_query = Course.query
 
     # 课程类型

@@ -42,7 +42,7 @@
       {% if title %}
         <span class="blue h4 desktop">{{ title }}</span>
 	<span class="blue h5 mobile">
-	  {% if this_module and this_module=='course.index' and course_type_dict and course_type %}
+	  {% if this_module and this_module=='course.index' and course_type_dict and course_type and course_type in course_type_dict %}
 		「{{ course_type_dict[course_type][0] }}」
           {% endif %}
 		{{ title }}
