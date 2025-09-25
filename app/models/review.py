@@ -1,6 +1,7 @@
 from flask import url_for, Markup
 from datetime import datetime
 from app import db
+from sqlalchemy.dialects.mysql import LONGTEXT
 import html2text
 try:
     from flask_login import current_user
@@ -21,7 +22,7 @@ class Review(db.Model):
     grading = db.Column(db.Integer,db.CheckConstraint('grading>=1 and grading<=3'))
     gain = db.Column(db.Integer,db.CheckConstraint('gain>=1 and gain<=3'))
     rate = db.Column(db.Integer,db.CheckConstraint('rate>=1 and rate<=10'))  #课程评分
-    content = db.Column(db.Text())
+    content = db.Column(LONGTEXT)
 
     publish_time = db.Column(db.DateTime(),default=datetime.utcnow)
     update_time = db.Column(db.DateTime(),default=datetime.utcnow)
@@ -223,7 +224,7 @@ class ReviewHistory(db.Model):
     grading = db.Column(db.Integer)
     gain = db.Column(db.Integer)
     rate = db.Column(db.Integer)
-    content = db.Column(db.Text())
+    content = db.Column(LONGTEXT)
 
     publish_time = db.Column(db.DateTime, default=datetime.utcnow)
     update_time = db.Column(db.DateTime, default=datetime.utcnow)

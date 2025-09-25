@@ -7,6 +7,7 @@ from .course import Course
 from .review import Review
 import jieba
 import html2text
+from sqlalchemy.dialects.mysql import LONGTEXT
 
 
 auto_update = app.config.get("UPDATE_SEARCH_CACHE", False)
@@ -77,7 +78,7 @@ class ReviewSearchCache(db.Model):
     id = db.Column(
         db.Integer, db.ForeignKey("reviews.id", ondelete="CASCADE"), primary_key=True
     )
-    text = db.Column(db.Text(collation="utf8mb4_unicode_ci"), nullable=False)
+    text = db.Column(LONGTEXT(collation="utf8mb4_unicode_ci"), nullable=False)
 
     # mysql full text search index
     __table_args__ = (
