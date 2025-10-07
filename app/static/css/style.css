@@ -303,6 +303,44 @@ a.nounderline,
 a.nounderline:hover,
 a.nounderline:active { text-decoration: none; }
 
+/* 搜索建议下拉框 */
+#search-suggestions {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 3px 3px 2px #ddd;
+}
+
+#search-suggestions li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#search-suggestions .search-suggestion-item {
+  display: block;
+  padding: 8px 12px;
+  color: #333;
+  text-decoration: none;
+  line-height: 25px;
+  word-wrap: break-word;
+}
+
+#search-suggestions .search-suggestion-item:hover,
+#search-suggestions .search-suggestion-item.active {
+  color: #fff;
+  background-color: #1caaea;
+  text-decoration: none;
+}
+
+#search-suggestions .search-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+#search-suggestions .search-suggestion-item:not(:last-child) {
+  border-bottom: 1px #ddd dashed;
+}
+
 /* styles for star rating... */
 .rate-part .btn { box-shadow: none; }
 .rating-stars { color: #337ab7 !important; }
