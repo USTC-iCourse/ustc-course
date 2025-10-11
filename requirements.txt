@@ -15,7 +15,7 @@ tqdm==4.66.3
 html2text==2020.1.16
 markdown==3.4.1
 pytz==2021.1
-werkzeug==3.0.3
+werkzeug==3.0.6
 cachelib==0.10.2
 email_validator==2.0.0
 gunicorn==22.0.0
