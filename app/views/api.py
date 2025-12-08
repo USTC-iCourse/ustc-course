@@ -423,7 +423,7 @@ def unblock_user():
     return jsonify(ok=True)
 
 
-@api.route('/search/token', methods=['GET'])
+@api.route('/search/token', methods=['POST'])
 def get_search_token():
     '''Generate a one-time token for search API'''
     # Get client IP address (handle proxies)

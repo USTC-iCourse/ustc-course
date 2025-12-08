@@ -44,9 +44,9 @@
     
     e.preventDefault();
     
-    // Fetch search token
+    // Fetch search token (using POST to prevent caching)
     $.ajax({
-      type: "GET",
+      type: "POST",
       url: "{{ url_for('api.get_search_token') }}",
       dataType: "json",
       success: function(res) {
@@ -70,9 +70,9 @@
     var link = $(this);
     var href = link.attr('href');
     
-    // Fetch search token
+    // Fetch search token (using POST to prevent caching)
     $.ajax({
-      type: "GET",
+      type: "POST",
       url: "{{ url_for('api.get_search_token') }}",
       dataType: "json",
       success: function(res) {
