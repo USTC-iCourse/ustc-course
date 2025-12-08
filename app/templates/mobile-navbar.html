@@ -1,7 +1,7 @@
       {% if this_module == 'home.search_reviews' %}
-      <form class="mobile ud-pd-sm" action="{{ url_for('home.search_reviews') }}" method="get">
+      <form class="mobile ud-pd-sm mobile-search-form" action="{{ url_for('home.search_reviews') }}" method="get" role="search">
       {% else %}
-      <form class="mobile ud-pd-sm" action="{{ url_for('home.search') }}" method="get">
+      <form class="mobile ud-pd-sm mobile-search-form" action="{{ url_for('home.search') }}" method="get" role="search">
       {% endif %}
         <div class="form-group" style="margin-bottom: 3px;">
           <input type="text" name="q" class="form-control input" placeholder="搜索你感兴趣的课程" value="{{ keyword or '' }}">

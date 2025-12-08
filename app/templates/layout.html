@@ -203,8 +203,8 @@
     });
   }
 
-  // Handle search form submission with token
-  $('.navbar-form[role="search"]').submit(function(e) {
+  // Handle search form submission with token (both desktop and mobile)
+  $('.navbar-form[role="search"], .mobile-search-form').submit(function(e) {
     e.preventDefault();
     var form = $(this);
     var searchQuery = form.find('input[name="q"]').val();
