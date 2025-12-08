@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken, CourseRate, Review, follow_course, follow_user, SearchLog, ThirdPartySigninHistory, Announcement, PasswordResetToken
+from app.models import User, RevokedToken, CourseRate, Review, follow_course, follow_user, SearchLog, ThirdPartySigninHistory, Announcement, PasswordResetToken, SearchToken
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail
 from flask_babel import gettext as _
@@ -320,6 +320,15 @@ def reset_password(token):
 def search_reviews():
     ''' 搜索点评内容 '''
     query_str = request.args.get('q')
+    
+    # Validate search token
+    search_token = request.args.get('token')
+    if not search_token or not SearchToken.validate_and_use(search_token):
+        return render_template('error-page.html', code=403, 
+                             message='页面已过期，请重新搜索。',
+                             search_keyword=query_str,
+                             search_type='reviews',
+                             is_search_error=True), 403
     if not query_str:
         return redirect_to_index()
 
@@ -359,6 +368,15 @@ def search_reviews():
 def search():
     ''' 搜索 '''
     query_str = request.args.get('q')
+    
+    # Validate search token
+    search_token = request.args.get('token')
+    if not search_token or not SearchToken.validate_and_use(search_token):
+        return render_template('error-page.html', code=403, 
+                             message='页面已过期，请重新搜索。',
+                             search_keyword=query_str,
+                             search_type='courses',
+                             is_search_error=True), 403
     if not query_str:
         return redirect_to_index()
     noredirect = request.args.get('noredirect')
@@ -398,6 +416,8 @@ def search():
     elif noredirect:
         title = '您的搜索「' + query_str + '」没有匹配到任何课程或老师'
     else:
+        # When redirecting to search_reviews, we need to get a new token
+        # Pass the token parameter along
         return search_reviews()
 
     search_log = SearchLog()

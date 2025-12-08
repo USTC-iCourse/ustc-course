@@ -58,4 +58,64 @@
 {% endblock %}
 
 {% block script %}
+<script>
+  // Handle pagination links with token
+  $('nav ul.pagination a').click(function(e) {
+    var link = $(this);
+    var href = link.attr('href');
+    
+    // Skip if it's a disabled link or placeholder
+    if (!href || href === '#' || link.parent().hasClass('disabled') || link.parent().hasClass('active')) {
+      e.preventDefault();
+      return false;
+    }
+    
+    e.preventDefault();
+    
+    // Fetch search token
+    $.ajax({
+      type: "GET",
+      url: "{{ url_for('api.get_search_token') }}",
+      dataType: "json",
+      success: function(res) {
+        if (res.ok && res.token) {
+          // Add token to URL
+          var separator = href.indexOf('?') > -1 ? '&' : '?';
+          window.location.href = href + separator + 'token=' + encodeURIComponent(res.token);
+        } else {
+          alert('无法获取搜索令牌，请稍后重试。');
+        }
+      },
+      error: function(e) {
+        alert('无法获取搜索令牌，请稍后重试。');
+      }
+    });
+  });
+
+  // Handle search type switch links (搜点评/搜课程)
+  $('.search-switch-link').click(function(e) {
+    e.preventDefault();
+    var link = $(this);
+    var href = link.attr('href');
+    
+    // Fetch search token
+    $.ajax({
+      type: "GET",
+      url: "{{ url_for('api.get_search_token') }}",
+      dataType: "json",
+      success: function(res) {
+        if (res.ok && res.token) {
+          // Add token to URL
+          var separator = href.indexOf('?') > -1 ? '&' : '?';
+          window.location.href = href + separator + 'token=' + encodeURIComponent(res.token);
+        } else {
+          alert('无法获取搜索令牌，请稍后重试。');
+        }
+      },
+      error: function(e) {
+        alert('无法获取搜索令牌，请稍后重试。');
+      }
+    });
+  });
+</script>
 {% endblock %}

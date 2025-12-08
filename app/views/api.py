@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, Markup, redirect, render_template, abort
 from flask_login import login_required, current_user
 from app.models import Review, ReviewComment, User, Course, ImageStore, Notification
-from app.models import ReviewCommentHistory, ThirdPartySigninHistory
+from app.models import ReviewCommentHistory, ThirdPartySigninHistory, SearchToken
 from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email
 from app.utils import editor_parse_at
@@ -421,3 +421,24 @@ def unblock_user():
     user.time_to_unblock = datetime.utcnow()
     user.save_without_edit()
     return jsonify(ok=True)
+
+
+@api.route('/search/token', methods=['GET'])
+def get_search_token():
+    '''Generate a one-time token for search API'''
+    # Get client IP address (handle proxies)
+    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if ip_address:
+        # X-Forwarded-For can contain multiple IPs, take the first one
+        ip_address = ip_address.split(',')[0].strip()
+    
+    # Optional: Clean up old tokens periodically (only 1% of the time to reduce overhead)
+    import random
+    if random.random() < 0.01:
+        try:
+            SearchToken.cleanup_old_tokens()
+        except:
+            pass  # Don't fail if cleanup fails
+    
+    token = SearchToken.generate(ip_address)
+    return jsonify(ok=True, token=token)

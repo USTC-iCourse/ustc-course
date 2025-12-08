@@ -5,25 +5,80 @@
   <div class="ud-pd-lg">
     {% if code == 404 %}
     <h1 style="color:#366184;">404 Not Found</h1>
-    <p class="ud-pd-md grey px20">哎呀抱歉，你要找的页面找不到了&gt;_&lt; </p>
+    <p class="ud-pd-md grey px20">{% if message %}{{ message }}{% else %}哎呀抱歉，你要找的页面找不到了&gt;_&lt;{% endif %}</p>
     {% elif code == 403 %}
     <h1 style="color:#366184;">403 Forbidden</h1>
-    <p class="ud-pd-md grey px20">哎呀抱歉，您没有权限访问此页面&gt;_&lt; </p>
+    <p class="ud-pd-md grey px20">{% if message %}{{ message }}{% else %}哎呀抱歉，您没有权限访问此页面&gt;_&lt;{% endif %}</p>
     {% elif code == 400 %}
     <h1 style="color:#366184;">400 Bad Request</h1>
-    <p class="ud-pd-md grey px20">哎呀抱歉，您的请求格式错误&gt;_&lt; </p>
+    <p class="ud-pd-md grey px20">{% if message %}{{ message }}{% else %}哎呀抱歉，您的请求格式错误&gt;_&lt;{% endif %}</p>
     {% elif code == 500 %}
     <h1 style="color:#366184;">500 Internal Server Error</h1>
-    <p class="ud-pd-md grey px20">哎呀抱歉，服务器给跪了&gt;_&lt; </p>
+    <p class="ud-pd-md grey px20">{% if message %}{{ message }}{% else %}哎呀抱歉，服务器给跪了&gt;_&lt;{% endif %}</p>
     {% elif code == 502 %}
     <h1 style="color:#366184;">502 Bad Gateway</h1>
-    <p class="ud-pd-md grey px20">哎呀抱歉，服务器给跪了&gt;_&lt; </p>
+    <p class="ud-pd-md grey px20">{% if message %}{{ message }}{% else %}哎呀抱歉，服务器给跪了&gt;_&lt;{% endif %}</p>
     {% else %}
     <h1 style="color:#366184;">HTTP Error {{ code }}</h1>
-    <p class="ud-pd-md grey px20">哎呀抱歉，服务器给跪了&gt;_&lt; </p>
+    <p class="ud-pd-md grey px20">{% if message %}{{ message }}{% else %}哎呀抱歉，服务器给跪了&gt;_&lt;{% endif %}</p>
     {% endif %}
+    
+    {% if is_search_error %}
+    <div class="ud-pd-md" style="max-width: 500px; margin: 0 auto;">
+      <form id="retry-search-form" class="form-inline" style="display: flex; justify-content: center;">
+        <div class="form-group" style="flex: 1; margin-right: 10px;">
+          <input type="text" name="q" class="form-control" id="search-retry" placeholder="{% if search_type == 'reviews' %}搜索点评内容{% else %}搜索课程、老师{% endif %}" style="width: 100%;" value="{{ search_keyword or '' }}">
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <span class="glyphicon glyphicon-search"></span> 重新搜索
+        </button>
+      </form>
+    </div>
+    {% else %}
     <div class="ud-pd-lg"></div>
+    {% endif %}
+    
     <p class="ud-pd-lg grey">如果这是网站的bug，或者要找的页面你很重要，请邮件联系我们：<span class="blue">service@icourse.club</span></p>
   </div>
 </div>
+
+{% if is_search_error %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $('#retry-search-form').submit(function(e) {
+    e.preventDefault();
+    var searchQuery = $('#search-retry').val();
+    var searchType = '{{ search_type }}';  // 'courses' or 'reviews'
+    
+    if (!searchQuery || searchQuery.trim() === '') {
+      alert('请输入搜索关键词');
+      return false;
+    }
+    
+    // Fetch search token
+    $.ajax({
+      type: "GET",
+      url: "/api/search/token",
+      dataType: "json",
+      success: function(res) {
+        if (res.ok && res.token) {
+          // Redirect to appropriate search endpoint based on type
+          var searchUrl;
+          if (searchType === 'reviews') {
+            searchUrl = '/search-reviews/?q=' + encodeURIComponent(searchQuery) + '&token=' + encodeURIComponent(res.token);
+          } else {
+            searchUrl = '/search/?q=' + encodeURIComponent(searchQuery) + '&token=' + encodeURIComponent(res.token);
+          }
+          window.location.href = searchUrl;
+        } else {
+          alert('无法获取搜索令牌，请稍后重试。');
+        }
+      },
+      error: function(e) {
+        alert('无法获取搜索令牌，请稍后重试。');
+      }
+    });
+  });
+</script>
+{% endif %}
 {% endblock %}

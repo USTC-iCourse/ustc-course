@@ -1,5 +1,58 @@
 from app import db
-from datetime import datetime
+from datetime import datetime, timedelta
+import secrets
+
+
+class SearchToken(db.Model):
+    """One-time token for search API to prevent DoS attacks"""
+    __tablename__ = 'search_tokens'
+    
+    token = db.Column(db.String(64), primary_key=True)
+    created_at = db.Column(db.DateTime(), default=datetime.utcnow, nullable=False)
+    used = db.Column(db.Boolean(), default=False, nullable=False)
+    ip_address = db.Column(db.String(45))  # Support IPv6
+    
+    @classmethod
+    def generate(cls, ip_address=None):
+        """Generate a new one-time search token"""
+        token = secrets.token_urlsafe(32)
+        search_token = cls(token=token, ip_address=ip_address)
+        db.session.add(search_token)
+        db.session.commit()
+        return token
+    
+    @classmethod
+    def validate_and_use(cls, token):
+        """Validate and mark token as used. Returns True if valid, False otherwise."""
+        if not token:
+            return False
+            
+        search_token = cls.query.filter_by(token=token).first()
+        if not search_token:
+            return False
+        
+        # Check if already used
+        if search_token.used:
+            return False
+        
+        # Check if expired (tokens expire after 5 minutes)
+        if datetime.utcnow() - search_token.created_at > timedelta(minutes=5):
+            # Clean up expired token
+            db.session.delete(search_token)
+            db.session.commit()
+            return False
+        
+        # Mark as used
+        search_token.used = True
+        db.session.commit()
+        return True
+    
+    @classmethod
+    def cleanup_old_tokens(cls):
+        """Remove tokens older than 1 hour"""
+        cutoff_time = datetime.utcnow() - timedelta(hours=1)
+        cls.query.filter(cls.created_at < cutoff_time).delete()
+        db.session.commit()
 
 
 class RevokedToken(db.Model):

@@ -6,3 +6,4 @@ data
 config/default.py
 migrations
 uploads/
+node_modules/

@@ -194,15 +194,46 @@
      })
    });
 
-   function read_notification(count) {
-     if (count == 0)
-         return;
-     $.ajax({
-        type: "POST",
-        url: "{{ url_for('api.read_notifications') }}",
-     });
-   }
-  </script>
+  function read_notification(count) {
+    if (count == 0)
+        return;
+    $.ajax({
+       type: "POST",
+       url: "{{ url_for('api.read_notifications') }}",
+    });
+  }
+
+  // Handle search form submission with token
+  $('.navbar-form[role="search"]').submit(function(e) {
+    e.preventDefault();
+    var form = $(this);
+    var searchQuery = form.find('input[name="q"]').val();
+    
+    if (!searchQuery || searchQuery.trim() === '') {
+      return false;
+    }
+    
+    // Fetch search token
+    $.ajax({
+      type: "GET",
+      url: "{{ url_for('api.get_search_token') }}",
+      dataType: "json",
+      success: function(res) {
+        if (res.ok && res.token) {
+          // Add token to form action and submit
+          var action = form.attr('action');
+          var separator = action.indexOf('?') > -1 ? '&' : '?';
+          window.location.href = action + separator + 'q=' + encodeURIComponent(searchQuery) + '&token=' + encodeURIComponent(res.token);
+        } else {
+          alert('无法获取搜索令牌，请稍后重试。');
+        }
+      },
+      error: function(e) {
+        alert('无法获取搜索令牌，请稍后重试。');
+      }
+    });
+  });
+ </script>
 
   {% block script %} {% endblock %}
 </html>
