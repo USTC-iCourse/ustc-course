@@ -9,8 +9,8 @@ bind = "127.0.0.1:3000"
 workers = 32
 
 # Logging
-accesslog = "/var/log/ustc-course-access.log"
-errorlog = "/var/log/ustc-course-error.log"
+accesslog = "/var/log/ustc-course/ustc-course-access.log"
+errorlog = "/var/log/ustc-course/ustc-course-error.log"
 loglevel = "info"
 
 # Capture print statements and errors
