@@ -31,8 +31,9 @@ class SearchToken(db.Model):
             raise
     
     @classmethod
-    def validate_and_use(cls, token):
-        """Validate and mark token as used. Returns True if valid, False otherwise."""
+    def validate_and_use(cls, token, ip_address=None):
+        """Validate and mark token as used. Returns True if valid, False otherwise.
+        Allows reuse from the same IP address within expiration period."""
         if not token:
             logger.warning("Token validation failed: No token provided")
             return False
@@ -44,12 +45,6 @@ class SearchToken(db.Model):
                 logger.warning(f"Token validation failed: Token not found in database: {token[:10]}...")
                 return False
             
-            # Check if already used
-            if search_token.used:
-                logger.warning(f"Token validation failed: Token already used: {token[:10]}...")
-                db.session.rollback()
-                return False
-            
             # Check if expired (tokens expire after 5 minutes)
             token_age = datetime.utcnow() - search_token.created_at
             if token_age > timedelta(minutes=5):
@@ -59,10 +54,22 @@ class SearchToken(db.Model):
                 db.session.commit()
                 return False
             
-            # Mark as used
+            # Check if already used
+            if search_token.used:
+                # Allow reuse from the same IP address
+                if ip_address and search_token.ip_address == ip_address:
+                    logger.info(f"Token reused by same IP: {token[:10]}... from {ip_address}")
+                    db.session.rollback()
+                    return True
+                else:
+                    logger.warning(f"Token validation failed: Token already used by different IP: {token[:10]}... (original IP: {search_token.ip_address}, request IP: {ip_address})")
+                    db.session.rollback()
+                    return False
+            
+            # Mark as used (first time)
             search_token.used = True
             db.session.commit()
-            logger.info(f"Token validated successfully: {token[:10]}...")
+            logger.info(f"Token validated successfully (first use): {token[:10]}... from IP: {ip_address}")
             return True
             
         except Exception as e:

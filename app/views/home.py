@@ -323,7 +323,12 @@ def search_reviews():
     
     # Validate search token
     search_token = request.args.get('token')
-    if not search_token or not SearchToken.validate_and_use(search_token):
+    # Get client IP address (handle proxies)
+    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if ip_address:
+        ip_address = ip_address.split(',')[0].strip()
+    
+    if not search_token or not SearchToken.validate_and_use(search_token, ip_address):
         return render_template('error-page.html', code=403, 
                              message='页面已过期，请重新搜索。',
                              search_keyword=query_str,
@@ -371,7 +376,12 @@ def search():
     
     # Validate search token
     search_token = request.args.get('token')
-    if not search_token or not SearchToken.validate_and_use(search_token):
+    # Get client IP address (handle proxies)
+    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if ip_address:
+        ip_address = ip_address.split(',')[0].strip()
+    
+    if not search_token or not SearchToken.validate_and_use(search_token, ip_address):
         return render_template('error-page.html', code=403, 
                              message='页面已过期，请重新搜索。',
                              search_keyword=query_str,
