@@ -15,44 +15,65 @@ class SearchToken(db.Model):
     @classmethod
     def generate(cls, ip_address=None):
         """Generate a new one-time search token"""
-        token = secrets.token_urlsafe(32)
-        search_token = cls(token=token, ip_address=ip_address)
-        db.session.add(search_token)
-        db.session.commit()
-        return token
+        try:
+            token = secrets.token_urlsafe(32)
+            search_token = cls(token=token, ip_address=ip_address)
+            db.session.add(search_token)
+            db.session.commit()
+            return token
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error generating search token: {e}")
+            raise
     
     @classmethod
     def validate_and_use(cls, token):
         """Validate and mark token as used. Returns True if valid, False otherwise."""
         if not token:
             return False
+        
+        try:
+            # Use row-level locking to prevent race conditions
+            search_token = cls.query.filter_by(token=token).with_for_update().first()
+            if not search_token:
+                return False
             
-        search_token = cls.query.filter_by(token=token).first()
-        if not search_token:
-            return False
-        
-        # Check if already used
-        if search_token.used:
-            return False
-        
-        # Check if expired (tokens expire after 5 minutes)
-        if datetime.utcnow() - search_token.created_at > timedelta(minutes=5):
-            # Clean up expired token
-            db.session.delete(search_token)
+            # Check if already used
+            if search_token.used:
+                db.session.rollback()
+                return False
+            
+            # Check if expired (tokens expire after 5 minutes)
+            if datetime.utcnow() - search_token.created_at > timedelta(minutes=5):
+                # Clean up expired token
+                db.session.delete(search_token)
+                db.session.commit()
+                return False
+            
+            # Mark as used
+            search_token.used = True
             db.session.commit()
+            return True
+            
+        except Exception as e:
+            # Log the error and rollback
+            db.session.rollback()
+            # In production, you might want to log this to a file
+            print(f"Error validating search token: {e}")
             return False
-        
-        # Mark as used
-        search_token.used = True
-        db.session.commit()
-        return True
     
     @classmethod
     def cleanup_old_tokens(cls):
         """Remove tokens older than 1 hour"""
-        cutoff_time = datetime.utcnow() - timedelta(hours=1)
-        cls.query.filter(cls.created_at < cutoff_time).delete()
-        db.session.commit()
+        try:
+            cutoff_time = datetime.utcnow() - timedelta(hours=1)
+            deleted_count = cls.query.filter(cls.created_at < cutoff_time).delete()
+            db.session.commit()
+            return deleted_count
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error cleaning up old tokens: {e}")
+            return 0
 
 
 class RevokedToken(db.Model):

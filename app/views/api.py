@@ -33,7 +33,7 @@ def review_upvote():
         else:
             return jsonify(ok=False,message="The review doesn't exist.")
     else:
-        return jsonify(ok=false,message="A id must be given")
+        return jsonify(ok=False,message="A id must be given")
 
 @api.route('/review/cancel_upvote/',methods=['POST'])
 @login_required
@@ -424,21 +424,28 @@ def unblock_user():
 
 
 @api.route('/search/token', methods=['POST'])
+@app.csrf.exempt
 def get_search_token():
-    '''Generate a one-time token for search API'''
-    # Get client IP address (handle proxies)
-    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
-    if ip_address:
-        # X-Forwarded-For can contain multiple IPs, take the first one
-        ip_address = ip_address.split(',')[0].strip()
-    
-    # Optional: Clean up old tokens periodically (only 1% of the time to reduce overhead)
-    import random
-    if random.random() < 0.01:
-        try:
-            SearchToken.cleanup_old_tokens()
-        except:
-            pass  # Don't fail if cleanup fails
-    
-    token = SearchToken.generate(ip_address)
-    return jsonify(ok=True, token=token)
+    '''Generate a one-time token for search API (public endpoint, CSRF exempt)'''
+    try:
+        # Get client IP address (handle proxies)
+        ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
+        if ip_address:
+            # X-Forwarded-For can contain multiple IPs, take the first one
+            ip_address = ip_address.split(',')[0].strip()
+        
+        # Optional: Clean up old tokens periodically (only 1% of the time to reduce overhead)
+        import random
+        if random.random() < 0.01:
+            try:
+                SearchToken.cleanup_old_tokens()
+            except:
+                pass  # Don't fail if cleanup fails
+        
+        token = SearchToken.generate(ip_address)
+        return jsonify(ok=True, token=token)
+        
+    except Exception as e:
+        # Log the error and return failure
+        print(f"Error in get_search_token: {e}")
+        return jsonify(ok=False, error='Failed to generate token'), 500
