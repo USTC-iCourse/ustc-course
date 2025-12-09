@@ -14,9 +14,11 @@ import hashlib
 import urllib
 import re
 import os
+import logging
 from datetime import datetime, timedelta
 
 api = Blueprint('api',__name__)
+logger = logging.getLogger(__name__)
 
 
 @api.route('/review/upvote/',methods=['POST'])
@@ -447,5 +449,5 @@ def get_search_token():
         
     except Exception as e:
         # Log the error and return failure
-        print(f"Error in get_search_token: {e}")
+        logger.error(f"Error in get_search_token: {e}", exc_info=True)
         return jsonify(ok=False, error='Failed to generate token'), 500

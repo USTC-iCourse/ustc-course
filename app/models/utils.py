@@ -1,6 +1,9 @@
 from app import db
 from datetime import datetime, timedelta
 import secrets
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SearchToken(db.Model):
@@ -23,7 +26,7 @@ class SearchToken(db.Model):
             return token
         except Exception as e:
             db.session.rollback()
-            print(f"Error generating search token: {e}")
+            logger.error(f"Error generating search token: {e}", exc_info=True)
             raise
     
     @classmethod
@@ -58,8 +61,7 @@ class SearchToken(db.Model):
         except Exception as e:
             # Log the error and rollback
             db.session.rollback()
-            # In production, you might want to log this to a file
-            print(f"Error validating search token: {e}")
+            logger.error(f"Error validating search token: {e}", exc_info=True)
             return False
     
     @classmethod
@@ -72,7 +74,7 @@ class SearchToken(db.Model):
             return deleted_count
         except Exception as e:
             db.session.rollback()
-            print(f"Error cleaning up old tokens: {e}")
+            logger.error(f"Error cleaning up old tokens: {e}", exc_info=True)
             return 0
 
 
