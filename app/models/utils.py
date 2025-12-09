@@ -23,6 +23,7 @@ class SearchToken(db.Model):
             search_token = cls(token=token, ip_address=ip_address)
             db.session.add(search_token)
             db.session.commit()
+            logger.info(f"Generated search token: {token[:10]}... for IP: {ip_address}")
             return token
         except Exception as e:
             db.session.rollback()
@@ -33,21 +34,26 @@ class SearchToken(db.Model):
     def validate_and_use(cls, token):
         """Validate and mark token as used. Returns True if valid, False otherwise."""
         if not token:
+            logger.warning("Token validation failed: No token provided")
             return False
         
         try:
             # Use row-level locking to prevent race conditions
             search_token = cls.query.filter_by(token=token).with_for_update().first()
             if not search_token:
+                logger.warning(f"Token validation failed: Token not found in database: {token[:10]}...")
                 return False
             
             # Check if already used
             if search_token.used:
+                logger.warning(f"Token validation failed: Token already used: {token[:10]}...")
                 db.session.rollback()
                 return False
             
             # Check if expired (tokens expire after 5 minutes)
-            if datetime.utcnow() - search_token.created_at > timedelta(minutes=5):
+            token_age = datetime.utcnow() - search_token.created_at
+            if token_age > timedelta(minutes=5):
+                logger.warning(f"Token validation failed: Token expired (age: {token_age}): {token[:10]}...")
                 # Clean up expired token
                 db.session.delete(search_token)
                 db.session.commit()
@@ -56,12 +62,13 @@ class SearchToken(db.Model):
             # Mark as used
             search_token.used = True
             db.session.commit()
+            logger.info(f"Token validated successfully: {token[:10]}...")
             return True
             
         except Exception as e:
             # Log the error and rollback
             db.session.rollback()
-            logger.error(f"Error validating search token: {e}", exc_info=True)
+            logger.error(f"Error validating search token {token[:10]}...: {e}", exc_info=True)
             return False
     
     @classmethod
