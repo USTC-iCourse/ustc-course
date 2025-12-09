@@ -32,8 +32,11 @@
 	{% else %}
         <form class="navbar-form navbar-left desktop" action="{{ url_for('home.search') }}" method="get" role="search">
 	{% endif %}
-          <div class="form-group">
-            <input type="text" name="q" class="form-control" id="search" placeholder="搜索课程、老师" style="width: 235px" value="{{ keyword or '' }}">
+          <div class="form-group" style="position: relative;">
+            <input type="text" name="q" class="form-control" id="search" placeholder="搜索课程、老师" style="width: 235px" value="{{ keyword or '' }}" autocomplete="off">
+            <!-- 搜索建议下拉框 -->
+            <div id="search-suggestions" class="dropdown-menu" style="display: none; position: absolute; top: 100%; left: 0; width: 235px; max-height: 300px; overflow-y: auto; z-index: 1000;">
+            </div>
           </div>
           <span class="desktop-wide">
             <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search grey"></span></button>
@@ -155,6 +158,124 @@
   <script type="text/javascript" id="MathJax-script" async src="/static/MathJax/es5/tex-svg.js"></script>
   {% include 'common-scripts.html' %}
   <script>
+   var searchTimeout;
+   var currentRequest;
+
+   function performSearch(query, delay) {
+     if (searchTimeout) {
+       clearTimeout(searchTimeout);
+     }
+     if (currentRequest) {
+       currentRequest.abort();
+     }
+     if (query.length < 2) {
+       $('#search-suggestions').html('');
+       $('#search-suggestions').hide();
+       return;
+     }
+     var searchFunction = function() {
+       currentRequest = $.ajax({
+         type: "GET",
+         url: "{{ url_for('home.search_courses') }}",
+         data: { q: query },
+         dataType: "json",
+         success: function(res) {
+           if (res.length > 0) {
+             showSearchSuggestions(res);
+           } else {
+             $('#search-suggestions').hide();
+           }
+         },
+         error: function(xhr) {
+           if (xhr.statusText !== 'abort') {
+             $('#search-suggestions').hide();
+           }
+         },
+         complete: function() {
+           currentRequest = null;
+         }
+       });
+     };
+     if (delay) {
+       searchTimeout = setTimeout(searchFunction, delay);
+     } else {
+       searchFunction();
+     }
+   }
+
+   $('#search').on('input', function() {
+     var query = $(this).val().trim();
+     performSearch(query, 500);
+   });
+
+   $('#search').on('focus', function() {
+     var query = $(this).val().trim();
+     if (query !== '') {
+       if ($('#search-suggestions').html().trim() !== '') {
+         $('#search-suggestions').show();
+       } else {
+         performSearch(query, 0);
+       }
+     }
+   });
+
+   function showSearchSuggestions(suggestions) {
+     var suggestionsHtml = '';
+     suggestions.forEach(function(suggestion) {
+       suggestionsHtml += '<li><a href="#" class="search-suggestion-item" data-name="' + 
+                         suggestion.replace(/"/g, '&quot;') + '">' + suggestion + '</a></li>';
+     });
+     
+     $('#search-suggestions').html(suggestionsHtml).show();
+   }
+
+   $(document).on('click', '.search-suggestion-item', function(e) {
+     e.preventDefault();
+     var courseName = $(this).data('name');
+     window.location.href = "{{ url_for('home.search') }}?q=" + encodeURIComponent(courseName) + "&exact=true&noredirect=True";
+   });
+
+   $(document).on('click', function(e) {
+     if (!$(e.target).closest('#search, #search-suggestions').length) {
+       $('#search-suggestions').hide();
+     }
+   });
+
+   var currentSelectedIndex = -1;
+   $('#search').on('keydown', function(e) {
+     var suggestions = $('#search-suggestions .search-suggestion-item');
+     if (e.keyCode === 40) { // DOWN
+       e.preventDefault();
+       currentSelectedIndex++;
+       if (currentSelectedIndex >= suggestions.length) {
+         currentSelectedIndex = 0;
+       }
+       updateSelection(suggestions);
+     } else if (e.keyCode === 38) { // UP
+       e.preventDefault();
+       currentSelectedIndex--;
+       if (currentSelectedIndex < 0) {
+         currentSelectedIndex = suggestions.length - 1;
+       }
+       updateSelection(suggestions);
+     } else if (e.keyCode === 13) { // Enter
+       if (currentSelectedIndex >= 0 && suggestions.length > 0) {
+         e.preventDefault();
+         $(suggestions[currentSelectedIndex]).click();
+       }
+     } else if (e.keyCode === 27) { // ESC
+       $('#search-suggestions').hide();
+       currentSelectedIndex = -1;
+     }
+   });
+
+   function updateSelection(suggestions) {
+     suggestions.removeClass('active');
+     if (currentSelectedIndex >= 0) {
+       $(suggestions[currentSelectedIndex]).addClass('active');
+     }
+   }
+
    $('#signin').on('shown.bs.modal', function () {
      $('#inputEmail').focus()
    });

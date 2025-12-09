@@ -22,7 +22,7 @@ def init() -> None:
     pass
 
 
-def search(keywords: List[str], page: int, per_page: int) -> MyPagination:
+def search(keywords: List[str], page: int, per_page: int, exact: bool) -> MyPagination:
     def course_query_with_meta(meta):
         return db.session.query(Course, literal_column(str(meta)).label("_meta"))
 
@@ -58,6 +58,8 @@ def search(keywords: List[str], page: int, per_page: int) -> MyPagination:
         # This function is very ugly because sqlalchemy generates anon field names for the literal meta field according to the number of union entries.
         # So, queries with different number of keywords have different ordering field names.
         # Expect to refactor this code.
+        if exact:
+            return query_obj.join(CourseRate).order_by(Course.QUERY_ORDER())
         if len(keywords) == 1:
             ordering_field = "anon_2_anon_3_anon_4_anon_5_"
         else:
@@ -71,7 +73,7 @@ def search(keywords: List[str], page: int, per_page: int) -> MyPagination:
         )
 
     union_keywords = None
-    if len(keywords) >= 2:
+    if len(keywords) >= 2 and not exact:
         union_keywords = teacher_and_course_match_0(
             course_query_with_meta(0), keywords
         ).union(teacher_and_course_match_1(course_query_with_meta(0), keywords))
@@ -83,7 +85,7 @@ def search(keywords: List[str], page: int, per_page: int) -> MyPagination:
             .union(include_match(course_query_with_meta(3), keyword))
             .union(fuzzy_match(course_query_with_meta(4), keyword))
             .union(courseries_match(course_query_with_meta(0), keyword))
-        )
+        ) if not exact else exact_match(course_query_with_meta(0), keyword)
         if union_keywords:
             union_keywords = union_keywords.union(union_courses)
         else:
@@ -98,6 +100,18 @@ def search(keywords: List[str], page: int, per_page: int) -> MyPagination:
     pagination = MyPagination(page=page, per_page=per_page, total=num_results, items=course_objs)
 
     return pagination
+
+
+def search_courses(keyword: str) -> List[str]:
+    if not keyword.strip():
+        return []
+
+    fuzzy_keyword = keyword.replace("%", "")
+    courses = db.session.query(Course.name).filter(
+        Course.name.like("%" + fuzzy_keyword + "%")
+    ).distinct().order_by(Course.name).limit(5).all()
+
+    return [course[0] for course in courses]
 
 
 def search_reviews(keywords: List[str], page: int, per_page: int, current_user) -> Pagination:
