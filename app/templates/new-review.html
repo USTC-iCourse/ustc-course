@@ -126,7 +126,6 @@ function submit_review() {
             alert('Failed to submit review, please try again!');
         } else {
             // remove auto saved content
-            var autoSaveKey = window.location.pathname;
             localStorage.removeItem(autoSaveKey);
             window.location.href = o.next_url;
         }
@@ -146,6 +145,121 @@ $(function(){
     }
 
     var allowUnrated = false;
+    var autoSaveKey = 'review_draft' + window.location.pathname;
+
+    // Helper: Get editor content
+    function getEditorContent() {
+        return window.editor ? window.editor.getData() : $('textarea[name=content]').val();
+    }
+
+    // Helper: Set editor content
+    function setEditorContent(content) {
+        if (window.editor) {
+            window.editor.setData(content);
+        } else {
+            $('textarea[name=content]').val(content);
+        }
+    }
+
+    // Helper: Restore poll selection
+    function restorePoll(name, value) {
+        if (value) {
+            $('input[name=' + name + '][value=' + value + ']').prop('checked', true)
+                .parent().addClass('active');
+        }
+    }
+
+    // Helper: Apply "review only" mode styling
+    function applyReviewOnlyMode() {
+        $('.rating-container .star').addClass('disabled').css('pointer-events', 'none').css('opacity', '0.5');
+        $('.star-rating .caption .blue').text("你可以提交没有评分的点评 :)");
+    }
+
+    // Auto-save function
+    function autoSave() {
+        var draftData = {
+            term: $('select[name=term]').val(),
+            difficulty: $('input[name=difficulty]:checked').val(),
+            homework: $('input[name=homework]:checked').val(),
+            grading: $('input[name=grading]:checked').val(),
+            gain: $('input[name=gain]:checked').val(),
+            rate: $('#rate-star').val(),
+            content: getEditorContent(),
+            is_anonymous: $('#is_anonymous').is(':checked'),
+            only_visible_to_student: $('#only_visible_to_student').is(':checked'),
+            clear_rating_checkbox: $('#clear-rating-checkbox').is(':checked'),
+            timestamp: new Date().getTime()
+        };
+        localStorage.setItem(autoSaveKey, JSON.stringify(draftData));
+        console.log('Draft auto-saved at ' + new Date(draftData.timestamp).toLocaleTimeString());
+    }
+
+    // Restore saved draft
+    function restoreDraft() {
+        var savedData = localStorage.getItem(autoSaveKey);
+        if (!savedData) return;
+
+        try {
+            var draftData = JSON.parse(savedData);
+
+            // Check if draft is not too old (e.g., 7 days)
+            var daysSinceLastSave = (new Date().getTime() - draftData.timestamp) / (1000 * 60 * 60 * 24);
+            if (daysSinceLastSave > 7) {
+                localStorage.removeItem(autoSaveKey);
+                return;
+            }
+
+            // Check if draft has any meaningful content
+            var hasContent = draftData.content && draftData.content.trim().length > 0;
+            var hasRatings = draftData.difficulty || draftData.homework || draftData.grading || draftData.gain || (draftData.rate && draftData.rate > 0);
+
+            if (!hasContent && !hasRatings) {
+                return; // Empty draft, skip restore
+            }
+
+            // Auto-restore without confirmation
+            console.log('Auto-restoring draft from ' + new Date(draftData.timestamp).toLocaleString());
+
+            // Restore term
+            if (draftData.term) {
+                $('select[name=term]').val(draftData.term);
+            }
+
+            // Restore poll selections
+            restorePoll('difficulty', draftData.difficulty);
+            restorePoll('homework', draftData.homework);
+            restorePoll('grading', draftData.grading);
+            restorePoll('gain', draftData.gain);
+
+            // Restore checkboxes
+            $('#is_anonymous').prop('checked', draftData.is_anonymous);
+            $('#only_visible_to_student').prop('checked', draftData.only_visible_to_student);
+
+            // Restore content
+            if (draftData.content) {
+                setEditorContent(draftData.content);
+            }
+
+            // Restore clear rating checkbox
+            if (draftData.clear_rating_checkbox) {
+                $('#clear-rating-checkbox').prop('checked', true);
+                allowUnrated = true;
+            }
+
+            // Restore rate (needs to happen after star rating is fully initialized)
+            if (draftData.rate && draftData.rate > 0) {
+                $('#rate-star').rating('update', draftData.rate);
+            }
+
+            // Apply review-only mode styling if needed
+            if (draftData.clear_rating_checkbox) {
+                applyReviewOnlyMode();
+            }
+        } catch (e) {
+            console.error('Failed to restore draft:', e);
+            localStorage.removeItem(autoSaveKey);
+        }
+    }
 
     function startStarRating() {
         $('#rate-star').rating({
@@ -178,16 +292,12 @@ $(function(){
             
             // Enable "review only" mode
             allowUnrated = true;
-            // Clear existing rating and disable star rating
             $('#rate-star').val(0).trigger('change');
-            $('.rating-container .star').addClass('disabled').css('pointer-events', 'none').css('opacity', '0.5');
             
             // Clear all poll selections (课程难度, 作业多少, 给分好坏, 收获多少)
             $('.review-poll input[type="radio"]:checked').prop('checked', false);
             $('.review-poll .btn.active').removeClass('active');
-            
-            // Update caption to show review-only mode
-            $('.star-rating .caption .blue').text("你可以提交没有评分的点评 :)");
+            applyReviewOnlyMode();
         } else {
             // Re-enable rating mode
             allowUnrated = false;
@@ -198,11 +308,44 @@ $(function(){
     }
 
     startStarRating();
-    
-    // Handle checkbox for clearing rating
+
+    // Auto-save on input changes
+    $('select[name=term]').on('change', autoSave);
+    $('.review-poll input[type=radio]').on('change', autoSave);
+    $('#rate-star').on('change', autoSave);
+    $('#is_anonymous').on('change', autoSave);
+    $('#only_visible_to_student').on('change', autoSave);
     $('#clear-rating-checkbox').on('change', function() {
         toggleRatingMode();
+        autoSave();
     });
+
+    // Wait for CKEditor 5 to be ready, then setup auto-save and restore draft
+    var editorCheckInterval = setInterval(function() {
+        if (window.editor) {
+            clearInterval(editorCheckInterval);
+
+            // Listen to CKEditor 5 changes
+            window.editor.model.document.on('change:data', debounce(autoSave, 1000));
+
+            // Restore draft after both CKEditor and star rating are ready
+            setTimeout(function() {
+                restoreDraft();
+            }, 300);
+        }
+    }, 100);
+
+    // Debounce function to avoid too frequent saves
+    function debounce(func, wait) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                func.apply(context, args);
+            }, wait);
+        };
+    }
 
     $('#review-form').submit(function(e) {
         e.preventDefault();
