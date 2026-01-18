@@ -67,14 +67,18 @@ def send_block_review_email(review):
     email = review.author.email
     subject = '您在课程「' + review.course.name + '」中的点评因违反社区规范，已被屏蔽'
     html = render_template('email/block-review.html', review=review)
-    msg = Message(subject=subject, html=html, recipients=[email])
+    admin_email = app.config.get('ADMIN_EMAIL', 'service@icourse.club')
+    cc = [admin_email]
+    msg = Message(subject=subject, html=html, recipients=[email], cc=cc)
     mail.send(msg)
 
 def send_unblock_review_email(review):
     email = review.author.email
     subject = '您在课程「' + review.course.name + '」中的点评已被解除屏蔽'
     html = render_template('email/unblock-review.html', review=review)
-    msg = Message(subject=subject, html=html, recipients=[email])
+    admin_email = app.config.get('ADMIN_EMAIL', 'service@icourse.club')
+    cc = [admin_email]
+    msg = Message(subject=subject, html=html, recipients=[email], cc=cc)
     mail.send(msg)
 
 
