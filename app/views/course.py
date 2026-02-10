@@ -52,12 +52,12 @@ def index():
     sort_by = request.args.get('sort_by', None, type=str)
     course_type = request.args.get('course_type', None, type=str)
     
-    # Clean up course_type parameter - remove any query string parts that might be incorrectly appended
-    if course_type and '?' in course_type:
-        course_type = course_type.split('?')[0]
+    # Validate sort_by against allowed values
+    if sort_by not in ('popular', 'rating'):
+        sort_by = None
     
     # Validate course_type is in allowed values
-    if course_type and course_type not in course_type_dict.keys():
+    if course_type not in course_type_dict:
         course_type = None
     
     course_query = Course.query
