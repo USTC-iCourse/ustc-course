@@ -107,6 +107,8 @@
 {% block script %}
 <script src="/static/js/star-rating.min.js" type="text/javascript"></script>
 <script>
+var autoSaveKey = 'review_draft' + window.location.pathname;
+
 function submit_review() {
     var url = "{{ url_for('course.new_review', course_id=course.id) }}";
     var data = $('#review-form').serializeArray().reduce(function(obj, item) {
@@ -145,7 +147,6 @@ $(function(){
     }
 
     var allowUnrated = false;
-    var autoSaveKey = 'review_draft' + window.location.pathname;
 
     // Helper: Get editor content
     function getEditorContent() {
