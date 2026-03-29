@@ -9,7 +9,7 @@ from app.utils import send_block_review_email, send_unblock_review_email
 from app.views.review import record_review_history
 from app.views.review import async_update_course_summary
 from flask_babel import gettext as _
-from app import app
+from app import app, limiter
 import hashlib
 import urllib
 import re
@@ -268,6 +268,7 @@ def upload_file():
 
 
 @api.route('/reg_verify', methods=['GET'])
+@limiter.limit("20/minute")
 def reg_verify():
     name = request.args.get('name')
     value = request.args.get('value')

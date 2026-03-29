@@ -14,6 +14,7 @@ from flask_babel import Babel
 from datetime import datetime
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_migrate import Migrate
+from flask_limiter import Limiter
 
 
 app = Flask(__name__)
@@ -23,6 +24,20 @@ toolbar = DebugToolbarExtension(app)
 
 db = SQLAlchemy(app)
 app.csrf = CSRFProtect(app)
+
+
+def _get_client_ip():
+    forwarded = request.headers.get('X-Forwarded-For')
+    if forwarded:
+        return forwarded.split(',')[0].strip()
+    return request.remote_addr or '127.0.0.1'
+
+
+limiter = Limiter(
+    app=app,
+    key_func=_get_client_ip,
+    storage_uri=app.config.get('RATELIMIT_STORAGE_URI', 'memory://'),
+)
 
 # exempt SQLAlchemy explain view from CSRF protection
 # workaround for https://github.com/pallets-eco/flask-debugtoolbar/issues/156
@@ -89,6 +104,10 @@ def page_not_found(e):
 @app.errorhandler(500)
 def page_not_found(e):
     return render_template('error-page.html', code=500), 500
+
+@app.errorhandler(429)
+def ratelimit_exceeded(e):
+    return render_template('error-page.html', code=429), 429
 
 @app.errorhandler(502)
 def page_not_found(e):

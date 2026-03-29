@@ -124,14 +124,50 @@ def load_program_recursive(program_id, tree):
 def load_program(program_id):
     url = site_root + 'api/teach/program/info/' + str(program_id)
     tree_json = requests.get(url, headers=headers)
-    tree = json.loads(tree_json.text)
+    
+    if tree_json.status_code != 200:
+        print(f"Error fetching program {program_id}: status {tree_json.status_code}")
+        return 0
+    
+    try:
+        tree = json.loads(tree_json.text)
+    except json.JSONDecodeError as e:
+        print(f"Error parsing JSON for program {program_id}: {e}")
+        print(f"Response preview: {tree_json.text[:200] if tree_json.text else 'empty'}")
+        return 0
+    
     module_tree = tree['moduleTree']
     return load_program_recursive(program_id, module_tree)
 
 
 def load_tree():
-    tree_json = requests.get(site_root + 'api/teach/program/tree', headers=headers)
-    tree = json.loads(tree_json.text)
+    url = site_root + 'api/teach/program/tree'
+    tree_json = requests.get(url, headers=headers)
+    
+    # Debug: print response status and content preview
+    print(f"Request URL: {url}")
+    print(f"Response status code: {tree_json.status_code}")
+    print(f"Response content-type: {tree_json.headers.get('content-type', 'unknown')}")
+    print(f"Response length: {len(tree_json.text)} chars")
+    if len(tree_json.text) < 500:
+        print(f"Response content: {tree_json.text}")
+    else:
+        print(f"Response preview (first 500 chars): {tree_json.text[:500]}")
+    
+    if tree_json.status_code != 200:
+        print(f"Error: Server returned status {tree_json.status_code}")
+        sys.exit(1)
+    
+    if not tree_json.text.strip():
+        print("Error: Empty response from server. Cookie may be expired.")
+        sys.exit(1)
+    
+    try:
+        tree = json.loads(tree_json.text)
+    except json.JSONDecodeError as e:
+        print(f"Error parsing JSON: {e}")
+        print("The response is likely not JSON (possibly HTML login page).")
+        sys.exit(1)
     
     for json_dept_id in tree:
         dept_data = tree[json_dept_id]

@@ -17,10 +17,42 @@ from hashlib import sha256
 import pdfkit
 from app.views.search import filter
 import os
+import urllib.request
+import urllib.parse
+import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 mail = Mail(app)
 ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
+
+def verify_turnstile(response_token):
+    """Verify Cloudflare Turnstile CAPTCHA. Returns True if CAPTCHA is not configured or verification succeeds."""
+    secret_key = app.config.get('TURNSTILE_SECRET_KEY')
+    if not app.config.get('TURNSTILE_SITE_KEY') or not secret_key:
+        return True
+
+    if not response_token:
+        return False
+
+    try:
+        data = urllib.parse.urlencode({
+            'secret': secret_key,
+            'response': response_token,
+        }).encode('utf-8')
+        req = urllib.request.Request(
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+            data=data,
+        )
+        resp = urllib.request.urlopen(req, timeout=5)
+        result = json.loads(resp.read().decode('utf-8'))
+        return result.get('success', False)
+    except Exception as e:
+        logger.warning('Turnstile verification failed: %s', e)
+        return True
 
 
 def rand_str():

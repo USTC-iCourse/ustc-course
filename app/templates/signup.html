@@ -73,6 +73,15 @@
         </div>
       </div>
 
+      {% if config.TURNSTILE_SITE_KEY %}
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-4">
+          <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+          <div class="cf-turnstile" data-sitekey="{{ config.TURNSTILE_SITE_KEY }}"></div>
+        </div>
+      </div>
+      {% endif %}
+
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-4">
           <button type="submit" class="btn btn-blue btn-block">注册</button>
@@ -120,8 +129,13 @@
        elem = $('#regverify-' + name);
        inputFeedback(elem, (data == 'OK'), data);
      },
-     error: function(err) {
-       alert('数据通信错误: ' + err.toString());
+     error: function(xhr) {
+       elem = $('#regverify-' + name);
+       if (xhr.status === 429) {
+         inputFeedback(elem, false, '请求过于频繁，请稍后再试');
+       } else {
+         inputFeedback(elem, false, '数据通信错误');
+       }
      }
    });
  }

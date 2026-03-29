@@ -20,7 +20,7 @@ LANGUAGES = {
 
 
 # SQL config
-SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://icourse:your-db-password@localhost/icourse?charset=utf8mb4'
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://ustc_course_test:16iXtZ75s+ST2vEXVkCiTDTE@localhost/icourse_test?charset=utf8mb4'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Flask mail
@@ -36,8 +36,11 @@ MAIL_MAX_EMAILS = None
 #MAIL_SUPPRESS_SEND =
 MAIL_ASCII_ATTACHMENTS = False
 
+# Admin email for CC when blocking reviews
+ADMIN_EMAIL = 'service@icourse.club'
+
 # Upload config
-UPLOAD_FOLDER = '/srv/ustc-course/uploads'
+UPLOAD_FOLDER = '/home/boj/test-ustc-course/uploads'
 # Alowed extentsions for a filetype
 # for example 'image': set(['png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = {
@@ -62,6 +65,16 @@ DEBUG_TB_PROFILER_ENABLED = True
 # Enable the template editor
 DEBUG_TB_TEMPLATE_EDITOR_ENABLED =True
 DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+# Rate limiting storage backend
+# Use "memory://" for single-process, or "redis://localhost:6379" for multi-worker
+RATELIMIT_STORAGE_URI = "memory://"
+
+# Cloudflare Turnstile CAPTCHA
+# Set both keys to enable CAPTCHA on signup and forgot-password forms
+# Get keys at https://dash.cloudflare.com/turnstile
+TURNSTILE_SITE_KEY = None
+TURNSTILE_SECRET_KEY = None
 
 # OpenAI API key to generate AI summary and responses
 OPENAI_API_KEY = None

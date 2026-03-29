@@ -12,10 +12,9 @@ for arg in sys.argv:
 
 def start():
     if debug:
-        db.create_all()
-        app.run(port=2021, threaded=True, host='0.0.0.0')
+        app.run(port=2021, threaded=True)
     else:
-        app.run(port=3000, threaded=True)
+        app.run(port=2021, threaded=True)
 
 
 

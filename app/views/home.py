@@ -2,12 +2,12 @@ from flask import Blueprint, request, redirect, url_for, render_template, flash,
 from flask_login import login_user, login_required, current_user, logout_user
 from app.models import User, RevokedToken, CourseRate, Review, follow_course, follow_user, SearchLog, ThirdPartySigninHistory, Announcement, PasswordResetToken, SearchToken
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
-from app.utils import ts, send_confirm_mail, send_reset_password_mail
+from app.utils import ts, send_confirm_mail, send_reset_password_mail, verify_turnstile
 from flask_babel import gettext as _
 from datetime import datetime, timedelta
 from sqlalchemy import or_
 from app import db
-from app import app
+from app import app, limiter
 from .course import deptlist
 from .search import search as search_, search_reviews as search_reviews_, filter
 from .search.pagination import MyPagination
@@ -81,6 +81,7 @@ def follow_reviews():
     return render_template('latest-reviews.html', reviews=reviews_paged, follow_type=follow_type, title=title, this_module='home.follow_reviews')
 
 @home.route('/signin/',methods=['POST','GET'])
+@limiter.limit("10/minute", methods=["POST"])
 def signin():
     next_url = request.args.get('next') or gen_index_url()
     if current_user.is_authenticated:
@@ -170,11 +171,15 @@ def verify_3rdparty_signin():
 
 
 @home.route('/signup/',methods=['GET','POST'])
+@limiter.limit("5/hour", methods=["POST"])
 def signup():
     if current_user.is_authenticated:
         return redirect(request.args.get('next') or gen_index_url())
     form = RegisterForm()
     if form.validate_on_submit():
+        if not verify_turnstile(request.form.get('cf-turnstile-response')):
+            return render_template('signup.html', form=form, title='注册',
+                                   error='请完成人机验证。')
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
@@ -197,6 +202,7 @@ def signup():
 
 
 @home.route('/confirm-email/')
+@limiter.limit("10/hour")
 def confirm_email():
     if current_user.is_authenticated:
         #logout_user()
@@ -255,6 +261,7 @@ def generate_reset_password_token(user):
 
 
 @home.route('/change-password/', methods=['GET'])
+@limiter.limit("5/hour")
 def change_password():
     '''在控制面板里发邮件修改密码'''
     if not current_user.is_authenticated:
@@ -265,12 +272,16 @@ def change_password():
 
 
 @home.route('/reset-password/', methods=['GET','POST'])
+@limiter.limit("5/hour", methods=["POST"])
 def forgot_password():
     ''' 忘记密码'''
     if current_user.is_authenticated:
         return redirect(request.args.get('next') or gen_index_url())
     form = ForgotPasswordForm()
     if form.validate_on_submit():
+        if not verify_turnstile(request.form.get('cf-turnstile-response')):
+            return render_template('forgot-password.html', title='忘记密码',
+                                   error='请完成人机验证。')
         email = form['email'].data
         user = User.query.filter_by(email=email).first()
         if user:
