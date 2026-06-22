@@ -11,10 +11,22 @@
 	（{{ user.follower_count }} 人）
       </div>
 
-      {% for user in user.followers %}
+      {% for follower in user.followers %}
       <div class="ud-pd-md dashed">
-	<img class="avatar-md circle" src="{{ user.avatar }}"/>
-	<a href={{ url_for('user.view_profile', user_id=user.id) }}><span class="right-pd-sm px16">{{ user.username }}</span></a>
+	<img class="avatar-md circle" src="{{ follower.avatar }}"/>
+	{% if follower.is_profile_hidden and (not current_user.is_authenticated or (current_user != follower and not current_user.is_admin)) %}
+	<span class="right-pd-sm px16">{{ follower.username }}</span>
+	<span class="gray px12">（主页未公开）</span>
+	{% else %}
+	<a href={{ url_for('user.view_profile', user_id=follower.id) }}><span class="right-pd-sm px16">{{ follower.username }}</span></a>
+	{% endif %}
+	{% if current_user.is_authenticated and current_user == user and follower != current_user %}
+	  {% if follower in current_user.users_following %}
+	  <span id="follow-state-{{ follower.id }}" class="gray px12"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> 已关注</span>
+	  {% else %}
+	  <span id="follow-state-{{ follower.id }}"><button onclick="follow_user({{ follower.id }})" class="btn btn-white btn-flat btn-xs btn-follow"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span> 回关 TA</button></span>
+	  {% endif %}
+	{% endif %}
       </div>
       {% endfor %}
 
@@ -23,4 +35,17 @@
 
   </div><!-- end float-element -->
 </div><!-- end container -->
+
+{% if current_user.is_authenticated and current_user == user %}
+<script type="text/javascript">
+function follow_user(user_id) {
+    $.post("{{ url_for('api.follow_user') }}", { user_id: user_id }, function(o) {
+        if (o.ok)
+            $('#follow-state-' + user_id).html('<span class="gray px12"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> 已关注</span>');
+        else
+            alert('关注用户失败：' + o.message);
+    }, 'json');
+}
+</script>
+{% endif %}
 {% endblock %}
