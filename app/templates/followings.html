@@ -11,10 +11,18 @@
 	（{{ user.following_count }} 人）
       </div>
 
-      {% for user in user.users_following %}
-      <div class="ud-pd-md dashed">
-	<img class="avatar-md circle" src="{{ user.avatar }}"/>
-	<a href={{ url_for('user.view_profile', user_id=user.id) }}><span class="right-pd-sm px16">{{ user.username }}</span></a>
+      {% for followed in user.users_following %}
+      <div class="ud-pd-md dashed following-item" id="following-item-{{ followed.id }}">
+	<img class="avatar-md circle" src="{{ followed.avatar }}"/>
+	{% if followed.is_profile_hidden and (not current_user.is_authenticated or (current_user != followed and not current_user.is_admin)) %}
+	<span class="right-pd-sm px16">{{ followed.username }}</span>
+	<span class="gray px12">（主页未公开）</span>
+	{% else %}
+	<a href={{ url_for('user.view_profile', user_id=followed.id) }}><span class="right-pd-sm px16">{{ followed.username }}</span></a>
+	{% endif %}
+	{% if current_user.is_authenticated and current_user == user %}
+	<button onclick="unfollow_user({{ followed.id }})" class="btn btn-blue btn-flat btn-xs btn-unfollow"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> 取消关注</button>
+	{% endif %}
       </div>
       {% endfor %}
 
@@ -23,4 +31,17 @@
 
   </div><!-- end float-element -->
 </div><!-- end container -->
+
+{% if current_user.is_authenticated and current_user == user %}
+<script type="text/javascript">
+function unfollow_user(user_id) {
+    $.post("{{ url_for('api.unfollow_user') }}", { user_id: user_id }, function(o) {
+        if (o.ok)
+            $('#following-item-' + user_id).remove();
+        else
+            alert('取消关注用户失败：' + o.message);
+    }, 'json');
+}
+</script>
+{% endif %}
 {% endblock %}
