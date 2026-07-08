@@ -15,6 +15,11 @@
     <link href="/static/css/style.css?ver=20230910" rel="stylesheet">
     <link href="/static/stellarnav/css/stellarnav.css?ver=20230223" rel="stylesheet">
     <link href="/static/ckeditor5/content.css?ver=20240204" rel="stylesheet">
+    <style>
+      /* Display (multi-line) LaTeX equations in reviews: keep them on their own
+         line and let long formulas scroll horizontally on narrow screens. */
+      .math-display { display: block; max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+    </style>
 
     {% block head %}
     {% endblock %}

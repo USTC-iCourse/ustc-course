@@ -75,6 +75,9 @@
             $('#review-' + review_id + '-comments').replaceWith(html);
             $('#review-' + review_id + '-comments').show();
             updateLocalTime();
+            if (window.typesetReviewMath) {
+                window.typesetReviewMath(document.getElementById('review-' + review_id + '-comments'));
+            }
         }, 'html')
      .fail(function() {
         alert('重新加载评论区出错，请刷新页面');

@@ -152,6 +152,33 @@
   <script src="/static/js/jquery.min.js"></script>
   <script src="/static/js/bootstrap.min.js"></script>
   <script src="/static/js/clipboard.min.js"></script>
+  <!-- MathJax config must be set before the (async) loader below.
+       We disable auto-typeset, stitch multi-line display equations back
+       together (review-math.js), then typeset once. See review-math.js. -->
+  <script>
+   window.MathJax = {
+     tex: {
+       inlineMath: [['\\(', '\\)']],
+       displayMath: [['\\[', '\\]'], ['$$', '$$']],
+       processEscapes: true,
+       processEnvironments: true
+     },
+     options: {
+       ignoreHtmlClass: 'tex2jax_ignore',
+       processHtmlClass: 'tex2jax_process'
+     },
+     startup: {
+       typeset: false,
+       pageReady: function () {
+         if (window.normalizeReviewMath) {
+           try { window.normalizeReviewMath(); } catch (e) { console.error(e); }
+         }
+         return window.MathJax.typesetPromise();
+       }
+     }
+   };
+  </script>
+  <script src="/static/js/review-math.js?ver=20260708"></script>
   <script type="text/javascript" id="MathJax-script" async src="/static/MathJax/es5/tex-svg.js"></script>
   {% include 'common-scripts.html' %}
   <script>
