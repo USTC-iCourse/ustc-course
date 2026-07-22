@@ -114,6 +114,19 @@ def send_unblock_review_email(review):
     mail.send(msg)
 
 
+def send_crisis_alert_email(info):
+    '''Alert admins that a review may indicate suicidal / self-harm intent.
+
+    `info` is a plain dict (no ORM objects) so this can safely run in a
+    background thread after the request has ended.
+    '''
+    admin_email = app.config.get('ADMIN_EMAIL', 'service@icourse.club')
+    subject = '[心理危机预警] 有点评可能包含自杀 / 自伤倾向，请尽快核实'
+    html = render_template('email/crisis-alert.html', info=info)
+    msg = Message(subject=subject, html=html, recipients=[admin_email])
+    mail.send(msg)
+
+
 def allowed_file(filename,type):
     return '.' in filename and \
             filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS'][type]
@@ -289,6 +302,31 @@ def editor_parse_at(text):
             text = re.sub("@" + re.escape(username), atstring, text)
             mentioned_users.append(user)
     return text, set(mentioned_users)
+
+# Keywords that may indicate suicidal / self-harm intent, including common
+# homophones and variants used to evade filters. Matching is intentionally
+# lenient: a false positive only results in showing supportive crisis
+# resources, which is harmless.
+CRISIS_KEYWORDS = [
+    '自杀', '紫砂', '自鲨', '自沙',
+    '割腕', '割脉', '跳楼', '烧炭',
+]
+
+
+def contains_crisis_keywords(text):
+    '''Return True if the text appears to express suicidal / self-harm intent.
+
+    HTML tags are stripped first so keywords split by markup are still caught.
+    '''
+    if not text:
+        return False
+    try:
+        plain = Markup(text).striptags()
+    except Exception:
+        plain = text
+    plain = plain.lower()
+    return any(keyword in plain for keyword in CRISIS_KEYWORDS)
+
 
 @app.template_filter('utctime')
 def utctime(date):

@@ -2,7 +2,7 @@ from flask import Blueprint,render_template,abort,redirect,url_for,request,abort
 from flask_security import current_user,login_required
 from app.models import Course, Review, ReviewHistory, ReviewSearchCache
 from app.forms import ReviewForm
-from app.utils import sanitize, editor_parse_at
+from app.utils import sanitize, editor_parse_at, contains_crisis_keywords, send_crisis_alert_email
 from flask_babel import gettext as _
 from .course import course
 import markdown
@@ -72,6 +72,31 @@ def async_update_course_summary(course, update_immediately=False):
     thread = threading.Thread(target=_update_course_summary, args=(course.id, update_immediately))
     thread.start()
     print('async get summary', course)
+
+
+def _send_crisis_alert(info):
+    with app.app_context():
+        try:
+            send_crisis_alert_email(info)
+        except Exception as e:
+            print('failed to send crisis alert email', e)
+
+
+def notify_crisis_admins(review, review_url, is_new):
+    '''Extract plain fields (ORM objects are not thread-safe once the request
+    ends) and email admins from a background thread so the response isn't blocked.'''
+    info = {
+        'course_name': review.course.name,
+        'author_email': review.author.email,
+        'author_username': review.author.username,
+        'is_anonymous': review.is_anonymous,
+        'is_new': is_new,
+        'review_url': review_url,
+        'content': review.content,
+        'time': datetime.utcnow(),
+    }
+    thread = threading.Thread(target=_send_crisis_alert, args=(info,))
+    thread.start()
 
 
 @course.route('/<int:course_id>/review/',methods=['GET','POST'])
@@ -174,10 +199,20 @@ def new_review(course_id):
                 ReviewSearchCache.update(review, follow_config=True)
                 async_update_course_summary(review.course)
 
-            next_url = url_for('course.view_course', course_id=course_id, _external=True) + '#review-' + str(review.id)
+            # If the review text suggests suicidal / self-harm intent, flag it so
+            # the frontend can immediately surface crisis-support resources, and
+            # alert admins so a human can decide whether to intervene.
+            show_crisis = contains_crisis_keywords(review.content)
+
+            course_url = url_for('course.view_course', course_id=course_id, _external=True)
+            fragment = '#review-' + str(review.id)
+            if show_crisis:
+                notify_crisis_admins(review, course_url + fragment, is_new)
             if form.is_ajax.data:
-                return jsonify({'ok': True, 'next_url': next_url })
+                return jsonify({'ok': True, 'next_url': course_url + fragment, 'crisis': show_crisis })
             else:
+                # query param must precede the fragment to be readable server-side
+                next_url = course_url + ('?crisis=1' if show_crisis else '') + fragment
                 return redirect(next_url)
         else: # invalid submission, try again
             message = '提交失败，请编辑后重新提交！错误信息：' + str(form.errors)

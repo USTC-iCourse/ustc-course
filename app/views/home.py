@@ -488,6 +488,13 @@ def community_rules():
     return render_template('community-rules.html', title='社区规范')
 
 
+@home.route('/mental-health/')
+def mental_health():
+    '''心理健康支持页面：心理援助 / 自杀干预热线等求助资源'''
+
+    return render_template('mental-health.html', title='心理健康支持')
+
+
 @home.route('/report-bug/')
 def report_bug():
     ''' 报bug表单 '''

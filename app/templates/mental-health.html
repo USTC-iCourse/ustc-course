@@ -1,0 +1,35 @@
+{% extends "layout-simple.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+    <h3 class="blue">心理健康支持</h3>
+    <hr>
+    <div class="dark-grey desktop-width75">
+      <div class="ud-pd-sm lh-lg">
+        <p>大学生活中，学业压力、人际关系、对未来的迷茫都可能让人感到疲惫甚至绝望。这些感受都是真实且值得被认真对待的。<b>无论现在多么艰难，寻求帮助永远是一个选择。</b></p>
+        <p>我们把常用的心理援助与危机干预资源整理在这里，希望在你或你关心的人需要时，能派上用场。</p>
+      </div>
+
+      <div class="ud-pd-sm lh-lg">
+        {% include 'crisis-resources.html' %}
+      </div>
+
+      <div class="ud-pd-sm lh-lg">
+        <h4 class="blue">关于安全与隐私的说明</h4>
+        <p>我们非常重视用户的隐私，通常不会公开或向第三方提供你的邮箱、学号等个人信息（详见<a href="/community-rules/">社区规范</a>）。</p>
+        <p>但是，<b>当一条点评或回复的内容显示发布者可能有自杀或严重自我伤害的倾向、面临紧迫的生命危险时，为了尽力挽救生命，我们可能会在必要范围内将该用户的邮箱等联系方式提供给学校相关部门或公安机关（110），以便及时提供帮助。</b>依据《中华人民共和国个人信息保护法》第十三条，为应对突发公共卫生事件、或在紧急情况下为保护自然人的生命健康和财产安全所必需，可以在未取得个人同意的情况下处理个人信息；《中华人民共和国精神卫生法》也规定学校、医疗机构等对心理危机负有干预义务。我们采取这一措施的唯一目的，是希望在关键时刻帮助你获得专业的支持。</p>
+      </div>
+
+      <div class="ud-pd-sm lh-lg">
+        <p class="text-muted">如果你此刻正陪伴着一位有自杀念头的朋友，请不要独自承担：认真倾听、陪在他/她身边、移开危险物品，并尽快联系上述热线、学校或家人，共同寻求专业帮助。</p>
+      </div>
+
+    </div>
+  </div><!-- end float-element -->
+</div><!-- end container -->
+{% endblock %}
+
+{% block script %}
+{% endblock %}

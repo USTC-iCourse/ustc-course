@@ -102,6 +102,25 @@
   </div>
   </div>
 </div>
+
+<!-- Crisis-support resources, shown after submitting a review whose text may indicate distress -->
+<div class="modal fade" id="crisis-modal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title blue">你的点评已发布 &bull; 我们想为你提供一些帮助</h4>
+      </div>
+      <div class="modal-body lh-lg">
+        {% include 'crisis-resources.html' %}
+      </div>
+      <div class="modal-footer">
+        <a href="/mental-health/" class="btn btn-flat btn-white blue float-left" target="_blank">查看更多支持资源</a>
+        <button type="button" class="btn btn-flat btn-blue" data-dismiss="modal">我知道了</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block script %}
@@ -129,7 +148,13 @@ function submit_review() {
         } else {
             // remove auto saved content
             localStorage.removeItem(autoSaveKey);
-            window.location.href = o.next_url;
+            if (o.crisis) {
+                // Review text may indicate distress: show crisis-support
+                // resources before leaving the page.
+                $('#crisis-modal').data('next-url', o.next_url).modal('show');
+            } else {
+                window.location.href = o.next_url;
+            }
         }
     }, 'json')
     .fail(function() {
@@ -347,6 +372,14 @@ $(function(){
             }, wait);
         };
     }
+
+    // After the crisis-support modal is closed, continue to the posted review.
+    $('#crisis-modal').on('hidden.bs.modal', function() {
+        var nextUrl = $(this).data('next-url');
+        if (nextUrl) {
+            window.location.href = nextUrl;
+        }
+    });
 
     $('#review-form').submit(function(e) {
         e.preventDefault();

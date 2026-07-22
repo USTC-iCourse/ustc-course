@@ -63,6 +63,15 @@
 
 <div class="container">
 
+  {% if request.args.get('crisis') %}
+  <div class="alert alert-info lh-lg" style="margin-top: 10px;">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h4 class="blue">你的点评已发布 &bull; 我们想为你提供一些帮助</h4>
+    {% include 'crisis-resources.html' %}
+    <a href="/mental-health/">查看更多支持资源 &raquo;</a>
+  </div>
+  {% endif %}
+
   <div class="row float-element">
     <div class="row">
 

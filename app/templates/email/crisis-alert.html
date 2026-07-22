@@ -1,0 +1,24 @@
+{% include 'email/email-css.html' %}
+
+<p><b>心理危机预警</b></p>
+
+<p>以下{% if info.is_new %}新发布{% else %}更新{% endif %}的点评经关键词检测，可能包含自杀或自我伤害倾向，请尽快人工核实，判断是否需要按照《心理健康支持》页面所述流程介入（如联系学校相关部门或公安机关）。</p>
+
+<p><b>请注意：</b>关键词匹配可能存在误报，务必人工阅读原文后再决定是否采取行动。</p>
+
+<hr />
+
+<p><b>课程：</b>{{ info.course_name }}</p>
+<p><b>点评链接：</b><a href="{{ info.review_url }}">{{ info.review_url }}</a></p>
+<p><b>作者邮箱：</b>{{ info.author_email }}</p>
+<p><b>作者用户名：</b>{{ info.author_username }}{% if info.is_anonymous %}（该点评为匿名发表）{% endif %}</p>
+<p><b>检测时间（UTC）：</b>{{ info.time }}</p>
+
+<p><b>点评内容：</b></p>
+<blockquote style="border-left: 3px solid #ccc; padding-left: 10px; color: #333;">
+{{ info.content | striptags }}
+</blockquote>
+
+<p>&nbsp;</p>
+
+<p>—— USTC 评课社区自动预警系统</p>
