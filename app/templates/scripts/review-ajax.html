@@ -162,6 +162,24 @@
      });
  }
 
+ function review_author_profile(review_id)
+ {
+     if (!confirm('你正在作为管理员，查询此点评作者的资料。\n作者的用户 ID、注册邮箱、登录记录和点评发布时间将发送至管理员邮箱，不会在网站上显示。\n确定继续吗？')) {
+         return;
+     }
+     $.post("{{ url_for('api.review_author_profile') }}", { review_id: review_id },
+         function(o) {
+            if (o.ok) {
+               alert('作者资料已发送至管理员邮箱');
+            } else {
+               alert(o.message);
+            }
+     }, 'json')
+     .fail(function() {
+         alert('发送失败，请重试');
+     });
+ }
+
  function hide_review(review_id)
  {
      $.post("{{ url_for('api.hide_review') }}", { review_id: review_id },

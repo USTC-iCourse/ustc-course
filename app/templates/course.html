@@ -464,6 +464,13 @@
               </a>
               {% endif %}
 
+              {% if user.is_admin %}
+              <a class="nounderline" href="javascript: review_author_profile({{ review.id }})">
+                <span class="glyphicon glyphicon-user grey left-pd-md small" aria-hidden="true"></span>
+                查询作者资料
+              </a>
+              {% endif %}
+
               {% if review.author == user %}
                 <span class="glyphicon glyphicon-ban-circle grey left-pd-md" aria-hidden="true"></span>
                 {% if review.is_hidden %}

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, Markup, redirect, render_template, abort
+from flask import Blueprint, jsonify, request, Markup, redirect, render_template, abort, url_for
 from flask_login import login_required, current_user
 from app.models import Review, ReviewComment, User, Course, ImageStore, Notification
 from app.models import ReviewCommentHistory, ThirdPartySigninHistory, SearchToken
@@ -6,6 +6,7 @@ from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email
 from app.utils import editor_parse_at
 from app.utils import send_block_review_email, send_unblock_review_email
+from app.utils import send_review_author_profile_email
 from app.views.review import record_review_history
 from app.views.review import async_update_course_summary
 from flask_babel import gettext as _
@@ -117,6 +118,55 @@ def delete_comment():
             return jsonify(ok=False,message="The comment doesn't exist.")
     else:
         return jsonify(ok=False,message="A id must be given")
+
+@api.route('/review/author_profile/', methods=['POST'])
+@login_required
+def review_author_profile():
+    review_id = request.values.get('review_id')
+    if review_id:
+        review = Review.query.get(review_id)
+        if review:
+            if current_user.is_admin:
+                author = review.author
+                if not author:
+                    return jsonify(ok=False, message="The review has no author.")
+                last_signin = (ThirdPartySigninHistory.query
+                        .filter_by(user_id=author.id)
+                        .order_by(ThirdPartySigninHistory.signin_time.desc())
+                        .first())
+                info = {
+                    'review_id': review.id,
+                    'review_url': url_for('course.view_course', course_id=review.course_id,
+                                          _external=True, _scheme='https') + '#review-' + str(review.id),
+                    'course_name': review.course.name,
+                    'publish_time': review.publish_time,
+                    'update_time': review.update_time,
+                    'is_anonymous': review.is_anonymous,
+                    'author_id': author.id,
+                    'author_username': author.username,
+                    'author_email': author.email,
+                    'register_time': author.register_time,
+                    'last_login_time': author.last_login_time,
+                    'last_third_party_signin': {
+                        'from_app': last_signin.from_app,
+                        'signin_time': last_signin.signin_time,
+                    } if last_signin else None,
+                    'requested_by': current_user.username + ' (ID ' + str(current_user.id) + ')',
+                }
+                try:
+                    send_review_author_profile_email(info)
+                except Exception:
+                    logger.exception('Failed to send review author profile email')
+                    return jsonify(ok=False, message="邮件发送失败，请稍后重试")
+                logger.info('Admin %s (ID %s) requested author profile of review %s',
+                            current_user.username, current_user.id, review.id)
+                return jsonify(ok=True, message="作者资料已发送至管理员邮箱")
+            else:
+                return jsonify(ok=False, message="Forbidden")
+        else:
+            return jsonify(ok=False, message="The review doesn't exist.")
+    else:
+        return jsonify(ok=False, message="A id must be given")
 
 @api.route('/review/block/', methods=['POST'])
 @login_required

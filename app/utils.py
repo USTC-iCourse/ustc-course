@@ -127,6 +127,22 @@ def send_crisis_alert_email(info):
     mail.send(msg)
 
 
+def send_review_author_profile_email(info):
+    '''Send the author profile of a review to the admin email address.
+
+    The profile (user ID, registration email, login log, publish time) is
+    never displayed on the website itself; it is only delivered to the
+    configured admin mailbox.
+
+    `info` is a plain dict (no ORM objects).
+    '''
+    admin_email = app.config.get('ADMIN_EMAIL', 'service@icourse.club')
+    subject = '[作者信息] 点评 #' + str(info['review_id']) + ' 的作者资料'
+    html = render_template('email/review-author-profile.html', info=info)
+    msg = Message(subject=subject, html=html, recipients=[admin_email])
+    mail.send(msg)
+
+
 def allowed_file(filename,type):
     return '.' in filename and \
             filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS'][type]

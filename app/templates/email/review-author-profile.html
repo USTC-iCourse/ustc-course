@@ -1,0 +1,30 @@
+{% include 'email/email-css.html' %}
+
+<p><b>点评作者资料</b></p>
+
+<p>管理员 {{ info.requested_by }} 请求查看点评 #{{ info.review_id }} 的作者资料。此信息仅发送至管理员邮箱，不会在网站上显示。</p>
+
+<hr />
+
+<p><b>点评信息</b></p>
+<p><b>课程：</b>{{ info.course_name }}</p>
+<p><b>点评链接：</b><a href="{{ info.review_url }}">{{ info.review_url }}</a></p>
+<p><b>发布时间（UTC）：</b>{{ info.publish_time }}</p>
+<p><b>最后编辑时间（UTC）：</b>{{ info.update_time }}</p>
+<p><b>是否匿名：</b>{% if info.is_anonymous %}是{% else %}否{% endif %}</p>
+
+<hr />
+
+<p><b>作者资料</b></p>
+<p><b>用户 ID：</b>{{ info.author_id }}</p>
+<p><b>用户名：</b>{{ info.author_username }}</p>
+<p><b>注册邮箱：</b>{{ info.author_email }}</p>
+<p><b>注册时间（UTC）：</b>{{ info.register_time }}</p>
+<p><b>最近登录时间（UTC）：</b>{{ info.last_login_time or '无记录' }}</p>
+{% if info.last_third_party_signin %}
+<p><b>最近第三方登录：</b>{{ info.last_third_party_signin.from_app }}，登录时间（UTC）：{{ info.last_third_party_signin.signin_time }}</p>
+{% endif %}
+
+<p>&nbsp;</p>
+
+<p>—— USTC 评课社区</p>
