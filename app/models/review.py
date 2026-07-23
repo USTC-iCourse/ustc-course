@@ -217,6 +217,7 @@ class ReviewComment(db.Model):
 
 class ReviewHistory(db.Model):
     __tablename__ = 'review_history'
+    __table_args__ = (db.Index('idx_course_author', 'course_id', 'author_id'),)
     id = db.Column(db.Integer,primary_key=True, unique=True)
 
     difficulty = db.Column(db.Integer)
@@ -230,7 +231,7 @@ class ReviewHistory(db.Model):
     update_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     author_id = db.Column(db.Integer)
-    course_id = db.Column(db.Integer, index=True)
+    course_id = db.Column(db.Integer)
     term = db.Column(db.String(10))
 
     is_anonymous = db.Column(db.Boolean, default=False)
