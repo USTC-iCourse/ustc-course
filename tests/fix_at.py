@@ -3,6 +3,7 @@ import sys
 sys.path.append('..')  # fix import directory
 
 from app import app, db
+from app.search.builder import request_rebuild
 from app.utils import editor_parse_at
 from app.models import Review, ReviewComment
 from app.views.api import record_review_comment_history
@@ -37,3 +38,9 @@ for comment in review_comments:
             user.notify('mention', comment, from_user=comment.author, time=comment.publish_time)
 
 db.session.commit()
+
+# Review text is indexed. The freshness overlay keys on update_time,
+# which this script deliberately does not bump -- a bulk cleanup should
+# not resurface every review as recently updated -- so the index has to
+# be rebuilt explicitly instead.
+request_rebuild(app, 'reviews')

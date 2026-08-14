@@ -266,6 +266,19 @@ class TestCatalogueRebuildRequests(FreshnessTestCase):
         self.assertEqual(taken, ["courses"])
         self.assertEqual(builder.take_requests(app), ["courses"])
 
+    def test_taking_one_collection_leaves_the_other_request_alone(self):
+        """The builder clears markers before building, and several seconds pass
+        between deciding what to build and doing it.  A request for a
+        collection it is *not* building must survive that window."""
+        builder.request_rebuild(app, "courses")
+        builder.request_rebuild(app, "reviews")
+        self.assertEqual(builder.take_requests(app, ["courses"]), ["courses"])
+        self.assertEqual(
+            builder.take_requests(app),
+            ["reviews"],
+            "clearing one collection's request also dropped the other's",
+        )
+
     def test_repeated_requests_collapse_into_one_rebuild(self):
         for _ in range(20):
             builder.request_rebuild(app, "courses")

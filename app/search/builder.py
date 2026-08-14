@@ -15,7 +15,7 @@ import logging
 import os
 import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Sequence
 
 from .collections import ALL, DOCUMENT_SOURCES
 from .segment import SegmentWriter
@@ -81,15 +81,20 @@ def request_rebuild(app, collection: str) -> None:
         )
 
 
-def take_requests(app) -> List[str]:
-    """Collections with a pending request, clearing the markers.
+def take_requests(app, collections: Optional[Sequence[str]] = None) -> List[str]:
+    """Clear the pending-request markers for the given collections.
 
     Cleared *before* building, not after: a request arriving mid-build then
     recreates the marker and is served by the next run, where clearing
     afterwards would discard it.
+
+    ``collections`` must name exactly what the caller is about to build.
+    Clearing every marker regardless would drop a request that arrived for a
+    *different* collection between deciding what to build and starting -- a
+    window several seconds wide, since the application import sits in it.
     """
     taken = []
-    for collection in sorted(ALL):
+    for collection in sorted(ALL if collections is None else collections):
         try:
             os.unlink(_request_path(app, collection))
         except OSError:
@@ -214,7 +219,8 @@ def main(argv: Optional[list] = None) -> int:
         if args.if_needed:
             # Clear the markers now, before building: a request arriving while
             # a build runs recreates its marker and is served by the next run.
-            take_requests(app)
+            # Only for what we are actually about to build.
+            take_requests(app, names)
         for name in names:
             stats = build(app, db, name, progress=progress)
             if not args.quiet:

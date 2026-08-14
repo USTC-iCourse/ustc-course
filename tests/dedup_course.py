@@ -3,6 +3,7 @@ import sys
 sys.path.append('..')  # fix import directory
 
 from app import app, db
+from app.search.builder import request_rebuild
 from app.models import Teacher
 
 ctx = app.test_request_context()
@@ -71,3 +72,8 @@ def dedup_teacher(teacher_id):
     print('Teacher information saved')
 
 dedup_teacher(int(sys.argv[1]))
+
+# Course names, teacher names and course codes are all indexed, so the
+# catalogue segment is stale after this. Ask for a rebuild; the timer
+# serves it within a couple of minutes.
+request_rebuild(app, 'courses')
