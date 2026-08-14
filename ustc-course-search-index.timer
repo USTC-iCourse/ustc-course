@@ -1,0 +1,15 @@
+[Unit]
+Description=Rebuild the USTC iCourse search index hourly
+
+[Timer]
+# Hourly is plenty: reviews written or edited since the last build are served
+# exactly by the freshness overlay in app/search/delta.py, so the rebuild is
+# only what keeps that overlay small.  A day's worth of new reviews is far
+# below the overlay's ceiling.
+OnBootSec=2min
+OnUnitActiveSec=1h
+AccuracySec=1min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

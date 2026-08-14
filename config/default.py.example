@@ -56,8 +56,10 @@ ALLOWED_EXTENSIONS = {
 MAX_CONTENT_LENGTH = 100 * 1024 * 1024
 
 # Search settings
-SEARCH_BACKEND = "sql-like"  # "sql-like" or "sql-cache"
-UPDATE_SEARCH_CACHE = True
+# The index lives on disk, outside the database, and is rebuilt out of band by
+#   PYTHONPATH=. python3 -m app.search.builder
+# (see ustc-course-search-index.timer).  Defaults to <repo>/data/search-index.
+#SEARCH_INDEX_DIR = "/var/lib/ustc-course/search-index"
 
 # Debugbar Settings
 # Enable the profiler on all requests

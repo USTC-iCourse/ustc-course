@@ -1,169 +1,160 @@
-# Deployment Instructions for Search Token Feature
+# Deployment Instructions
 
-## Prerequisites
+Covers deploying the search engine in `app/search/`, which replaced the two
+MySQL FULLTEXT backends and the one-time search-token scheme.
 
-1. Database migration has been applied (search_tokens table exists)
-2. You have sudo access to deploy changes
+## What changed operationally
 
-## Step 1: Deploy Code to Production
+* Search reads a **memory-mapped index on disk**, not the database. It must be
+  built before the site can serve searches, and rebuilt on a timer.
+* The `course_search_cache`, `review_search_cache` and `search_tokens` tables
+  are dropped by an Alembic migration.
+* `/search/` and `/search-reviews/` are plain GET endpoints again — no token,
+  no rate limit. `/api/search/token` no longer exists. A search costs a few
+  milliseconds against a memory-mapped index, so it is no more expensive to
+  serve than any other page.
+* New Python dependencies: `numpy`, `pypinyin`, `zhconv`.
+
+## Step 1: Install dependencies
 
 ```bash
-# Copy files to production directory
+sudo -u icourse /usr/bin/python3 -m pip install --user -r /srv/ustc-course/requirements.txt
+```
+
+## Step 2: Deploy code
+
+```bash
 sudo cp -r /home/boj/test-ustc-course/app /srv/ustc-course/
 sudo cp /home/boj/test-ustc-course/gunicorn_config.py /srv/ustc-course/
+sudo cp -r /home/boj/test-ustc-course/migrations /srv/ustc-course/
 sudo chown -R icourse:icourse /srv/ustc-course/
 ```
 
-## Step 2: Create Log Files
+## Step 3: Build the index **before** restarting
+
+The site returns HTTP 503 for searches until a segment exists, so build first.
+A full build is roughly 20 s for courses and 3 min for reviews.
 
 ```bash
-# Create log files with proper permissions
-sudo touch /var/log/ustc-course-access.log
-sudo touch /var/log/ustc-course-error.log
-sudo chown icourse:icourse /var/log/ustc-course-*.log
-sudo chmod 644 /var/log/ustc-course-*.log
+sudo -u icourse mkdir -p /srv/ustc-course/data/search-index
+cd /srv/ustc-course && sudo -u icourse env PYTHONPATH=. /usr/bin/python3 -m app.search.builder
 ```
 
-## Step 3: Update Systemd Service (Optional)
+Expect output like:
 
-Update `/etc/systemd/system/ustc-course.service`:
-
-```ini
-[Unit]
-Description=USTC iCourse - a popular course rating platform for USTC students
-Requires=mysql.service
-After=network-online.target nss-lookup.target
-
-[Service]
-Type=notify
-NotifyAccess=main
-User=icourse
-Group=icourse
-WorkingDirectory=/srv/ustc-course
-# Use the config file
-ExecStart=/home/icourse/.local/bin/gunicorn -c gunicorn_config.py app:app
-ExecReload=/bin/kill -s HUP $MAINPID
-KillMode=mixed
-Restart=on-failure
-TimeoutStopSec=5
-PrivateTmp=true
-
-# Capture output to journal
-StandardOutput=journal
-StandardError=journal
-
-[Install]
-WantedBy=multi-user.target
+```
+courses   17509 docs    20.2 s     9.1 MB  ->  /srv/ustc-course/data/search-index/courses.seg
+reviews   33704 docs   198.2 s   118.4 MB  ->  /srv/ustc-course/data/search-index/reviews.seg
 ```
 
-Then reload and restart:
+To keep the index off the application volume, set `SEARCH_INDEX_DIR` in
+`config/default.py` and make sure the `icourse` user can write it.
+
+## Step 4: Install the rebuild timer
 
 ```bash
+sudo cp /home/boj/test-ustc-course/ustc-course-search-index.service /etc/systemd/system/
+sudo cp /home/boj/test-ustc-course/ustc-course-search-index.timer /etc/systemd/system/
 sudo systemctl daemon-reload
+sudo systemctl enable --now ustc-course-search-index.timer
+systemctl list-timers ustc-course-search-index.timer
+```
+
+Hourly is deliberate, not conservative: reviews written or edited since the
+last build are served exactly by the freshness overlay
+(`app/search/delta.py`), so the rebuild only exists to keep that overlay small.
+
+## Step 5: Restart the application
+
+```bash
 sudo systemctl restart ustc-course.service
 ```
 
-## Step 4: View Logs
+Optional: setting `preload_app = True` in `gunicorn_config.py` makes the 32
+workers share one load of the jieba/pypinyin/zhconv dictionaries (~1 s each)
+instead of paying it per worker at startup. It does mean `systemctl reload`
+(SIGHUP) no longer picks up new code, since the app is imported in the master —
+deploys must use `systemctl restart`, which Step 5 already does. The index
+itself is shared either way: a memory-mapped file is one physical copy across
+all workers regardless of how they were started.
 
-### Real-time Monitoring
+## Step 6: Apply the migration
+
+Only after the new code is serving correctly — the old tables are then
+provably unused, and rolling back before this step needs no database work.
 
 ```bash
-# Watch error log file
-tail -f /var/log/ustc-course-error.log
-
-# Watch access log file
-tail -f /var/log/ustc-course-access.log
-
-# Watch systemd journal (if StandardOutput configured)
-sudo journalctl -u ustc-course.service -f
-
-# Filter for search token errors
-tail -f /var/log/ustc-course-error.log | grep -i "search token"
+cd /srv/ustc-course && sudo -u icourse env PYTHONPATH=. /home/icourse/.local/bin/flask db upgrade
 ```
 
-### Historical Logs
+This drops `review_search_cache` (~65 MB), `course_search_cache` and
+`search_tokens`. All three are derived or ephemeral; the downgrade recreates
+the schema empty.
+
+## Verifying
 
 ```bash
-# View recent errors
-tail -100 /var/log/ustc-course-error.log
-
-# Search for specific errors
-grep "Error.*search token" /var/log/ustc-course-error.log
-
-# View logs from today
-grep "$(date +%Y-%m-%d)" /var/log/ustc-course-error.log
+cd /srv/ustc-course && sudo -u icourse env PYTHONPATH=. /usr/bin/python3 - <<'PY'
+from app import app
+from app.search import index_status
+with app.app_context():
+    print(index_status())
+PY
 ```
 
-## Step 5: Verify Deployment
+Then, on the site:
 
-1. **Test search functionality:**
-   - Visit https://icourse.club
-   - Try searching for a course
-   - Navigate through pagination
-   - Click "搜点评" / "搜课程" buttons
+* search a two-character word that appears in reviews — `班风`, `程学`, `末考`
+  all returned nothing under the old engine and must now return results;
+* search a course abbreviation — `数分` should reach 数学分析;
+* search while signed in on a **Teacher** account — this raised
+  `ArgumentError` for all 667 non-Student accounts before;
+* reload a search URL, page through results, and open a search with
+  JavaScript disabled — all were 403s under the token scheme;
+* post a review and immediately search for a phrase in it — the freshness
+  overlay should surface it within a few seconds, well before the next rebuild.
 
-2. **Monitor logs:**
-   ```bash
-   tail -f /var/log/ustc-course-error.log
-   ```
-
-3. **Check for errors:**
-   ```bash
-   # Should return nothing if all is working
-   grep -i "error.*token" /var/log/ustc-course-error.log
-   ```
-
-## Troubleshooting
-
-### If logs are still empty:
+Run the test suites against production data if you want the full check:
 
 ```bash
-# Check file permissions
-ls -la /var/log/ustc-course-*.log
-
-# Check if service is running
-sudo systemctl status ustc-course.service
-
-# Check Gunicorn process
-ps aux | grep gunicorn
-
-# Test write access
-sudo -u icourse touch /var/log/ustc-course-test.log
-```
-
-### If search tokens don't work:
-
-1. Verify database table exists:
-   ```bash
-   mysql -u [user] -p [database] -e "SHOW TABLES LIKE 'search_tokens';"
-   ```
-
-2. Check table structure:
-   ```bash
-   mysql -u [user] -p [database] -e "DESCRIBE search_tokens;"
-   ```
-
-3. Check for token generation:
-   ```bash
-   mysql -u [user] -p [database] -e "SELECT COUNT(*) FROM search_tokens;"
-   ```
-
-## Rollback Plan
-
-If issues occur:
-
-```bash
-# Restore previous version
 cd /srv/ustc-course
-sudo -u icourse git checkout HEAD~1 app/
-
-# Restart service
-sudo systemctl restart ustc-course.service
+for t in text segment engine freshness; do
+  sudo -u icourse env PYTHONPATH=. /usr/bin/python3 tests/test_search_$t.py
+done
+sudo -u icourse env PYTHONPATH=. /usr/bin/python3 tests/search_benchmark.py
 ```
 
-## Log Rotation
+## Operational notes
 
-Add to `/etc/logrotate.d/ustc-course`:
+**After importing courses.** The catalogue import scripts no longer maintain a
+cache table; rebuild the course segment when they finish:
+
+```bash
+cd /srv/ustc-course && sudo -u icourse env PYTHONPATH=. /usr/bin/python3 -m app.search.builder courses
+```
+
+**Disk.** Roughly 130 MB for both segments, plus the same again transiently
+while a rebuild writes its temporary file. The builder peaks around 400 MB RSS.
+
+**If the timer stops.** Searches stay *correct* — the overlay covers the gap —
+but get slower as it grows. Past `MAX_DELTA_ROWS` the overlay stops expanding
+and `index_status()["delta_overflowed"]` becomes true, which is the signal to
+look at the timer.
+
+**Rollback.** Before Step 6, `git checkout` the previous revision and restart;
+the old tables are still present and populated. After Step 6, run
+`flask db downgrade` first, then repopulate the caches — which requires the old
+engine's code to do.
+
+## Logs
+
+```bash
+sudo journalctl -u ustc-course.service -f
+sudo journalctl -u ustc-course-search-index.service -n 50
+tail -f /var/log/ustc-course-error.log
+```
+
+Log rotation, in `/etc/logrotate.d/ustc-course`:
 
 ```
 /var/log/ustc-course-*.log {
@@ -179,12 +170,3 @@ Add to `/etc/logrotate.d/ustc-course`:
     endscript
 }
 ```
-
-## Success Indicators
-
-- ✅ No 403 errors when searching
-- ✅ Search works from all pages (home, navbar, error page)
-- ✅ Pagination works without errors
-- ✅ "搜点评"/"搜课程" buttons work
-- ✅ No error messages in logs about tokens
-

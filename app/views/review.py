@@ -1,6 +1,6 @@
 from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify
 from flask_security import current_user,login_required
-from app.models import Course, Review, ReviewHistory, ReviewSearchCache
+from app.models import Course, Review, ReviewHistory
 from app.forms import ReviewForm
 from app.utils import sanitize, editor_parse_at, contains_crisis_keywords, send_crisis_alert_email
 from flask_babel import gettext as _
@@ -196,7 +196,6 @@ def new_review(course_id):
             if old_review and not old_review.only_visible_to_student and review.only_visible_to_student:
                 async_update_course_summary(review.course, update_immediately=True)
             elif is_new or old_review.content != review.content:
-                ReviewSearchCache.update(review, follow_config=True)
                 async_update_course_summary(review.course)
 
             # If the review text suggests suicidal / self-harm intent, flag it so

@@ -1,95 +1,8 @@
 from app import db
 from datetime import datetime, timedelta
-import secrets
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-class SearchToken(db.Model):
-    """One-time token for search API to prevent DoS attacks"""
-    __tablename__ = 'search_tokens'
-    
-    token = db.Column(db.String(64), primary_key=True)
-    created_at = db.Column(db.DateTime(), default=datetime.utcnow, nullable=False)
-    used = db.Column(db.Boolean(), default=False, nullable=False)
-    ip_address = db.Column(db.String(45))  # Support IPv6
-    
-    @classmethod
-    def generate(cls, ip_address=None):
-        """Generate a new one-time search token"""
-        try:
-            token = secrets.token_urlsafe(32)
-            search_token = cls(token=token, ip_address=ip_address)
-            db.session.add(search_token)
-            db.session.commit()
-            logger.info(f"Generated search token: {token[:10]}... for IP: {ip_address}")
-            return token
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"Error generating search token: {e}", exc_info=True)
-            raise
-    
-    @classmethod
-    def validate_and_use(cls, token, ip_address=None):
-        """Validate and mark token as used. Returns True if valid, False otherwise.
-        Allows reuse from the same IP address within expiration period."""
-        if not token:
-            logger.warning("Token validation failed: No token provided")
-            return False
-        
-        try:
-            # Use row-level locking to prevent race conditions
-            search_token = cls.query.filter_by(token=token).with_for_update().first()
-            if not search_token:
-                logger.warning(f"Token validation failed: Token not found in database: {token[:10]}...")
-                return False
-            
-            # Check if expired (tokens expire after 5 minutes)
-            token_age = datetime.utcnow() - search_token.created_at
-            if token_age > timedelta(minutes=5):
-                logger.warning(f"Token validation failed: Token expired (age: {token_age}): {token[:10]}...")
-                # Clean up expired token
-                db.session.delete(search_token)
-                db.session.commit()
-                return False
-            
-            # Check if already used
-            if search_token.used:
-                # Allow reuse from the same IP address
-                if ip_address and search_token.ip_address == ip_address:
-                    logger.info(f"Token reused by same IP: {token[:10]}... from {ip_address}")
-                    db.session.rollback()
-                    return True
-                else:
-                    logger.warning(f"Token validation failed: Token already used by different IP: {token[:10]}... (original IP: {search_token.ip_address}, request IP: {ip_address})")
-                    db.session.rollback()
-                    return False
-            
-            # Mark as used (first time)
-            search_token.used = True
-            db.session.commit()
-            logger.info(f"Token validated successfully (first use): {token[:10]}... from IP: {ip_address}")
-            return True
-            
-        except Exception as e:
-            # Log the error and rollback
-            db.session.rollback()
-            logger.error(f"Error validating search token {token[:10]}...: {e}", exc_info=True)
-            return False
-    
-    @classmethod
-    def cleanup_old_tokens(cls):
-        """Remove tokens older than 1 hour"""
-        try:
-            cutoff_time = datetime.utcnow() - timedelta(hours=1)
-            deleted_count = cls.query.filter(cls.created_at < cutoff_time).delete()
-            db.session.commit()
-            return deleted_count
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"Error cleaning up old tokens: {e}", exc_info=True)
-            return 0
 
 
 class RevokedToken(db.Model):
@@ -140,8 +53,18 @@ class SearchLog(db.Model):
 
     def save(self):
         self.time = datetime.utcnow()
-        db.session.add(self)
-        db.session.commit()
+        if self.keyword and len(self.keyword) > 255:
+            # A query longer than the column used to raise DataError, which
+            # left the session needing a rollback and turned the whole search
+            # into a 500.
+            self.keyword = self.keyword[:255]
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception:
+            # Analytics must never be able to fail a request.
+            db.session.rollback()
+            logger.warning('failed to record search log', exc_info=True)
 
 
 class Announcement(db.Model):
