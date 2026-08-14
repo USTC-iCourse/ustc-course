@@ -11,8 +11,12 @@ Description=Rebuild the USTC iCourse search index when it needs it
 # the rebuild is just what keeps that overlay small.  The catalogue has no
 # overlay, so an administrator changing a course's teachers requests a rebuild
 # directly and it lands within a couple of minutes rather than within an hour.
-OnBootSec=2min
-OnUnitActiveSec=2min
+#
+# OnCalendar, not OnUnitActiveSec: the latter arms itself relative to the last
+# time the service was *active*, and a run skipped by ExecCondition never
+# becomes active -- so after the first skip the timer would stop scheduling
+# itself entirely and the index would never be rebuilt again.
+OnCalendar=*:0/2
 AccuracySec=30s
 Persistent=true
 
