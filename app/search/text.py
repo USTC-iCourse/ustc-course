@@ -28,6 +28,7 @@ indexed as its own field and each backs a different retrieval tier:
 ``abbr``    pinyin initials of a whole short name (``数学分析`` -> ``sxfx``).
 """
 
+import os
 import re
 import unicodedata
 from typing import List
@@ -35,6 +36,18 @@ from typing import List
 import jieba
 import zhconv
 from pypinyin import Style, lazy_pinyin
+
+# jieba caches its compiled prefix dictionary, and defaults to /tmp for it.
+# That is the wrong place here twice over: the service runs with PrivateTmp,
+# so the cache would be discarded on every restart, and a /tmp path owned by
+# another user makes the write fail outright.  Either way jieba silently falls
+# back to rebuilding the dictionary in every process -- about a second, times
+# every worker, on every restart.  The module this replaced set the same thing.
+jieba.dt.tmp_dir = os.path.expanduser("~/.cache/jieba")
+try:
+    os.makedirs(jieba.dt.tmp_dir, exist_ok=True)
+except OSError:  # read-only home: fall back to jieba's default
+    jieba.dt.tmp_dir = None
 
 #: Runs joined by this character in normalized text.  A single space keeps
 #: normalized text usable as a plain substring-search haystack.
