@@ -18,7 +18,7 @@ import sqlalchemy as sa  # noqa: E402
 
 from app import app, db  # noqa: E402
 from app.search import IndexUnavailable, MatchQuality, ranked_review_ids  # noqa: E402
-from app.search import delta  # noqa: E402
+from app.search import builder, delta  # noqa: E402
 from app.search.service import _registry  # noqa: E402
 
 #: A string that cannot occur in the corpus, so any hit is the row we wrote.
@@ -232,6 +232,70 @@ class TestVisibilityIsLive(FreshnessTestCase):
         delta.visibility(db)
         review_id = self._insert_review("<p>%s</p>" % NONCE, invalidate=False, is_hidden=1)
         self.assertNotIn(review_id, self._find(NONCE)[0])
+
+
+class TestCatalogueRebuildRequests(FreshnessTestCase):
+    """Courses have no overlay, so edits to them ask for a rebuild instead.
+
+    Reviews must never do this: a full review rebuild takes three minutes and
+    the overlay already covers them exactly.
+    """
+
+    def tearDown(self):
+        super(TestCatalogueRebuildRequests, self).tearDown()
+        for name in ("courses", "reviews"):
+            try:
+                os.unlink(builder._request_path(app, name))
+            except OSError:
+                pass
+
+    def test_a_request_is_visible_to_the_builder(self):
+        builder.request_rebuild(app, "courses")
+        self.assertEqual(builder.take_requests(app), ["courses"])
+
+    def test_taking_requests_clears_them(self):
+        builder.request_rebuild(app, "courses")
+        builder.take_requests(app)
+        self.assertEqual(builder.take_requests(app), [])
+
+    def test_requests_are_cleared_before_the_build_not_after(self):
+        """An edit arriving while a rebuild runs must not be swallowed by it."""
+        builder.request_rebuild(app, "courses")
+        taken = builder.take_requests(app)  # build would start here
+        builder.request_rebuild(app, "courses")  # ...and an edit lands mid-build
+        self.assertEqual(taken, ["courses"])
+        self.assertEqual(builder.take_requests(app), ["courses"])
+
+    def test_repeated_requests_collapse_into_one_rebuild(self):
+        for _ in range(20):
+            builder.request_rebuild(app, "courses")
+        self.assertEqual(builder.take_requests(app), ["courses"])
+
+    def test_segment_age_reports_a_built_segment(self):
+        self.assertLess(builder.segment_age(app, "reviews"), float("inf"))
+        self.assertEqual(builder.segment_age(app, "nonexistent"), float("inf"))
+
+    def test_changing_teachers_requests_a_rebuild(self):
+        """The regression this exists to prevent: teacher names are indexed,
+        and the catalogue has no overlay to notice they changed."""
+        from app.models import Course, Teacher
+
+        course = Course.query.filter(Course.id.isnot(None)).first()
+        teacher = Teacher.query.filter(
+            ~Teacher.id.in_([t.id for t in course.teachers])
+        ).first()
+        if course is None or teacher is None:
+            self.skipTest("no course/teacher pair available")
+        try:
+            os.unlink(builder._request_path(app, "courses"))
+        except OSError:
+            pass
+
+        with app.test_request_context():
+            course.teachers.append(teacher)
+            db.session.flush()
+            builder.request_rebuild(app, "courses")
+        self.assertIn("courses", builder.take_requests(app))
 
 
 class TestOverlayBounds(FreshnessTestCase):

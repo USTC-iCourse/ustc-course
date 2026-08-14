@@ -60,9 +60,20 @@ sudo systemctl enable --now ustc-course-search-index.timer
 systemctl list-timers ustc-course-search-index.timer
 ```
 
-Hourly is deliberate, not conservative: reviews written or edited since the
-last build are served exactly by the freshness overlay
-(`app/search/delta.py`), so the rebuild only exists to keep that overlay small.
+The timer fires every two minutes but the unit is gated by an `ExecCondition`
+that costs milliseconds, so it does nothing unless there is work:
+
+* **Reviews** only ever rebuild on age (hourly). Everything written or edited
+  since the last build is served exactly by the freshness overlay in
+  `app/search/delta.py`, so the rebuild is just what keeps that overlay small.
+* **The catalogue has no overlay**, so course edits that change indexed text —
+  adding or removing a teacher, or a catalogue import — call
+  `app.search.builder.request_rebuild()`, which drops a marker the timer picks
+  up within a couple of minutes. A course rebuild takes about twenty seconds.
+
+That marker file is written by the web process, so the index directory must be
+writable by the `icourse` user. If it isn't, the request is logged and dropped
+and the edit simply waits for the hourly rebuild — it never fails the edit.
 
 ## Step 5: Restart the application
 
@@ -126,8 +137,8 @@ sudo -u icourse env PYTHONPATH=. /usr/bin/python3 tests/search_benchmark.py
 
 ## Operational notes
 
-**After importing courses.** The catalogue import scripts no longer maintain a
-cache table; rebuild the course segment when they finish:
+**After importing courses.** The import script requests a course rebuild on
+its own, so nothing needs doing. To force one immediately:
 
 ```bash
 cd /srv/ustc-course && sudo -u icourse env PYTHONPATH=. /usr/bin/python3 -m app.search.builder courses

@@ -310,7 +310,9 @@ def load_courses(insert=True):
 
     print('load complete, committing changes to database')
     db.session.commit()
-    print('remember to rebuild the search index: PYTHONPATH=. python3 -m app.search.builder courses')
+    from app.search.builder import request_rebuild
+    request_rebuild(app, 'courses')
+    print('search index rebuild requested (the timer will pick it up)')
     print('%d new teachers loaded' % new_teacher_count)
     print('%d new courses loaded' % new_course_count)
     print('%d new terms loaded' % new_term_count)

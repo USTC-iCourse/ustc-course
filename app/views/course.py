@@ -3,7 +3,8 @@ from flask_login import login_required
 from flask_babel import gettext as _
 from app.models import *
 from app.forms import ReviewForm, CourseForm
-from app import db
+from app import app, db
+from app.search.builder import request_rebuild
 from app.utils import sanitize
 from sqlalchemy import or_, func
 
@@ -366,6 +367,8 @@ def remove_teacher(course_id):
         return jsonify(ok=False, message=_('Teacher Not Found In Course'))
     course.teachers = new_teachers
     db.session.commit()
+    # Teacher names are indexed, so the catalogue segment is now out of date.
+    request_rebuild(app, 'courses')
     return jsonify(ok=True)
 
 
@@ -389,4 +392,5 @@ def add_teacher(course_id):
         return jsonify(ok=False, message=_('Teacher Already Exists In Course'))
     course.teachers.append(teacher)
     db.session.commit()
+    request_rebuild(app, 'courses')
     return jsonify(ok=True)

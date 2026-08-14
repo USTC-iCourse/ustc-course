@@ -11,13 +11,33 @@ a row edited while the build is running is covered by the overlay rather than
 falling into the gap between the two.
 """
 
+import logging
 import os
 import time
 from datetime import datetime, timedelta
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from .collections import ALL, DOCUMENT_SOURCES
 from .segment import SegmentWriter
+
+
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def default_segment_dir() -> str:
+    """Where segments live, resolved without importing the application.
+
+    The timer wakes every couple of minutes and almost always has nothing to
+    do; importing Flask, jieba, pypinyin and zhconv to discover that costs four
+    seconds of CPU each time, against about fifty milliseconds for this.
+    """
+    try:
+        import config.default as cfg  # noqa: F401  (plain module, no side effects)
+
+        configured = getattr(cfg, "SEARCH_INDEX_DIR", None)
+    except Exception:
+        configured = None
+    return configured or os.path.join(_REPO_ROOT, "data", "search-index")
 
 
 def segment_dir(app) -> str:
@@ -29,6 +49,77 @@ def segment_dir(app) -> str:
 
 def segment_path(app, collection: str) -> str:
     return os.path.join(segment_dir(app), "%s.seg" % collection)
+
+
+def _request_path(app, collection: str) -> str:
+    return os.path.join(segment_dir(app), "%s.rebuild" % collection)
+
+
+def request_rebuild(app, collection: str) -> None:
+    """Ask the next builder run to rebuild this collection now.
+
+    For reviews, freshness is the overlay's job and this is never needed.  The
+    catalogue is different: it has no overlay, it changes only when an
+    administrator edits it, and rebuilding the whole of it costs less than
+    twenty seconds -- so for courses, a full rebuild *is* the incremental
+    update, and this marker is how a request for one survives the web process.
+
+    Deliberately a filesystem marker rather than a background thread: an edit
+    made while a rebuild is running must not be swallowed by it, and thirty-two
+    workers must not be able to start thirty-two rebuilds.
+    """
+    try:
+        path = _request_path(app, collection)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "a"):
+            pass
+    except OSError:
+        # A missed marker costs freshness until the next scheduled rebuild; it
+        # must never cost the edit that triggered it.
+        logging.getLogger(__name__).warning(
+            "could not request a %s index rebuild", collection, exc_info=True
+        )
+
+
+def take_requests(app) -> List[str]:
+    """Collections with a pending request, clearing the markers.
+
+    Cleared *before* building, not after: a request arriving mid-build then
+    recreates the marker and is served by the next run, where clearing
+    afterwards would discard it.
+    """
+    taken = []
+    for collection in sorted(ALL):
+        try:
+            os.unlink(_request_path(app, collection))
+        except OSError:
+            continue
+        taken.append(collection)
+    return taken
+
+
+def _work_pending(index_dir: str, max_age: float) -> List[str]:
+    """Which collections need building, decided from the filesystem alone."""
+    needed = []
+    for collection in sorted(ALL):
+        if os.path.exists(os.path.join(index_dir, "%s.rebuild" % collection)):
+            needed.append(collection)
+            continue
+        try:
+            age = time.time() - os.stat(os.path.join(index_dir, "%s.seg" % collection)).st_mtime
+        except OSError:
+            age = float("inf")
+        if age >= max_age:
+            needed.append(collection)
+    return needed
+
+
+def segment_age(app, collection: str) -> float:
+    """Seconds since the segment was written; ``inf`` if there isn't one."""
+    try:
+        return max(time.time() - os.stat(segment_path(app, collection)).st_mtime, 0.0)
+    except OSError:
+        return float("inf")
 
 
 def build(app, db, collection: str, progress=None) -> Dict[str, float]:
@@ -76,8 +167,7 @@ def main(argv: Optional[list] = None) -> int:
     import argparse
     import sys
 
-    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-    from app import app, db  # noqa: E402  (import after sys.path fix)
+    sys.path.insert(0, _REPO_ROOT)
 
     parser = argparse.ArgumentParser(description="Build search index segments")
     parser.add_argument(
@@ -87,6 +177,18 @@ def main(argv: Optional[list] = None) -> int:
         help="collections to build (default: all of %s)" % ", ".join(sorted(ALL)),
     )
     parser.add_argument("--quiet", action="store_true")
+    parser.add_argument(
+        "--if-needed",
+        action="store_true",
+        help="build only what has been requested by the application or has "
+        "aged past --max-age; exits without work otherwise",
+    )
+    parser.add_argument(
+        "--max-age",
+        type=float,
+        default=3600.0,
+        help="with --if-needed, rebuild a segment older than this many seconds",
+    )
     args = parser.parse_args(argv)
 
     names = args.collections or sorted(ALL)
@@ -94,11 +196,25 @@ def main(argv: Optional[list] = None) -> int:
     if unknown:
         parser.error("unknown collection(s): %s" % ", ".join(unknown))
 
+    if args.if_needed:
+        # Decided from the filesystem, before the expensive imports: the timer
+        # fires every couple of minutes and usually has nothing to do.
+        pending = set(_work_pending(default_segment_dir(), args.max_age))
+        names = [name for name in names if name in pending]
+        if not names:
+            return 0
+
+    from app import app, db  # noqa: E402  (imported late, and after sys.path)
+
     def progress(n):
         if not args.quiet:
             print("  %d documents..." % n, end="\r", flush=True)
 
     with app.app_context():
+        if args.if_needed:
+            # Clear the markers now, before building: a request arriving while
+            # a build runs recreates its marker and is served by the next run.
+            take_requests(app)
         for name in names:
             stats = build(app, db, name, progress=progress)
             if not args.quiet:
