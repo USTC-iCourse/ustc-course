@@ -1,0 +1,36 @@
+[Unit]
+Description=Rebuild the USTC iCourse search index
+Documentation=file:///srv/ustc-course/app/search/__init__.py
+After=mysql.service
+Requires=mysql.service
+
+[Service]
+Type=oneshot
+User=icourse
+Group=icourse
+WorkingDirectory=/srv/ustc-course
+Environment=PYTHONPATH=/srv/ustc-course
+Environment=INDEX_DIR=/srv/ustc-course/data/search-index
+
+# The timer fires every couple of minutes so that a rebuild an administrator
+# asked for lands promptly, but there is almost never anything to do.  Deciding
+# that in Python would mean importing Flask, SQLAlchemy and the tokenizer
+# dictionaries first -- four seconds of CPU, every two minutes, to discover
+# there is no work.  This shell test costs milliseconds and skips the unit.
+#
+# It is only a pre-filter: --if-needed below re-checks authoritatively, so the
+# two can disagree without anything being built wrongly.  Keep the -mmin value
+# at or below the builder's --max-age.
+ExecCondition=/bin/sh -c 'ls $INDEX_DIR/*.rebuild >/dev/null 2>&1 || [ ! -f $INDEX_DIR/reviews.seg ] || [ ! -f $INDEX_DIR/courses.seg ] || [ -n "$(find $INDEX_DIR -maxdepth 1 -name \\*.seg -mmin +59 -print -quit)" ]'
+
+ExecStart=/usr/bin/python3 -m app.search.builder --quiet --if-needed
+
+# The builder holds the postings for one collection in memory before packing
+# them; reviews peaks around 400 MB.  Nice it down so a rebuild never competes
+# with request handling.
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=1800
+
+[Install]
+WantedBy=multi-user.target

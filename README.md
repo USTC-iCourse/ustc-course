@@ -17,8 +17,7 @@ USTC 评课社区是使用 Python 3 + Flask + SQLAlchemy 开发的 Web 系统。
 这几行的作用是：
 
 - 设置数据库使用 utf8mb4 作为默认连接字符集和存储字符集，以免出现乱码，并且支持 emoji。
-- 设置 MySQL 全文搜索的最小词长度为 1，以支持中文搜索。
-- 取消停用词设置。
+- 全文搜索相关的几行（```innodb_ft_*```、```ft_*```）现在只是历史遗留，搜索已不再使用 MySQL 全文索引（见下文「搜索索引」），保留无害。
 
 ```
 [client]
@@ -68,6 +67,26 @@ GRANT ALL ON icourse.* to 'ustc_course'@'localhost';
 
 初始化数据库：```python -m tests.init_db```，如果没有报错就初始化成功了。
 
+### 搜索索引
+
+搜索不走数据库，而是使用 ```app/search``` 自己构建的索引文件（内存映射，所有
+worker 共享一份）。首次部署和导入课程后都需要构建：
+
+```console
+PYTHONPATH=. python3 -m app.search.builder
+```
+
+生成的文件在 ```data/search-index/```（可用 ```SEARCH_INDEX_DIR``` 改位置）。
+索引未构建时搜索会返回 503。
+
+新发布和修改的点评不必等待重建：```app/search/delta.py``` 会直接从数据库读取
+自上次构建以来变化的行，因此点评索引每小时重建一次即可。
+
+课程索引没有这套机制，所以修改课程教师、或导入课程目录时，代码会调用
+```app.search.builder.request_rebuild()``` 请求重建，定时器会在几分钟内执行
+（见 ```ustc-course-search-index.timer```）。详见
+```DEPLOYMENT_INSTRUCTIONS.md```。
+
 ### 配置 Nginx
 
 如果您已经安装了其他 Web 服务器（如 Apache）或者已经有 Nginx 配置，请参考 ```tests/conf/nginx-config``` 来修改。
@@ -104,7 +123,18 @@ git submodule update --init --recursive
 * static 是静态文件，由 nginx 直接返回给用户
 * templates 是页面模板
 * views 是各种功能的业务逻辑
+* search 是搜索引擎（分词与归一化、索引格式、检索与排序），入口是 ```app/search/service.py```
 * utils.py 是工具函数
+
+搜索相关的测试：
+
+```console
+PYTHONPATH=. python3 tests/test_search_text.py       # 归一化与分词，不需要数据库
+PYTHONPATH=. python3 tests/test_search_segment.py    # 索引文件格式，不需要数据库
+PYTHONPATH=. python3 tests/test_search_engine.py     # 召回率、排序、权限、延迟
+PYTHONPATH=. python3 tests/test_search_freshness.py  # 新发布/修改/隐藏的点评
+PYTHONPATH=. python3 tests/search_benchmark.py       # 延迟与召回率基准
+```
 
 ## License
 

@@ -8,4 +8,3 @@ from .image import *
 from .share import *
 from .notification import *
 from .program import *
-from .searchcache import *

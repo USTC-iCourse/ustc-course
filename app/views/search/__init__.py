@@ -1,37 +1,28 @@
-from . import sqllike, sqlcache
-from flask_sqlalchemy.pagination import Pagination
-from .pagination import MyPagination
-from typing import List, Union
-from app import app
+"""Compatibility shim over :mod:`app.search`.
+
+The two SQL backends that used to live here -- ``sql-like`` and ``sql-cache``,
+selected by a config switch, so that development and production ran different
+matching code -- are gone.  This module remains only so that existing scripts
+(``tests/search_eval.py``, ``tests/eval_popular_search.py``) keep working.
+New code should import from :mod:`app.search` directly.
+"""
+
+from app.search import search_courses, search_reviews  # noqa: F401
+from app.search.text import normalize_query
+
+from .pagination import MyPagination  # noqa: F401
 
 
-def get_backend():
-    # put config get in function to help test scripts like tests.search_eval work
-    backend = app.config.get("SEARCH_BACKEND", "sql-like")
-    if backend not in ["sql-like", "sql-cache"]:
-        raise ValueError("Invalid SEARCH_BACKEND value: " + backend)
-    return backend
+def filter(query):
+    """Historically stripped punctuation before the caller ``.split()`` it.
 
-if get_backend() == "sql-like":
-    sqllike.init()
-else:
-    sqlcache.init()
+    Normalization now happens inside the engine, against the same function the
+    index was built with, so this only has to be harmless: it returns the
+    normalized query, whose whitespace-separated runs are exactly the units the
+    old callers expected to get from ``.split()``.
+    """
+    return normalize_query(query)
 
 
-def filter(x: str) -> str:
-    if get_backend() == "sql-like":
-        return sqllike.filter(x)
-    else:
-        return sqlcache.filter(x)
-
-def search(keywords: List[str], page: int, per_page: int) -> Union[Pagination, MyPagination]:
-    if get_backend() == "sql-like":
-        return sqllike.search(keywords, page, per_page)
-    else:
-        return sqlcache.search(keywords, page, per_page)
-
-def search_reviews(keywords: List[str], page: int, per_page: int, current_user) -> Union[Pagination, MyPagination]:
-    if get_backend() == "sql-like":
-        return sqllike.search_reviews(keywords, page, per_page, current_user)
-    else:
-        return sqlcache.search_reviews(keywords, page, per_page, current_user)
+def search(query, page, per_page):
+    return search_courses(query, page, per_page)

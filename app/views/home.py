@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
-from app.models import User, RevokedToken, CourseRate, Review, follow_course, follow_user, SearchLog, ThirdPartySigninHistory, Announcement, PasswordResetToken, SearchToken
+from app.models import User, RevokedToken, CourseRate, Review, follow_course, follow_user, SearchLog, ThirdPartySigninHistory, Announcement, PasswordResetToken
 from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
 from app.utils import ts, send_confirm_mail, send_reset_password_mail, verify_turnstile
 from flask_babel import gettext as _
@@ -9,8 +9,7 @@ from sqlalchemy import or_
 from app import db
 from app import app, limiter
 from .course import deptlist
-from .search import search as search_, search_reviews as search_reviews_, filter
-from .search.pagination import MyPagination
+from app.search import IndexUnavailable, search_courses, search_reviews as search_reviews_
 from itsdangerous import URLSafeTimedSerializer
 
 
@@ -327,40 +326,28 @@ def reset_password(token):
     return render_template('reset-password.html', form=form, title='重设密码')
 
 
+def _search_page_args():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    return max(page, 1), min(max(per_page, 1), 50)
+
+
 @home.route('/search-reviews/')
 def search_reviews():
     ''' 搜索点评内容 '''
     query_str = request.args.get('q')
-    
-    # Validate search token
-    search_token = request.args.get('token')
-    # Get client IP address (handle proxies)
-    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
-    if ip_address:
-        ip_address = ip_address.split(',')[0].strip()
-    
-    if not search_token or not SearchToken.validate_and_use(search_token, ip_address):
-        return render_template('error-page.html', code=403, 
-                             message='页面已过期，请重新搜索。',
-                             search_keyword=query_str,
-                             search_type='reviews',
-                             is_search_error=True), 403
     if not query_str:
         return redirect_to_index()
+    page, per_page = _search_page_args()
+    return _render_review_search(query_str, page, per_page)
 
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
 
-    keywords = filter(query_str).split()
-    if not keywords:
-        return render_template('search-reviews.html', keyword=query_str,
-                               reviews=MyPagination.empty(),
-                               title="无效的搜索关键词")
-    max_keywords_allowed = 10
-    if len(keywords) > max_keywords_allowed:
-        keywords = keywords[:max_keywords_allowed]
-
-    reviews_paged = search_reviews_(keywords, page, per_page, current_user)
+def _render_review_search(query_str, page, per_page):
+    ''' Shared by /search-reviews/ and by /search/ when no course matched. '''
+    try:
+        reviews_paged = search_reviews_(query_str, page, per_page, current_user)
+    except IndexUnavailable:
+        return _search_index_unavailable()
 
     if reviews_paged.total > 0:
         title = '搜索点评「' + query_str + '」'
@@ -376,28 +363,21 @@ def search_reviews():
     search_log.save()
 
     return render_template('search-reviews.html', reviews=reviews_paged,
-                title=title,
+                title=title, search_note=reviews_paged.note,
                 this_module='home.search_reviews', keyword=query_str)
+
+
+def _search_index_unavailable():
+    ''' The index has never been built, or was removed from under a worker. '''
+    app.logger.error('search index unavailable', exc_info=True)
+    return render_template('error-page.html', code=503,
+                           message='搜索服务正在初始化，请稍后再试。'), 503
 
 
 @home.route('/search/')
 def search():
     ''' 搜索 '''
     query_str = request.args.get('q')
-    
-    # Validate search token
-    search_token = request.args.get('token')
-    # Get client IP address (handle proxies)
-    ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
-    if ip_address:
-        ip_address = ip_address.split(',')[0].strip()
-    
-    if not search_token or not SearchToken.validate_and_use(search_token, ip_address):
-        return render_template('error-page.html', code=403, 
-                             message='页面已过期，请重新搜索。',
-                             search_keyword=query_str,
-                             search_type='courses',
-                             is_search_error=True), 403
     if not query_str:
         return redirect_to_index()
     noredirect = request.args.get('noredirect')
@@ -416,30 +396,22 @@ def search():
     #    # 开课地点
     #    course_query = course_query.filter(Course.campus==campus)
 
-    keywords = filter(query_str).split()
-    if not keywords:
-        return render_template('search.html', keyword=query_str,
-                               courses=MyPagination.empty(),
-                               title="无效的搜索关键词")
-    max_keywords_allowed = 10
-    if len(keywords) > max_keywords_allowed:
-        keywords = keywords[:max_keywords_allowed]
-    
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
-    if page <= 1:
-        page = 1
-    
-    pagination = search_(keywords, page, per_page)
+    page, per_page = _search_page_args()
+    try:
+        pagination = search_courses(query_str, page, per_page)
+    except IndexUnavailable:
+        return _search_index_unavailable()
 
     if pagination.total > 0:
         title = '搜索课程「' + query_str + '」'
     elif noredirect:
         title = '您的搜索「' + query_str + '」没有匹配到任何课程或老师'
     else:
-        # When redirecting to search_reviews, we need to get a new token
-        # Pass the token parameter along
-        return search_reviews()
+        # Nothing in the catalogue matched, so answer from the reviews instead.
+        # This used to re-validate the one-time token the request had already
+        # consumed a few lines earlier, and only worked at all because reuse
+        # from the same address was permitted.
+        return _render_review_search(query_str, page, per_page)
 
     search_log = SearchLog()
     search_log.keyword = query_str
@@ -451,7 +423,7 @@ def search():
 
     return render_template('search.html', keyword=query_str, courses=pagination,
                 dept=department, deptlist=deptlist,
-                title=title,
+                title=title, search_note=pagination.note,
                 this_module='home.search')
 
 

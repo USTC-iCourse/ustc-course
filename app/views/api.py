@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, Markup, redirect, render_template, abort, url_for
 from flask_login import login_required, current_user
 from app.models import Review, ReviewComment, User, Course, ImageStore, Notification
-from app.models import ReviewCommentHistory, ThirdPartySigninHistory, SearchToken
+from app.models import ReviewCommentHistory, ThirdPartySigninHistory
 from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email
 from app.utils import editor_parse_at
@@ -476,29 +476,9 @@ def unblock_user():
     return jsonify(ok=True)
 
 
-@api.route('/search/token', methods=['POST'])
-@app.csrf.exempt
-def get_search_token():
-    '''Generate a one-time token for search API (public endpoint, CSRF exempt)'''
-    try:
-        # Get client IP address (handle proxies)
-        ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
-        if ip_address:
-            # X-Forwarded-For can contain multiple IPs, take the first one
-            ip_address = ip_address.split(',')[0].strip()
-        
-        # Optional: Clean up old tokens periodically (only 1% of the time to reduce overhead)
-        import random
-        if random.random() < 0.01:
-            try:
-                SearchToken.cleanup_old_tokens()
-            except:
-                pass  # Don't fail if cleanup fails
-        
-        token = SearchToken.generate(ip_address)
-        return jsonify(ok=True, token=token)
-        
-    except Exception as e:
-        # Log the error and return failure
-        logger.error(f"Error in get_search_token: {e}", exc_info=True)
-        return jsonify(ok=False, error='Failed to generate token'), 500
+# The one-time search-token endpoint that used to live here is gone.
+# It permitted reuse from the same address, so it never actually
+# rate-limited anything, while making search impossible without
+# JavaScript and search URLs impossible to share.  Search now runs
+# against a memory-mapped index in single-digit milliseconds, so it
+# needs no more protection than any other page.

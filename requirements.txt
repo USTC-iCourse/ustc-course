@@ -12,6 +12,10 @@ flask-migrate==3.1.0
 flask-mysqldb==0.2.0
 flask-babel==2.0.0
 jieba==0.42.1
+# search index: postings arrays, pinyin fallback, traditional->simplified folding
+numpy==1.26.4
+pypinyin==0.46.0
+zhconv==1.4.3
 tqdm==4.66.3
 html2text==2020.1.16
 markdown==3.4.1
