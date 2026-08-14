@@ -141,14 +141,56 @@ class TestKnownQueries(SearchTestCase):
             self.assertEqual(results.quality, MatchQuality.EXACT)
 
     def test_homophones_reach_the_original(self):
-        # 紫砂 is the euphemism students use for 自杀; the crisis keyword list
-        # in app/utils.py enumerates variants by hand, the pinyin tier does not.
-        plan_hits = search_courses("紫砂", 1, 10)
-        self.assertIsNotNone(plan_hits)  # must not raise
-        results = search_reviews("自鲨", 1, 10, self.anon)
-        self.assertGreater(results.total, 0, "no homophone fallback for 自鲨")
+        """A homophone of 自杀 must find something, and say how it found it.
+
+        Which rung fires depends on the corpus, so the expectation is derived
+        from it rather than hardcoded: students really do write 自鲨, and on a
+        database where they have, an exact match is the *right* answer, not a
+        failure of the homophone tier.  An earlier version of this test assumed
+        the word was absent and failed against production for being correct.
+        """
+        for probe in ("紫砂", "自鲨", "自沙"):
+            occurs = db.session.execute(
+                sa.text(
+                    "SELECT COUNT(*) FROM reviews WHERE is_blocked = 0 AND is_hidden = 0 "
+                    "AND only_visible_to_student = 0 AND content LIKE :w"
+                ),
+                {"w": "%" + probe + "%"},
+            ).scalar()
+            results = search_reviews(probe, 1, 10, self.anon)
+            self.assertGreater(results.total, 0, "%r found nothing at all" % probe)
+            if occurs:
+                self.assertEqual(
+                    results.quality,
+                    MatchQuality.EXACT,
+                    "%r occurs verbatim and should match exactly" % probe,
+                )
+                self.assertIsNone(results.note)
+            else:
+                self.assertLess(
+                    results.quality,
+                    MatchQuality.EXACT,
+                    "%r does not occur, so it can only have been reached by "
+                    "relaxing the query" % probe,
+                )
+                self.assertIsNotNone(results.note, "a relaxed match must say so")
+
+    def test_a_homophone_absent_from_the_corpus_still_reaches_it(self):
+        """The pinyin tier proper: a spelling nobody used, reaching one they did.
+
+        This is what replaces the hand-maintained variant list in app/utils.py.
+        """
+        made_up = "自杀".replace("杀", "煞")  # 自煞: same pinyin, not a real word
+        occurs = db.session.execute(
+            sa.text("SELECT COUNT(*) FROM reviews WHERE content LIKE :w"),
+            {"w": "%" + made_up + "%"},
+        ).scalar()
+        if occurs:
+            self.skipTest("%r unexpectedly occurs in this database" % made_up)
+        results = search_reviews(made_up, 1, 10, self.anon)
+        self.assertGreater(results.total, 0, "%r reached nothing" % made_up)
         self.assertLess(results.quality, MatchQuality.EXACT)
-        self.assertIsNotNone(results.note, "a fuzzy match must say so")
+        self.assertIsNotNone(results.note)
 
     def test_course_abbreviations(self):
         for probe, expected in (("数分", "数学分析"), ("线代", "线性代数")):
