@@ -1,10 +1,10 @@
 """Builds index segments from the database.
 
-Runs out of process, on a timer.  A full rebuild of both collections takes
-well under a minute, which is why there is no incremental-update machinery to
+Runs out of process, on a timer.  There is no incremental-update machinery to
 get wrong: the index is simply replaced, and everything written since the build
 started is served by the freshness overlay in :mod:`app.search.delta` until the
-next rebuild catches up.
+next rebuild catches up.  On production that costs about twenty seconds for the
+catalogue and five minutes for the reviews.
 
 The watermark stored in the segment is the instant *before* the build began, so
 a row edited while the build is running is covered by the overlay rather than
@@ -22,6 +22,32 @@ from .segment import SegmentWriter
 
 
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+#: How stale a segment may become before the timer rebuilds it even though
+#: nothing asked for one.  Per collection, because the two are safety nets
+#: against different things:
+#:
+#: ``courses``  Rebuilds are event-driven -- every route and script that edits
+#:              indexed catalogue data calls :func:`request_rebuild`.  The age
+#:              path only catches what bypasses that: a direct database edit,
+#:              or a marker that could not be written.
+#: ``reviews``  Has no event path and does not need one; the overlay serves
+#:              every row written since the build, exactly.  Rebuilding only
+#:              bounds how much the overlay carries, and this site accumulates
+#:              its fifty thousand reviews over *years* -- a day's writes are a
+#:              few dozen, against MAX_DELTA_ROWS of five thousand.
+#:
+#: An hour was the original guess for both.  Measured over twelve hours of
+#: production it cost about forty-five minutes of CPU -- some 7% of a core,
+#: continuously -- to rebuild an index that nothing had invalidated, because
+#: the overlay was already serving the handful of new reviews correctly.
+MAX_AGE = {
+    "courses": 86400.0,
+    "reviews": 86400.0,
+}
+
+#: Used for a collection with no entry above.
+DEFAULT_MAX_AGE = 86400.0
 
 
 def default_segment_dir() -> str:
@@ -103,18 +129,23 @@ def take_requests(app, collections: Optional[Sequence[str]] = None) -> List[str]
     return taken
 
 
-def _work_pending(index_dir: str, max_age: float) -> List[str]:
-    """Which collections need building, decided from the filesystem alone."""
+def _work_pending(index_dir: str, max_age: Optional[float] = None) -> List[str]:
+    """Which collections need building, decided from the filesystem alone.
+
+    ``max_age`` overrides :data:`MAX_AGE` for every collection; leave it unset
+    to use each collection's own limit.
+    """
     needed = []
     for collection in sorted(ALL):
         if os.path.exists(os.path.join(index_dir, "%s.rebuild" % collection)):
             needed.append(collection)
             continue
+        limit = max_age if max_age is not None else MAX_AGE.get(collection, DEFAULT_MAX_AGE)
         try:
             age = time.time() - os.stat(os.path.join(index_dir, "%s.seg" % collection)).st_mtime
         except OSError:
             age = float("inf")
-        if age >= max_age:
+        if age >= limit:
             needed.append(collection)
     return needed
 
@@ -191,8 +222,10 @@ def main(argv: Optional[list] = None) -> int:
     parser.add_argument(
         "--max-age",
         type=float,
-        default=3600.0,
-        help="with --if-needed, rebuild a segment older than this many seconds",
+        default=None,
+        help="with --if-needed, rebuild a segment older than this many seconds, "
+        "overriding the per-collection defaults (%s)"
+        % ", ".join("%s=%gs" % kv for kv in sorted(MAX_AGE.items())),
     )
     args = parser.parse_args(argv)
 

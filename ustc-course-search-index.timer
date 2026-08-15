@@ -6,11 +6,14 @@ Description=Rebuild the USTC iCourse search index when it needs it
 # unless there is work: either a segment has aged past --max-age (one hour) or
 # the application has asked for a rebuild.
 #
-# Reviews only ever take the hourly path -- everything written since the last
-# build is served exactly by the freshness overlay in app/search/delta.py, so
-# the rebuild is just what keeps that overlay small.  The catalogue has no
-# overlay, so an administrator changing a course's teachers requests a rebuild
-# directly and it lands within a couple of minutes rather than within an hour.
+# Firing often is what makes a *requested* rebuild land within a couple of
+# minutes: an administrator changing a course's teachers asks for one directly,
+# because the catalogue has no freshness overlay.
+#
+# Nothing is rebuilt merely because time passed until it is a day old (see
+# MAX_AGE in app/search/builder.py).  Reviews do not need it sooner -- the
+# overlay in app/search/delta.py serves everything written since the last build,
+# exactly -- and rebuilding them hourly cost ~7% of a core doing nothing useful.
 #
 # OnCalendar, not OnUnitActiveSec: the latter arms itself relative to the last
 # time the service was *active*, and a run skipped by ExecCondition never
