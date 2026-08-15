@@ -2,6 +2,7 @@
 import sys
 sys.path.append('..')
 from app import app, db
+from app.search.builder import request_rebuild
 from app.models import Review
 from lxml.html.clean import Cleaner
 from app.utils import sanitize
@@ -26,3 +27,9 @@ with app.app_context():
 
             record_review_history(review, 'clean-html')
             db.session.commit()
+
+    # Review text is indexed. The freshness overlay keys on update_time,
+    # which this script deliberately does not bump -- a bulk cleanup should
+    # not resurface every review as recently updated -- so the index has to
+    # be rebuilt explicitly instead.
+    request_rebuild(app, 'reviews')

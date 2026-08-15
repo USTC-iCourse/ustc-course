@@ -6,6 +6,7 @@ import sys
 sys.path.append("..")  # fix import directory
 
 from app import app, db
+from app.search.builder import request_rebuild
 from app.models import *
 from datetime import datetime
 import argparse
@@ -288,3 +289,7 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         load_courses(args)
+        # Course names, teacher names and course codes are all indexed, so the
+        # catalogue segment is stale after this. Ask for a rebuild; the timer
+        # serves it within a couple of minutes.
+        request_rebuild(app, 'courses')
