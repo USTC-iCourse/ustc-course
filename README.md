@@ -80,7 +80,7 @@ PYTHONPATH=. python3 -m app.search.builder
 索引未构建时搜索会返回 503。
 
 新发布和修改的点评不必等待重建：```app/search/delta.py``` 会直接从数据库读取
-自上次构建以来变化的行，因此点评索引每小时重建一次即可。
+自上次构建以来变化的行，因此点评索引每天重建一次即可（见 ```app/search/builder.py``` 中的 ```MAX_AGE```）。
 
 课程索引没有这套机制，所以修改课程教师、或导入课程目录时，代码会调用
 ```app.search.builder.request_rebuild()``` 请求重建，定时器会在几分钟内执行

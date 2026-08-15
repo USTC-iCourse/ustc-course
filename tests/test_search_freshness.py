@@ -284,6 +284,25 @@ class TestCatalogueRebuildRequests(FreshnessTestCase):
             builder.request_rebuild(app, "courses")
         self.assertEqual(builder.take_requests(app), ["courses"])
 
+    def test_age_limits_are_per_collection_and_overridable(self):
+        index_dir = builder.segment_dir(app)
+        # Fresh segments, nothing requested: no work.
+        self.assertEqual(builder._work_pending(index_dir), [])
+        # A zero limit makes everything overdue, which is how the CLI override
+        # forces a rebuild.
+        self.assertEqual(builder._work_pending(index_dir, max_age=0), sorted(builder.ALL))
+        # Every collection must have a limit, whether or not it is named.
+        for name in builder.ALL:
+            limit = builder.MAX_AGE.get(name, builder.DEFAULT_MAX_AGE)
+            self.assertGreater(limit, 0)
+
+    def test_a_request_beats_the_age_limit(self):
+        """A requested rebuild must happen now, not when the segment ages out."""
+        index_dir = builder.segment_dir(app)
+        self.assertEqual(builder._work_pending(index_dir), [])
+        builder.request_rebuild(app, "courses")
+        self.assertEqual(builder._work_pending(index_dir), ["courses"])
+
     def test_segment_age_reports_a_built_segment(self):
         self.assertLess(builder.segment_age(app, "reviews"), float("inf"))
         self.assertEqual(builder.segment_age(app, "nonexistent"), float("inf"))

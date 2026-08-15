@@ -63,9 +63,12 @@ systemctl list-timers ustc-course-search-index.timer
 The timer fires every two minutes but the unit is gated by an `ExecCondition`
 that costs milliseconds, so it does nothing unless there is work:
 
-* **Reviews** only ever rebuild on age (hourly). Everything written or edited
-  since the last build is served exactly by the freshness overlay in
-  `app/search/delta.py`, so the rebuild is just what keeps that overlay small.
+* **Reviews** only ever rebuild on age, once a day. Everything written or
+  edited since the last build is served exactly by the freshness overlay in
+  `app/search/delta.py`, so the rebuild is just what keeps that overlay small —
+  and this site takes years to accumulate the reviews that would fill it.
+  Rebuilding them hourly, as originally shipped, spent about 7% of a core
+  continuously to no effect.
 * **The catalogue has no overlay**, so course edits that change indexed text —
   adding or removing a teacher, or a catalogue import — call
   `app.search.builder.request_rebuild()`, which drops a marker the timer picks
@@ -73,7 +76,7 @@ that costs milliseconds, so it does nothing unless there is work:
 
 That marker file is written by the web process, so the index directory must be
 writable by the `icourse` user. If it isn't, the request is logged and dropped
-and the edit simply waits for the hourly rebuild — it never fails the edit.
+and the edit waits for the daily rebuild instead — it never fails the edit.
 
 ## Step 5: Restart the application
 
@@ -146,6 +149,11 @@ cd /srv/ustc-course && sudo -u icourse env PYTHONPATH=. /usr/bin/python3 -m app.
 
 **Disk.** Roughly 130 MB for both segments, plus the same again transiently
 while a rebuild writes its temporary file. The builder peaks around 400 MB RSS.
+
+**Rebuild cadence** is `MAX_AGE` in `app/search/builder.py`, per collection.
+The `ExecCondition` in the service unit duplicates the threshold as a cheap
+pre-filter; keep its `-mmin` just *below* the smallest `MAX_AGE`, since too low
+only wastes a process start while too high would skip a due rebuild.
 
 **If the timer stops.** Searches stay *correct* — the overlay covers the gap —
 but get slower as it grows. Past `MAX_DELTA_ROWS` the overlay stops expanding

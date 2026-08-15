@@ -19,9 +19,14 @@ Environment=INDEX_DIR=/srv/ustc-course/data/search-index
 # there is no work.  This shell test costs milliseconds and skips the unit.
 #
 # It is only a pre-filter: --if-needed below re-checks authoritatively, so the
-# two can disagree without anything being built wrongly.  Keep the -mmin value
-# at or below the builder's --max-age.
-ExecCondition=/bin/sh -c 'ls $INDEX_DIR/*.rebuild >/dev/null 2>&1 || [ ! -f $INDEX_DIR/reviews.seg ] || [ ! -f $INDEX_DIR/courses.seg ] || [ -n "$(find $INDEX_DIR -maxdepth 1 -name \\*.seg -mmin +59 -print -quit)" ]'
+# two can disagree without anything being built wrongly -- but only in the safe
+# direction.  Keep -mmin just *below* the smallest MAX_AGE in app/search/builder.py
+# (currently 86400s = 1440min): too low merely starts Python to find no work,
+# whereas too high would skip a rebuild that was actually due.  At 1439 the two
+# disagree for one minute a day; at the previous 59-vs-60 they disagreed for one
+# minute an hour, which is where fifteen pointless starts per twelve hours came
+# from.
+ExecCondition=/bin/sh -c 'ls $INDEX_DIR/*.rebuild >/dev/null 2>&1 || [ ! -f $INDEX_DIR/reviews.seg ] || [ ! -f $INDEX_DIR/courses.seg ] || [ -n "$(find $INDEX_DIR -maxdepth 1 -name \\*.seg -mmin +1439 -print -quit)" ]'
 
 ExecStart=/usr/bin/python3 -m app.search.builder --quiet --if-needed
 
