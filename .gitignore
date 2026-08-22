@@ -1,8 +1,22 @@
 *.pyc
 __pycache__
 .*
+!.github/
 *~
 data
-config/default.py
 uploads/
 node_modules/
+
+# config/ holds the live SECRET_KEY, database URI, mail password and API keys.
+# Ignore the whole directory and re-admit only the two files meant to be
+# public, so that a stray backup -- config-backup.py, default.py.bak-<date> --
+# can never be committed to this public repository by an `git add -A`.
+config/*
+!config/__init__.py
+!config/default.py.example
+
+# Editor and ad-hoc backups, kept out for the same reason.
+*.bak
+*.bak-*
+*.orig
+nohup.out

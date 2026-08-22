@@ -1,6 +1,4 @@
 # Gunicorn configuration file
-import logging
-import sys
 
 # Bind to localhost
 bind = "127.0.0.1:3000"
@@ -13,10 +11,13 @@ accesslog = "/var/log/ustc-course/ustc-course-access.log"
 errorlog = "/var/log/ustc-course/ustc-course-error.log"
 loglevel = "info"
 
-# Capture print statements and errors
+# Capture stray print()/stderr from the app into the error log (safety net).
 capture_output = True
 
-# Log to stdout as well (for systemd journal)
+# Send access logs and error/app logs to SEPARATE files.
+# access -> access_file, error/app -> error_file. No console handler:
+# under capture_output the process stdout/stderr is already redirected to
+# the error log, so a console handler would just duplicate everything there.
 logconfig_dict = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -25,35 +26,39 @@ logconfig_dict = {
             'format': '%(asctime)s [%(process)d] [%(levelname)s] %(message)s',
             'datefmt': '[%Y-%m-%d %H:%M:%S %z]',
             'class': 'logging.Formatter'
+        },
+        'access': {
+            # gunicorn's access_log_format already includes time/status/etc.
+            'format': '%(message)s',
+            'class': 'logging.Formatter'
         }
     },
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'generic',
-            'stream': sys.stdout
-        },
         'error_file': {
             'class': 'logging.FileHandler',
             'formatter': 'generic',
             'filename': errorlog
+        },
+        'access_file': {
+            'class': 'logging.FileHandler',
+            'formatter': 'access',
+            'filename': accesslog
         }
     },
     'root': {
         'level': 'INFO',
-        'handlers': ['console', 'error_file']
+        'handlers': ['error_file']
     },
     'loggers': {
         'gunicorn.error': {
             'level': 'INFO',
-            'handlers': ['console', 'error_file'],
+            'handlers': ['error_file'],
             'propagate': False
         },
         'gunicorn.access': {
             'level': 'INFO',
-            'handlers': ['console'],
+            'handlers': ['access_file'],
             'propagate': False
         }
     }
 }
-
