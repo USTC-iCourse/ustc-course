@@ -19,7 +19,7 @@
         <p class="text-muted ck-content">{{ announcement.content|safe }}</p>
 
         <div class="grey bm-pd-md">
-	      <a href="{{ url_for('user.view_profile', user_id=announcement.author.id) }}">{{ announcement.author.username }}</a> 发表于
+	      <a href="{{ url_for('user.view_profile', user_id=announcement.author.id) }}"><bdi>{{ announcement.author.username }}</bdi></a> 发表于
           <span class="localtime" style="display: none;">{{ announcement.publish_time|utctime }}</span>
 	      {% if announcement.publish_time != announcement.update_time %}
 	      <span>（最后修改于</span> <span class="localtime" style="display: none;">{{ announcement.update_time|utctime }}</span><span>）</span>

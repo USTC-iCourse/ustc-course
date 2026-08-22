@@ -68,7 +68,7 @@
           <btn class="btn btn-link float-right"><a href="javascript: remove_teacher({{ teacher.id }});">从课程中删除教师</a></btn>
           {% endif %}
           {% endif %}
-          <h3 class="blue"><a href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}">{{ teacher.name }}</a></h3>
+          <h3 class="blue"><a href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}"><bdi>{{ teacher.name }}</bdi></a></h3>
           <p>{{ teacher.dept.name }}</p>
           <p>教师主页：
             {% if teacher.homepage and teacher.homepage != 'http://' %}

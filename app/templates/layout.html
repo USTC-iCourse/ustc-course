@@ -8,7 +8,7 @@
       <div class="navbar-header">
         {% if current_user.is_authenticated %}
         <button type="button" class="mobile btn btn-default navbar-btn pull-right right-mg-md" style="outline:none" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          {{ current_user.username }} <span class="caret"></span>
+          <bdi>{{ current_user.username }}</bdi> <span class="caret"></span>
         </button>
         {% else %}
         <button type="button" class="mobile btn btn-default navbar-btn pull-right right-mg-md" style="outline:none" data-toggle="modal" data-target="#signin">登录</button>
@@ -64,7 +64,7 @@
           </li>
 
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><bdi>{{ current_user.username }}</bdi><span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
               <li><a href="{{ url_for('user.view_profile', user_id=current_user.id) }}">个人主页</a></li>
               <li><a href="{{ url_for('user.account_settings') }}">设置</a></li>

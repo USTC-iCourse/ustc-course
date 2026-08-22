@@ -2,7 +2,7 @@
             <div class="panel-body" style="padding: 5px 15px;">
               {% for comment in review.comments %}
               <div class="ud-pd-sm solid">
-                  <a href="{{ url_for('user.view_profile', user_id=comment.author.id) }}">{{ comment.author.username }}</a>：
+                  <a href="{{ url_for('user.view_profile', user_id=comment.author.id) }}"><bdi>{{ comment.author.username }}</bdi></a>：
                   <span>{{ comment.content|content_filter|safe|urlize(nofollow=true) }}</span>
                   <span class="text-muted small float-right">
                     {% if user.is_active %}

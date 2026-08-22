@@ -66,7 +66,7 @@
           </tr>
         {% for user in users %}
           <tr>
-            <td><a href="{{ url_for('user.view_profile', user_id=user.id) }}" target="_blank">{{ user.username }}</a></td>
+            <td><a href="{{ url_for('user.view_profile', user_id=user.id) }}" target="_blank"><bdi>{{ user.username }}</bdi></a></td>
             <td>{{ user.reviews_count }}</td>
 	    <td>{{ user.review_upvotes_count }}</td>
           </tr>
@@ -85,7 +85,7 @@
         {% for review in reviews %}
           <tr>
             <td><a href="{{ url_for('course.view_course', course_id=review.course_id) }}#review-{{ review.review_id }}" target="_blank">{{ review.course_name }}</a></td>
-            <td><a href="{{ url_for('user.view_profile', user_id=review.author_id) }}" target="_blank">{{ review.author_username }}</a></td>
+            <td><a href="{{ url_for('user.view_profile', user_id=review.author_id) }}" target="_blank"><bdi>{{ review.author_username }}</bdi></a></td>
             <td>{{ review.review_upvotes_count }}</td>
           </tr>
         {% endfor %}

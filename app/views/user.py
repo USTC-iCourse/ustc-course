@@ -2,7 +2,7 @@ from flask import Blueprint,render_template,abort,redirect,url_for,request, abor
 from app.models import *
 from app.forms import LoginForm, ProfileForm,PasswordForm
 from flask_login import login_user, current_user, login_required
-from app.utils import handle_upload, resize_avatar, sanitize, cal_validation_code
+from app.utils import handle_upload, resize_avatar, sanitize, cal_validation_code, normalize_url
 from flask_babel import gettext as _
 import re
 
@@ -105,9 +105,7 @@ def account_settings():
         else:
             user.username = username
 
-        user.homepage = form['homepage'].data.strip()
-        if not user.homepage.startswith('http'):
-            user.homepage = 'http://' + user.homepage
+        user.homepage = normalize_url(form['homepage'].data)
         user.description = form['description'].data.strip()
         if request.files.get('avatar'):
             avatar = request.files['avatar']

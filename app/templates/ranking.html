@@ -151,8 +151,7 @@
             {% if review.is_anonymous %}
             <td>匿名用户</td>
             {% else %}
-            <td><a href="{{ url_for('user.view_profile', user_id=review.author_id) }}" target="_blank">{{
-                review.author_username }}</a></td>
+            <td><a href="{{ url_for('user.view_profile', user_id=review.author_id) }}" target="_blank"><bdi>{{ review.author_username }}</bdi></a></td>
             {% endif %}
             <td>{{ review.review_upvotes_count }}</td>
           </tr>
@@ -182,8 +181,7 @@
             {% if review.is_anonymous %}
             <td>匿名用户</td>
             {% else %}
-            <td><a href="{{ url_for('user.view_profile', user_id=review.author_id) }}" target="_blank">{{
-                review.author_username }}</a></td>
+            <td><a href="{{ url_for('user.view_profile', user_id=review.author_id) }}" target="_blank"><bdi>{{ review.author_username }}</bdi></a></td>
             {% endif %}
             <td>{{ review.review_upvotes_count }}</td>
             <td>{{ review.review_length }}</td>
@@ -214,7 +212,7 @@
           {% for user in users %}
 	        <tr {% if loop.index > default_show_count %}class="collapse more-users"{% endif %}>
             <th class="text-center">#{{ loop.index }}</th>
-            <td><a href="{{ url_for('user.view_profile', user_id=user.id) }}" target="_blank">{{ user.username }}</a>
+            <td><a href="{{ url_for('user.view_profile', user_id=user.id) }}" target="_blank"><bdi>{{ user.username }}</bdi></a>
             </td>
             <td>{{ user.reviews_count }}</td>
             <td>{{ user.review_upvotes_count }}</td>

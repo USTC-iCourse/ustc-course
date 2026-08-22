@@ -11,7 +11,7 @@
 <p><b>课程：</b>{{ info.course_name }}</p>
 <p><b>点评链接：</b><a href="{{ info.review_url }}">{{ info.review_url }}</a></p>
 <p><b>作者邮箱：</b>{{ info.author_email }}</p>
-<p><b>作者用户名：</b>{{ info.author_username }}{% if info.is_anonymous %}（该点评为匿名发表）{% endif %}</p>
+<p><b>作者用户名：</b><bdi>{{ info.author_username }}</bdi>{% if info.is_anonymous %}（该点评为匿名发表）{% endif %}</p>
 <p><b>检测时间（UTC）：</b>{{ info.time }}</p>
 
 <p><b>点评内容：</b></p>
