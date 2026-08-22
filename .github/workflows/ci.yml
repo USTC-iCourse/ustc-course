@@ -1,0 +1,117 @@
+name: CI / Deploy
+
+# CI runs for every push and every pull request.  The deploy job runs only for
+# a push to master and only after CI has passed: `needs: ci` makes that a hard
+# gate rather than a convention -- a red check cannot reach production.
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false          # app/static/MathJax is a large, asset-only submodule
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'      # matches /usr/bin/python3 on the production host
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install mysqlclient build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends pkg-config default-libmysqlclient-dev
+
+      - name: Syntax-check every tracked Python file
+        # py_compile parses without importing, so this reaches the maintenance
+        # scripts in tests/ that the import check below never touches.
+        run: git ls-files -z '*.py' | xargs -0 -n 50 python -m py_compile
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check for conflicting dependencies
+        run: pip check
+
+      - name: Provide a configuration for the import check
+        # config/default.py is deliberately untracked -- it holds the production
+        # SECRET_KEY, database URI and mail/API credentials.  The committed
+        # example is enough to import the application.
+        run: cp config/default.py.example config/default.py
+
+      - name: Import the application
+        # app/__init__.py ends in `from app.views import *`, so importing the
+        # package pulls in every view, model and form.  This is the check that
+        # catches a missing dependency, a bad import or a NameError at module
+        # level before it can reach production.  Nothing connects to MySQL at
+        # import time, so no database service is needed here.
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import app
+          routes = list(app.app.url_map.iter_rules())
+          print(f"imported cleanly, {len(routes)} routes registered")
+          if len(routes) < 50:
+              raise SystemExit(f"only {len(routes)} routes registered -- blueprints failed to load")
+          PY
+
+      - name: Check the migration history has a single head
+        # Two heads make `flask db upgrade` fail on the server, which would
+        # otherwise only be discovered halfway through a deploy.
+        run: |
+          heads=$(PYTHONPATH=. flask db heads 2>/dev/null | grep -cE '^[0-9a-f]{8,}') || true
+          echo "alembic heads: ${heads:-0}"
+          if [ "${heads:-0}" != "1" ]; then
+            echo "::error::expected exactly one Alembic head, found ${heads:-0}"
+            exit 1
+          fi
+
+      - name: Run the database-free test suites
+        run: |
+          PYTHONPATH=. python tests/test_search_text.py
+          PYTHONPATH=. python tests/test_search_segment.py
+
+  deploy:
+    name: Deploy to icourse.club
+    needs: ci
+    # Never runs for a pull request.  This repository is public and the runner
+    # lives on the production host, so the guard is a security boundary, not a
+    # convenience.
+    if: >-
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      && github.ref == 'refs/heads/master'
+    runs-on: [self-hosted, icourse-prod]
+    timeout-minutes: 30
+    concurrency:
+      group: production-deploy      # one deploy at a time, never cancelled midway
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: false
+          persist-credentials: false
+
+      - name: Deploy and verify
+        # Deploys this exact commit -- the one CI just passed on -- rather than
+        # whatever origin/master points at by now.
+        env:
+          DEPLOY_REF: ${{ github.sha }}
+        run: ./deploy/deploy.sh
+
+      - name: Report the running revision
+        if: always()
+        run: git -C /srv/ustc-course log -1 --format='now serving %h %s'
