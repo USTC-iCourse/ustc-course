@@ -154,3 +154,82 @@ itself failed — the only case that needs immediate attention:
 
 `git -C /srv/ustc-course reflog` lists the revisions that were deployed, newest
 first, which is where `<sha>` comes from.
+
+## Operating the search index
+
+Search reads a memory-mapped index on disk, not the database, so the index must
+exist before the site can serve searches — `/search/` returns 503 until a
+segment is there. The files live in `data/search-index/`, relocatable with
+`SEARCH_INDEX_DIR` in `config/default.py`.
+
+`ustc-course-search-index.timer` fires every two minutes, but the unit is gated
+by an `ExecCondition` costing milliseconds, so it does nothing unless there is
+work:
+
+* **Reviews** rebuild on age, once a day. Everything written or edited since the
+  last build is served exactly by the freshness overlay in `app/search/delta.py`,
+  so the rebuild only keeps that overlay small — and this site takes years to
+  accumulate the reviews that would fill it.
+* **The catalogue has no overlay**, so course edits that change indexed text —
+  adding or removing a teacher, or a catalogue import — call
+  `app.search.builder.request_rebuild()`, which drops a marker file the timer
+  picks up within a couple of minutes. A course rebuild takes about twenty
+  seconds.
+
+The marker is written by the web process, so the index directory must be
+writable by `icourse`. If it is not, the request is logged and dropped and the
+edit waits for the daily rebuild — it never fails the edit. `deploy.sh` requests
+a rebuild of both collections whenever a deploy changed `app/search/`.
+
+**Forcing a rebuild.** The catalogue import asks for one itself, so ordinarily
+nothing needs doing. To run one immediately:
+
+    cd /srv/ustc-course && sudo -u icourse env PYTHONPATH=. /usr/bin/python3 -m app.search.builder courses
+
+Omit `courses` to rebuild everything. Expect roughly 20 s for courses and 3 min
+for reviews.
+
+**Cadence** is `MAX_AGE` in `app/search/builder.py`, per collection. The
+`ExecCondition` in the service unit duplicates the threshold as a cheap
+pre-filter; keep its `-mmin` just *below* the smallest `MAX_AGE`, since too low
+only wastes a process start while too high would skip a due rebuild.
+
+**Disk.** Roughly 130 MB for both segments, plus the same again transiently
+while a rebuild writes its temporary file. The builder peaks around 400 MB RSS.
+
+**If the timer stops.** Searches stay *correct* — the overlay covers the gap —
+but get slower as it grows. Past `MAX_DELTA_ROWS` the overlay stops expanding
+and `index_status()["delta_overflowed"]` becomes true, which is the signal to
+look at the timer:
+
+    cd /srv/ustc-course && sudo -u icourse env PYTHONPATH=. /usr/bin/python3 - <<'PY'
+    from app import app
+    from app.search import index_status
+    with app.app_context():
+        print(index_status())
+    PY
+
+## Logs
+
+    sudo journalctl -u ustc-course.service -f
+    sudo journalctl -u ustc-course-search-index.service -n 50
+    sudo journalctl -u actions.runner.USTC-iCourse-ustc-course.icourse-prod -n 50
+    tail -f /var/log/ustc-course/ustc-course-error.log
+
+Rotation is configured in `/etc/logrotate.d/ustc-course`. `copytruncate` is
+used rather than `create` plus a reload, because gunicorn holds each log open
+twice — once through a `logging.FileHandler` and once through
+`capture_output = True` — and both open in append mode, so truncating in place
+is safe and no writer needs signalling:
+
+    /var/log/ustc-course/*.log {
+        su icourse icourse
+        daily
+        rotate 14
+        missingok
+        notifempty
+        compress
+        copytruncate
+        dateext
+        maxsize 1G
+    }

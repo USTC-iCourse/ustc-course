@@ -84,8 +84,8 @@ PYTHONPATH=. python3 -m app.search.builder
 
 课程索引没有这套机制，所以修改课程教师、或导入课程目录时，代码会调用
 ```app.search.builder.request_rebuild()``` 请求重建，定时器会在几分钟内执行
-（见 ```ustc-course-search-index.timer```）。详见
-```DEPLOYMENT_INSTRUCTIONS.md```。
+（见 ```ustc-course-search-index.timer```）。索引的运维（重建节奏、磁盘占用、
+定时器故障排查）详见 ```deploy/README.md```。
 
 ### 配置 Nginx
 
