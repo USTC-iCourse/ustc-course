@@ -373,7 +373,7 @@
               {% if review.is_anonymous %}
               匿名用户
               {% else %}
-              <a href={{ url_for('user.view_profile', user_id=review.author.id) }}>{{ review.author.username }}</a>
+              <a href={{ url_for('user.view_profile', user_id=review.author.id) }}><bdi>{{ review.author.username }}</bdi></a>
               {% endif %}
             </span>
 
@@ -493,7 +493,7 @@
           <div class="bm-pd-md" id="review-upvotes-{{ review.id }}">
             <p style="line-break: loose;">
               <span class="glyphicon glyphicon-thumbs-up blue" aria-hidden="true"></span>
-              {% for upvote_user in review.upvote_users %}{% if upvote_user != review.upvote_users[0] %}、{% endif %}<a href={{ url_for('user.view_profile', user_id=upvote_user.id) }}>{{ upvote_user.username }}</a>{% endfor %}
+              {% for upvote_user in review.upvote_users %}{% if upvote_user != review.upvote_users[0] %}、{% endif %}<a href={{ url_for('user.view_profile', user_id=upvote_user.id) }}><bdi>{{ upvote_user.username }}</bdi></a>{% endfor %}
             </p>
           </div>
           {% endif %}
@@ -565,7 +565,7 @@
               {% endif %}
             {% endif %}
           {% endif %}
-          <h3 class="blue"><a href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}">{{ teacher.name }}</a></h3>
+          <h3 class="blue"><a href="{{ url_for('teacher.view_profile', teacher_id=teacher.id) }}"><bdi>{{ teacher.name }}</bdi></a></h3>
           <p>{{ teacher.dept.name }}</p>
           <p>教师主页：
             {% if teacher.homepage and teacher.homepage != 'http://' %}
@@ -615,7 +615,7 @@
 
         {% for teacher in course.teachers %}
         <div class="ud-pd-md dashed">
-          <h4 class="blue">{{ teacher.name }}老师的其他课</h5>
+          <h4 class="blue"><bdi>{{ teacher.name }}</bdi>老师的其他课</h5>
           {% for rel_course in course.same_teacher_courses(teacher) %}
           {% if rel_course != course %}
           <div class="ud-pd-sm">

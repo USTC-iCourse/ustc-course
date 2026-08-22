@@ -65,7 +65,7 @@
 	{% if current_user.is_authenticated %}
 	<btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
 	{% endif %}
-	<h3 class="blue">{{ teacher.name }}</h3>
+	<h3 class="blue"><bdi>{{ teacher.name }}</bdi></h3>
 	<p>{{ teacher.dept.name }}</p>
         {% if teacher.homepage and teacher.homepage != 'http://' %}
           {% set homepages = teacher.homepage.split('\n') %}
@@ -77,18 +77,18 @@
           {% endfor %}
           {% if valid_homepages %}
             {% if valid_homepages|length == 1 %}
-            <p>教师主页：<a href="{{ valid_homepages[0] }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> {{ valid_homepages[0] }}</a></p>
+            <p>教师主页：<a href="{{ valid_homepages[0] | safe_url }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <bdi>{{ valid_homepages[0] }}</bdi></a></p>
             {% else %}
             <p>教师主页：
               {% for homepage in valid_homepages %}
-              <br><a href="{{ homepage }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> {{ homepage }}</a>
+              <br><a href="{{ homepage | safe_url }}" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <bdi>{{ homepage }}</bdi></a>
               {% endfor %}
             </p>
             {% endif %}
           {% endif %}
 	{% endif %}
 	{% if teacher.research_interest %}
-	<p>研究方向：{{ teacher.research_interest }}</p>
+	<p>研究方向：<bdi>{{ teacher.research_interest }}</bdi></p>
 	{% endif %}
       </div>
 

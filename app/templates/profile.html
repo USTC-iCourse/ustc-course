@@ -130,14 +130,14 @@
     <div class="col-md-4 right-col">
       <div class="ud-pd-md dashed">
 	<img class="avatar-lg circle" src="{{ user.avatar }}"/>
-	<h3 class="blue">{{ user.username }}</h3>
+	<h3 class="blue"><bdi>{{ user.username }}</bdi></h3>
       {% if user.is_teacher %}<span class="label label-success px14">老师</span>{% endif %}
         <ul class="list-unstyled dark-grey">
-          <li class="ud-pd-sm">简介：{{ user.description }}</li>
+          <li class="ud-pd-sm">简介：<bdi>{{ user.description }}</bdi></li>
           <li class="ud-pd-sm" style="overflow:hidden">博客：
             {% if user.homepage and user.homepage != 'http://' %}
-            <a href="{{ user.homepage }}">
-              <span class="glyphicon glyphicon-link" aria-hidden="true"></span> {{ user.homepage }}
+            <a href="{{ user.homepage | safe_url }}">
+              <span class="glyphicon glyphicon-link" aria-hidden="true"></span> <bdi>{{ user.homepage }}</bdi>
             </a>
             {% else %}
             暂无

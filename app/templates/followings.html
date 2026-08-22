@@ -7,7 +7,7 @@
 
     <div class="bm-pd-lg">
       <div class="inline-h3">
-        <span class="blue h4"><strong>{{ user.username }} 的关注 </strong></span>
+        <span class="blue h4"><strong><bdi>{{ user.username }}</bdi> 的关注 </strong></span>
 	（{{ user.following_count }} 人）
       </div>
 
@@ -15,10 +15,10 @@
       <div class="ud-pd-md dashed following-item" id="following-item-{{ followed.id }}">
 	<img class="avatar-md circle" src="{{ followed.avatar }}"/>
 	{% if followed.is_profile_hidden and (not current_user.is_authenticated or (current_user != followed and not current_user.is_admin)) %}
-	<span class="right-pd-sm px16">{{ followed.username }}</span>
+	<span class="right-pd-sm px16"><bdi>{{ followed.username }}</bdi></span>
 	<span class="gray px12">（主页未公开）</span>
 	{% else %}
-	<a href={{ url_for('user.view_profile', user_id=followed.id) }}><span class="right-pd-sm px16">{{ followed.username }}</span></a>
+	<a href={{ url_for('user.view_profile', user_id=followed.id) }}><span class="right-pd-sm px16"><bdi>{{ followed.username }}</bdi></span></a>
 	{% endif %}
 	{% if current_user.is_authenticated and current_user == user %}
 	<button onclick="unfollow_user({{ followed.id }})" class="btn btn-blue btn-flat btn-xs btn-unfollow"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> 取消关注</button>

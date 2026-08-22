@@ -186,6 +186,75 @@ def resize_avatar(old_file):
         return new_filename
     return old_file
 
+# Invisible characters that can hide or reorder text. Two families:
+#  - zero-width / word-joiner characters used to smuggle or split text
+#  - bidirectional control/override characters used for text-direction
+#    spoofing (Trojan Source, CVE-2021-42574)
+HIDDEN_CHARS = [
+    '\u200b',  # Zero-width space
+    '\u200c',  # Zero-width non-joiner
+    '\u200d',  # Zero-width joiner
+    '\ufeff',  # Zero-width no-break space (BOM)
+    '\u2060',  # Word joiner
+    '\u180e',  # Mongolian vowel separator
+    '\u2061',  # Function application
+    '\u2062',  # Invisible times
+    '\u2063',  # Invisible separator
+    '\u2064',  # Invisible plus
+    '\u200e',  # Left-to-right mark
+    '\u200f',  # Right-to-left mark
+    '\u061c',  # Arabic letter mark
+    '\u202a',  # Left-to-right embedding
+    '\u202b',  # Right-to-left embedding
+    '\u202c',  # Pop directional formatting
+    '\u202d',  # Left-to-right override
+    '\u202e',  # Right-to-left override
+    '\u2066',  # Left-to-right isolate
+    '\u2067',  # Right-to-left isolate
+    '\u2068',  # First strong isolate
+    '\u2069',  # Pop directional isolate
+    '\u206a',  # Inhibit symmetric swapping
+    '\u206b',  # Activate symmetric swapping
+    '\u206c',  # Inhibit Arabic form shaping
+    '\u206d',  # Activate Arabic form shaping
+    '\u206e',  # National digit shapes
+    '\u206f',  # Nominal digit shapes
+]
+_HIDDEN_CHARS_TABLE = {ord(c): None for c in HIDDEN_CHARS}
+
+
+def strip_hidden_chars(text):
+    """Remove zero-width and bidirectional control characters that can be used
+    to hide or reorder text (Unicode spoofing / Trojan-Source tricks)."""
+    if not text:
+        return text
+    return text.translate(_HIDDEN_CHARS_TABLE)
+
+
+@app.template_filter('safe_url')
+def normalize_url(url):
+    """Normalize a user-supplied external URL for safe use in an href.
+
+    Only http/https are allowed; a schemeless value gets http:// prepended;
+    a value carrying any other scheme (javascript:, data:, vbscript:, ...) or
+    an otherwise unusable value becomes '' so it renders as an inert href.
+    """
+    if not url:
+        return ''
+    url = strip_hidden_chars(str(url)).strip()
+    # Browsers ignore embedded control characters inside a URL, so drop them
+    # first -- otherwise "java\tscript:alert(1)" would slip past the check.
+    url = re.sub(r'[\x00-\x1f\x7f]', '', url).strip()
+    if not url:
+        return ''
+    m = re.match(r'^([a-zA-Z][a-zA-Z0-9+.\-]*):', url)
+    if m:
+        if m.group(1).lower() not in ('http', 'https'):
+            return ''
+        return url
+    return 'http://' + url
+
+
 def sanitize(text):
     # First pass: use lxml cleaner to remove dangerous elements  
     # style=True removes ALL style attributes, preventing any CSS-based hiding
@@ -197,21 +266,9 @@ def sanitize(text):
     )
     text = cleaner.clean_html(text)
 
-    # Remove zero-width characters and other Unicode hiding tricks
-    zero_width_chars = [
-        '\u200b',  # Zero-width space
-        '\u200c',  # Zero-width non-joiner  
-        '\u200d',  # Zero-width joiner
-        '\ufeff',  # Zero-width no-break space
-        '\u2060',  # Word joiner
-        '\u180e',  # Mongolian vowel separator
-        '\u2061',  # Function application
-        '\u2062',  # Invisible times
-        '\u2063',  # Invisible separator
-        '\u2064',  # Invisible plus
-    ]
-    for char in zero_width_chars:
-        text = text.replace(char, '')
+    # Remove zero-width and bidirectional control characters
+    # (Unicode hiding / text-direction spoofing tricks).
+    text = strip_hidden_chars(text)
 
     # Apply existing image dimension removal rules
     text = re.sub(r'<img ([^>]*) style="height:[0-9]+px; width:[0-9]+px"', r'<img \1', text)
@@ -310,7 +367,7 @@ def editor_parse_at(text):
         if user:
             url = url_for('user.view_profile', user_id=user.id)
             # replace @ to Unicode char ＠ to avoid further substitution when review is edited
-            atstring = '<a href="' + url + '">' + '＠' + username + '</a>'
+            atstring = '<a href="' + url + '"><bdi>' + '＠' + username + '</bdi></a>'
             # warn: simple str.replace is wrong.
             # consider the following case: @boj @bojjenny42
             #   @boj is first matched and replaced, then the string becomes <a href="">@boj</a> <a href="">@boj</a>jenny42

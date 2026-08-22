@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from app.models import Review, ReviewComment, User, Course, ImageStore, Notification
 from app.models import ReviewCommentHistory, ThirdPartySigninHistory
 from app.forms import ReviewCommentForm
-from app.utils import rand_str, handle_upload, validate_username, validate_email
+from app.utils import rand_str, handle_upload, validate_username, validate_email, strip_hidden_chars
 from app.utils import editor_parse_at
 from app.utils import send_block_review_email, send_unblock_review_email
 from app.utils import send_review_author_profile_email
@@ -85,7 +85,7 @@ def review_new_comment():
             content = request.form.get('content')
             if len(content) > 500:
                 return jsonify(ok=False,message="评论太长了，不能超过 500 字哦")
-            content = Markup.escape(content)
+            content = Markup.escape(strip_hidden_chars(content))
             content, mentioned_users = editor_parse_at(content)
             ok,message = comment.add(review,content)
             if ok:

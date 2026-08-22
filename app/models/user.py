@@ -112,7 +112,7 @@ class User(db.Model, UserMixin):
 
     @property
     def link(self):
-        return Markup('<a href="' + self.url + '">') + Markup.escape(self.username) + Markup('</a>')
+        return Markup('<a href="' + self.url + '"><bdi>') + Markup.escape(self.username) + Markup('</bdi></a>')
 
     @property
     def is_blocked_now(self):
@@ -536,7 +536,7 @@ class Teacher(db.Model):
 
     @property
     def link(self):
-        return Markup('<a href="' + self.url + '">') + Markup.escape(self.name) + Markup('</a>')
+        return Markup('<a href="' + self.url + '"><bdi>') + Markup.escape(self.name) + Markup('</bdi></a>')
 
     @property
     def image(self):

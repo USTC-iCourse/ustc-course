@@ -43,7 +43,7 @@
       	      {% else %}暂无{% endif %}
       	    </p>
             <div>
-              <span class="text-muted">贡献者：<a href="{{ url_for('user.view_profile', user_id=history.author) }}">{{ history.author_user.username }}</a></span>
+              <span class="text-muted">贡献者：<a href="{{ url_for('user.view_profile', user_id=history.author) }}"><bdi>{{ history.author_user.username }}</bdi></a></span>
               <span class="text-muted pull-right">编辑时间：<span class="localtime" style="display: none;">{{ history.update_time|utctime }}</span></span>
             </div>
       	  </div>
@@ -58,7 +58,7 @@
 	{% if current_user.is_authenticated %}
 	<btn class="btn btn-link float-right"><a href="{{ url_for('teacher.edit_profile', teacher_id=teacher.id) }}">编辑教师信息</a></btn>
 	{% endif %}
-	<h3 class="blue">{{ teacher.name }}</h3>
+	<h3 class="blue"><bdi>{{ teacher.name }}</bdi></h3>
 	<p>{{ teacher.dept.name }}</p>
 	<p>教师主页：
           {% if teacher.homepage and teacher.homepage != 'http://' %}

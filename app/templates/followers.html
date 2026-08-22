@@ -7,7 +7,7 @@
 
     <div class="bm-pd-lg">
       <div class="inline-h3">
-        <span class="blue h4"><strong> {{ user.username }} 被关注 </strong></span>
+        <span class="blue h4"><strong> <bdi>{{ user.username }}</bdi> 被关注 </strong></span>
 	（{{ user.follower_count }} 人）
       </div>
 
@@ -15,10 +15,10 @@
       <div class="ud-pd-md dashed">
 	<img class="avatar-md circle" src="{{ follower.avatar }}"/>
 	{% if follower.is_profile_hidden and (not current_user.is_authenticated or (current_user != follower and not current_user.is_admin)) %}
-	<span class="right-pd-sm px16">{{ follower.username }}</span>
+	<span class="right-pd-sm px16"><bdi>{{ follower.username }}</bdi></span>
 	<span class="gray px12">（主页未公开）</span>
 	{% else %}
-	<a href={{ url_for('user.view_profile', user_id=follower.id) }}><span class="right-pd-sm px16">{{ follower.username }}</span></a>
+	<a href={{ url_for('user.view_profile', user_id=follower.id) }}><span class="right-pd-sm px16"><bdi>{{ follower.username }}</bdi></span></a>
 	{% endif %}
 	{% if current_user.is_authenticated and current_user == user and follower != current_user %}
 	  {% if follower in current_user.users_following %}

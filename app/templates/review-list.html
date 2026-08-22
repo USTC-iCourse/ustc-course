@@ -14,7 +14,7 @@
           {% if review.is_anonymous %}
           <span class="blue">匿名用户</span>
           {% else %}
-	      <a href="{{ url_for('user.view_profile', user_id=review.author.id) }}">{{ review.author.username }}</a>
+	      <a href="{{ url_for('user.view_profile', user_id=review.author.id) }}"><bdi>{{ review.author.username }}</bdi></a>
           {% endif %}
 	      {% if review.publish_time == review.update_time %}点评了{% else %}更新了点评{% endif %}
               <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">{{ review.course.name }}{% if review.course.teachers %}（{{ review.course.teacher_names_display|name_display_short }}）{% endif %}</a>
