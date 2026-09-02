@@ -23,13 +23,16 @@
             </div>
             {% include 'review-hidden.html' %}
             <p class="text-muted review-content">
+	      <span{% if review_has_redactions(review.id) %} class="review-redact-pending"{% endif %} data-redact-target="{{ review.id }}">
 	      {% if keyword %}
 	      {{ review.content|abstract_by_keyword(keyword)|safe }}
 	      {% else %}
 	      {{ review.content|abstract }}
 	      {% endif %}
+	      </span>
 	      <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a>
 	    </p>
+            {% include 'review-redaction-data.html' %}
           </div><!-- ./col-md-8 -->
         </div><!-- ./row -->
       </div><!-- ./dashed -->

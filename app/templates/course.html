@@ -422,7 +422,8 @@
           </ul>
           {% endif %}
 
-          <div class="review-content ck-content" id="review-content-{{ review.id }}"><p>{{ review.content|my_urlize(nofollow=true)|safe }}</p></div>
+          <div class="review-content ck-content{% if review_has_redactions(review.id) %} review-redact-pending{% endif %}" id="review-content-{{ review.id }}" data-redact-target="{{ review.id }}"><p>{{ review.content|my_urlize(nofollow=true)|safe }}</p></div>
+          {% include 'review-redaction-data.html' %}
 
           {% if review.filter_rule %}
           <div style="display:none;" class="review-filter-rule" id="review-filter-rule-{{ review.id }}">{{ review.filter_rule }}</div>
@@ -468,6 +469,10 @@
               <a class="nounderline" href="javascript: review_author_profile({{ review.id }})">
                 <span class="glyphicon glyphicon-user grey left-pd-md small" aria-hidden="true"></span>
                 查询作者资料
+              </a>
+              <a class="nounderline" href="{{ url_for('review.redact_review_page', review_id=review.id) }}">
+                <span class="glyphicon glyphicon-edit grey left-pd-md small" aria-hidden="true"></span>
+                涂黑
               </a>
               {% endif %}
 

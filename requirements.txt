@@ -18,6 +18,8 @@ pypinyin==0.46.0
 zhconv==1.4.3
 tqdm==4.66.3
 html2text==2020.1.16
+# review redaction: tells a deleted quote apart from a disguised one
+diff-match-patch==20241021
 markdown==3.4.1
 pytz==2021.1
 werkzeug==3.0.3

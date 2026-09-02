@@ -1,0 +1,297 @@
+{% extends "layout.html" %}
+{#- The admin-only page where a redaction is drawn.
+
+     Kept away from the course page on purpose.  Admins read the site with the
+     same masks everyone else sees, so highlighting text while reading never
+     produces a moderation control; reaching for the black marker starts with
+     following the 涂黑 link on a review.  Revoking works the same way -- there
+     is no ✕ sitting on the public page waiting to be misclicked. -#}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+    <div class="col-md-9">
+
+      <h4 class="blue">涂黑点评内容</h4>
+      <p class="text-muted">
+        涂黑只影响这条点评的显示，<b>不会修改作者写下的原文</b>，随时可以撤销。
+        <a href="{{ url_for('course.view_course', course_id=course.id) }}#review-{{ review.id }}">返回点评</a>
+      </p>
+
+      <div class="ud-pd-md dashed">
+        <div class="grey bm-pd-md">
+          <a href="{{ url_for('course.view_course', course_id=course.id) }}">{{ course.name }}</a>
+          <span class="left-pd-md">{{ review.term|term_display }}</span>
+          <span class="left-pd-md">
+            {% if review.is_anonymous %}匿名用户{% else %}<bdi>{{ review.author.username }}</bdi>{% endif %}
+          </span>
+          <span class="pull-right small localtime" style="display: none;">{{ review.update_time|utctime }}</span>
+        </div>
+
+        {#- Shown unmasked: judging what to cover means reading what is there. -#}
+        <div class="review-content ck-content" id="redact-source"><p>{{ review.content|my_urlize(nofollow=true)|safe }}</p></div>
+      </div>
+
+      <p class="text-muted top-pd-md">
+        用鼠标划选上面要涂黑的文字，松开后会弹出确认框。
+      </p>
+
+      <div id="redact-confirm" class="ud-pd-md dashed" style="display: none;">
+        <p><b>将涂黑：</b><span id="redact-preview" style="background: #ffe; padding: 0 3px;"></span></p>
+        <p class="text-muted small">请核对上面这段文字与你划选的完全一致，多选的空格已经自动去掉。</p>
+
+        <div class="form-group">
+          <label for="redact-reason">涂黑理由</label>
+          <select id="redact-reason" class="form-control" style="max-width: 260px;">
+            {% for value, label in reasons %}
+            <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>涂黑范围</label>
+          <div class="radio">
+            <label><input type="radio" name="redact-scope" value="all" checked>
+              本点评中出现的全部 <span id="redact-count">1</span> 处</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="redact-scope" value="once">
+              仅这一处</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="redact-note">备注（可选，例如投诉工单号）</label>
+          <input type="text" id="redact-note" class="form-control" maxlength="200" style="max-width: 420px;">
+        </div>
+
+        <button type="button" class="btn btn-primary" id="redact-submit">确认涂黑</button>
+        <button type="button" class="btn btn-default" id="redact-cancel">取消</button>
+      </div>
+
+      <h4 class="blue top-pd-lg">已有的涂黑记录</h4>
+      {% if not redactions %}
+      <p class="text-muted">这条点评还没有任何涂黑记录。</p>
+      {% else %}
+      <table class="table">
+        <thead>
+          <tr><th>内容</th><th>理由</th><th>状态</th><th>操作人</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for row in redactions %}
+          <tr id="redaction-row-{{ row.id }}">
+            <td><code>{{ row.quote }}</code>{% if row.note %}<br><span class="small text-muted">{{ row.note }}</span>{% endif %}</td>
+            <td>{{ reasons_labels.get(row.reason, row.reason or '—') }}</td>
+            <td>
+              {% if row.status == 'active' %}
+              <span class="label label-default">生效中</span>
+              {% elif row.status == 'auto_resolved' %}
+              {#- The diff found the whole span deleted: the author took the
+                   words out themselves, so there is nothing left to cover. -#}
+              <span class="label label-success">作者已自行删除</span>
+              {% elif row.status == 'tampered' %}
+              {#- Part of the span survived, or something was spliced into it.
+                   That is the evasion shape, and it needs a human. -#}
+              <span class="label label-danger">被改动，需复核</span>
+              {% elif row.status == 'revoked' %}
+              <span class="label label-default">已撤销</span>
+              {% endif %}
+              {% if row.status in ('auto_resolved', 'tampered') and not row.reviewed_at %}
+              <span class="label label-warning">未处理</span>
+              {% endif %}
+            </td>
+            <td class="small">
+              {% if row.created_by %}<bdi>{{ row.created_by.username }}</bdi>{% endif %}
+              <br><span class="text-muted">{{ row.created_at }}</span>
+            </td>
+            <td>
+              {% if row.status == 'active' %}
+              <button type="button" class="btn btn-xs btn-default redact-revoke" data-id="{{ row.id }}">撤销</button>
+              {% elif row.status in ('auto_resolved', 'tampered') and not row.reviewed_at %}
+              <button type="button" class="btn btn-xs btn-default redact-ack" data-id="{{ row.id }}">标记已处理</button>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+ /* Turning a mouse selection into a redaction.
+  *
+  * The offset sent along is measured the same way the server measures it and
+  * the same way static/js/review-redact.js measures it: the concatenation of
+  * the text nodes in document order.  All three have to agree, or an offset
+  * stored here would not address the text anyone else walks.
+  *
+  * The offset only decides which occurrence a 'once'-scoped redaction covers;
+  * the string itself is what the mask matches on.  The server snaps whatever
+  * arrives here to a real occurrence anyway, so a page left open while the
+  * author edited cannot silently mask the wrong words.
+  */
+ (function () {
+     'use strict';
+
+     var MAX_QUOTE_LENGTH = {{ max_quote_length }};
+     var source = document.getElementById('redact-source');
+     var confirmBox = document.getElementById('redact-confirm');
+     var preview = document.getElementById('redact-preview');
+     var countLabel = document.getElementById('redact-count');
+     var pending = null;
+
+     function plainText() {
+         var walker = document.createTreeWalker(source, NodeFilter.SHOW_TEXT, {
+             acceptNode: function (node) {
+                 var parent = node.parentNode;
+                 if (parent && (parent.nodeName === 'SCRIPT' || parent.nodeName === 'STYLE')) {
+                     return NodeFilter.FILTER_REJECT;
+                 }
+                 return NodeFilter.FILTER_ACCEPT;
+             }
+         }, false);
+         var nodes = [];
+         var text = '';
+         var node;
+         while ((node = walker.nextNode())) {
+             nodes.push({ node: node, start: text.length });
+             text += node.data;
+         }
+         return { nodes: nodes, text: text };
+     }
+
+     function offsetOf(collected, container, offset) {
+         // A selection boundary can land on an element rather than a text node
+         // (double-clicking a paragraph, for instance); walk to the text node
+         // the offset actually indexes into.
+         if (container.nodeType !== 3) {
+             var child = container.childNodes[offset] || container.lastChild;
+             while (child && child.nodeType !== 3) {
+                 child = child.firstChild || child.nextSibling;
+             }
+             container = child;
+             offset = 0;
+         }
+         for (var i = 0; i < collected.nodes.length; i++) {
+             if (collected.nodes[i].node === container) {
+                 return collected.nodes[i].start + offset;
+             }
+         }
+         return null;
+     }
+
+     function occurrenceCount(text, quote) {
+         var count = 0;
+         var index = text.indexOf(quote);
+         while (index >= 0) {
+             count++;
+             index = text.indexOf(quote, index + 1);
+         }
+         return count;
+     }
+
+     function hide() {
+         pending = null;
+         confirmBox.style.display = 'none';
+     }
+
+     source.addEventListener('mouseup', function () {
+         var selection = window.getSelection();
+         if (!selection || selection.isCollapsed || !selection.rangeCount) {
+             return;
+         }
+         var range = selection.getRangeAt(0);
+         if (!source.contains(range.commonAncestorContainer)) {
+             return;
+         }
+
+         // Trim here as well as on the server, so the confirmation dialog shows
+         // exactly the characters that will end up covered.
+         var quote = selection.toString().replace(/^\s+|\s+$/g, '');
+         if (!quote) {
+             return;
+         }
+         if (quote.length > MAX_QUOTE_LENGTH) {
+             alert('选中的文字过长（' + quote.length + ' 字），涂黑最多 ' + MAX_QUOTE_LENGTH +
+                   ' 字。如果整条点评都有问题，请直接使用「屏蔽」。');
+             return;
+         }
+
+         var collected = plainText();
+         var start = offsetOf(collected, range.startContainer, range.startOffset);
+         // Re-find the trimmed string near the raw selection rather than
+         // adjusting the offset by hand: leading whitespace may span nodes.
+         var anchor = start === null ? collected.text.indexOf(quote)
+                                     : collected.text.indexOf(quote, Math.max(0, start - 2));
+         if (anchor < 0) {
+             anchor = collected.text.indexOf(quote);
+         }
+
+         pending = { quote: quote, anchor: anchor };
+         preview.textContent = quote;
+         countLabel.textContent = occurrenceCount(collected.text, quote);
+         confirmBox.style.display = '';
+     });
+
+     document.getElementById('redact-cancel').addEventListener('click', hide);
+
+     document.getElementById('redact-submit').addEventListener('click', function () {
+         if (!pending) {
+             return;
+         }
+         var scope = document.querySelector('input[name="redact-scope"]:checked').value;
+         $.post("{{ url_for('api.redact_review') }}", {
+             review_id: {{ review.id }},
+             quote: pending.quote,
+             anchor_pos: pending.anchor,
+             scope: scope,
+             reason: document.getElementById('redact-reason').value,
+             note: document.getElementById('redact-note').value
+         }, function (o) {
+             if (o.ok) {
+                 window.location.reload();
+             } else {
+                 alert(o.message);
+             }
+         }, 'json').fail(function () {
+             alert('涂黑失败，请重试');
+         });
+     });
+
+     function post(url, data, done) {
+         $.post(url, data, function (o) {
+             if (o.ok) {
+                 done();
+             } else {
+                 alert(o.message);
+             }
+         }, 'json').fail(function () {
+             alert('操作失败，请重试');
+         });
+     }
+
+     $('.redact-revoke').on('click', function () {
+         if (!window.confirm('撤销后这段文字将重新对所有人可见，确定吗？')) {
+             return;
+         }
+         post("{{ url_for('api.unredact_review') }}",
+              { redaction_id: $(this).data('id') },
+              function () { window.location.reload(); });
+     });
+
+     $('.redact-ack').on('click', function () {
+         post("{{ url_for('api.acknowledge_redaction') }}",
+              { redaction_id: $(this).data('id') },
+              function () { window.location.reload(); });
+     });
+ }());
+</script>
+{% endblock %}

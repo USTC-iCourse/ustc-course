@@ -1,0 +1,8 @@
+{#- The active redactions of one review, handed to static/js/review-redact.js.
+
+     Emitted next to every place a review's text is rendered.  Nothing is
+     emitted for a review with no redactions, which is nearly all of them. -#}
+{%- set redaction_payload = review_redactions_json(review.id) -%}
+{%- if redaction_payload -%}
+<script type="application/json" class="review-redaction-data" data-review-id="{{ review.id }}">{{ redaction_payload }}</script>
+{%- endif -%}
