@@ -1,8 +1,10 @@
 from flask import Blueprint,render_template,abort,redirect,url_for,request,abort,jsonify
 from flask_security import current_user,login_required
-from app.models import Course, Review, ReviewHistory
+from app.models import Course, Review, ReviewHistory, ReviewRedaction
 from app.forms import ReviewForm
 from app.utils import sanitize, editor_parse_at, contains_crisis_keywords, send_crisis_alert_email
+from app.utils import send_review_redaction_alert_email
+from app import redaction as redact
 from flask_babel import gettext as _
 from .course import course
 import markdown
@@ -97,6 +99,122 @@ def notify_crisis_admins(review, review_url, is_new):
     }
     thread = threading.Thread(target=_send_crisis_alert, args=(info,))
     thread.start()
+
+
+def diagnose_redactions(review, old_content):
+    '''Follow every mask on this review across an edit and label what happened.
+
+    Rendering matches redactions by text, so an edit that leaves the quoted
+    words alone needs nothing done to it.  This runs for the other case: the
+    quote is no longer in the review, and the new text alone cannot say whether
+    the author removed the words or disguised them.  Diffing the old content
+    against the new one can -- see ``app/redaction.py``.
+
+    Statuses are updated in place and the outcome of each row is returned for
+    the alert mail.  Nothing is hidden and no mask is widened here: the site
+    never moderates on its own, it only tells the admins what to look at.
+    '''
+    rows = ReviewRedaction.query.filter_by(review_id=review.id, status='active').all()
+    if not rows:
+        return []
+
+    old_text = redact.html_to_text(old_content)
+    new_text = redact.html_to_text(review.content)
+    outcomes = []
+
+    for row in rows:
+        start = row.anchor_pos if row.anchor_pos is not None else 0
+        new_start, _new_end, verdict = redact.remap(
+            old_text, new_text, start, start + len(row.quote))
+        occurrences = redact.find_occurrences(new_text, row.quote)
+
+        if occurrences:
+            # The words are still somewhere in the review, so the mask still
+            # has something to cover and stays on.  'moved' means the diff saw
+            # the original span change even though a copy survives elsewhere.
+            row.anchor_pos = new_start if new_start is not None else \
+                redact.nearest_occurrence(new_text, row.quote, start)
+            outcome = 'intact' if verdict == redact.INTACT else 'moved'
+        else:
+            # Gone from the text: either the author took it out, or they broke
+            # it up.  The diff is the only thing that can tell those apart.
+            row.status = 'auto_resolved' if verdict == redact.DELETED else 'tampered'
+            outcome = row.status
+            if new_start is not None:
+                row.anchor_pos = new_start
+
+        # Any edit puts the row back in front of a human, whatever it did.
+        row.reviewed_at = None
+        outcomes.append({
+            'quote': row.quote,
+            'reason': redact.REASON_LABELS.get(row.reason, row.reason),
+            'outcome': outcome,
+        })
+
+    db.session.commit()
+    return outcomes
+
+
+def _send_redaction_alert(info):
+    with app.app_context():
+        try:
+            send_review_redaction_alert_email(info)
+        except Exception as e:
+            print('failed to send review redaction alert email', e)
+
+
+def notify_redaction_admins(review, review_url, outcomes):
+    '''Mail the admins about an edit to a review that carries redactions.
+
+    Sent for every such edit, including the ones the diff found harmless: the
+    point is that a human confirms, and a mail that only arrives on suspicion
+    teaches nobody to trust the ones that do arrive.  Fields are extracted into
+    a plain dict because ORM objects are not safe to touch once the request has
+    ended.
+    '''
+    info = {
+        'review_id': review.id,
+        'course_name': review.course.name,
+        'author_username': review.author.username,
+        'is_anonymous': review.is_anonymous,
+        'review_url': review_url,
+        'redact_url': url_for('review.redact_review_page',
+                              review_id=review.id, _external=True),
+        'content': review.content,
+        'outcomes': outcomes,
+        'time': datetime.utcnow(),
+    }
+    thread = threading.Thread(target=_send_redaction_alert, args=(info,))
+    thread.start()
+
+
+@review.route('/<int:review_id>/redact/', methods=['GET'])
+@login_required
+def redact_review_page(review_id):
+    '''The admin-only page where masking actually happens.
+
+    Deliberately separate from the course page.  Admins read the site with the
+    same masks everyone else sees, so highlighting text while reading can never
+    pop up a moderation control; taking the black marker out is an explicit act
+    that starts by following the 涂黑 link on a review.
+    '''
+    if not current_user.is_admin:
+        abort(403)
+    review_obj = Review.query.get(review_id)
+    if not review_obj:
+        abort(404)
+    rows = ReviewRedaction.query.filter_by(review_id=review_id) \
+        .order_by(ReviewRedaction.created_at.desc()).all()
+    return render_template(
+        'review-redact.html',
+        review=review_obj,
+        course=review_obj.course,
+        redactions=rows,
+        reasons=redact.REASONS,
+        reasons_labels=redact.REASON_LABELS,
+        max_quote_length=redact.MAX_QUOTE_LENGTH,
+        title='涂黑点评内容',
+    )
 
 
 @course.route('/<int:course_id>/review/',methods=['GET','POST'])
@@ -198,6 +316,13 @@ def new_review(course_id):
             elif is_new or old_review.content != review.content:
                 async_update_course_summary(review.course)
 
+            # An edited review may carry admin redactions.  Work out what the
+            # edit did to each of them and alert the admins; the masks are never
+            # widened or dropped on the site's own initiative.
+            redaction_outcomes = []
+            if not is_new and old_review.content != review.content:
+                redaction_outcomes = diagnose_redactions(review, old_review.content)
+
             # If the review text suggests suicidal / self-harm intent, flag it so
             # the frontend can immediately surface crisis-support resources, and
             # alert admins so a human can decide whether to intervene.
@@ -207,6 +332,8 @@ def new_review(course_id):
             fragment = '#review-' + str(review.id)
             if show_crisis:
                 notify_crisis_admins(review, course_url + fragment, is_new)
+            if redaction_outcomes:
+                notify_redaction_admins(review, course_url + fragment, redaction_outcomes)
             if form.is_ajax.data:
                 return jsonify({'ok': True, 'next_url': course_url + fragment, 'crisis': show_crisis })
             else:

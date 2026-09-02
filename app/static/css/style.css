@@ -492,3 +492,20 @@ a.nounderline:active { text-decoration: none; }
   margin-bottom: 5px;
   word-wrap: break-word;
 }
+
+/* Partial redaction of review text -- see static/js/review-redact.js.
+   A container holding a redaction renders hidden and is revealed only once the
+   masks are painted, so a browser without JavaScript (or a bug in that file)
+   leaves the review blank rather than publishing what an admin covered. */
+.review-redact-pending {
+    visibility: hidden;
+}
+
+.review-redacted {
+    background: #000;
+    color: #000;
+    /* The characters are already replaced with block glyphs, so a selection
+       carries nothing away; this just stops the bar from looking selectable. */
+    user-select: none;
+    -webkit-user-select: none;
+}

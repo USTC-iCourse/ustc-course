@@ -1,0 +1,42 @@
+{% include 'email/email-css.html' %}
+
+<p><b>涂黑复核</b></p>
+
+<p>点评 #{{ info.review_id }} 上有已经生效的涂黑记录，作者刚刚修改了这条点评的内容，请复核这些涂黑是否仍然合适。</p>
+
+<p><b>请注意：</b>网站不会自动隐藏点评，也不会自动扩大涂黑范围。下面的判断只说明这次修改对每处涂黑做了什么，是否需要处理由你决定。</p>
+
+<hr />
+
+<p><b>课程：</b>{{ info.course_name }}</p>
+<p><b>点评链接：</b><a href="{{ info.review_url }}">{{ info.review_url }}</a></p>
+<p><b>涂黑管理：</b><a href="{{ info.redact_url }}">{{ info.redact_url }}</a></p>
+<p><b>作者用户名：</b><bdi>{{ info.author_username }}</bdi>{% if info.is_anonymous %}（该点评为匿名发表）{% endif %}</p>
+<p><b>修改时间（UTC）：</b>{{ info.time }}</p>
+
+<p><b>各处涂黑的情况：</b></p>
+<ul>
+{% for item in info.outcomes %}
+  <li>
+    <code>{{ item.quote }}</code>（{{ item.reason }}）——
+    {% if item.outcome == 'intact' %}
+    未受影响，涂黑继续生效。
+    {% elif item.outcome == 'moved' %}
+    原处已改动，但这段文字在点评中仍然存在，涂黑继续生效。
+    {% elif item.outcome == 'auto_resolved' %}
+    <b>作者已自行删除这段文字</b>，涂黑不再生效，通常无需处理。
+    {% elif item.outcome == 'tampered' %}
+    <b>这段文字被拆改而非删除</b>（例如中间插入了符号），涂黑已经失效，可能是在规避屏蔽，请尽快复核。
+    {% endif %}
+  </li>
+{% endfor %}
+</ul>
+
+<p><b>修改后的点评内容：</b></p>
+<blockquote style="border-left: 3px solid #ccc; padding-left: 10px; color: #333;">
+{{ info.content | striptags }}
+</blockquote>
+
+<p>&nbsp;</p>
+
+<p>—— USTC 评课社区自动预警系统</p>

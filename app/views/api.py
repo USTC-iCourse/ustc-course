@@ -1,12 +1,14 @@
 from flask import Blueprint, jsonify, request, Markup, redirect, render_template, abort, url_for
 from flask_login import login_required, current_user
 from app.models import Review, ReviewComment, User, Course, ImageStore, Notification
-from app.models import ReviewCommentHistory, ThirdPartySigninHistory
+from app.models import ReviewCommentHistory, ThirdPartySigninHistory, ReviewRedaction
 from app.forms import ReviewCommentForm
 from app.utils import rand_str, handle_upload, validate_username, validate_email, strip_hidden_chars
 from app.utils import editor_parse_at
 from app.utils import send_block_review_email, send_unblock_review_email
 from app.utils import send_review_author_profile_email
+from app import db
+from app import redaction as redact
 from app.views.review import record_review_history
 from app.views.review import async_update_course_summary
 from flask_babel import gettext as _
@@ -190,6 +192,124 @@ def block_review():
             return jsonify(ok=False,message="The review doesn't exist.")
     else:
         return jsonify(ok=False,message="A id must be given")
+
+@api.route('/review/redact/', methods=['POST'])
+@login_required
+def redact_review():
+    '''Black out a stretch of text inside one review.
+
+    Called from the dedicated redaction page, never from the public course page
+    -- admins read the site exactly as everyone else does, so a stray text
+    selection can never turn into a moderation action.
+
+    The selection arrives as the string the admin highlighted plus the plain-text
+    offset it was taken from.  The offset is re-derived and snapped here rather
+    than trusted: the admin's page may have been open while the author edited,
+    and a stale offset would silently mask the wrong occurrence.
+    '''
+    if not current_user.is_admin:
+        return jsonify(ok=False, message="Forbidden")
+
+    review_id = request.values.get('review_id', type=int)
+    review = Review.query.get(review_id) if review_id else None
+    if not review:
+        return jsonify(ok=False, message="The review doesn't exist.")
+
+    quote = redact.normalize_quote(request.values.get('quote'))
+    if not quote:
+        return jsonify(ok=False, message="请选择要涂黑的文字（不超过 %d 个字符）" % redact.MAX_QUOTE_LENGTH)
+
+    reason = request.values.get('reason')
+    if reason not in redact.REASON_LABELS:
+        return jsonify(ok=False, message="请选择涂黑理由")
+
+    scope = request.values.get('scope')
+    if scope not in ('all', 'once'):
+        scope = 'all'
+
+    # The selection has to exist in the review as stored right now.  A mismatch
+    # means the admin was looking at a stale copy, and saving would produce a
+    # redaction that covers nothing.
+    text = redact.html_to_text(review.content)
+    occurrences = redact.find_occurrences(text, quote)
+    if not occurrences:
+        return jsonify(ok=False, message="该点评已被修改，选中的文字已不存在，请刷新页面后重试")
+
+    # Snap to a real occurrence so 'once' addresses a position that exists.
+    anchor_pos = request.values.get('anchor_pos', type=int)
+    if anchor_pos is None:
+        anchor_pos = occurrences[0]
+    else:
+        anchor_pos = min(occurrences, key=lambda start: abs(start - anchor_pos))
+
+    existing = ReviewRedaction.query.filter_by(
+        review_id=review.id, quote=quote, status='active').first()
+    if existing:
+        return jsonify(ok=False, message="这段文字已经被涂黑了")
+
+    row = ReviewRedaction(
+        review_id=review.id,
+        quote=quote,
+        anchor_pos=anchor_pos,
+        scope=scope,
+        reason=reason,
+        note=(request.values.get('note') or '').strip()[:2000] or None,
+        status='active',
+        created_at=datetime.utcnow(),
+        created_by_id=current_user.id,
+    )
+    db.session.add(row)
+    db.session.commit()
+    record_review_history(review, 'redact')
+    return jsonify(ok=True, message="Success!", redaction_id=row.id, count=len(occurrences))
+
+
+@api.route('/review/unredact/', methods=['POST'])
+@login_required
+def unredact_review():
+    '''Take a mask back off.  The row is kept, not deleted, so the audit trail
+    still shows what was covered, by whom, and who undid it.'''
+    if not current_user.is_admin:
+        return jsonify(ok=False, message="Forbidden")
+
+    redaction_id = request.values.get('redaction_id', type=int)
+    row = ReviewRedaction.query.get(redaction_id) if redaction_id else None
+    if not row:
+        return jsonify(ok=False, message="The redaction doesn't exist.")
+    if row.status == 'revoked':
+        return jsonify(ok=False, message="该涂黑已经被撤销")
+
+    row.status = 'revoked'
+    row.revoked_at = datetime.utcnow()
+    row.revoked_by_id = current_user.id
+    db.session.commit()
+    if row.review:
+        record_review_history(row.review, 'unredact')
+    return jsonify(ok=True, message="Success!")
+
+
+@api.route('/review/redaction/acknowledge/', methods=['POST'])
+@login_required
+def acknowledge_redaction():
+    '''Mark a redaction the author's edit knocked loose as handled.
+
+    An edit can leave a row 'auto_resolved' (the author deleted the words) or
+    'tampered' (the words were broken up rather than removed).  Neither state
+    masks anything, so this only clears the flag from the admin page once a
+    human has decided the review needs nothing further.
+    '''
+    if not current_user.is_admin:
+        return jsonify(ok=False, message="Forbidden")
+
+    redaction_id = request.values.get('redaction_id', type=int)
+    row = ReviewRedaction.query.get(redaction_id) if redaction_id else None
+    if not row:
+        return jsonify(ok=False, message="The redaction doesn't exist.")
+
+    row.reviewed_at = datetime.utcnow()
+    db.session.commit()
+    return jsonify(ok=True, message="Success!")
+
 
 @api.route('/review/unblock/', methods=['POST'])
 @login_required

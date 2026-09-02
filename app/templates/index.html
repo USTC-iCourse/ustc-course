@@ -34,7 +34,8 @@
               <span class="float-right localtime" style="display: none;">{{ review.update_time|utctime }}</span>
             </div>
             {% include 'review-hidden.html' %}
-            <p class="text-muted">{{ review.content|abstract }} <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>
+            <p class="text-muted"><span{% if review_has_redactions(review.id) %} class="review-redact-pending"{% endif %} data-redact-target="{{ review.id }}">{{ review.content|abstract }}</span> <a href="{{ url_for('course.view_course', course_id=review.course.id) }}#review-{{ review.id }}">&gt;&gt;更多</a></p>
+            {% include 'review-redaction-data.html' %}
           </div><!-- ./col-md-8 -->
         </div><!-- ./row -->
       </div><!-- ./dashed -->

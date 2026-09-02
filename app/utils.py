@@ -1,10 +1,10 @@
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail,Message
 from . import app
-from flask import render_template, url_for, Markup
+from flask import render_template, url_for, Markup, g
 from random import randint
 from datetime import datetime
-from app.models import ImageStore, User
+from app.models import ImageStore, User, ReviewRedaction
 import hashlib
 import os
 from lxml.html.clean import Cleaner
@@ -16,6 +16,7 @@ import lxml.html
 from hashlib import sha256
 import pdfkit
 from app.views.search import filter
+from app import redaction
 import os
 import urllib.request
 import urllib.parse
@@ -141,6 +142,78 @@ def send_review_author_profile_email(info):
     html = render_template('email/review-author-profile.html', info=info)
     msg = Message(subject=subject, html=html, recipients=[admin_email])
     mail.send(msg)
+
+
+def send_review_redaction_alert_email(info):
+    '''Tell admins that a review carrying redactions was edited by its author.
+
+    Sent for every edit of such a review, whatever the diff concluded -- the
+    site never hides or re-masks anything on its own, so a human has to look.
+    ``info`` is a plain dict (no ORM objects) so this can run in a background
+    thread after the request has ended.
+    '''
+    admin_email = app.config.get('ADMIN_EMAIL', 'service@icourse.club')
+    subject = '[涂黑复核] 点评 #' + str(info['review_id']) + ' 已被作者修改'
+    html = render_template('email/review-redaction-alert.html', info=info)
+    msg = Message(subject=subject, html=html, recipients=[admin_email])
+    mail.send(msg)
+
+
+def _active_redaction_map():
+    '''Every active redaction on the site, keyed by review id.
+
+    Loaded once per request.  A single page can render fifty reviews drawn from
+    as many courses, so asking each review for its own rows would cost fifty
+    queries to discover, almost always, nothing.  Partial redaction is a
+    case-by-case response to individual complaints, so the active set stays
+    small enough to fetch whole and index in memory.  Should it ever reach a few
+    thousand rows, replace this with a query keyed on the review ids actually
+    being rendered.
+    '''
+    cached = getattr(g, '_review_redaction_map', None)
+    if cached is not None:
+        return cached
+    mapping = {}
+    try:
+        for row in ReviewRedaction.query.filter_by(status='active').all():
+            mapping.setdefault(row.review_id, []).append(row)
+    except Exception:
+        # A redaction that fails to load must not take the page down with it;
+        # the review renders unmasked and the admin still has the alert mail.
+        logger.exception('failed to load the active review redactions')
+    g._review_redaction_map = mapping
+    return mapping
+
+
+@app.template_global()
+def review_redactions_json(review_id):
+    '''The active redactions of one review, as JSON for review-redact.js.
+
+    ``<`` is escaped even though this lands in a ``<script type="application/
+    json">`` block: the quoted text comes from a review, so it can contain
+    ``</script>`` and close the tag early.
+    '''
+    rows = _active_redaction_map().get(review_id) or []
+    if not rows:
+        return Markup('')
+    payload = json.dumps([row.as_dict() for row in rows], ensure_ascii=False)
+    return Markup(payload.replace('<', '\\u003c'))
+
+
+@app.template_global()
+def review_has_redactions(review_id):
+    '''Whether this review needs to render hidden until the masks are painted.'''
+    return bool(_active_redaction_map().get(review_id))
+
+
+@app.template_filter('redact')
+def redact_text(text, review_id):
+    '''Mask a review's redacted quotes inside a plain-text string.
+
+    Used by the RSS feed, which has no browser to paint the masks for it.
+    '''
+    rows = _active_redaction_map().get(review_id) or []
+    return redaction.mask_text(text, [row.quote for row in rows])
 
 
 def allowed_file(filename,type):
