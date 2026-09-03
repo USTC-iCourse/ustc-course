@@ -132,6 +132,14 @@
      elem.val('回复 @' + reply_to + ': ');
  }
 
+ $(document).on('click', '.reply-comment', function(event) {
+     event.preventDefault();
+     reply_comment(
+         $(this).attr('data-review-id'),
+         $(this).attr('data-reply-to')
+     );
+ });
+
  function block_review(review_id)
  {
      $.post("{{ url_for('api.block_review') }}", { review_id: review_id },
