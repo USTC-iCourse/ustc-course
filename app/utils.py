@@ -2,6 +2,7 @@ from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail,Message
 from . import app
 from flask import render_template, url_for
+from werkzeug.utils import secure_filename
 from markupsafe import Markup
 from random import randint
 from datetime import datetime
@@ -150,12 +151,15 @@ def allowed_file(filename,type):
 def handle_upload(file,type):
     ''' type is the file type,for example:image.
     more file type to be added in the future.'''
+    directories = {'image': 'images', 'file': 'files'}
+    if type not in directories:
+        return False, 'Unsupported upload type'
     if file and allowed_file(file.filename,type):
         old_filename = file.filename
         file_suffix = old_filename.split('.')[-1]
-        new_filename = rand_str() + '.' + file_suffix
+        new_filename = secure_filename(rand_str() + '.' + file_suffix)
         try:
-            upload_path = os.path.join(app.config['UPLOAD_FOLDER'],type+'s/')
+            upload_path = os.path.join(app.config['UPLOAD_FOLDER'], directories[type])
             file.save(os.path.join(upload_path, new_filename))
         except FileNotFoundError:
             os.makedirs(upload_path)
@@ -600,8 +604,11 @@ def validate_username(username, check_db=True):
     return 'OK'
 
 def validate_email(email):
-    regex = re.compile("[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(mail\.)?ustc\.edu\.cn")
-    if not regex.fullmatch(email):
+    local, separator, domain = email.rpartition('@')
+    allowed = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!#$%&'*+/=?^_`{|}~-")
+    if (not separator or not local or len(email) > 254 or len(local) > 64
+            or domain not in {'ustc.edu.cn', 'mail.ustc.edu.cn'}
+            or any(char not in allowed for char in local)):
         return ('必须使用科大邮箱注册!')
     if User.query.filter_by(email=email).first():
         return ('此邮件地址已被注册！')
