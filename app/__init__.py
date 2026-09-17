@@ -54,10 +54,11 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'home.signin'
 
-babel = Babel(app)
-@babel.localeselector
 def get_locale():
     return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
+
+
+babel = Babel(app, locale_selector=get_locale)
 
 def log_login(app,user):
     '''update the last login time of the user'''

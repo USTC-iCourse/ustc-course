@@ -1,5 +1,6 @@
 from datetime import datetime
-from flask import url_for, Markup
+from flask import url_for
+from markupsafe import Markup
 from app import db
 from decimal import Decimal
 from sqlalchemy import orm, cast, Float

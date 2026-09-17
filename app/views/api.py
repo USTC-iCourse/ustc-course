@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, request, Markup, redirect, render_template, abort, url_for
+from flask import Blueprint, jsonify, request, redirect, render_template, abort, url_for
+from markupsafe import Markup
 from flask_login import login_required, current_user
 from app.models import Review, ReviewComment, User, Course, ImageStore, Notification
 from app.models import ReviewCommentHistory, ThirdPartySigninHistory
