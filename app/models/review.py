@@ -1,4 +1,5 @@
-from flask import url_for, Markup
+from flask import url_for
+from markupsafe import Markup
 from datetime import datetime
 from app import db
 from sqlalchemy.dialects.mysql import LONGTEXT

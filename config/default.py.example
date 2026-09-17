@@ -80,3 +80,7 @@ TURNSTILE_SECRET_KEY = None
 
 # OpenAI API key to generate AI summary and responses
 OPENAI_API_KEY = None
+
+# Explicit HTTPS callback URLs for trusted third-party sign-in integrations.
+# Empty by default: administrators must register each destination.
+THIRD_PARTY_SIGNIN_REDIRECTS = []

@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, request, Markup, redirect, render_template, abort, url_for
+from flask import Blueprint, jsonify, request, redirect, render_template, abort, url_for
+from markupsafe import Markup
 from flask_login import login_required, current_user
 from app.models import Review, ReviewComment, User, Course, ImageStore, Notification
 from app.models import ReviewCommentHistory, ThirdPartySigninHistory
@@ -361,6 +362,12 @@ def signin_3rdparty():
         next_url = request.form['next_url']
     else:
         abort(400, description='next_url parameter not specified')
+    # Redirect destinations must be explicitly registered by an administrator.
+    # Select the trusted configuration value rather than returning form input.
+    next_url = next((url for url in app.config.get('THIRD_PARTY_SIGNIN_REDIRECTS', [])
+                     if url == next_url), None)
+    if next_url is None:
+        abort(400, description='Unregistered third-party redirect destination')
     if 'from_app' in request.form:
         from_app = request.form['from_app']
     else:

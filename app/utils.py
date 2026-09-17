@@ -1,7 +1,9 @@
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail,Message
 from . import app
-from flask import render_template, url_for, Markup
+from flask import render_template, url_for
+from werkzeug.utils import secure_filename
+from markupsafe import Markup
 from random import randint
 from datetime import datetime
 from app.models import ImageStore, User
@@ -14,7 +16,6 @@ from PIL import Image
 from email.utils import format_datetime
 import lxml.html
 from hashlib import sha256
-import pdfkit
 from app.views.search import filter
 import os
 import urllib.request
@@ -150,12 +151,15 @@ def allowed_file(filename,type):
 def handle_upload(file,type):
     ''' type is the file type,for example:image.
     more file type to be added in the future.'''
+    directories = {'image': 'images', 'file': 'files'}
+    if type not in directories:
+        return False, 'Unsupported upload type'
     if file and allowed_file(file.filename,type):
         old_filename = file.filename
         file_suffix = old_filename.split('.')[-1]
-        new_filename = rand_str() + '.' + file_suffix
+        new_filename = secure_filename(rand_str() + '.' + file_suffix)
         try:
-            upload_path = os.path.join(app.config['UPLOAD_FOLDER'],type+'s/')
+            upload_path = os.path.join(app.config['UPLOAD_FOLDER'], directories[type])
             file.save(os.path.join(upload_path, new_filename))
         except FileNotFoundError:
             os.makedirs(upload_path)
@@ -600,8 +604,11 @@ def validate_username(username, check_db=True):
     return 'OK'
 
 def validate_email(email):
-    regex = re.compile("[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(mail\.)?ustc\.edu\.cn")
-    if not regex.fullmatch(email):
+    local, separator, domain = email.rpartition('@')
+    allowed = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!#$%&'*+/=?^_`{|}~-")
+    if (not separator or not local or len(email) > 254 or len(local) > 64
+            or domain not in {'ustc.edu.cn', 'mail.ustc.edu.cn'}
+            or any(char not in allowed for char in local)):
         return ('必须使用科大邮箱注册!')
     if User.query.filter_by(email=email).first():
         return ('此邮件地址已被注册！')
@@ -630,8 +637,36 @@ def utils_export_rankings_pdf():
     pdf_filename = 'icourse-rankings-' + date_str + '.pdf'
     pdf_path = os.path.join(pdf_folder, pdf_filename)
 
-    url = url_for('stats.view_ranking', show_all=1, _external=True)
-    return pdfkit.from_url(url, pdf_path)
+    # Render the public ranking page using only approved static assets.
+    from pathlib import Path
+    from urllib.parse import urlsplit, unquote
+    import mimetypes
+    from weasyprint import HTML, CSS
+    from weasyprint.urls import URLFetcher, URLFetcherResponse
+
+    static_root = Path(app.static_folder).resolve()
+
+    class StaticOnlyFetcher(URLFetcher):
+        def fetch(self, url, headers=None):
+            parsed = urlsplit(url)
+            if parsed.scheme not in ('http', 'https') or parsed.netloc != 'icourse.club':
+                raise ValueError('PDF resource is not an approved static asset')
+            path = unquote(parsed.path)
+            if not path.startswith('/static/'):
+                raise ValueError('PDF resource is not an approved static asset')
+            asset = (static_root / path[len('/static/'):]).resolve()
+            if not asset.is_relative_to(static_root) or not asset.is_file():
+                raise ValueError('PDF resource is outside static assets')
+            return URLFetcherResponse(
+                url, body=asset.read_bytes(),
+                headers={'Content-Type': mimetypes.guess_type(asset.name)[0] or 'application/octet-stream'},
+            )
+
+    with app.test_request_context('/stats/rankings/?show_all=1', base_url='https://icourse.club'):
+        html = app.make_response(app.view_functions['stats.view_ranking']()).get_data(as_text=True)
+    styles = CSS(string='@page { size: A4; margin: 15mm; } body { font-family: "Noto Sans CJK SC", sans-serif; font-size: 9pt; } table { width: 100%; border-collapse: collapse; } th, td { border-bottom: 1px solid #ddd; padding: 3px; } nav, .navbar, footer { display: none; }')
+    HTML(string=html, base_url='https://icourse.club', url_fetcher=StaticOnlyFetcher()).write_pdf(pdf_path, stylesheets=[styles])
+    return True
 
 def get_rankings_history_file_list():
     pdf_folder = get_rankings_history_base()

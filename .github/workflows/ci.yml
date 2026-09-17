@@ -25,14 +25,14 @@ jobs:
 
       - uses: actions/setup-python@v7
         with:
-          python-version: '3.9'      # matches /usr/bin/python3 on the production host
+          python-version: '3.11'     # AGIdock application runtime
           cache: pip
-          cache-dependency-path: requirements.txt
+          cache-dependency-path: deploy/requirements-agidock.lock
 
       - name: Install mysqlclient build dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends pkg-config default-libmysqlclient-dev
+          sudo apt-get install -y --no-install-recommends pkg-config default-libmysqlclient-dev libpango-1.0-0 libpangoft2-1.0-0 fonts-noto-cjk
 
       - name: Syntax-check every tracked Python file
         # py_compile parses without importing, so this reaches the maintenance
@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r deploy/requirements-agidock.lock
 
       - name: Check for conflicting dependencies
         run: pip check
@@ -86,33 +86,38 @@ jobs:
           PYTHONPATH=. python tests/test_review_comment_reply.py
 
   deploy:
-    name: Deploy to icourse.club
+    name: Deploy to AGIdock
     needs: ci
-    # Never runs for a pull request.  This repository is public and the runner
-    # lives on the production host, so the guard is a security boundary, not a
-    # convenience.
     if: >-
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      github.repository == 'USTC-iCourse/ustc-course'
+      && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
       && github.ref == 'refs/heads/master'
-    runs-on: [self-hosted, icourse-prod]
+    runs-on: ubuntu-latest
+    environment: agidock-production
     timeout-minutes: 30
     concurrency:
-      group: production-deploy      # one deploy at a time, never cancelled midway
+      group: production-deploy
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
-          submodules: false
-          persist-credentials: false
-
-      - name: Deploy and verify
-        # Deploys this exact commit -- the one CI just passed on -- rather than
-        # whatever origin/master points at by now.
+      - name: Deploy the tested revision
         env:
           DEPLOY_REF: ${{ github.sha }}
-        run: ./deploy/deploy.sh
-
-      - name: Report the running revision
-        if: always()
-        run: git -C /srv/ustc-course log -1 --format='now serving %h %s'
+          DEPLOY_KEY: ${{ secrets.AGIDOCK_DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.AGIDOCK_DEPLOY_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$DEPLOY_REF" =~ ^[0-9a-f]{40}$ ]]
+          [[ -n "$DEPLOY_KEY" && -n "$DEPLOY_KNOWN_HOSTS" ]]
+          umask 077
+          deploy_dir=$(mktemp -d)
+          trap 'rm -rf "$deploy_dir"' EXIT
+          printf '%s\n' "$DEPLOY_KEY" > "$deploy_dir/key"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$deploy_dir/known_hosts"
+          ssh -T -i "$deploy_dir/key" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o ForwardAgent=no \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$deploy_dir/known_hosts" \
+            -o ConnectTimeout=20 -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=3 \
+            icourse@155.103.253.176 "deploy $DEPLOY_REF"

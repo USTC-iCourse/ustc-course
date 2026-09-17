@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from flask import Flask, Markup
+from flask import Flask
+from markupsafe import Markup
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKeyConstraint
 from datetime import datetime
