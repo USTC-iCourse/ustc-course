@@ -35,8 +35,8 @@ BRANCH=${BRANCH:-master}
 DEPLOY_REF=${DEPLOY_REF:-origin/${BRANCH}}
 HEALTH_URL=${HEALTH_URL:-http://127.0.0.1:3000/}
 HEALTH_TIMEOUT=${HEALTH_TIMEOUT:-120}
-PYTHON=${PYTHON:-/usr/bin/python3}
-FLASK=${FLASK:-/home/icourse/.local/bin/flask}
+PYTHON=${PYTHON:-/opt/icourse-venv/bin/python}
+FLASK=${FLASK:-/opt/icourse-venv/bin/flask}
 LOCK_FILE=${LOCK_FILE:-/home/icourse/.cache/ustc-course-deploy.lock}
 # The account that owns APP_DIR. Overridable so that the script can be
 # exercised against a staging checkout without impersonating icourse.
@@ -79,8 +79,28 @@ code_revision() {
 }
 
 install_requirements() {
-    ( cd "$APP_DIR" && "$PYTHON" -m pip install --user --quiet \
-        --no-warn-script-location -r requirements.txt )
+    # The production environment remains root-owned. Dependency updates must
+    # be provisioned and validated by an administrator before code deployment.
+    ( cd "$APP_DIR" && "$PYTHON" - <<'PYLOCK'
+from importlib.metadata import version, PackageNotFoundError
+from pathlib import Path
+errors = []
+for line in Path("deploy/requirements-agidock.lock").read_text().splitlines():
+    line = line.strip()
+    if not line or line.startswith("#"):
+        continue
+    name, expected = line.split("==", 1)
+    try:
+        actual = version(name)
+    except PackageNotFoundError:
+        actual = "missing"
+    if actual != expected:
+        errors.append(f"{name}: installed {actual}, required {expected}")
+if errors:
+    raise SystemExit("Administrator must provision the locked runtime first:\n" + "\n".join(errors))
+print("Locked production dependencies verified")
+PYLOCK
+    )
 }
 
 # Byte-compile, then import the application with the real production config.
@@ -249,7 +269,8 @@ main() {
     fi
 
     STAGE="dependencies"
-    if git_ diff --quiet "$PREV_SHA" HEAD -- requirements.txt; then
+    install_requirements || abort "locked runtime is not provisioned"
+    if git_ diff --quiet "$PREV_SHA" HEAD -- requirements.txt deploy/requirements-agidock.lock; then
         log "requirements.txt unchanged; skipping pip"
     else
         log "requirements.txt changed; installing dependencies"
@@ -267,10 +288,7 @@ main() {
     if [[ -n "$want" && "$want" == "$PREV_DB_REV" ]]; then
         log "database already at ${want}; no migration needed"
     else
-        log "migrating database ${PREV_DB_REV:-none} -> ${want:-head}"
-        UPGRADE_ATTEMPTED=1
-        ( cd "$APP_DIR" && PYTHONPATH=. "$FLASK" db upgrade ) || abort "flask db upgrade failed"
-        log "database now at $(db_revision)"
+        abort "schema ${PREV_DB_REV:-unknown} does not match ${want:-unknown}; an administrator must review and apply migrations with separate database credentials"
     fi
 
     STAGE="restart"
