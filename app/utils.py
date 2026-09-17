@@ -53,7 +53,7 @@ def verify_turnstile(response_token):
         return result.get('success', False)
     except Exception as e:
         logger.warning('Turnstile verification failed: %s', e)
-        return True
+        return False
 
 
 def rand_str():
