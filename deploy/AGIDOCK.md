@@ -28,3 +28,5 @@ The AGIdock deploy.sh now defaults to the Python 3.11 virtual environment. It ve
 CodeQL findings addressed before activation: upload categories map to fixed directories and generated filenames are sanitized; email validation uses bounded linear checks; third-party sign-in callbacks require an exact administrator-configured THIRD_PARTY_SIGNIN_REDIRECTS entry (empty by default, so integrations require registration).
 
 PI Review compatibility: register its HTTPS verification callback in THIRD_PARTY_SIGNIN_REDIRECTS and map its legacy HTTP callback to that exact HTTPS URL in THIRD_PARTY_SIGNIN_REDIRECT_ALIASES. Aliases cannot authorize destinations outside the allowlist.
+
+OpenAI SDK updated to the tested version in requirements.txt and the dependency lock. The previous SDK passed an unsupported proxies argument to httpx before requests could run. Configure the direct https://api.openai.com/v1 endpoint with a fresh key.
