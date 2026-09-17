@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from app.models import Review, ReviewComment, User, Course, ImageStore, Notification
 from app.models import ReviewCommentHistory, ThirdPartySigninHistory
 from app.forms import ReviewCommentForm
-from app.utils import rand_str, handle_upload, validate_username, validate_email, strip_hidden_chars
+from app.utils import rand_str, handle_upload, validate_username, validate_email, strip_hidden_chars, trusted_signin_callback
 from app.utils import editor_parse_at
 from app.utils import send_block_review_email, send_unblock_review_email
 from app.utils import send_review_author_profile_email
@@ -364,8 +364,7 @@ def signin_3rdparty():
         abort(400, description='next_url parameter not specified')
     # Redirect destinations must be explicitly registered by an administrator.
     # Select the trusted configuration value rather than returning form input.
-    next_url = next((url for url in app.config.get('THIRD_PARTY_SIGNIN_REDIRECTS', [])
-                     if url == next_url), None)
+    next_url = trusted_signin_callback(next_url)
     if next_url is None:
         abort(400, description='Unregistered third-party redirect destination')
     if 'from_app' in request.form:

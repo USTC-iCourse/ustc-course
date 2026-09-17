@@ -30,7 +30,7 @@ click==8.3.3
 wtforms==3.0.1
 pillow==12.3.0
 MarkupSafe==2.1.2
-openai==1.30.4
+openai==3.14.1
 Flask-Limiter==3.8.0
 # for debug only
 flask-debugtoolbar==0.14.1
