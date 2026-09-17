@@ -84,3 +84,6 @@ OPENAI_API_KEY = None
 # Explicit HTTPS callback URLs for trusted third-party sign-in integrations.
 # Empty by default: administrators must register each destination.
 THIRD_PARTY_SIGNIN_REDIRECTS = []
+
+# Optional legacy callback aliases; every target must also be in the allowlist.
+THIRD_PARTY_SIGNIN_REDIRECT_ALIASES = {}

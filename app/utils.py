@@ -704,3 +704,9 @@ def print_sqlalchemy_statement(statement) -> None:
     if type(statement) == sqlalchemy.orm.Query or flask_sqlalchemy.query.Query:
         statement = statement.statement
     print(statement.compile(dialect=mysql.dialect(), compile_kwargs={"literal_binds": True}))
+
+
+def trusted_signin_callback(requested):
+    canonical = app.config.get('THIRD_PARTY_SIGNIN_REDIRECT_ALIASES', {}).get(requested, requested)
+    return next((url for url in app.config.get('THIRD_PARTY_SIGNIN_REDIRECTS', [])
+                 if url == canonical), None)
