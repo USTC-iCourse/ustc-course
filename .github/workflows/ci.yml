@@ -85,6 +85,7 @@ jobs:
           PYTHONPATH=. python tests/test_search_segment.py
           PYTHONPATH=. python tests/test_review_comment_reply.py
           PYTHONPATH=. python tests/test_signin_callbacks.py
+          PYTHONPATH=. python tests/test_turnstile.py
 
   deploy:
     name: Deploy to AGIdock
