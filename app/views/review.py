@@ -58,6 +58,18 @@ def _update_course_summary(course_id, update_immediately=False):
                 return
 
         need_summary, summary = get_summary_of_course(course)
+
+        # Summary generation is slow (external model call). Under MariaDB's
+        # innodb_snapshot_isolation (default since 11.6), an UPDATE from the
+        # transaction that read the row before another session changed it fails
+        # with "Record has changed since last read", so end the read transaction
+        # and re-fetch the row before writing.
+        session.commit()
+        course = session.get(Course, course_id)
+        if course is None:
+            session.close()
+            return
+
         if not need_summary:
             course.summary = None
             session.commit()
@@ -66,6 +78,7 @@ def _update_course_summary(course_id, update_immediately=False):
             course.summary = summary
             course.summary_update_time = datetime.utcnow()
             session.commit()
+        session.close()
 
 
 def async_update_course_summary(course, update_immediately=False):
