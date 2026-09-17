@@ -35,5 +35,5 @@ Flask-Limiter==3.8.0
 # for debug only
 flask-debugtoolbar==0.14.1
 # Runtime compatibility and shared rate-limit storage
-setuptools==80.10.2
+setuptools==83.0.0
 redis==8.1.0
