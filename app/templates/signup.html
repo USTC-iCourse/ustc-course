@@ -13,18 +13,38 @@
       </div>
 
 
+      <div id="regverify-identity" class="form-group">
+        <label class="col-sm-2 control-label">身份</label>
+        <div class="col-sm-4">
+          {% for value, label in form.email_domain.choices %}
+          <div class="radio">
+            <label>
+              <input type="radio" name="email_domain" value="{{ value }}"
+                     {% if form.email_domain.data == value %}checked{% endif %}
+                     onchange="selectDomain()"> {{ label }}
+            </label>
+          </div>
+          {% endfor %}
+          {% for info in form.errors.get('email_domain', []) %}
+            <span class="help-block">{{ info }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
       <div id="regverify-email" class="form-group">
         <label for="reginput-email" class="col-sm-2 control-label">科大邮箱</label>
         <div class="col-sm-4">
-          <input type="email" id="reginput-email" name="email" class="form-control" placeholder="*@mail.ustc.edu.cn or *@ustc.edu.cn" onchange="regverify('email')">
-          <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display:none"></span>
-          <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display:none"></span>
+          <div class="input-group">
+            <input type="text" id="reginput-email" name="email_prefix" class="form-control"
+                   value="{{ form.email_prefix.data or '' }}" placeholder="邮箱前缀"
+                   autocomplete="off" autocapitalize="off" spellcheck="false"
+                   onchange="regverify('email')">
+            <span class="input-group-addon" id="email-domain-suffix">@{{ form.email_domain.data }}</span>
+          </div>
           <span class="help-block" style="display:none"></span>
-          {% if form.errors.get('email') %}
-            {% for info in form.errors.get('email') %}
-              {{ info }}
-            {% endfor %}
-          {% endif %}
+          {% for info in form.errors.get('email_prefix', []) %}
+            <span class="help-block">{{ info }}</span>
+          {% endfor %}
         </div>
       </div>
 
@@ -103,34 +123,82 @@
 {% block script %}
 <script>
  $('#reginput-email').focus();
- function inputFeedback(elem, ok, error_msg) {
+ // The domains the suffix box can show, longest first so that a pasted
+ // address ending in mail.ustc.edu.cn is not matched as ustc.edu.cn.
+ var EMAIL_DOMAINS = ['mail.ustc.edu.cn', 'ustc.edu.cn'];
+
+ // 'success', 'warning' or 'error'.  A warning is the case this form exists
+ // for: the address is well-formed and free, and still probably not the one
+ // the person meant.
+ function setFieldState(elem, state, msg) {
    elem.find('.form-control-feedback').hide();
-   if (ok) {
-     elem.attr('class', 'form-group has-success has-feedback');
+   elem.attr('class', 'form-group has-feedback has-' + state);
+   if (state === 'success') {
      elem.find('.glyphicon-ok').show();
-     elem.find('.help-block').hide();
-   } else {
-     elem.attr('class', 'form-group has-error has-feedback');
-     elem.find('.help-block').text(error_msg);
-     elem.find('.help-block').show();
+   } else if (state === 'error') {
      elem.find('.glyphicon-remove').show();
+   }
+   if (msg) {
+     elem.find('.help-block').first().text(msg).show();
+   } else {
+     elem.find('.help-block').first().hide();
+   }
+ }
+ function inputFeedback(elem, ok, error_msg) {
+   setFieldState(elem, ok ? 'success' : 'error', ok ? '' : error_msg);
+ }
+ function selectedDomain() {
+   return $('input[name=email_domain]:checked').val();
+ }
+ function selectDomain() {
+   $('#email-domain-suffix').text('@' + selectedDomain());
+   if ($('#reginput-email').val()) {
+     regverify('email');
+   }
+ }
+ // Someone who types the whole address out of habit should not be told off
+ // for it: split it, move the radio to the domain they actually typed, and
+ // let the verification below say whether that domain makes sense for them.
+ function splitPastedAddress() {
+   var value = $('#reginput-email').val() || '';
+   var at = value.indexOf('@');
+   if (at < 0) {
+     return;
+   }
+   var domain = value.slice(at + 1).trim().toLowerCase();
+   for (var i = 0; i < EMAIL_DOMAINS.length; i++) {
+     if (domain === EMAIL_DOMAINS[i]) {
+       $('#reginput-email').val(value.slice(0, at).trim());
+       $('input[name=email_domain][value="' + EMAIL_DOMAINS[i] + '"]').prop('checked', true);
+       $('#email-domain-suffix').text('@' + EMAIL_DOMAINS[i]);
+       return;
+     }
    }
  }
  function regverify(name) {
+   var data = { name: name, value: $('#reginput-' + name).val() };
+   if (name === 'email') {
+     splitPastedAddress();
+     data.value = $('#reginput-email').val();
+     data.domain = selectedDomain();
+   }
    $.ajax({
      type: "get",
      url: "{{ url_for('api.reg_verify') }}",
      async: true,
-     data: {
-       name: name,
-       value: $('#reginput-' + name).val(),
-     },
-     success: function(data) {
-       elem = $('#regverify-' + name);
-       inputFeedback(elem, (data == 'OK'), data);
+     data: data,
+     success: function(res) {
+       var elem = $('#regverify-' + name);
+       if (!res.ok) {
+         setFieldState(elem, 'error', res.message);
+       } else if (res.warning) {
+         setFieldState(elem, 'warning', res.warning);
+       } else {
+         setFieldState(elem, 'success', '');
+       }
      },
      error: function(xhr) {
-       elem = $('#regverify-' + name);
+       var elem = $('#regverify-' + name);
        if (xhr.status === 429) {
          inputFeedback(elem, false, '请求过于频繁，请稍后再试');
        } else {

@@ -2,7 +2,7 @@ from flask import Blueprint,render_template,abort,redirect,url_for,request, abor
 from app.models import *
 from app.forms import LoginForm, ProfileForm,PasswordForm
 from flask_login import login_user, current_user, login_required
-from app.utils import handle_upload, resize_avatar, sanitize, cal_validation_code, normalize_url
+from app.utils import handle_upload, resize_avatar, sanitize, cal_validation_code, normalize_url, identity_for_email
 from flask_babel import gettext as _
 import re
 
@@ -147,13 +147,9 @@ def bind_identity():
     elif identity == 'Teacher':
         return render_template('feedback.html',status=False,message=_('教师不能绑定学号！'), title='绑定学号')
     else:
-        email_suffix = current_user.email.split('@')[-1]
-        if email_suffix == 'mail.ustc.edu.cn':
-            current_user.identity = 'Student'
-            current_user.save()
-            return redirect(url_for('.bind_identity'))
-        elif email_suffix == 'ustc.edu.cn':
-            current_user.identity = 'Teacher'
+        identity = identity_for_email(current_user.email)
+        if identity:
+            current_user.identity = identity
             current_user.save()
             return redirect(url_for('.bind_identity'))
         else:

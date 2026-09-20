@@ -1,8 +1,8 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, abort, jsonify, make_response
 from flask_login import login_user, login_required, current_user, logout_user
 from app.models import User, RevokedToken, CourseRate, Review, follow_course, follow_user, SearchLog, ThirdPartySigninHistory, Announcement, PasswordResetToken
-from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm
-from app.utils import ts, send_confirm_mail, send_reset_password_mail, verify_turnstile
+from app.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, FixUnconfirmedEmailForm
+from app.utils import ts, send_confirm_mail, send_reset_password_mail, verify_turnstile, identity_for_email
 from flask_babel import gettext as _
 from datetime import datetime, timedelta
 from sqlalchemy import or_
@@ -100,11 +100,17 @@ def signin():
                     return redirect(next_url)
             elif status:
                 '''没有确认邮箱的用户'''
-                message = '请点击邮箱里的激活链接。 <a href=%s>重发激活邮件</a>' % url_for('.confirm_email',
-                    email=user.email,
-                    action='send',
-                    _external=True,
-                    _scheme='https')
+                # Show the address: someone who never got the mail because
+                # they mistyped the domain cannot tell that from a message
+                # that only offers to send it again.
+                message = '请点击发往 <b>%s</b> 的激活链接。 <a href=%s>重发激活邮件</a>，或者 <a href=%s>更正注册邮箱</a>。' % (
+                    user.email,
+                    url_for('.confirm_email',
+                        email=user.email,
+                        action='send',
+                        _external=True,
+                        _scheme='https'),
+                    url_for('.fix_email', _external=True, _scheme='https'))
                 if request.args.get('ajax'):
                     return jsonify(status=403, msg=message)
                 else:
@@ -179,25 +185,67 @@ def signup():
         if not verify_turnstile(request.form.get('cf-turnstile-response')):
             return render_template('signup.html', form=form, title='注册',
                                    error='请完成人机验证。')
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        user = User(username=username, email=email, password=password)
-        email_suffix = email.split('@')[-1]
-        if email_suffix == 'mail.ustc.edu.cn':
-            user.identity = 'Student'
-        elif email_suffix == 'ustc.edu.cn':
-            user.identity = 'Teacher'
-            ok,message = user.bind_teacher(email)
-            #TODO: deal with bind feedback
-        else:
+        email = form.email_address
+        identity = identity_for_email(email)
+        if identity is None:
             abort(403, "必须使用科大学生或教师邮箱注册")
+        user = User(username=form.username.data, email=email,
+                    password=form.password.data)
+        user.identity = identity
+        if identity == 'Teacher':
+            ok, message = user.bind_teacher(email)
+            if not ok:
+                # Not grounds for refusing: the crawled roster misses most of
+                # the staff who go on to activate an account.  Worth recording,
+                # because a run of these is what a wave of students mistyping
+                # the domain looks like from the server side.
+                app.logger.info('signup: no teacher record for %s (%s)', email, message)
         send_confirm_mail(user.email)
         user.save()
         #login_user(user)
-        '''注册完毕后显示一个需要激活的页面'''
-        return render_template('feedback.html', status=True, message=_('我们已经向您发送了激活邮件，请在邮箱中点击激活链接。如果您没有收到邮件，有可能是在垃圾箱中。'), title='注册')
+        '''注册完毕后显示一个需要激活的页面，并把地址显示出来供核对'''
+        return render_template('signup-sent.html', email=user.email, title='注册')
     return render_template('signup.html', form=form, title='注册')
+
+
+@home.route('/fix-email/', methods=['GET', 'POST'])
+@limiter.limit("5/hour", methods=["POST"])
+def fix_email():
+    '''Repair the address on an account that never received its activation mail.
+
+    See FixUnconfirmedEmailForm for why registering again is not good enough.
+    '''
+    if current_user.is_authenticated:
+        return redirect(gen_index_url())
+    form = FixUnconfirmedEmailForm()
+    error = ''
+    if form.validate_on_submit():
+        user, authenticated, confirmed = User.authenticate(
+            (form.login.data or '').strip(), form.password.data)
+        email = form.email_address
+        if not user or not authenticated or user.is_deleted:
+            error = _('用户名或密码错误！')
+        elif confirmed:
+            error = _('这个账号的邮箱已经激活过了，不需要更正。')
+        elif email == user.email:
+            error = _('新邮箱和原来的地址相同。')
+        else:
+            user.email = email
+            user.identity = identity_for_email(email)
+            if user.identity == 'Teacher':
+                user.bind_teacher(email)
+            else:
+                # A teacher row bound at signup points back at this user and
+                # would go on claiming them from the teacher profile page.
+                user._teacher_info = None
+            send_confirm_mail(email)
+            user.save()
+            return render_template('signup-sent.html', email=email, title='更正注册邮箱')
+    elif request.method == 'POST' and not form.errors:
+        # Field-level problems are shown next to their field by the template;
+        # anything left here is a failed CSRF token or a stale session.
+        error = _('表单已过期，请重新填写。')
+    return render_template('fix-email.html', form=form, error=error, title='更正注册邮箱')
 
 
 @home.route('/confirm-email/')
