@@ -1,0 +1,32 @@
+{% extends "layout-simple.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+    <h3 class="blue">激活邮件已发送</h3>
+    <hr>
+    <div class='status-message'>
+      <p>我们已经向 <b><bdi>{{ email }}</bdi></b> 发送了激活邮件，请在邮箱中点击激活链接。</p>
+      <p class="text-muted">
+        没有收到？先看一下垃圾箱，或者
+        <a href="{{ url_for('home.confirm_email', action='send', email=email) }}">重新发送</a>。
+      </p>
+
+      <div class="alert alert-info">
+        <b>上面这个地址是你自己填的，请核对一遍。</b>
+        如果它不是你真正在用的信箱——例如学生把后缀填成了
+        <code>@ustc.edu.cn</code>，而你的信箱其实是 <code>@mail.ustc.edu.cn</code>——
+        那么激活邮件永远不会到，重发多少次都一样。
+        这种情况不用重新注册，
+        <a href="{{ url_for('home.fix_email') }}">点这里更正注册邮箱</a>，
+        原来的用户名可以保留。
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{% endblock %}

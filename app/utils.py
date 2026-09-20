@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 from markupsafe import Markup
 from random import randint
 from datetime import datetime
-from app.models import ImageStore, User
+from app.models import ImageStore, Teacher, User
 import hashlib
 import os
 from lxml.html.clean import Cleaner
@@ -603,16 +603,70 @@ def validate_username(username, check_db=True):
         return ('此用户名已被他人使用！')
     return 'OK'
 
+# USTC issues @mail.ustc.edu.cn to students and @ustc.edu.cn to staff, so the
+# domain someone registers with silently declares their identity.  Nothing in a
+# single email box shows that, and a student who drops the `mail.` becomes a
+# Teacher whose activation mail goes to a mailbox that does not exist.  The
+# signup form, the identity binding and the recovery form all read the mapping
+# from here so that they cannot drift apart.
+EMAIL_DOMAIN_IDENTITY = {
+    'mail.ustc.edu.cn': 'Student',
+    'ustc.edu.cn': 'Teacher',
+}
+
+EMAIL_LOCAL_CHARS = frozenset(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!#$%&'*+/=?^_`{|}~-")
+
+
+def identity_for_email(email):
+    '''The identity a USTC address implies, or None if the domain is not ours.'''
+    return EMAIL_DOMAIN_IDENTITY.get(email.rpartition('@')[2].lower())
+
+
 def validate_email(email):
     local, separator, domain = email.rpartition('@')
-    allowed = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!#$%&'*+/=?^_`{|}~-")
     if (not separator or not local or len(email) > 254 or len(local) > 64
-            or domain not in {'ustc.edu.cn', 'mail.ustc.edu.cn'}
-            or any(char not in allowed for char in local)):
+            or domain not in EMAIL_DOMAIN_IDENTITY
+            or any(char not in EMAIL_LOCAL_CHARS for char in local)):
         return ('必须使用科大邮箱注册!')
     if User.query.filter_by(email=email).first():
         return ('此邮件地址已被注册！')
     return 'OK'
+
+
+def validate_email_parts(prefix, domain):
+    '''Validate the two halves of the address the signup form now collects.
+
+    The prefix box exists so that the domain cannot be mistyped; a prefix that
+    still carries an @ is someone pasting a whole address into it, which is
+    worth saying plainly rather than reporting as a malformed mailbox.
+    '''
+    prefix = (prefix or '').strip()
+    if not prefix:
+        return ('请填写邮箱前缀！')
+    if '@' in prefix:
+        return ('这里只填 @ 前面的部分，后缀请用左边的身份选项切换。')
+    if domain not in EMAIL_DOMAIN_IDENTITY:
+        return ('必须使用科大邮箱注册!')
+    return validate_email(prefix + '@' + domain)
+
+
+def email_identity_warning(email):
+    '''A non-blocking second opinion on a @ustc.edu.cn registration.
+
+    That domain makes the account a teacher, and the overwhelming majority of
+    the addresses registered with it and then never activated belong to
+    students who dropped the `mail.`.  The crawled teacher roster is the only
+    evidence available at signup time and it is badly incomplete -- most of the
+    staff who do go on to activate an account are missing from it -- so a miss
+    earns a warning and never a rejection.
+    '''
+    if identity_for_email(email) != 'Teacher':
+        return None
+    if Teacher.query.filter_by(email=email).first():
+        return None
+    return ('这个地址不在教师名录里。学生请把身份改成「学生」，用 @mail.ustc.edu.cn，'
+            '否则激活邮件会发到一个不存在的信箱。')
 
 @app.template_filter('text')
 def text(html_string):

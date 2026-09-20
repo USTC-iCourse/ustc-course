@@ -1,0 +1,110 @@
+{% extends "layout-simple.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row float-element">
+
+    {% if error %}
+    <div class="row">
+      <div class="alert alert-danger col-sm-6" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        {{ error }}
+      </div>
+    </div>
+    {% endif %}
+
+    <h3 class="blue">更正注册邮箱</h3>
+    <hr>
+
+    <p class="text-muted">
+      如果注册时邮箱填错了（最常见的是学生漏掉了 <code>mail.</code>，
+      填成 <code>@ustc.edu.cn</code>），激活邮件会发到一个不存在的信箱。
+      在这里填上原来的用户名和密码，就能把地址改过来，用户名不用换。
+      <br>
+      只有<b>尚未激活</b>的账号可以这样更正；已经激活的账号请联系管理员。
+    </p>
+
+    <form class="form-horizontal" method="post" action="{{ url_for('home.fix_email') }}">
+      {{ form.csrf_token }}
+
+      <div class="form-group">
+        <label for="input-login" class="col-sm-2 control-label">原用户名或邮箱</label>
+        <div class="col-sm-4">
+          <input type="text" id="input-login" name="login" class="form-control"
+                 value="{{ form.login.data or '' }}" placeholder="注册时用的用户名或邮箱"
+                 autocomplete="off">
+          {% for info in form.errors.get('login', []) %}
+            <span class="help-block">{{ info }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="input-password" class="col-sm-2 control-label">密码</label>
+        <div class="col-sm-4">
+          <input type="password" id="input-password" name="password" class="form-control"
+                 placeholder="Password">
+          {% for info in form.errors.get('password', []) %}
+            <span class="help-block">{{ info }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">身份</label>
+        <div class="col-sm-4">
+          {% for value, label in form.email_domain.choices %}
+          <div class="radio">
+            <label>
+              <input type="radio" name="email_domain" value="{{ value }}"
+                     {% if form.email_domain.data == value %}checked{% endif %}
+                     onchange="selectDomain()"> {{ label }}
+            </label>
+          </div>
+          {% endfor %}
+          {% for info in form.errors.get('email_domain', []) %}
+            <span class="help-block">{{ info }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="input-email-prefix" class="col-sm-2 control-label">正确的邮箱</label>
+        <div class="col-sm-4">
+          <div class="input-group">
+            <input type="text" id="input-email-prefix" name="email_prefix" class="form-control"
+                   value="{{ form.email_prefix.data or '' }}" placeholder="邮箱前缀"
+                   autocomplete="off" autocapitalize="off" spellcheck="false">
+            <span class="input-group-addon" id="email-domain-suffix">@{{ form.email_domain.data }}</span>
+          </div>
+          {% for info in form.errors.get('email_prefix', []) %}
+            <span class="help-block">{{ info }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-4">
+          <button type="submit" class="btn btn-blue btn-block">发送激活邮件到新地址</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="row ud-pd-md">
+      <div class="col-sm-offset-2 col-sm-4">
+        <span class="text-muted"><a href="{{ url_for('home.signin') }}">返回登录</a></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+ function selectDomain() {
+   $('#email-domain-suffix').text('@' + $('input[name=email_domain]:checked').val());
+ }
+ $('#input-login').focus();
+</script>
+{% endblock %}

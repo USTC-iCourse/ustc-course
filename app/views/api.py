@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from app.models import Review, ReviewComment, User, Course, ImageStore, Notification
 from app.models import ReviewCommentHistory, ThirdPartySigninHistory
 from app.forms import ReviewCommentForm
-from app.utils import rand_str, handle_upload, validate_username, validate_email, strip_hidden_chars, trusted_signin_callback
+from app.utils import rand_str, handle_upload, validate_username, validate_email_parts, email_identity_warning, strip_hidden_chars, trusted_signin_callback
 from app.utils import editor_parse_at
 from app.utils import send_block_review_email, send_unblock_review_email
 from app.utils import send_review_author_profile_email
@@ -321,13 +321,26 @@ def upload_file():
 @api.route('/reg_verify', methods=['GET'])
 @limiter.limit("20/minute")
 def reg_verify():
+    '''Live feedback for the signup form.
+
+    Answers in three levels rather than two: an address can be perfectly valid
+    and still be the wrong one, which is the whole failure this endpoint now
+    exists to catch.  See utils.email_identity_warning.
+    '''
     name = request.args.get('name')
-    value = request.args.get('value')
+    value = request.args.get('value', '')
 
     if name == 'username':
-        return validate_username(value)
+        result = validate_username(value)
+        return jsonify(ok=(result == 'OK'),
+                       message='' if result == 'OK' else result)
     elif name == 'email':
-        return validate_email(value)
+        domain = request.args.get('domain', '')
+        result = validate_email_parts(value, domain)
+        if result != 'OK':
+            return jsonify(ok=False, message=result)
+        warning = email_identity_warning(value.strip() + '@' + domain)
+        return jsonify(ok=True, message='', warning=warning or '')
     return 'Invalid Request', 400
 
 @api.route('/notifications/', methods=['POST'])
