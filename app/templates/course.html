@@ -654,4 +654,5 @@
 
 {% block script %}
 {% include 'scripts/course-ajax.html' %}
+<script src="{{ url_for('static', filename='js/course-materials.js') }}" data-cache-scope="{% if current_user.is_authenticated %}user:{{ current_user.id }}:{{ current_user.identity }}:{{ current_user.is_admin|int }}{% else %}anonymous{% endif %}"></script>
 {% endblock %}
