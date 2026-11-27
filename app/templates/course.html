@@ -221,6 +221,11 @@
         <div class="ud-pd-sm">
           <strong>课程主页</strong>：{% if course.homepage and course.homepage != 'http://' %}<a href="{{ course.homepage }}">{{ course.homepage }}</a>{% else %}暂无（如果你知道，劳烦告诉我们！）{% endif %}
         </div>
+        <div class="ud-pd-sm yexi-course-materials" style="display:none"
+             data-yexi-course-slot="detail"
+             data-course-code="{{ course.latest_term.code if course.latest_term and course.latest_term.code else '' }}"
+             data-course-series="{{ course.latest_term.courseries if course.latest_term and course.latest_term.courseries else '' }}">
+        </div>
 
         <div id="action-btn-group" class="ud-pd-md" style="display:none">
           <button class="btn btn-white btn-flat btn-follow btn-do"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span> 关注 <small>(<span class="count"></span>)</small></button>

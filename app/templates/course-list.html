@@ -13,6 +13,10 @@
       {% if course.reviewed %}
       <span class="label label-success">已点评</span>
       {% endif %}
+      <span class="yexi-course-materials-badge" style="display:none"
+            data-yexi-course-slot="list"
+            data-course-code="{{ course.latest_term.code if course.latest_term and course.latest_term.code else '' }}"
+            data-course-series="{{ course.latest_term.courseries if course.latest_term and course.latest_term.courseries else '' }}"></span>
 
       <span class="small text-muted">{{ course.term_ids|term_display_one }}</span>
 
