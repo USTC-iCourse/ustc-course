@@ -100,6 +100,13 @@ test('extractResourceCodes filters has_resources=true and deduplicates', () => {
   assert.deepEqual(codes, ['001046', 'PHYS1008B+']);
 });
 
+test('extractResourceCount handles valid, empty, and malformed payloads', () => {
+  assert.equal(yexi.extractResourceCount({ resources: [{ id: 1 }, { id: 2 }] }), 2);
+  assert.equal(yexi.extractResourceCount({ resources: [] }), null);
+  assert.equal(yexi.extractResourceCount({}), null);
+  assert.equal(yexi.extractResourceCount(null), null);
+});
+
 test('resolveCourseCode matches short code and courseries variants', () => {
   const codeMap = yexi.buildCodeMap(['001046', 'STAT2002', 'CS1001A', 'PHYS1008B+']);
 
@@ -111,10 +118,18 @@ test('resolveCourseCode matches short code and courseries variants', () => {
   assert.equal(yexi.resolveCourseCode(codeMap, '', 'UNKNOWN01'), null);
 });
 
-test('buildCourseUrl encodes special characters like plus sign', () => {
+test('buildCourseUrl and buildCourseDataUrl encode special characters properly', () => {
   assert.equal(
     yexi.buildCourseUrl('PHYS1008B+'),
     'https://twinjades.github.io/USTC_Study_Materials_Navigation/course.html?code=PHYS1008B%2B'
+  );
+  assert.equal(
+    yexi.buildCourseDataUrl('001046'),
+    'https://twinjades.github.io/USTC_Study_Materials_Navigation/data/agent/courses/001046.json'
+  );
+  assert.equal(
+    yexi.buildCourseDataUrl('PHYS1008B+'),
+    'https://twinjades.github.io/USTC_Study_Materials_Navigation/data/agent/courses/PHYS1008B%252B.json'
   );
 });
 
@@ -132,12 +147,15 @@ test('initYexiBookshelf exits without fetching when page has no slots', async ()
   assert.equal(fetchCalls, 0);
 });
 
-test('initYexiBookshelf renders detail and list slots from fresh cache without network', async () => {
+test('initYexiBookshelf renders detail with count from fresh caches without network', async () => {
   const now = 1_700_000_000_000;
   const storage = createMemoryStorage({
     [yexi.CACHE_KEY]: JSON.stringify({
       fetchedAt: now - 1000,
       codes: ['001046', 'PHYS1008B+'],
+    }),
+    [yexi.COUNT_CACHE_KEY]: JSON.stringify({
+      '001046': { count: 7, fetchedAt: now - 1000 },
     }),
   });
   const detailHit = createSlot('detail', '', '00104601');
@@ -161,6 +179,7 @@ test('initYexiBookshelf renders detail and list slots from fresh cache without n
   assert.equal(detailHit.style.display, '');
   const detailLink = detailHit.children.find((c) => c.tagName === 'A');
   assert.ok(detailLink);
+  assert.equal(detailLink.textContent.trim(), '也西书架（7）');
   assert.equal(
     detailLink.getAttribute('href'),
     'https://twinjades.github.io/USTC_Study_Materials_Navigation/course.html?code=001046'
@@ -181,41 +200,105 @@ test('initYexiBookshelf renders detail and list slots from fresh cache without n
   assert.equal(listMiss.children.length, 0);
 });
 
-test('initYexiBookshelf fetches index on cache miss and caches only resource courses', async () => {
+test('initYexiBookshelf fetches index and course resource count on cache miss', async () => {
   const now = 1_700_000_000_000;
   const storage = createMemoryStorage();
   const detailSlot = createSlot('detail', '', 'STAT200202');
   const doc = createFakeDocument([detailSlot]);
 
-  let fetchCount = 0;
+  const requestedUrls = [];
   const rendered = await yexi.initYexiBookshelf(doc, {
     now: () => now,
     storage,
     fetch: async (url, init) => {
-      fetchCount++;
-      assert.equal(url, yexi.INDEX_URL);
+      requestedUrls.push(url);
       assert.equal(init.credentials, 'omit');
-      return {
-        ok: true,
-        json: async () => ({
-          schema_version: 1,
-          courses: [
-            { code: 'STAT2002', name: '概率论与数理统计', has_resources: true },
-            { code: 'EMPTY01', name: '无资料', has_resources: false },
-          ],
-        }),
-      };
+      if (url === yexi.INDEX_URL) {
+        return {
+          ok: true,
+          json: async () => ({
+            schema_version: 1,
+            courses: [
+              { code: 'STAT2002', name: '概率论与数理统计', has_resources: true },
+              { code: 'EMPTY01', name: '无资料', has_resources: false },
+            ],
+          }),
+        };
+      }
+      if (url === yexi.buildCourseDataUrl('STAT2002')) {
+        return {
+          ok: true,
+          json: async () => ({
+            schema_version: 1,
+            code: 'STAT2002',
+            resources: new Array(62).fill({ id: 'x' }),
+          }),
+        };
+      }
+      throw new Error('unexpected url: ' + url);
     },
   });
 
-  assert.equal(fetchCount, 1);
+  assert.deepEqual(requestedUrls, [yexi.INDEX_URL, yexi.buildCourseDataUrl('STAT2002')]);
   assert.equal(rendered, 1);
   assert.equal(detailSlot.style.display, '');
-  const cached = JSON.parse(storage.getItem(yexi.CACHE_KEY));
-  assert.deepEqual(cached, { fetchedAt: now, codes: ['STAT2002'] });
+  const detailLink = detailSlot.children.find((c) => c.tagName === 'A');
+  assert.equal(detailLink.textContent.trim(), '也西书架（62）');
+
+  const cachedIndex = JSON.parse(storage.getItem(yexi.CACHE_KEY));
+  assert.deepEqual(cachedIndex, { fetchedAt: now, codes: ['STAT2002'] });
+  const cachedCounts = JSON.parse(storage.getItem(yexi.COUNT_CACHE_KEY));
+  assert.deepEqual(cachedCounts, { STAT2002: { count: 62, fetchedAt: now } });
 });
 
-test('initYexiBookshelf falls back to stale cache or degrades silently on fetch failure', async () => {
+test('initYexiBookshelf does not fetch per-course JSON for list-only pages', async () => {
+  const now = 1_700_000_000_000;
+  const storage = createMemoryStorage({
+    [yexi.CACHE_KEY]: JSON.stringify({
+      fetchedAt: now - 1000,
+      codes: ['001046', 'STAT2002'],
+    }),
+  });
+  const doc = createFakeDocument([
+    createSlot('list', '', '00104601'),
+    createSlot('list', '', 'STAT200202'),
+  ]);
+  let fetchCalls = 0;
+  const rendered = await yexi.initYexiBookshelf(doc, {
+    now: () => now,
+    storage,
+    fetch: async () => {
+      fetchCalls++;
+      throw new Error('list slots should not fetch per-course JSON');
+    },
+  });
+  assert.equal(rendered, 2);
+  assert.equal(fetchCalls, 0);
+});
+
+test('initYexiBookshelf keeps detail link without count when count fetch fails', async () => {
+  const now = 1_700_000_000_000;
+  const storage = createMemoryStorage({
+    [yexi.CACHE_KEY]: JSON.stringify({
+      fetchedAt: now - 1000,
+      codes: ['001046'],
+    }),
+  });
+  const detailSlot = createSlot('detail', '', '00104601');
+  const rendered = await yexi.initYexiBookshelf(createFakeDocument([detailSlot]), {
+    now: () => now,
+    storage,
+    fetch: async () => ({ ok: false, status: 503 }),
+  });
+  assert.equal(rendered, 1);
+  assert.equal(detailSlot.style.display, '');
+  const detailLink = detailSlot.children.find((c) => c.tagName === 'A');
+  assert.equal(detailLink.textContent.trim(), '也西书架');
+  assert.equal(detailLink.getAttribute('target'), '_blank');
+  assert.equal(detailLink.getAttribute('rel'), 'noopener noreferrer');
+});
+
+test('initYexiBookshelf falls back to stale cache or degrades silently on index fetch failure', async () => {
   const now = 1_700_000_000_000;
   const staleStorage = createMemoryStorage({
     [yexi.CACHE_KEY]: JSON.stringify({

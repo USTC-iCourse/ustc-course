@@ -9,7 +9,9 @@
 
   var SITE_BASE = 'https://twinjades.github.io/USTC_Study_Materials_Navigation/';
   var INDEX_URL = SITE_BASE + 'data/agent/index.json';
+  var COURSE_DATA_BASE = SITE_BASE + 'data/agent/courses/';
   var CACHE_KEY = 'icourse:yexi-bookshelf-index:v1';
+  var COUNT_CACHE_KEY = 'icourse:yexi-bookshelf-counts:v1';
   var CACHE_TTL_MS = 6 * 60 * 60 * 1000;
   var STALE_FALLBACK_MS = 7 * 24 * 60 * 60 * 1000;
   var FETCH_TIMEOUT_MS = 8000;
@@ -39,6 +41,16 @@
       }
     }
     return codes;
+  }
+
+  /**
+   * Extract positive resource count from a single-course agent JSON payload.
+   */
+  function extractResourceCount(payload) {
+    if (!payload || !Array.isArray(payload.resources) || payload.resources.length <= 0) {
+      return null;
+    }
+    return payload.resources.length;
   }
 
   /**
@@ -108,6 +120,10 @@
     return SITE_BASE + 'course.html?code=' + encodeURIComponent(code);
   }
 
+  function buildCourseDataUrl(code) {
+    return COURSE_DATA_BASE + encodeURIComponent(encodeURIComponent(code)) + '.json';
+  }
+
   function clearElement(el) {
     while (el.firstChild) {
       el.removeChild(el.firstChild);
@@ -117,7 +133,7 @@
   /**
    * Populate and reveal a course slot element using safe DOM APIs.
    */
-  function renderSlot(slotEl, matchedCode, doc) {
+  function renderSlot(slotEl, matchedCode, doc, resourceCount) {
     if (!slotEl || !matchedCode || !doc) {
       return false;
     }
@@ -141,7 +157,11 @@
       bookIcon.setAttribute('aria-hidden', 'true');
       link.appendChild(bookIcon);
 
-      link.appendChild(doc.createTextNode(' 前往也西书架查看该课程学习资料 '));
+      var textLabel =
+        typeof resourceCount === 'number' && resourceCount > 0
+          ? ' 也西书架（' + resourceCount + '） '
+          : ' 也西书架 ';
+      link.appendChild(doc.createTextNode(textLabel));
 
       var extIcon = doc.createElement('span');
       extIcon.setAttribute('class', 'glyphicon glyphicon-new-window');
@@ -172,12 +192,12 @@
     return false;
   }
 
-  function renderAllSlots(doc, codeMap) {
+  function collectMatchedSlots(doc, codeMap) {
     if (!doc || typeof doc.querySelectorAll !== 'function') {
-      return 0;
+      return [];
     }
     var slots = doc.querySelectorAll('[data-yexi-course-slot]');
-    var rendered = 0;
+    var matched = [];
     for (var i = 0; i < slots.length; i++) {
       var slot = slots[i];
       var code = resolveCourseCode(
@@ -186,10 +206,14 @@
         slot.getAttribute('data-course-series')
       );
       if (code && renderSlot(slot, code, doc)) {
-        rendered++;
+        matched.push({ slot: slot, code: code });
       }
     }
-    return rendered;
+    return matched;
+  }
+
+  function renderAllSlots(doc, codeMap) {
+    return collectMatchedSlots(doc, codeMap).length;
   }
 
   function readCache(storage, now) {
@@ -233,6 +257,70 @@
     }
   }
 
+  function readCountCacheMap(storage) {
+    if (!storage || typeof storage.getItem !== 'function') {
+      return {};
+    }
+    try {
+      var raw = storage.getItem(COUNT_CACHE_KEY);
+      if (!raw) {
+        return {};
+      }
+      var parsed = JSON.parse(raw);
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function readCountCache(storage, code, now) {
+    var map = readCountCacheMap(storage);
+    var entry = Object.prototype.hasOwnProperty.call(map, code) ? map[code] : null;
+    if (
+      !entry ||
+      typeof entry.count !== 'number' ||
+      entry.count <= 0 ||
+      typeof entry.fetchedAt !== 'number'
+    ) {
+      return null;
+    }
+    var age = now - entry.fetchedAt;
+    if (age < 0 || age > STALE_FALLBACK_MS) {
+      return null;
+    }
+    return {
+      count: entry.count,
+      isFresh: age < CACHE_TTL_MS,
+    };
+  }
+
+  function writeCountCache(storage, code, count, now) {
+    if (!storage || typeof storage.setItem !== 'function' || typeof count !== 'number' || count <= 0) {
+      return;
+    }
+    try {
+      var map = readCountCacheMap(storage);
+      var pruned = {};
+      var keys = Object.keys(map);
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        var item = map[k];
+        if (
+          item &&
+          typeof item.fetchedAt === 'number' &&
+          now - item.fetchedAt >= 0 &&
+          now - item.fetchedAt <= STALE_FALLBACK_MS
+        ) {
+          pruned[k] = item;
+        }
+      }
+      pruned[code] = { count: count, fetchedAt: now };
+      storage.setItem(COUNT_CACHE_KEY, JSON.stringify(pruned));
+    } catch (e) {
+      // Ignore quota / privacy-mode storage errors.
+    }
+  }
+
   function fetchJsonWithTimeout(fetchFn, url, timeoutMs) {
     var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     var timer = null;
@@ -253,7 +341,7 @@
       })
       .then(function (res) {
         if (!res || !res.ok) {
-          throw new Error('Failed to load Yexi Bookshelf index');
+          throw new Error('Failed to load Yexi Bookshelf JSON');
         }
         return res.json();
       })
@@ -264,44 +352,79 @@
       });
   }
 
+  function resolveRuntimeOptions(options) {
+    var opts = options || {};
+    return {
+      now: typeof opts.now === 'function' ? opts.now() : Date.now(),
+      storage:
+        'storage' in opts
+          ? opts.storage
+          : typeof window !== 'undefined'
+            ? window.localStorage
+            : null,
+      fetchFn:
+        'fetch' in opts
+          ? opts.fetch
+          : typeof fetch === 'function'
+            ? fetch
+            : null,
+      indexUrl: opts.indexUrl || INDEX_URL,
+      courseDataUrlFor: opts.courseDataUrlFor || buildCourseDataUrl,
+      timeoutMs: typeof opts.timeoutMs === 'number' ? opts.timeoutMs : FETCH_TIMEOUT_MS,
+    };
+  }
+
   /**
    * Load resource course codes from localStorage cache or network, with stale-cache fallback.
    */
   function loadResourceCodes(options) {
-    var opts = options || {};
-    var now = typeof opts.now === 'function' ? opts.now() : Date.now();
-    var storage =
-      'storage' in opts
-        ? opts.storage
-        : typeof window !== 'undefined'
-          ? window.localStorage
-          : null;
-    var fetchFn =
-      'fetch' in opts
-        ? opts.fetch
-        : typeof fetch === 'function'
-          ? fetch
-          : null;
-    var indexUrl = opts.indexUrl || INDEX_URL;
-    var timeoutMs = typeof opts.timeoutMs === 'number' ? opts.timeoutMs : FETCH_TIMEOUT_MS;
-
-    var cached = readCache(storage, now);
+    var rt = resolveRuntimeOptions(options);
+    var cached = readCache(rt.storage, rt.now);
     if (cached && cached.isFresh) {
       return Promise.resolve(cached.codes);
     }
 
-    if (typeof fetchFn !== 'function') {
+    if (typeof rt.fetchFn !== 'function') {
       return Promise.resolve(cached ? cached.codes : []);
     }
 
-    return fetchJsonWithTimeout(fetchFn, indexUrl, timeoutMs)
+    return fetchJsonWithTimeout(rt.fetchFn, rt.indexUrl, rt.timeoutMs)
       .then(function (payload) {
         var codes = extractResourceCodes(payload);
-        writeCache(storage, codes, now);
+        writeCache(rt.storage, codes, rt.now);
         return codes;
       })
       .catch(function () {
         return cached ? cached.codes : [];
+      });
+  }
+
+  /**
+   * Load the resource count for a single course from cache or its agent JSON file.
+   */
+  function loadCourseResourceCount(code, options) {
+    if (!code) {
+      return Promise.resolve(null);
+    }
+    var rt = resolveRuntimeOptions(options);
+    var cached = readCountCache(rt.storage, code, rt.now);
+    if (cached && cached.isFresh) {
+      return Promise.resolve(cached.count);
+    }
+    if (typeof rt.fetchFn !== 'function') {
+      return Promise.resolve(cached ? cached.count : null);
+    }
+
+    return fetchJsonWithTimeout(rt.fetchFn, rt.courseDataUrlFor(code), rt.timeoutMs)
+      .then(function (payload) {
+        var count = extractResourceCount(payload);
+        if (count !== null) {
+          writeCountCache(rt.storage, code, count, rt.now);
+        }
+        return count;
+      })
+      .catch(function () {
+        return cached ? cached.count : null;
       });
   }
 
@@ -319,7 +442,29 @@
         if (!codes || codes.length === 0) {
           return 0;
         }
-        return renderAllSlots(targetDoc, buildCodeMap(codes));
+        var matched = collectMatchedSlots(targetDoc, buildCodeMap(codes));
+        var detailUpdates = [];
+        for (var i = 0; i < matched.length; i++) {
+          (function (entry) {
+            if (entry.slot.getAttribute('data-yexi-course-slot') !== 'detail') {
+              return;
+            }
+            detailUpdates.push(
+              loadCourseResourceCount(entry.code, options)
+                .then(function (count) {
+                  if (typeof count === 'number' && count > 0) {
+                    renderSlot(entry.slot, entry.code, targetDoc, count);
+                  }
+                })
+                .catch(function () {
+                  // Keep base detail link without count on error.
+                })
+            );
+          })(matched[i]);
+        }
+        return Promise.all(detailUpdates).then(function () {
+          return matched.length;
+        });
       })
       .catch(function () {
         return 0;
@@ -339,16 +484,21 @@
   return {
     SITE_BASE: SITE_BASE,
     INDEX_URL: INDEX_URL,
+    COURSE_DATA_BASE: COURSE_DATA_BASE,
     CACHE_KEY: CACHE_KEY,
+    COUNT_CACHE_KEY: COUNT_CACHE_KEY,
     CACHE_TTL_MS: CACHE_TTL_MS,
     STALE_FALLBACK_MS: STALE_FALLBACK_MS,
     extractResourceCodes: extractResourceCodes,
+    extractResourceCount: extractResourceCount,
     buildCodeMap: buildCodeMap,
     resolveCourseCode: resolveCourseCode,
     buildCourseUrl: buildCourseUrl,
+    buildCourseDataUrl: buildCourseDataUrl,
     renderSlot: renderSlot,
     renderAllSlots: renderAllSlots,
     loadResourceCodes: loadResourceCodes,
+    loadCourseResourceCount: loadCourseResourceCount,
     initYexiBookshelf: initYexiBookshelf,
   };
 });
