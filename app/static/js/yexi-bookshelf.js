@@ -159,7 +159,7 @@
 
       var textLabel =
         typeof resourceCount === 'number' && resourceCount > 0
-          ? ' 也西书架（' + resourceCount + '） '
+          ? ' 也西书架(' + resourceCount + ') '
           : ' 也西书架 ';
       link.appendChild(doc.createTextNode(textLabel));
 

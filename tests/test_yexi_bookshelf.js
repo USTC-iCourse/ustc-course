@@ -179,7 +179,7 @@ test('initYexiBookshelf renders detail with count from fresh caches without netw
   assert.equal(detailHit.style.display, '');
   const detailLink = detailHit.children.find((c) => c.tagName === 'A');
   assert.ok(detailLink);
-  assert.equal(detailLink.textContent.trim(), '也西书架（7）');
+  assert.equal(detailLink.textContent.trim(), '也西书架(7)');
   assert.equal(
     detailLink.getAttribute('href'),
     'https://twinjades.github.io/USTC_Study_Materials_Navigation/course.html?code=001046'
@@ -243,7 +243,7 @@ test('initYexiBookshelf fetches index and course resource count on cache miss', 
   assert.equal(rendered, 1);
   assert.equal(detailSlot.style.display, '');
   const detailLink = detailSlot.children.find((c) => c.tagName === 'A');
-  assert.equal(detailLink.textContent.trim(), '也西书架（62）');
+  assert.equal(detailLink.textContent.trim(), '也西书架(62)');
 
   const cachedIndex = JSON.parse(storage.getItem(yexi.CACHE_KEY));
   assert.deepEqual(cachedIndex, { fetchedAt: now, codes: ['STAT2002'] });
